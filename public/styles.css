@@ -1690,14 +1690,14 @@ dd{margin:0;overflow-wrap:anywhere}
   content:"";
   position:absolute;
   z-index:-1;
-  left:-48px;
-  right:-7px;
-  bottom:-3px;
-  height:6px;
-  border-bottom:3px solid #f39a42;
+  left:4px;
+  right:2px;
+  bottom:-2px;
+  height:3px;
+  border-bottom:2px solid #f39a42;
   border-radius:50%;
-  transform:rotate(-1.5deg);
-  opacity:1;
+  transform:rotate(-1deg);
+  opacity:.8;
 }
 
 .hero-message p{
@@ -1874,11 +1874,7 @@ dd{margin:0;overflow-wrap:anywhere}
     margin-bottom:9px;
   }
 
-  .hero-message>strong>span:after{
-    left:-38px;
-    bottom:-2px;
-  }
-
+  
   .hero-message p{
     font-size:13px;
     line-height:1.65;
