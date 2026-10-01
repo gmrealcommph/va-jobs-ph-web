@@ -1,4 +1,4 @@
-export const COLUMNS = 'id,title,company,description,category,location,remote,workplace_type,source,job_url,posted_at,collected_at';
+export const COLUMNS = 'id,title,company,description,category,location,remote,workplace_type,source,job_url,posted_at,collected_at,company_logo_url';
 export const PAGE_SIZE = 15;
 
 export function config(env) {
