@@ -242,10 +242,99 @@ export function layout({ title, description, canonical, body, noindex = false })
 }
 
 export function card(job) {
-  const location = job.location || (job.remote ? 'Remote' : 'Location not specified');
-  const remoteLabel = job.workplace_type || (job.remote ? 'Remote' : '');
+  const location =
+    job.location ||
+    (job.remote ? 'Remote' : 'Location not specified');
 
-  return `<article class="job-card"><div class="company-icon" aria-hidden="true">${esc((job.company || 'J').slice(0, 1))}</div><div class="job-content"><div class="eyebrow">${esc(job.company || 'Company not specified')}</div><h2><a href="${jobPath(job)}">${esc(job.title || 'Job opportunity')}</a></h2><div class="job-meta"><span class="meta-location"><i aria-hidden="true">⌖</i>${esc(location)}</span>${remoteLabel ? `<span class="meta-remote"><i aria-hidden="true">⌁</i>${esc(remoteLabel)}</span>` : ''}</div>${job.category ? `<a class="tag" href="${categoryPath(job.category)}">${esc(job.category)}</a>` : ''}</div><div class="card-end">${date(job.posted_at) ? `<span>Posted ${date(job.posted_at)}</span>` : ''}<a class="arrow" href="${jobPath(job)}" aria-label="View ${esc(job.title)}">↗</a></div></article>`;
+  const remoteLabel =
+    job.workplace_type ||
+    (job.remote ? 'Remote' : '');
+
+  const posted = date(job.posted_at);
+
+  return `
+    <article class="job-card opportunity-card">
+
+      <div class="opportunity-card-top">
+
+        <div class="opportunity-company">
+          ${esc(job.company || 'Company not specified')}
+        </div>
+
+        ${
+          posted
+            ? `<span class="opportunity-date">
+                Posted ${posted}
+              </span>`
+            : ''
+        }
+
+      </div>
+
+
+      <h2 class="opportunity-title">
+        <a href="${jobPath(job)}">
+          ${esc(job.title || 'Job opportunity')}
+        </a>
+      </h2>
+
+
+      <div class="opportunity-meta">
+
+        <span class="opportunity-location">
+          <i aria-hidden="true">●</i>
+          ${esc(location)}
+        </span>
+
+        ${
+          remoteLabel
+            ? `<span class="opportunity-remote">
+                <i aria-hidden="true">⌁</i>
+                ${esc(remoteLabel)}
+              </span>`
+            : ''
+        }
+
+      </div>
+
+
+      <div class="opportunity-card-bottom">
+
+        ${
+          job.category
+            ? `<a
+                class="opportunity-category"
+                href="${categoryPath(job.category)}"
+              >
+                ${esc(job.category)}
+              </a>`
+            : '<span></span>'
+        }
+
+
+        <div class="opportunity-launch">
+
+          <span
+            class="opportunity-flight-path"
+            aria-hidden="true"
+          >
+            · · · ·
+          </span>
+
+          <a
+            class="opportunity-arrow"
+            href="${jobPath(job)}"
+            aria-label="View ${esc(job.title || 'job opportunity')}"
+          >
+            ↗
+          </a>
+
+        </div>
+
+      </div>
+
+    </article>
+  `;
 }
 
 export function searchForm(search = '', category = '', action = '/') {
