@@ -1732,3 +1732,84 @@ dd{margin:0;overflow-wrap:anywhere}
     line-height:1.6;
   }
 }
+
+/* Refined VeeAys hero supporting message */
+.hero-message{
+  max-width:510px;
+  margin:2px 0 24px;
+}
+
+.hero-message>strong{
+  display:block;
+  color:#fffdf3;
+  font-family:'Trebuchet MS',Arial,sans-serif;
+  font-size:20px;
+  line-height:1.35;
+  font-weight:700;
+  letter-spacing:-.35px;
+  margin-bottom:11px;
+}
+
+.hero-message>strong>span{
+  position:relative;
+  display:inline-block;
+  z-index:1;
+}
+
+/* More visible hand-drawn orange stroke */
+.hero-message>strong>span:after{
+  content:"";
+  position:absolute;
+  z-index:-1;
+
+  left:-48px;
+  right:-7px;
+  bottom:-3px;
+
+  height:6px;
+
+  border-bottom:3px solid #f39a42;
+  border-radius:50%;
+
+  transform:rotate(-1.5deg);
+  opacity:1;
+}
+
+.hero-message p{
+  max-width:490px;
+  margin:0;
+  color:#cbd9ce;
+  font-size:14px;
+  line-height:1.75;
+}
+
+@media(max-width:850px){
+  .hero-message>strong{
+    font-size:18px;
+  }
+
+  .hero-message p{
+    font-size:13px;
+  }
+}
+
+@media(max-width:600px){
+  .hero-message{
+    margin-bottom:20px;
+  }
+
+  .hero-message>strong{
+    font-size:17px;
+    margin-bottom:9px;
+  }
+
+  .hero-message>strong>span:after{
+    left:-38px;
+    bottom:-2px;
+  }
+
+  .hero-message p{
+    font-size:13px;
+    line-height:1.65;
+  }
+}
