@@ -361,23 +361,7 @@ if (
         !allowedTypes.has(
           contentType
         )
-      ) {
-        console.error(
-          'Unexpected company logo type:',
-          contentType
-        );
-
-        return new Response(
-  `Invalid logo response: ${contentType}`,
-          {
-            status: 502,
-            headers: {
-              'cache-control':
-                'public, max-age=60'
-            }
-          }
-        );
-      }
+      ) 
 
       return new Response(
         logoResponse.body,
