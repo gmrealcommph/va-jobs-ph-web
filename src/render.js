@@ -558,9 +558,7 @@ export function listing({ rows, total, page, search, category, names }) {
 
           <h2>${resultsTitle}</h2>
 
-          <p>
-            Newest listings first${page > 1 ? ` · Page ${page}` : ''}
-          </p>
+          
         </div>
 
         ${!search && !category ? `
