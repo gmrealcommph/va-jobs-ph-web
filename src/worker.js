@@ -195,8 +195,8 @@ if (
           logoUrl.pathname
         );
 
-        return new Response(
-  'Logo source not allowed',
+       return new Response(
+  `Logo source not allowed: ${logoUrl.hostname}${logoUrl.pathname}`,
   {
     status: 403,
             headers: {
