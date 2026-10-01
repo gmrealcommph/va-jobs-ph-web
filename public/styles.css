@@ -3017,3 +3017,154 @@ dd{margin:0;overflow-wrap:anywhere}
   }
 
 }
+/* =========================================================
+   VEEAYS SIMPLIFIED FINAL CTA + FOOTER
+   ========================================================= */
+
+/* Cleaner closing CTA */
+.final-cta{
+  padding-top:82px;
+  padding-bottom:105px;
+}
+
+.final-cta-grid{
+  grid-template-columns:minmax(0,.9fr) minmax(390px,1.1fr);
+  gap:90px;
+}
+
+.final-cta-copy{
+  max-width:590px;
+}
+
+.final-cta h2{
+  font-size:clamp(46px,4.4vw,66px);
+  line-height:1;
+  letter-spacing:-3px;
+  margin-bottom:25px;
+}
+
+.final-cta h2 em{
+  color:#72ad3d;
+}
+
+.final-cta-copy>p{
+  max-width:500px;
+  margin-bottom:28px;
+  font-size:15px;
+  line-height:1.7;
+}
+
+/* Remove remnants of the old busier version */
+.final-cta-kicker,
+.final-cta-scribble{
+  display:none;
+}
+
+/* Slightly calmer primary button */
+.final-cta-primary{
+  min-height:54px;
+  padding:6px 7px 6px 22px;
+}
+
+.final-cta-primary b{
+  width:39px;
+  height:39px;
+  font-size:20px;
+}
+
+.final-cta-primary:after{
+  display:none;
+}
+
+/* Footer no longer needs space for the repeated slogan */
+.site-footer .footer-main{
+  grid-template-columns:minmax(240px,.75fr) minmax(420px,1.25fr);
+  gap:100px;
+  align-items:start;
+
+  padding-top:65px;
+  padding-bottom:48px;
+}
+
+/* Keep navigation from stretching across the whole footer */
+.site-footer .footer-links{
+  grid-template-columns:repeat(3,minmax(110px,150px));
+  justify-content:start;
+  gap:60px;
+}
+
+/* Old slogan is gone from HTML, but keep this defensive */
+.site-footer .footer-note{
+  display:none;
+}
+
+
+/* Tablet */
+@media(max-width:900px){
+
+  .final-cta-grid{
+    grid-template-columns:minmax(0,1fr) 380px;
+    gap:35px;
+  }
+
+  .site-footer .footer-main{
+    grid-template-columns:200px 1fr;
+    gap:55px;
+  }
+
+  .site-footer .footer-links{
+    gap:30px;
+  }
+
+}
+
+
+/* Mobile */
+@media(max-width:760px){
+
+  .final-cta{
+    padding-top:65px;
+    padding-bottom:95px;
+  }
+
+  .final-cta-grid{
+    display:block;
+  }
+
+  .final-cta h2{
+    font-size:clamp(42px,10vw,56px);
+    letter-spacing:-2.3px;
+  }
+
+  .final-cta-art{
+    margin-top:52px;
+  }
+
+  .site-footer .footer-main{
+    grid-template-columns:1fr;
+    gap:40px;
+
+    padding-top:55px;
+    padding-bottom:42px;
+  }
+
+  .site-footer .footer-links{
+    grid-template-columns:repeat(3,1fr);
+    gap:25px;
+  }
+
+}
+
+
+@media(max-width:520px){
+
+  .final-cta h2{
+    font-size:41px;
+  }
+
+  .site-footer .footer-links{
+    grid-template-columns:1fr 1fr;
+    gap:32px 25px;
+  }
+
+}
