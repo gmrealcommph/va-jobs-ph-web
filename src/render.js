@@ -160,9 +160,12 @@ export function listing({ rows, total, page, search, category, names }) {
 
       <div class="home-values">
         <div class="wrap">
-          <span><b>01</b> Built for Filipino talent</span>
-          <span><b>02</b> Global &amp; remote possibilities</span>
-          <span><b>03</b> Apply through the original source</span>
+          <span>Made for Filipino talent</span>
+          <i aria-hidden="true">✦</i>
+          <span>Global &amp; remote opportunities</span>
+          <i aria-hidden="true">✦</i>
+          <span>Apply directly to employers</span>
+          <b class="values-doodle" aria-hidden="true">↝</b>
         </div>
       </div>`;
 
