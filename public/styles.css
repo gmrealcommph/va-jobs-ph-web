@@ -3943,3 +3943,68 @@ dd{margin:0;overflow-wrap:anywhere}
   }
 
 }
+/* =========================================================
+   VEEAYS OPPORTUNITY CARDS — FINAL SPACING
+   ========================================================= */
+
+.home-page .job-card.opportunity-card,
+.job-card.opportunity-card{
+  min-height:155px;
+  padding-top:17px;
+  padding-bottom:15px;
+}
+
+/* Bring company/date closer to the top */
+.opportunity-card-top{
+  margin-bottom:8px;
+}
+
+/* Keep the ticket-style centered composition */
+.opportunity-company{
+  text-align:center;
+}
+
+.opportunity-date{
+  text-align:center;
+}
+
+.home-page .opportunity-title,
+.opportunity-title{
+  margin-bottom:10px;
+  text-align:center;
+}
+
+.opportunity-meta{
+  justify-content:center;
+  margin-bottom:13px;
+}
+
+/* Keep category + launch button anchored at the bottom */
+.opportunity-card-bottom{
+  margin-top:auto;
+}
+
+
+/* Tablet */
+@media(max-width:1050px){
+
+  .home-page .job-card.opportunity-card,
+  .job-card.opportunity-card{
+    min-height:155px;
+    padding-top:16px;
+    padding-bottom:14px;
+  }
+
+}
+
+
+/* Mobile gets a little more breathing room */
+@media(max-width:700px){
+
+  .home-page .job-card.opportunity-card,
+  .job-card.opportunity-card{
+    min-height:160px;
+    padding:18px;
+  }
+
+}
