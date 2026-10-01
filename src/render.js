@@ -165,7 +165,6 @@ export function listing({ rows, total, page, search, category, names }) {
           <span>Global &amp; remote opportunities</span>
           <i aria-hidden="true">✦</i>
           <span>Apply directly to employers</span>
-          <b class="values-doodle" aria-hidden="true">↝</b>
         </div>
       </div>`;
 
