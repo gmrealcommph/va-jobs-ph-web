@@ -5,7 +5,7 @@ import { categories, listJobs } from '../src/data.js';
 import { safeUrl } from '../src/render.js';
 
 const env = { SUPABASE_URL: 'https://nwqmhqiymtqkdihjadrp.supabase.co', SUPABASE_PUBLISHABLE_KEY: 'sb_publishable_test', SITE_URL: 'https://jobs.example.com' };
-const job = { id: 'job-1', title: 'Virtual Assistant', company: 'Example Company', description: 'Support a growing team.', category: 'Admin & Support', location: 'Philippines', remote: true, workplace_type: 'Remote', source: 'Example', job_url: 'https://example.com/apply', posted_at: '2026-09-30T00:00:00Z', collected_at: '2026-10-01T00:00:00Z' };
+const job = { id: '101', title: 'Virtual Assistant', company: 'Example Company', description: 'Support a growing team.', category: 'Admin & Support', location: 'Philippines', remote: true, workplace_type: 'Remote', source: 'Example', job_url: 'https://example.com/apply', posted_at: '2026-09-30T00:00:00Z', collected_at: '2026-10-01T00:00:00Z' };
 const originalFetch = globalThis.fetch;
 afterEach(() => { globalThis.fetch = originalFetch; });
 function mock(rows = [job], total = rows.length) {
@@ -23,7 +23,7 @@ function mock(rows = [job], total = rows.length) {
 const request = path => new Request(env.SITE_URL + path);
 test('home renders real job content without client JavaScript', async () => {
   mock(); const res = await handle(request('/'), env); const html = await res.text();
-  assert.equal(res.status, 200); assert.match(html, /Virtual Assistant/); assert.match(html, /\/jobs\/job-1/); assert.doesNotMatch(html, /<script/); assert.match(html, /index,follow/);
+  assert.equal(res.status, 200); assert.match(html, /Virtual Assistant/); assert.match(html, /\/jobs\/101/); assert.doesNotMatch(html, /<script/); assert.match(html, /index,follow/);
 });
 test('category URL round-trips spaces and punctuation', async () => {
   mock(); const res = await handle(request('/categories/Admin%20%26%20Support'), env);
@@ -41,7 +41,7 @@ test('search is quoted and pagination/filtering happen in Supabase', async () =>
 });
 test('job detail escapes content and rejects script application URLs', async () => {
   mock([{ ...job, title: '<script>alert(1)</script>', description: '<img src=x onerror=alert(1)>', job_url: 'javascript:alert(1)' }]);
-  const html = await (await handle(request('/jobs/job-1'), env)).text();
+  const html = await (await handle(request('/jobs/101'), env)).text();
   assert.match(html, /&lt;script&gt;/); assert.doesNotMatch(html, /<script|<img|href="javascript:/); assert.match(html, /application link is currently unavailable/);
 });
 test('missing jobs, unknown categories and invalid pages return 404', async () => {
@@ -71,7 +71,7 @@ test('category scan respects upstream caps', async () => {
 });
 test('sitemaps contain canonical job URLs and index endpoints', async () => {
   mock(); let res = await handle(request('/sitemap.xml'), env); assert.match(await res.text(), /sitemaps\/jobs-1.xml/);
-  res = await handle(request('/sitemaps/jobs-1.xml'), env); assert.match(await res.text(), /https:\/\/jobs.example.com\/jobs\/job-1/);
+  res = await handle(request('/sitemaps/jobs-1.xml'), env); assert.match(await res.text(), /https:\/\/jobs.example.com\/jobs\/101/);
   res = await handle(request('/sitemaps/pages.xml'), env); assert.match(await res.text(), /Admin%20%26%20Support/);
 });
 test('preview indexing is disabled and HEAD has no body', async () => {
@@ -82,4 +82,35 @@ test('preview indexing is disabled and HEAD has no body', async () => {
 test('safe application links and allowed methods', async () => {
   assert.equal(safeUrl('data:text/html,hi'), null); assert.equal(safeUrl('https://example.com'), 'https://example.com/');
   assert.equal((await handle(new Request(env.SITE_URL, { method: 'POST' }), env)).status, 405);
+});
+
+test('homepage branding is scoped away from category and detail content', async () => {
+  mock();
+  const home = await (await handle(request('/'), env)).text();
+  assert.match(home, /Same skills\./);
+  assert.match(home, /class="home-page"/);
+  for (const path of ['/categories', '/categories/Admin%20%26%20Support', '/jobs/101']) {
+    const res = await handle(request(path), env);
+    assert.equal(res.status, 200);
+    const html = await res.text();
+    assert.match(html, /aria-label="VeeAys home"/);
+    assert.doesNotMatch(html, /class="home-page"|Same skills\./);
+  }
+});
+
+test('search remains a GET form and category pagination retains the keyword', async () => {
+  mock(Array.from({ length: 16 }, (_, i) => ({ ...job, id: String(i + 101) })));
+  const html = await (await handle(request('/categories/Admin%20%26%20Support?q=assistant'), env)).text();
+  assert.match(html, /action="\/categories\/Admin%20%26%20Support" method="get"/);
+  assert.match(html, /name="q"[^>]*value="assistant"/);
+  assert.match(html, /rel="next" href="\/categories\/Admin%20%26%20Support\?q=assistant&amp;page=2"/);
+});
+
+test('numeric job detail keeps the original application link and canonical', async () => {
+  mock();
+  const res = await handle(request('/jobs/101'), env);
+  assert.equal(res.status, 200);
+  const html = await res.text();
+  assert.match(html, /href="https:\/\/example.com\/apply" target="_blank" rel="noopener noreferrer nofollow"/);
+  assert.match(html, /rel="canonical" href="https:\/\/jobs.example.com\/jobs\/101"/);
 });

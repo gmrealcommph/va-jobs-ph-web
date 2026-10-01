@@ -51,7 +51,7 @@ export async function handle(request, env) {
       let id; try { id = decodeURIComponent(jobMatch[1]); } catch { return missing(); }
       if (id.length > 200) return missing();
       const job = await getJob(env, id);
-      return job ? render(`${job.title || 'Job opportunity'}${job.company ? ' at ' + job.company : ''}`, detail(job), { canonical: base + jobPath(job), description: String(job.description || `Explore this opportunity at ${job.company || 'VA Jobs PH'}.`).replace(/\s+/g, ' ').slice(0, 155) }) : missing();
+      return job ? render(`${job.title || 'Job opportunity'}${job.company ? ' at ' + job.company : ''}`, detail(job), { canonical: base + jobPath(job), description: String(job.description || `Explore this opportunity at ${job.company || 'VeeAys'}.`).replace(/\s+/g, ' ').slice(0, 155) }) : missing();
     }
     const categoryMatch = url.pathname.match(/^\/categories\/([^/]+)$/);
     if (url.pathname !== '/' && !categoryMatch) return missing();
