@@ -5,11 +5,63 @@
 /* VeeAys first pass: shared header and homepage only. */
 .site-header{background:#fffdf3;border-bottom:1px solid #dcded0}
 .site-header .header{min-height:88px;gap:58px}
-.veeays-brand{display:inline-flex;align-items:center;gap:11px;text-decoration:none!important;color:#123e30}
-.veeays-wordmark{font-family:'Arial Rounded MT Bold','Trebuchet MS',sans-serif;font-size:38px;font-weight:900;letter-spacing:-2.8px;line-height:1}
-.veeays-wordmark>span{color:#367719}
-.brand-plane{display:block;width:31px;height:31px;color:#91df52;transform:rotate(9deg)}
-.brand-plane svg{width:100%;height:100%}
+.veeays-brand{
+  display:inline-flex;
+  align-items:center;
+  width:260px;
+  height:74px;
+  flex-shrink:0;
+  text-decoration:none!important;
+}
+
+.veeays-logo{
+  display:block;
+  width:100%;
+  height:auto;
+  overflow:visible;
+}
+
+.veeays-logo text{
+  font-family:'Arial Rounded MT Bold','Trebuchet MS',Arial,sans-serif;
+  font-size:43px;
+  font-weight:900;
+  letter-spacing:-3px;
+}
+
+.logo-vee{
+  fill:#123e30;
+}
+
+.logo-ays{
+  fill:#63ad35;
+}
+
+.logo-dot{
+  fill:#f5b82e;
+}
+
+.logo-flight-path{
+  fill:none;
+  stroke:#63ad35;
+  stroke-width:2.6;
+  stroke-linecap:round;
+  stroke-dasharray:2 7;
+}
+
+.logo-plane{
+  color:#f5b82e;
+  filter:drop-shadow(2px 3px 0 rgba(18,62,48,.12));
+}
+
+.veeays-brand:hover .logo-plane{
+  transform:translate(2px,-2px);
+}
+
+.logo-plane{
+  transition:transform .2s ease;
+  transform-box:fill-box;
+  transform-origin:center;
+}
 .site-header nav a{padding:10px 0;font-size:13px}
 .site-header nav a:hover{text-decoration-color:#66a932;text-underline-offset:7px}
 .site-header .header-note{color:#48614f;font-size:12px}
@@ -70,4 +122,11 @@
 .home-outro>a{margin-left:auto;white-space:nowrap;font-size:12px;font-weight:700}
 @media(min-width:1100px){.desktop-break{display:none}}
 @media(max-width:850px){.site-header .header{gap:25px}.home-intro h1{font-size:54px;letter-spacing:-2.6px}.home-hero-grid{grid-template-columns:1.2fr 1fr;gap:10px}.flight-art{height:320px}.talent-stamp{width:125px;padding:15px;left:5%;top:28%}.talent-stamp strong{font-size:21px}.hero-plane{width:110px;height:110px;top:16%;right:0}.art-label{font-size:13px;left:2%}.home-values>.wrap{font-size:10px}.home-values b{display:none}.home-page .listings{gap:24px}.home-page .home-outro{flex-wrap:wrap}.home-outro>a{margin-left:76px}}
-@media(max-width:600px){.site-header .header{min-height:76px;gap:16px}.veeays-wordmark{font-size:31px;letter-spacing:-2.3px}.brand-plane{width:23px;height:23px}.veeays-brand{gap:6px}.site-header nav{gap:17px}.site-header nav a{font-size:12px}.home-hero>.wrap{padding-top:34px;padding-bottom:22px}.home-hero-grid{display:block}.home-kicker{font-size:9px;letter-spacing:1.2px}.home-intro h1{font-size:clamp(40px,10.8vw,62px);letter-spacing:-2.1px;margin:22px 0 18px}.desktop-break{display:none}.home-intro p{font-size:14px;max-width:420px;margin-bottom:17px}.flight-art{display:none}.home-search{margin-top:28px}.home-search .search input{font-size:13px;padding:10px 5px}.home-search .search-row>span{padding-left:7px}.home-search .search button{padding:12px}.search-caption{font-size:10px;gap:8px}.search-caption>span{max-width:130px}.home-values>.wrap{flex-wrap:wrap;justify-content:flex-start;gap:8px 18px;padding-top:13px;padding-bottom:13px}.home-values span:last-child{width:100%}.home-values b{display:inline}.home-page .listings{padding-top:27px;padding-bottom:36px}.home-page .results-heading h2{font-size:25px}.home-page .job-card{padding:19px 14px}.home-page .home-outro{gap:14px;padding-top:25px;padding-bottom:30px}.home-outro>span{font-size:38px}.home-outro>div{flex:1}.home-outro h2{font-size:21px;line-height:1.25}.home-outro>a{margin-left:48px}.home-page .pagination{gap:10px}.home-page .pagination a{font-size:12px}}
+@media(max-width:600px){.site-header .header{min-height:76px;gap:16px}.veeays-brand{
+  width:175px;
+  height:auto;
+}
+
+.veeays-logo text{
+  font-size:43px;
+}.site-header nav{gap:17px}.site-header nav a{font-size:12px}.home-hero>.wrap{padding-top:34px;padding-bottom:22px}.home-hero-grid{display:block}.home-kicker{font-size:9px;letter-spacing:1.2px}.home-intro h1{font-size:clamp(40px,10.8vw,62px);letter-spacing:-2.1px;margin:22px 0 18px}.desktop-break{display:none}.home-intro p{font-size:14px;max-width:420px;margin-bottom:17px}.flight-art{display:none}.home-search{margin-top:28px}.home-search .search input{font-size:13px;padding:10px 5px}.home-search .search-row>span{padding-left:7px}.home-search .search button{padding:12px}.search-caption{font-size:10px;gap:8px}.search-caption>span{max-width:130px}.home-values>.wrap{flex-wrap:wrap;justify-content:flex-start;gap:8px 18px;padding-top:13px;padding-bottom:13px}.home-values span:last-child{width:100%}.home-values b{display:inline}.home-page .listings{padding-top:27px;padding-bottom:36px}.home-page .results-heading h2{font-size:25px}.home-page .job-card{padding:19px 14px}.home-page .home-outro{gap:14px;padding-top:25px;padding-bottom:30px}.home-outro>span{font-size:38px}.home-outro>div{flex:1}.home-outro h2{font-size:21px;line-height:1.25}.home-outro>a{margin-left:48px}.home-page .pagination{gap:10px}.home-page .pagination a{font-size:12px}}
