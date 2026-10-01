@@ -100,9 +100,18 @@ export function listing({ rows, total, page, search, category, names }) {
                 </p>
               </div>
 
-              <a class="home-jump" href="#opportunities">
-                Find your next opportunity
-                <span aria-hidden="true">↓</span>
+              <a class="home-jump hero-cta" href="#opportunities">
+                <span class="hero-cta-label">Explore opportunities</span>
+
+                <span class="hero-cta-arrow" aria-hidden="true">
+                  ↓
+                </span>
+
+                <span class="hero-cta-rays" aria-hidden="true">
+                  <i></i>
+                  <i></i>
+                  <i></i>
+                </span>
               </a>
             </div>
 
