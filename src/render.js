@@ -814,6 +814,9 @@ function formatJobDescription(text = '') {
 export function detail(job) {
   const apply = safeUrl(job.job_url);
 
+  const logo =
+    safeUrl(job.company_logo_url);
+
   const company =
     job.company ||
     'Company not specified';
@@ -969,6 +972,21 @@ export function detail(job) {
               <span aria-hidden="true">✦</span>
               OPPORTUNITY SNAPSHOT
             </div>
+
+
+            ${
+              logo
+                ? `<div class="job-detail-logo-wrap">
+                    <img
+                      class="job-detail-logo"
+                      src="${esc(logo)}"
+                      alt="${esc(company)} logo"
+                      loading="lazy"
+                      referrerpolicy="no-referrer"
+                    >
+                  </div>`
+                : ''
+            }
 
 
             <h2>
