@@ -979,7 +979,7 @@ export function detail(job) {
                 ? `<div class="job-detail-logo-wrap">
                     <img
                       class="job-detail-logo"
-                      src="${esc(logo)}"
+                      src="/company-logo/${encodeURIComponent(String(job.id))}"
                       alt="${esc(company)} logo"
                       loading="lazy"
                       referrerpolicy="no-referrer"
