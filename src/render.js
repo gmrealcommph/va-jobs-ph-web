@@ -710,6 +710,107 @@ export function listing({ rows, total, page, search, category, names }) {
   }`;
 }
 
+function formatJobDescription(text = '') {
+  if (!text) {
+    return '<p>Visit the original listing for the full job description.</p>';
+  }
+
+  const lines = String(text)
+    .replace(/\r\n/g, '\n')
+    .replace(/\r/g, '\n')
+    .split('\n');
+
+  let html = '';
+  let paragraph = [];
+  let inList = false;
+
+  const flushParagraph = () => {
+    if (!paragraph.length) return;
+
+    html += `<p>${paragraph.map(esc).join(' ')}</p>`;
+    paragraph = [];
+  };
+
+  const closeList = () => {
+    if (!inList) return;
+
+    html += '</ul>';
+    inList = false;
+  };
+
+  const isHeading = (line) => {
+    const clean = line.trim();
+
+    if (!clean) return false;
+    if (clean.length > 90) return false;
+
+    /*
+      Typical imported job-description headings:
+      WHAT YOU'LL DO
+      REQUIREMENTS:
+      About You
+      Who You Are
+      AS A CSM YOU WILL BE:
+    */
+    const letters = clean.replace(/[^A-Za-z]/g, '');
+
+    const uppercase =
+      letters.length >= 4 &&
+      letters === letters.toUpperCase();
+
+    const headingPhrase =
+      /^(about|what|who|why|your|you'll|you will|requirements?|qualifications?|responsibilities|responsibilities include|skills|experience|benefits|nice to have|preferred|the role|the opportunity|what we offer|what you'll do|what you will do|who you are|about you)\b/i.test(
+        clean
+      );
+
+    return uppercase || headingPhrase;
+  };
+
+  for (const rawLine of lines) {
+    const line = rawLine.trim();
+
+    if (!line) {
+      flushParagraph();
+      closeList();
+      continue;
+    }
+
+    const bulletMatch = line.match(
+      /^(?:[-–—•*▪◦]|\d+[.)])\s*(.+)$/
+    );
+
+    if (bulletMatch) {
+      flushParagraph();
+
+      if (!inList) {
+        html += '<ul>';
+        inList = true;
+      }
+
+      html += `<li>${esc(bulletMatch[1])}</li>`;
+      continue;
+    }
+
+    if (isHeading(line)) {
+      flushParagraph();
+      closeList();
+
+      const heading = line.replace(/:\s*$/, '');
+
+      html += `<h3>${esc(heading)}</h3>`;
+      continue;
+    }
+
+    closeList();
+    paragraph.push(line);
+  }
+
+  flushParagraph();
+  closeList();
+
+  return html;
+}
+
 export function detail(job) {
   const apply = safeUrl(job.job_url);
 
@@ -854,7 +955,7 @@ export function detail(job) {
 
 
           <div class="description job-detail-description">
-            ${esc(description)}
+            ${formatJobDescription(description)}
           </div>
 
         </article>
