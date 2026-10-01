@@ -4805,3 +4805,59 @@ dd{margin:0;overflow-wrap:anywhere}
   }
 
 }
+/* =========================================================
+   JOB DETAIL — COMPANY LOGO
+   ========================================================= */
+
+.job-detail-logo-wrap{
+  display:flex;
+  align-items:center;
+  justify-content:flex-start;
+
+  width:100%;
+  min-height:72px;
+
+  margin:2px 0 22px;
+  padding:14px 16px;
+
+  border:1px solid rgba(18,62,48,.12);
+  border-radius:10px;
+
+  background:rgba(255,255,255,.72);
+}
+
+.job-detail-logo{
+  display:block;
+
+  width:auto;
+  max-width:180px;
+  height:auto;
+  max-height:48px;
+
+  object-fit:contain;
+  object-position:left center;
+}
+
+
+/* Logo present: give the headline a little breathing room */
+
+.job-detail-logo-wrap + h2{
+  margin-top:0;
+}
+
+
+/* Mobile */
+
+@media(max-width:700px){
+
+  .job-detail-logo-wrap{
+    min-height:66px;
+    padding:12px 14px;
+  }
+
+  .job-detail-logo{
+    max-width:165px;
+    max-height:44px;
+  }
+
+}
