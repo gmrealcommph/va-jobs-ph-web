@@ -1662,3 +1662,73 @@ dd{margin:0;overflow-wrap:anywhere}
   }
 
 }
+/* VeeAys hero supporting message */
+.hero-message{
+  max-width:500px;
+  margin:0 0 22px;
+}
+
+.hero-message>strong{
+  display:block;
+  color:#fffdf3;
+  font-family:'Trebuchet MS',Arial,sans-serif;
+  font-size:18px;
+  line-height:1.35;
+  font-weight:700;
+  letter-spacing:-.25px;
+  margin-bottom:8px;
+}
+
+.hero-message>strong>span{
+  position:relative;
+  display:inline-block;
+  z-index:1;
+}
+
+.hero-message>strong>span:after{
+  content:"";
+  position:absolute;
+  z-index:-1;
+  left:-2px;
+  right:-5px;
+  bottom:0;
+  height:5px;
+  background:#f39a42;
+  border-radius:50%;
+  transform:rotate(-2deg);
+  opacity:.9;
+}
+
+.hero-message p{
+  max-width:470px;
+  margin:0;
+  color:#cbd9ce;
+  font-size:14px;
+  line-height:1.7;
+}
+
+@media(max-width:850px){
+  .hero-message>strong{
+    font-size:17px;
+  }
+
+  .hero-message p{
+    font-size:13px;
+  }
+}
+
+@media(max-width:600px){
+  .hero-message{
+    margin-bottom:19px;
+  }
+
+  .hero-message>strong{
+    font-size:16px;
+    margin-bottom:6px;
+  }
+
+  .hero-message p{
+    font-size:13px;
+    line-height:1.6;
+  }
+}
