@@ -42,7 +42,7 @@ export function layout({ title, description, canonical, body, noindex = false })
     type="image/svg+xml"
   >
 
-  <link rel="stylesheet" href="/styles.css?v=4">
+  <link rel="stylesheet" href="/styles.css?v=5">
 </head>
 
 <body>
