@@ -88,11 +88,17 @@ export function listing({ rows, total, page, search, category, names }) {
 
               <div class="hero-scribble" aria-hidden="true"></div>
 
-              <p>
-                Your next chapter can start right here. Discover global and
-                remote roles open to Filipino talent, from virtual assistance
-                to whatever’s next.
-              </p>
+              <div class="hero-message">
+                <strong>
+                  Your skills can take you
+                  <span>further.</span>
+                </strong>
+
+                <p>
+                  Discover remote opportunities from companies around the
+                  world, open to Filipino talent.
+                </p>
+              </div>
 
               <a class="home-jump" href="#opportunities">
                 Find your next opportunity
