@@ -261,15 +261,91 @@ if (
         );
       }
 
-      const contentType =
-        (
-          logoResponse.headers.get(
-            'content-type'
-          ) || ''
-        )
-          .split(';')[0]
-          .trim()
-          .toLowerCase();
+      const upstreamContentType =
+  (
+    logoResponse.headers.get(
+      'content-type'
+    ) || ''
+  )
+    .split(';')[0]
+    .trim()
+    .toLowerCase();
+
+const allowedTypes =
+  new Set([
+    'image/png',
+    'image/jpeg',
+    'image/webp',
+    'image/gif',
+    'image/avif',
+    'image/svg+xml'
+  ]);
+
+let contentType =
+  upstreamContentType;
+
+/*
+ * Lever's logo S3 bucket can return company images as
+ * application/octet-stream instead of their actual image
+ * MIME type.
+ *
+ * Only permit this fallback for the already allowlisted
+ * Lever logo host.
+ */
+
+if (
+  isLeverLogo &&
+  upstreamContentType ===
+    'application/octet-stream'
+) {
+  const pathname =
+    logoUrl.pathname.toLowerCase();
+
+  if (
+    pathname.endsWith('.png')
+  ) {
+    contentType = 'image/png';
+  } else if (
+    pathname.endsWith('.jpg') ||
+    pathname.endsWith('.jpeg')
+  ) {
+    contentType = 'image/jpeg';
+  } else if (
+    pathname.endsWith('.webp')
+  ) {
+    contentType = 'image/webp';
+  } else if (
+    pathname.endsWith('.gif')
+  ) {
+    contentType = 'image/gif';
+  } else if (
+    pathname.endsWith('.svg')
+  ) {
+    contentType = 'image/svg+xml';
+  }
+}
+
+if (
+  !allowedTypes.has(
+    contentType
+  )
+) {
+  console.error(
+    'Unexpected company logo type:',
+    upstreamContentType
+  );
+
+  return new Response(
+    'Invalid logo response',
+    {
+      status: 502,
+      headers: {
+        'cache-control':
+          'public, max-age=60'
+      }
+    }
+  );
+}
 
       const allowedTypes =
         new Set([
