@@ -190,7 +190,7 @@ export async function handle(request, env) {
         );
 
         return new Response(
-  `Logo source not allowed: ${logoUrl.hostname}${logoUrl.pathname}`,
+  'Logo source not allowed',
   {
     status: 403,
             headers: {
