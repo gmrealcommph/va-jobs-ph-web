@@ -208,29 +208,7 @@ export function layout({ title, description, canonical, body, noindex = false })
     </div>
 
 
-    <div class="footer-note">
-
-      <span
-        class="footer-note-star"
-        aria-hidden="true"
-      >
-        ✦
-      </span>
-
-      <p>
-        Work without<br>
-        borders.
-      </p>
-
-      <span
-        class="footer-note-arrow"
-        aria-hidden="true"
-      >
-        ↘
-      </span>
-
-    </div>
-
+    
   </div>
 
 
@@ -570,86 +548,90 @@ export function listing({ rows, total, page, search, category, names }) {
     category
       ? ''
       : `<section class="final-cta">
+  <div class="wrap final-cta-grid">
 
-        <div class="wrap final-cta-grid">
+    <div class="final-cta-copy">
 
-          <div class="final-cta-copy">
+      <h2>
+        Ready for your<br>
+        <em>next opportunity?</em>
+      </h2>
 
-            <div class="final-cta-kicker">
-              <span aria-hidden="true">✦</span>
-              YOUR NEXT MOVE
-            </div>
+      <p>
+        Find remote opportunities from companies around the world,
+        open to Filipino talent.
+      </p>
 
-            <h2>
-              Your next opportunity<br>
-              <em>could be one click away.</em>
-            </h2>
+      <div class="final-cta-actions">
 
-            <div class="final-cta-scribble" aria-hidden="true"></div>
+        <a class="final-cta-primary" href="#opportunities">
+          <span>Back to opportunities</span>
+          <b>↑</b>
+        </a>
 
-            <p>
-              <strong>Global roles. Filipino talent.</strong>
-              Find remote opportunities from companies around the world
-              and take the next step in your career.
-            </p>
+        <a class="final-cta-secondary" href="/categories">
+          Browse categories <span>↗</span>
+        </a>
 
-            <div class="final-cta-actions">
+      </div>
 
-              <a class="final-cta-primary" href="#opportunities">
-                <span>Explore opportunities</span>
-                <b aria-hidden="true">↓</b>
-              </a>
+    </div>
 
-              <a class="final-cta-secondary" href="/categories">
-                Browse categories
-                <span aria-hidden="true">↗</span>
-              </a>
 
-            </div>
+    <div class="final-cta-art" aria-hidden="true">
 
-          </div>
+      <span class="final-art-star star-one">✳</span>
+      <span class="final-art-star star-two">✦</span>
 
-          <div class="final-cta-art" aria-hidden="true">
+      <div class="final-map-stamp">
+        <span>PH</span>
+        <b>↗</b>
+        <span>WORLD</span>
+      </div>
 
-            <span class="final-art-star star-one">✳</span>
-            <span class="final-art-star star-two">✦</span>
+      <div class="final-paper-card">
+        <span class="final-paper-pin">✦</span>
 
-            <div class="final-map-stamp">
-              <span>PH</span>
-              <b>↗</b>
-              <span>WORLD</span>
-            </div>
+        <strong>
+          Ready when<br>
+          you are.
+        </strong>
 
-            <div class="final-paper-card">
-              <span class="final-paper-pin">✦</span>
-              <strong>Ready when<br>you are.</strong>
-              <small>Your skills can travel.</small>
-            </div>
+        <small>
+          Your skills can travel.
+        </small>
+      </div>
 
-            <div class="final-flight-path">
-              <span class="final-path-dot dot-one"></span>
-              <span class="final-path-dot dot-two"></span>
-              <span class="final-path-dot dot-three"></span>
-              <span class="final-path-dot dot-four"></span>
-              <span class="final-path-dot dot-five"></span>
-              <span class="final-path-dot dot-six"></span>
-            </div>
+      <div class="final-flight-path">
+        <span class="final-path-dot dot-one"></span>
+        <span class="final-path-dot dot-two"></span>
+        <span class="final-path-dot dot-three"></span>
+        <span class="final-path-dot dot-four"></span>
+        <span class="final-path-dot dot-five"></span>
+        <span class="final-path-dot dot-six"></span>
+      </div>
 
-            <span class="final-paper-plane">➤</span>
+      <span class="final-paper-plane">➤</span>
 
-            <div class="final-postcard">
-              <span>WORK</span>
-              <strong>WITHOUT<br>BORDERS</strong>
-              <small>VEEAYS · PH → WORLD</small>
-            </div>
+      <div class="final-postcard">
+        <span>WORK</span>
 
-          </div>
+        <strong>
+          WITHOUT<br>
+          BORDERS
+        </strong>
 
-        </div>
+        <small>
+          VEEAYS · PH → WORLD
+        </small>
+      </div>
 
-        <div class="final-cta-tear" aria-hidden="true"></div>
+    </div>
 
-      </section>
+  </div>
+
+  <div class="final-cta-tear" aria-hidden="true"></div>
+</section>
       </div>`
   }`;
 }
