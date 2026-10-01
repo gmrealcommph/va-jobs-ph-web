@@ -164,25 +164,31 @@ export async function handle(request, env) {
        */
 
       const isAshbyLogo =
-        logoUrl.protocol === 'https:' &&
-        logoUrl.hostname ===
-          'app.ashbyhq.com' &&
-        logoUrl.pathname.startsWith(
-          '/api/images/'
-        );
+  logoUrl.protocol === 'https:' &&
+  logoUrl.hostname ===
+    'app.ashbyhq.com' &&
+  logoUrl.pathname.startsWith(
+    '/api/images/'
+  );
 
-      const isGreenhouseLogo =
-        logoUrl.protocol === 'https:' &&
-        logoUrl.hostname ===
-          'recruiting.cdn.greenhouse.io' &&
-        logoUrl.pathname.startsWith(
-          '/external_greenhouse_job_boards/'
-        );
+const isGreenhouseLogo =
+  logoUrl.protocol === 'https:' &&
+  logoUrl.hostname ===
+    'recruiting.cdn.greenhouse.io' &&
+  logoUrl.pathname.startsWith(
+    '/external_greenhouse_job_boards/'
+  );
 
-      if (
-        !isAshbyLogo &&
-        !isGreenhouseLogo
-      ) {
+const isLeverLogo =
+  logoUrl.protocol === 'https:' &&
+  logoUrl.hostname ===
+    'lever-client-logos.s3.us-west-2.amazonaws.com';
+
+if (
+  !isAshbyLogo &&
+  !isGreenhouseLogo &&
+  !isLeverLogo
+) {
         console.error(
           'Company logo source not allowed:',
           logoUrl.hostname,
