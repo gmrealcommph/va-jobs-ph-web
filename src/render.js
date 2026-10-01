@@ -491,14 +491,16 @@ export function listing({ rows, total, page, search, category, names }) {
       </div>
 
       ${
-        rows.length
-          ? rows.map(card).join('')
-          : `<div class="empty">
-              <h2>No matching opportunities yet</h2>
-              <p>Try another keyword or explore all categories.</p>
-              <a class="button" href="/">Browse all jobs</a>
-            </div>`
-      }
+  rows.length
+    ? `<div class="opportunity-grid">
+        ${rows.map(card).join('')}
+      </div>`
+    : `<div class="empty">
+        <h2>No matching opportunities yet</h2>
+        <p>Try another keyword or explore all categories.</p>
+        <a class="button" href="/">Browse all jobs</a>
+      </div>`
+}
 
       ${
         pages > 1
