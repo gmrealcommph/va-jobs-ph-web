@@ -196,7 +196,7 @@ if (
         );
 
        return new Response(
-  `Logo source not allowed: ${logoUrl.hostname}${logoUrl.pathname}`,
+  'Logo source not allowed',
   {
     status: 403,
             headers: {
@@ -347,22 +347,7 @@ if (
   );
 }
 
-      const allowedTypes =
-        new Set([
-          'image/png',
-          'image/jpeg',
-          'image/webp',
-          'image/gif',
-          'image/avif',
-          'image/svg+xml'
-        ]);
-
-      if (
-        !allowedTypes.has(
-          contentType
-        )
-      ) 
-
+      
       return new Response(
         logoResponse.body,
         {
