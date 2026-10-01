@@ -3819,3 +3819,127 @@ dd{margin:0;overflow-wrap:anywhere}
   }
 
 }
+/* =========================================================
+   VEEAYS OPPORTUNITY CARDS — COMPACT POLISH
+   ========================================================= */
+
+/* Shorter, tighter cards */
+.home-page .job-card.opportunity-card,
+.job-card.opportunity-card{
+  min-height:174px;
+  padding:20px 22px 17px;
+}
+
+
+/* Company left, date right */
+.opportunity-card-top{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:14px;
+
+  width:100%;
+  margin-bottom:13px;
+}
+
+.opportunity-company{
+  text-align:left;
+}
+
+.opportunity-date{
+  margin-left:auto;
+  text-align:right;
+}
+
+
+/* Job title */
+.home-page .opportunity-title,
+.opportunity-title{
+  width:100%;
+  margin:0 0 12px;
+
+  text-align:left;
+
+  font-size:clamp(20px,1.45vw,25px);
+  line-height:1.08;
+  letter-spacing:-.65px;
+}
+
+
+/* Location + remote */
+.opportunity-meta{
+  justify-content:flex-start;
+
+  width:100%;
+  margin-bottom:17px;
+
+  text-align:left;
+}
+
+
+/* Bring category and arrow upward */
+.opportunity-card-bottom{
+  align-items:center;
+  margin-top:auto;
+}
+
+
+/* Slightly smaller category stamp */
+.home-page .opportunity-category,
+.opportunity-category{
+  padding:5px 8px 4px;
+
+  font-size:8.5px;
+  letter-spacing:.6px;
+}
+
+
+/* Slightly smaller launch button */
+.home-page .opportunity-arrow,
+.opportunity-arrow{
+  width:39px;
+  height:39px;
+
+  flex-basis:39px;
+
+  font-size:20px;
+
+  box-shadow:0 2px 0 #72ad43;
+}
+
+
+/* Don't let long company names crowd the date */
+.opportunity-company{
+  max-width:68%;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media(max-width:1050px){
+
+  .home-page .job-card.opportunity-card,
+  .job-card.opportunity-card{
+    min-height:170px;
+    padding:18px 19px 16px;
+  }
+
+}
+
+
+@media(max-width:700px){
+
+  .home-page .job-card.opportunity-card,
+  .job-card.opportunity-card{
+    min-height:165px;
+    padding:19px 18px 16px;
+  }
+
+  .home-page .opportunity-title,
+  .opportunity-title{
+    font-size:22px;
+  }
+
+}
