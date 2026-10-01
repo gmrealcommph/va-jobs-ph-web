@@ -231,19 +231,7 @@ export function layout({ title, description, canonical, body, noindex = false })
     </div>
 
 
-    <div class="footer-safety">
-
-      <span aria-hidden="true">✳</span>
-
-      <strong>
-        Never pay to apply.
-      </strong>
-
-      <span>
-        Legitimate employers won't charge you for a job application.
-      </span>
-
-    </div>
+    
 
   </div>
 
