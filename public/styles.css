@@ -4810,21 +4810,21 @@ dd{margin:0;overflow-wrap:anywhere}
    ========================================================= */
 
 .job-detail-logo-wrap{
-  display:inline-flex;
+  display:flex;
   align-items:center;
-  justify-content:center;
+  justify-content:flex-start;
 
-  width:auto;
-  max-width:210px;
-  height:68px;
+  width:max-content;
+  max-width:190px;
+  height:auto;
 
-  margin:4px 0 22px;
-  padding:10px 14px;
+  margin:8px 0 22px;
+  padding:0;
 
-  border:1px solid rgba(18,62,48,.12);
-  border-radius:10px;
+  border:0;
+  border-radius:0;
 
-  background:rgba(255,255,255,.78);
+  background:transparent;
 }
 
 .job-detail-logo{
@@ -4833,36 +4833,27 @@ dd{margin:0;overflow-wrap:anywhere}
   width:auto;
   height:auto;
 
-  max-width:180px;
-  max-height:48px;
+  max-width:170px;
+  max-height:54px;
 
   object-fit:contain;
+  object-position:left center;
 }
-
-
-/* Keep the headline nicely separated */
 
 .job-detail-logo-wrap + h2{
   margin-top:0;
 }
 
-
-/* Mobile */
-
 @media(max-width:700px){
 
   .job-detail-logo-wrap{
-    height:62px;
-
-    max-width:190px;
-
-    padding:9px 12px;
-    margin-bottom:19px;
+    max-width:170px;
+    margin-bottom:18px;
   }
 
   .job-detail-logo{
-    max-width:165px;
-    max-height:44px;
+    max-width:155px;
+    max-height:50px;
   }
 
 }
