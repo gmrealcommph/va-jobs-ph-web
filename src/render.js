@@ -1139,18 +1139,22 @@ export function detail(job) {
 
 
             ${
-              logo
-                ? `<div class="job-detail-logo-wrap">
-                    <img
-                      class="job-detail-logo"
-                      src="/company-logo/${encodeURIComponent(String(job.id))}"
-                      alt="${esc(company)} logo"
-                      loading="lazy"
-                      referrerpolicy="no-referrer"
-                    >
-                  </div>`
-                : ''
-            }
+  logo
+    ? `<div class="job-detail-logo-wrap${
+        company.toLowerCase() === 'assist world'
+          ? ' job-detail-logo-wrap--assist-world'
+          : ''
+      }">
+        <img
+          class="job-detail-logo"
+          src="/company-logo/${encodeURIComponent(String(job.id))}"
+          alt="${esc(company)} logo"
+          loading="lazy"
+          referrerpolicy="no-referrer"
+        >
+      </div>`
+    : ''
+}
 
 
             <h2>
