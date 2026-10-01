@@ -7,50 +7,13 @@ export function layout({ title, description, canonical, body, noindex = false })
   return `<!doctype html><html lang="en-PH"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${esc(title)} | VeeAys</title><meta name="description" content="${esc(description)}"><meta name="robots" content="${noindex ? 'noindex,follow' : 'index,follow'}"><link rel="canonical" href="${esc(canonical)}"><meta property="og:type" content="website"><meta property="og:title" content="${esc(title)}"><meta property="og:description" content="${esc(description)}"><meta property="og:url" content="${esc(canonical)}"><meta property="og:site_name" content="VeeAys"><meta name="theme-color" content="#123e30"><link rel="icon" href="/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="/styles.css"></head><body><a class="skip" href="#main">Skip to content</a><header class="site-header"><div class="wrap header">
 
 <a class="veeays-brand" href="/" aria-label="VeeAys home">
-  <svg class="veeays-logo" viewBox="0 0 245 72" role="img" aria-label="VeeAys">
-    <text class="logo-vee" x="2" y="43">Vee</text>
-    <text class="logo-ays" x="70" y="43">Ays</text>
-
-    <circle class="logo-dot" cx="143" cy="39" r="4.5"/>
-
-    <path
-      class="logo-flight-path"
-      d="M137 53
-         C149 64 166 64 174 55
-         C181 47 176 40 169 42
-         C160 45 164 55 175 54
-         C188 53 196 43 204 33"
-    />
-
-    <g class="logo-plane" transform="translate(196 13) rotate(5)">
-      <path
-        d="M2 15 L34 2 L22 34 L15 21 Z"
-        fill="#f7bf35"
-        stroke="#123e30"
-        stroke-width="1.8"
-        stroke-linejoin="round"
-      />
-      <path
-        d="M15 21 L34 2 L22 26 Z"
-        fill="#f28a3c"
-        stroke="#123e30"
-        stroke-width="1.6"
-        stroke-linejoin="round"
-      />
-      <path
-        d="M15 21 L12 30 L20 25"
-        fill="#f7bf35"
-        stroke="#123e30"
-        stroke-width="1.6"
-        stroke-linejoin="round"
-      />
-    </g>
-
-    <g class="logo-spark" aria-hidden="true">
-      <path d="M232 10v6M229 13h6"/>
-      <path d="M237 17l4 3M238 7l3-3"/>
-    </g>
-  </svg>
+  <img
+    class="veeays-logo-img"
+    src="/veeays-logo.png"
+    alt="VeeAys"
+    width="1200"
+    height="400"
+  >
 </a>
 
 <nav aria-label="Main navigation"><a href="/">Find a job</a><a href="/categories">Categories</a></nav><span class="header-note">Filipino talent. Global possibilities.</span></div></header><main id="main">${body}</main><footer><div class="wrap footer"><a class="brand" href="/">VeeAys</a><p>Opportunities for Filipino talent. A new way forward.</p><p class="fine">Listings link to external sources. Confirm details with the employer and never pay to apply.</p></div></footer></body></html>`;
