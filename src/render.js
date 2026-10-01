@@ -33,7 +33,9 @@ export function layout({ title, description, canonical, body, noindex = false })
 
 export function card(job) {
   const location = job.location || (job.remote ? 'Remote' : 'Location not specified');
-  return `<article class="job-card"><div class="company-icon" aria-hidden="true">${esc((job.company || 'J').slice(0, 1))}</div><div class="job-content"><div class="eyebrow">${esc(job.company || 'Company not specified')}</div><h2><a href="${jobPath(job)}">${esc(job.title || 'Job opportunity')}</a></h2><div class="job-meta"><span>${esc(location)}</span>${job.workplace_type ? `<span>${esc(job.workplace_type)}</span>` : ''}${job.remote && !/remote/i.test(location + " " + (job.workplace_type || "")) ? '<span>Remote</span>' : ''}</div>${job.category ? `<a class="tag" href="${categoryPath(job.category)}">${esc(job.category)}</a>` : ''}</div><div class="card-end">${date(job.posted_at) ? `<span>Posted ${date(job.posted_at)}</span>` : ''}<a class="arrow" href="${jobPath(job)}" aria-label="View ${esc(job.title)}">↗</a></div></article>`;
+  const remoteLabel = job.workplace_type || (job.remote ? 'Remote' : '');
+
+  return `<article class="job-card"><div class="company-icon" aria-hidden="true">${esc((job.company || 'J').slice(0, 1))}</div><div class="job-content"><div class="eyebrow">${esc(job.company || 'Company not specified')}</div><h2><a href="${jobPath(job)}">${esc(job.title || 'Job opportunity')}</a></h2><div class="job-meta"><span class="meta-location"><i aria-hidden="true">⌖</i>${esc(location)}</span>${remoteLabel ? `<span class="meta-remote"><i aria-hidden="true">⌁</i>${esc(remoteLabel)}</span>` : ''}</div>${job.category ? `<a class="tag" href="${categoryPath(job.category)}">${esc(job.category)}</a>` : ''}</div><div class="card-end">${date(job.posted_at) ? `<span>Posted ${date(job.posted_at)}</span>` : ''}<a class="arrow" href="${jobPath(job)}" aria-label="View ${esc(job.title)}">↗</a></div></article>`;
 }
 
 export function searchForm(search = '', category = '', action = '/') {
@@ -43,7 +45,28 @@ export function searchForm(search = '', category = '', action = '/') {
 export function listing({ rows, total, page, search, category, names }) {
   const action = category ? categoryPath(category) : '/';
   const pages = Math.ceil(total / 15);
-  const pageUrl = n => `${action}?${new URLSearchParams({ ...(search ? { q: search } : {}), page: String(n) })}`;
+
+  const pageUrl = n => `${action}?${new URLSearchParams({
+    ...(search ? { q: search } : {}),
+    page: String(n)
+  })}`;
+
+  const categoryIcon = name => ({
+    'Account Management': '◎',
+    'Bookkeeping & Finance': '₱',
+    'Customer Support': '◉',
+    'Design & Creative': '✎',
+    'E-commerce': '▣',
+    'Executive Assistant': '◇',
+    'Marketing': '◌',
+    'Operations & Admin': '⌘',
+    'Project Management': '▦',
+    'Recruitment & HR': '♙',
+    'Sales': '➤',
+    'Social Media': '♧',
+    'Virtual Assistant': '✦',
+    'Writing & Content': '✐'
+  }[name] || '•');
 
   const hero = category
     ? `<section class="hero"><div class="wrap"><div class="kicker"><span></span> BUILT FOR FILIPINO TALENT</div><h1>${category ? `${esc(category)}<br><em>opportunities.</em>` : 'Great work.<br><em>Closer than you think.</em>'}</h1><p>Find your next opportunity in virtual assistance and beyond.<br>Explore roles open to talent in the Philippines.</p>${searchForm(search, category, action)}<div class="hero-foot"><span>Find your fit. Make your move.</span><span>PH <span aria-hidden="true">✳</span> WORLDWIDE POSSIBILITIES</span></div></div></section>`
@@ -143,7 +166,169 @@ export function listing({ rows, total, page, search, category, names }) {
         </div>
       </div>`;
 
-  return `${category ? '' : '<div class="home-page">'}${hero}<section class="wrap listings" id="opportunities"><aside><h2>Explore categories</h2><a class="filter ${category ? '' : 'selected'}" href="/${search ? '?' + new URLSearchParams({ q: search }) : ''}">All opportunities <span>↗</span></a>${names.map(name => `<a class="filter ${category === name ? 'selected' : ''}" ${category === name ? 'aria-current="page"' : ''} href="${categoryPath(name)}${search ? '?' + new URLSearchParams({ q: search }) : ''}">${esc(name)}</a>`).join('')}<div class="aside-note"><span aria-hidden="true">✳</span><h3>Your skills.<br>New possibilities.</h3><p>Discover a role that fits where you want to go next.</p></div></aside><div class="results"><div class="results-heading"><div class="eyebrow">YOUR NEXT OPPORTUNITY</div><h2>${search ? `Results for “${esc(search)}”` : 'Latest opportunities'} <span>${total.toLocaleString('en-US')}</span></h2><p>Newest listings first${page > 1 ? ` · Page ${page}` : ''}</p></div>${rows.length ? rows.map(card).join('') : `<div class="empty"><h2>No matching opportunities yet</h2><p>Try another keyword or explore all categories.</p><a class="button" href="/">Browse all jobs</a></div>`}${pages > 1 ? `<nav class="pagination" aria-label="Pagination">${page > 1 ? `<a rel="prev" href="${esc(pageUrl(page - 1))}">← Previous</a>` : '<span></span>'}<span>Page ${page} of ${pages}</span>${page < pages ? `<a rel="next" href="${esc(pageUrl(page + 1))}">Next →</a>` : '<span></span>'}</nav>` : ''}</div></section>${category ? '' : '<section class="home-outro wrap"><span aria-hidden="true">✳</span><div><h2>Your next chapter looks good on you.</h2><p>We connect Filipino talent with global opportunities. Looking for legitimate work? Check employer details, use the original listing, and never pay to apply.</p></div><a href="/categories">Find your direction ↗</a></section></div>'}`;
+  const filters = names.map(name => `
+    <a
+      class="filter ${category === name ? 'selected' : ''}"
+      ${category === name ? 'aria-current="page"' : ''}
+      href="${categoryPath(name)}${search ? '?' + new URLSearchParams({ q: search }) : ''}"
+    >
+      <span class="filter-icon" aria-hidden="true">${categoryIcon(name)}</span>
+      <span class="filter-name">${esc(name)}</span>
+      <span class="filter-chevron" aria-hidden="true">›</span>
+    </a>
+  `).join('');
+
+  const resultsTitle = search
+    ? `Results for “${esc(search)}”`
+    : category
+      ? `${esc(category)} opportunities`
+      : 'Fresh opportunities<br><em>for Filipino talent.</em>';
+
+  return `${category ? '' : '<div class="home-page">'}${hero}
+
+  <section class="wrap listings" id="opportunities">
+
+    <aside class="opportunity-map">
+
+      <div class="category-doodle" aria-hidden="true">
+        Find a role<br>
+        that fits you
+        <b>↘</b>
+      </div>
+
+      <div class="category-panel">
+
+        <h2>Explore categories</h2>
+
+        <a
+          class="filter all-filter ${category ? '' : 'selected'}"
+          href="/${search ? '?' + new URLSearchParams({ q: search }) : ''}"
+        >
+          <span class="filter-icon" aria-hidden="true">⊞</span>
+          <span class="filter-name">All opportunities</span>
+          <span class="all-count">${total.toLocaleString('en-US')}</span>
+          <span class="filter-chevron" aria-hidden="true">›</span>
+        </a>
+
+        ${filters}
+
+      </div>
+
+      <div class="aside-note">
+        <span aria-hidden="true">✳</span>
+
+        <h3>
+          Your skills.<br>
+          New possibilities.
+        </h3>
+
+        <p>
+          Discover a role that fits where you want to go next.
+        </p>
+
+        <b aria-hidden="true">↗</b>
+      </div>
+
+    </aside>
+
+    <div class="results">
+
+      <div class="results-heading opportunity-heading">
+
+        <div>
+          <div class="eyebrow">
+            YOUR NEXT OPPORTUNITY
+          </div>
+
+          <h2>${resultsTitle}</h2>
+
+          <p>
+            Newest listings first${page > 1 ? ` · Page ${page}` : ''}
+          </p>
+        </div>
+
+        ${!search && !category ? `
+          <div
+            class="opportunity-count"
+            aria-label="${total.toLocaleString('en-US')} opportunities"
+          >
+            <strong>${total.toLocaleString('en-US')}</strong>
+
+            <span>
+              opportunities<br>
+              and counting
+            </span>
+          </div>
+        ` : ''}
+
+      </div>
+
+      ${
+        rows.length
+          ? rows.map(card).join('')
+          : `<div class="empty">
+              <h2>No matching opportunities yet</h2>
+              <p>Try another keyword or explore all categories.</p>
+              <a class="button" href="/">Browse all jobs</a>
+            </div>`
+      }
+
+      ${
+        pages > 1
+          ? `<nav class="pagination" aria-label="Pagination">
+
+              ${
+                page > 1
+                  ? `<a rel="prev" href="${esc(pageUrl(page - 1))}">
+                      ← Previous
+                    </a>`
+                  : '<span></span>'
+              }
+
+              <span>
+                Page ${page} of ${pages}
+              </span>
+
+              ${
+                page < pages
+                  ? `<a rel="next" href="${esc(pageUrl(page + 1))}">
+                      Next →
+                    </a>`
+                  : '<span></span>'
+              }
+
+            </nav>`
+          : ''
+      }
+
+    </div>
+
+  </section>
+
+  ${
+    category
+      ? ''
+      : `<section class="home-outro wrap">
+
+          <span aria-hidden="true">✳</span>
+
+          <div>
+            <h2>Your next chapter looks good on you.</h2>
+
+            <p>
+              We connect Filipino talent with global opportunities.
+              Looking for legitimate work? Check employer details,
+              use the original listing, and never pay to apply.
+            </p>
+          </div>
+
+          <a href="/categories">
+            Find your direction ↗
+          </a>
+
+        </section>
+      </div>`
+  }`;
 }
 
 export function detail(job) {
