@@ -153,18 +153,42 @@ export async function handle(request, env) {
       }
 
       /*
-       * For now our collected logos come from Ashby.
-       * Restrict the proxy to Ashby's image host.
+       * Only allow logo hosts that VeeAys explicitly
+       * collects from supported job platforms.
+       *
+       * Ashby:
+       *   https://app.ashbyhq.com/api/images/...
+       *
+       * Greenhouse:
+       *   https://recruiting.cdn.greenhouse.io/...
        */
 
-      if (
-        logoUrl.protocol !== 'https:' ||
-        logoUrl.hostname !==
-          'app.ashbyhq.com' ||
-        !logoUrl.pathname.startsWith(
+      const isAshbyLogo =
+        logoUrl.protocol === 'https:' &&
+        logoUrl.hostname ===
+          'app.ashbyhq.com' &&
+        logoUrl.pathname.startsWith(
           '/api/images/'
-        )
+        );
+
+      const isGreenhouseLogo =
+        logoUrl.protocol === 'https:' &&
+        logoUrl.hostname ===
+          'recruiting.cdn.greenhouse.io' &&
+        logoUrl.pathname.startsWith(
+          '/external_greenhouse_job_boards/'
+        );
+
+      if (
+        !isAshbyLogo &&
+        !isGreenhouseLogo
       ) {
+        console.error(
+          'Company logo source not allowed:',
+          logoUrl.hostname,
+          logoUrl.pathname
+        );
+
         return new Response(
           'Logo source not allowed',
           {
