@@ -292,7 +292,7 @@ if (
         );
 
         return new Response(
-          'Invalid logo response',
+  `Invalid logo response: ${contentType}`,
           {
             status: 502,
             headers: {
