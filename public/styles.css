@@ -4849,3 +4849,31 @@ dd{margin:0;overflow-wrap:anywhere}
     max-height:64px;
   }
 }
+/* Assist World's Lever logo contains substantial empty image space.
+   Scale it independently without affecting other company logos. */
+.job-detail-logo-wrap--assist-world{
+  width:210px;
+  height:72px;
+  min-height:72px;
+  overflow:hidden;
+}
+
+.job-detail-logo-wrap--assist-world .job-detail-logo{
+  max-width:none;
+  max-height:none;
+  width:300px;
+  height:auto;
+  transform-origin:left center;
+}
+
+@media(max-width:700px){
+  .job-detail-logo-wrap--assist-world{
+    width:190px;
+    height:64px;
+    min-height:64px;
+  }
+
+  .job-detail-logo-wrap--assist-world .job-detail-logo{
+    width:270px;
+  }
+}
