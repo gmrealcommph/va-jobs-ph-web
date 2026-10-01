@@ -14,6 +14,13 @@
   text-decoration:none!important;
 }
 
+.logo-spark{
+  fill:none;
+  stroke:#f28a3c;
+  stroke-width:2;
+  stroke-linecap:round;
+}
+
 .veeays-logo{
   display:block;
   width:100%;
