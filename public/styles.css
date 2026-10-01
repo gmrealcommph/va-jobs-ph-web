@@ -3168,3 +3168,46 @@ dd{margin:0;overflow-wrap:anywhere}
   }
 
 }
+/* =========================================================
+   VEEAYS COMPACT FOOTER
+   ========================================================= */
+
+.site-footer .footer-main{
+  padding-top:52px;
+  padding-bottom:34px;
+}
+
+.site-footer .footer-tagline{
+  margin-top:18px;
+}
+
+.site-footer .footer-brand .footer-flight{
+  margin-top:16px;
+}
+
+.site-footer .footer-bottom{
+  min-height:0;
+  padding-top:18px;
+  padding-bottom:20px;
+  justify-content:flex-start;
+}
+
+.site-footer .footer-legal{
+  gap:20px;
+}
+
+
+/* Tablet / mobile */
+@media(max-width:760px){
+
+  .site-footer .footer-main{
+    padding-top:45px;
+    padding-bottom:32px;
+  }
+
+  .site-footer .footer-bottom{
+    padding-top:18px;
+    padding-bottom:22px;
+  }
+
+}
