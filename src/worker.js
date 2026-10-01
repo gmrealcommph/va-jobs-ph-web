@@ -190,9 +190,9 @@ export async function handle(request, env) {
         );
 
         return new Response(
-          'Logo source not allowed',
-          {
-            status: 403,
+  `Logo source not allowed: ${logoUrl.hostname}${logoUrl.pathname}`,
+  {
+    status: 403,
             headers: {
               'cache-control':
                 'public, max-age=300'
