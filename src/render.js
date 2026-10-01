@@ -4,7 +4,48 @@ export const categoryPath = name => `/categories/${encodeURIComponent(name)}`;
 export function safeUrl(value) { try { const u = new URL(value); return ['https:', 'http:'].includes(u.protocol) ? u.href : null; } catch { return null; } }
 export function date(value) { const d = new Date(value); return value && !Number.isNaN(+d) ? d.toLocaleDateString('en-PH', { year: 'numeric', month: 'short', day: 'numeric', timeZone: 'Asia/Manila' }) : ''; }
 export function layout({ title, description, canonical, body, noindex = false }) {
-  return `<!doctype html><html lang="en-PH"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${esc(title)} | VeeAys</title><meta name="description" content="${esc(description)}"><meta name="robots" content="${noindex ? 'noindex,follow' : 'index,follow'}"><link rel="canonical" href="${esc(canonical)}"><meta property="og:type" content="website"><meta property="og:title" content="${esc(title)}"><meta property="og:description" content="${esc(description)}"><meta property="og:url" content="${esc(canonical)}"><meta property="og:site_name" content="VeeAys"><meta name="theme-color" content="#173d32"><link rel="icon" href="/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="/styles.css"></head><body><a class="skip" href="#main">Skip to content</a><header class="site-header"><div class="wrap header"><a class="veeays-brand" href="/" aria-label="VeeAys home"><span class="veeays-wordmark">VeeAys<span>.</span></span><span class="brand-plane"><svg viewBox="0 0 48 48" fill="none" aria-hidden="true"><path d="M5 21 43 5 30 43 21 28 5 21Z" fill="currentColor"/><path d="m21 28 22-23M21 28l-2 11 8-5" stroke="#123e30" stroke-width="2.5" stroke-linejoin="round"/></svg></span></a><nav aria-label="Main navigation"><a href="/">Find a job</a><a href="/categories">Categories</a></nav><span class="header-note">Filipino talent. Global possibilities.</span></div></header><main id="main">${body}</main><footer><div class="wrap footer"><a class="brand" href="/">VeeAys</a><p>Opportunities for Filipino talent. A new way forward.</p><p class="fine">Listings link to external sources. Confirm details with the employer and never pay to apply.</p></div></footer></body></html>`;
+  return `<!doctype html><html lang="en-PH"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${esc(title)} | VeeAys</title><meta name="description" content="${esc(description)}"><meta name="robots" content="${noindex ? 'noindex,follow' : 'index,follow'}"><link rel="canonical" href="${esc(canonical)}"><meta property="og:type" content="website"><meta property="og:title" content="${esc(title)}"><meta property="og:description" content="${esc(description)}"><meta property="og:url" content="${esc(canonical)}"><meta property="og:site_name" content="VeeAys"><meta name="theme-color" content="#123e30"><link rel="icon" href="/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="/styles.css"></head><body><a class="skip" href="#main">Skip to content</a><header class="site-header"><div class="wrap header">
+
+<a class="veeays-brand" href="/" aria-label="VeeAys home">
+  <svg class="veeays-logo" viewBox="0 0 260 74" role="img" aria-label="VeeAys">
+    <text class="logo-vee" x="1" y="43">Vee</text>
+    <text class="logo-ays" x="76" y="43">Ays</text>
+
+    <circle class="logo-dot" cx="153" cy="12" r="4.5"/>
+
+    <path
+      class="logo-flight-path"
+      d="M153 55
+         C169 69 196 66 207 50
+         C216 37 209 26 198 29
+         C185 32 189 48 205 48
+         C221 48 229 37 235 29"
+    />
+
+    <g class="logo-plane" transform="translate(226 11) rotate(8)">
+      <path
+        d="M2 15 L30 3 L20 31 L14 20 Z"
+        fill="currentColor"
+      />
+      <path
+        d="M14 20 L30 3"
+        fill="none"
+        stroke="#123e30"
+        stroke-width="2"
+        stroke-linecap="round"
+      />
+      <path
+        d="M14 20 L12 28 L18 24"
+        fill="none"
+        stroke="#123e30"
+        stroke-width="1.7"
+        stroke-linejoin="round"
+      />
+    </g>
+  </svg>
+</a>
+
+<nav aria-label="Main navigation"><a href="/">Find a job</a><a href="/categories">Categories</a></nav><span class="header-note">Filipino talent. Global possibilities.</span></div></header><main id="main">${body}</main><footer><div class="wrap footer"><a class="brand" href="/">VeeAys</a><p>Opportunities for Filipino talent. A new way forward.</p><p class="fine">Listings link to external sources. Confirm details with the employer and never pay to apply.</p></div></footer></body></html>`;
 }
 export function card(job) {
   const location = job.location || (job.remote ? 'Remote' : 'Location not specified');
