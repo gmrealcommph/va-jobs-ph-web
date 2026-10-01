@@ -110,3 +110,32 @@
 }
 .site-header nav{gap:17px}.site-header nav a{font-size:12px}.home-hero>.wrap{padding-top:34px;padding-bottom:22px}.home-hero-grid{display:block}.home-kicker{font-size:9px;letter-spacing:1.2px}.home-intro h1{font-size:clamp(40px,10.8vw,62px);letter-spacing:-2.1px;margin:22px 0 18px}.desktop-break{display:none}.home-intro p{font-size:14px;max-width:420px;margin-bottom:17px}.flight-art{display:none}.home-search{margin-top:28px}.home-search .search input{font-size:13px;padding:10px 5px}.home-search .search-row>span{padding-left:7px}.home-search .search button{padding:12px}.search-caption{font-size:10px;gap:8px}.search-caption>span{max-width:130px}.home-values>.wrap{flex-wrap:wrap;justify-content:flex-start;gap:8px 18px;padding-top:13px;padding-bottom:13px}.home-values span:last-child{width:100%}.home-values b{display:inline}.home-page .listings{padding-top:27px;padding-bottom:36px}.home-page .results-heading h2{font-size:25px}.home-page .job-card{padding:19px 14px}.home-page .home-outro{gap:14px;padding-top:25px;padding-bottom:30px}.home-outro>span{font-size:38px}.home-outro>div{flex:1 1 240px}.home-outro>a{margin-left:52px}
 }
+
+/* Employer CTA: override the broad nav-link styles in the shared header. */
+.site-header nav .post-job-cta{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  background:#b3ef73;
+  color:#123e30;
+  padding:11px 17px;
+  border-radius:9px;
+  font-size:12px;
+  font-weight:800;
+  line-height:1;
+  text-decoration:none!important;
+  box-shadow:0 2px 0 #86bd50;
+}
+.site-header nav .post-job-cta:hover{
+  background:#caf59d;
+  text-decoration:none;
+  transform:translateY(-1px);
+  box-shadow:0 3px 0 #86bd50;
+}
+@media(max-width:850px){
+  .site-header nav .post-job-cta{padding:10px 14px}
+}
+@media(max-width:600px){
+  .site-header nav .post-job-cta{padding:9px 12px;font-size:11px;border-radius:8px}
+}
+
