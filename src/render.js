@@ -713,5 +713,255 @@ export function listing({ rows, total, page, search, category, names }) {
 export function detail(job) {
   const apply = safeUrl(job.job_url);
 
-  return `<div class="wrap detail"><a class="back" href="${job.category ? categoryPath(job.category) : '/'}">← Back to opportunities</a><div class="detail-grid"><article><div class="eyebrow">${esc(job.company || 'Company not specified')}</div><h1>${esc(job.title || 'Job opportunity')}</h1><div class="job-meta"><span>${esc(job.location || 'Location not specified')}</span>${job.remote && !/remote/i.test((job.location || '') + ' ' + (job.workplace_type || '')) ? '<span>Remote</span>' : ''}${job.workplace_type ? `<span>${esc(job.workplace_type)}</span>` : ''}</div>${job.category ? `<a class="tag" href="${categoryPath(job.category)}">${esc(job.category)}</a>` : ''}<hr><h2>About this opportunity</h2><div class="description">${esc(job.description || 'Visit the original listing for the full job description.')}</div></article><aside class="apply-panel"><div class="eyebrow">TAKE THE NEXT STEP</div><h2>Sound like your kind of work?</h2><p>Read the original listing and apply directly through the source.</p>${apply ? `<a class="button" href="${esc(apply)}" target="_blank" rel="noopener noreferrer nofollow">View original & apply ↗</a><p class="fine">Opens an external website in a new tab.</p>` : '<p>The application link is currently unavailable.</p>'}<dl>${job.source ? `<dt>Source</dt><dd>${esc(job.source)}</dd>` : ''}${date(job.posted_at) ? `<dt>Posted</dt><dd>${date(job.posted_at)}</dd>` : ''}${date(job.collected_at) ? `<dt>Added to VeeAys</dt><dd>${date(job.collected_at)}</dd>` : ''}</dl></aside></div></div>`;
+  const company =
+    job.company ||
+    'Company not specified';
+
+  const title =
+    job.title ||
+    'Job opportunity';
+
+  const location =
+    job.location ||
+    'Location not specified';
+
+  const workplace =
+    job.workplace_type ||
+    (job.remote ? 'Remote' : '');
+
+  const posted =
+    date(job.posted_at);
+
+  const description =
+    job.description ||
+    'Visit the original listing for the full job description.';
+
+  return `
+    <div class="job-detail-page">
+
+      <section class="job-detail-hero">
+
+        <div class="wrap">
+
+          <a
+            class="job-detail-back"
+            href="${job.category ? categoryPath(job.category) : '/'}"
+          >
+            ← Back to opportunities
+          </a>
+
+
+          <div class="job-detail-hero-card">
+
+            <div class="job-detail-hero-top">
+
+              <div class="job-detail-company">
+                ${esc(company)}
+              </div>
+
+              ${
+                posted
+                  ? `<div class="job-detail-posted">
+                      Posted ${posted}
+                    </div>`
+                  : ''
+              }
+
+            </div>
+
+
+            <h1>
+              ${esc(title)}
+            </h1>
+
+
+            <div class="job-detail-meta">
+
+              <span class="job-detail-location">
+                <i aria-hidden="true">●</i>
+                ${esc(location)}
+              </span>
+
+              ${
+                workplace
+                  ? `<span class="job-detail-remote">
+                      <i aria-hidden="true">⌁</i>
+                      ${esc(workplace)}
+                    </span>`
+                  : ''
+              }
+
+            </div>
+
+
+            <div class="job-detail-hero-bottom">
+
+              ${
+                job.category
+                  ? `<a
+                      class="job-detail-category"
+                      href="${categoryPath(job.category)}"
+                    >
+                      ${esc(job.category)}
+                    </a>`
+                  : '<span></span>'
+              }
+
+              <div
+                class="job-detail-route"
+                aria-hidden="true"
+              >
+                <span>PH</span>
+                <b>· · · · · ·</b>
+                <span>WORLD</span>
+                <strong>↗</strong>
+              </div>
+
+            </div>
+
+
+            <span
+              class="job-detail-corner"
+              aria-hidden="true"
+            ></span>
+
+          </div>
+
+        </div>
+
+      </section>
+
+
+      <section class="wrap job-detail-layout">
+
+        <article class="job-detail-content">
+
+          <div class="job-detail-section-heading">
+
+            <span aria-hidden="true">✦</span>
+
+            <div>
+              <div class="eyebrow">
+                THE OPPORTUNITY
+              </div>
+
+              <h2>
+                About this opportunity
+              </h2>
+            </div>
+
+          </div>
+
+
+          <div class="description job-detail-description">
+            ${esc(description)}
+          </div>
+
+        </article>
+
+
+        <aside class="job-detail-sidebar">
+
+          <div class="job-detail-snapshot">
+
+            <div class="job-detail-snapshot-kicker">
+              <span aria-hidden="true">✦</span>
+              OPPORTUNITY SNAPSHOT
+            </div>
+
+
+            <h2>
+              Sound like your<br>
+              kind of work?
+            </h2>
+
+
+            <dl>
+
+              <div>
+                <dt>Company</dt>
+                <dd>${esc(company)}</dd>
+              </div>
+
+
+              <div>
+                <dt>Location</dt>
+                <dd>${esc(location)}</dd>
+              </div>
+
+
+              ${
+                workplace
+                  ? `<div>
+                      <dt>Workplace</dt>
+                      <dd>${esc(workplace)}</dd>
+                    </div>`
+                  : ''
+              }
+
+
+              ${
+                job.category
+                  ? `<div>
+                      <dt>Category</dt>
+                      <dd>
+                        <a href="${categoryPath(job.category)}">
+                          ${esc(job.category)}
+                        </a>
+                      </dd>
+                    </div>`
+                  : ''
+              }
+
+
+              ${
+                posted
+                  ? `<div>
+                      <dt>Posted</dt>
+                      <dd>${posted}</dd>
+                    </div>`
+                  : ''
+              }
+
+            </dl>
+
+
+            ${
+              apply
+                ? `<a
+                    class="job-detail-apply"
+                    href="${esc(apply)}"
+                    target="_blank"
+                    rel="noopener noreferrer nofollow"
+                  >
+                    <span>Apply for this role</span>
+                    <b>↗</b>
+                  </a>
+
+                  <p class="job-detail-external">
+                    Opens the employer's original listing
+                    in a new tab.
+                  </p>`
+                : `<p class="job-detail-unavailable">
+                    The application link is currently unavailable.
+                  </p>`
+            }
+
+
+            <div
+              class="job-detail-flight"
+              aria-hidden="true"
+            >
+              <span>· · · · · · ·</span>
+              <b>➤</b>
+            </div>
+
+          </div>
+
+        </aside>
+
+      </section>
+
+    </div>
+  `;
 }
