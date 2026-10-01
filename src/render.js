@@ -715,55 +715,211 @@ function formatJobDescription(text = '') {
     return '<p>Visit the original listing for the full job description.</p>';
   }
 
-  const lines = String(text)
+  /*
+    Some ATS feeds put bullets in the middle of a line:
+
+    Key Responsibilities ● First item ● Second item
+
+    Put those bullets onto their own lines before parsing.
+  */
+  const normalized = String(text)
     .replace(/\r\n/g, '\n')
     .replace(/\r/g, '\n')
-    .split('\n');
+    .replace(/\s*[●•▪◦]\s*/g, '\n● ');
+
+  const lines = normalized.split('\n');
 
   let html = '';
   let paragraph = [];
   let inList = false;
 
   const flushParagraph = () => {
-    if (!paragraph.length) return;
+    if (!paragraph.length) {
+      return;
+    }
 
-    html += `<p>${paragraph.map(esc).join(' ')}</p>`;
+    html += `<p>${paragraph
+      .map(esc)
+      .join(' ')}</p>`;
+
     paragraph = [];
   };
 
   const closeList = () => {
-    if (!inList) return;
+    if (!inList) {
+      return;
+    }
 
     html += '</ul>';
     inList = false;
   };
 
-  const isHeading = (line) => {
-    const clean = line.trim();
+  const isKnownHeading = (line) => {
+    const clean = line
+      .trim()
+      .replace(/:\s*$/, '');
 
-    if (!clean) return false;
-    if (clean.length > 90) return false;
+    const lower = clean.toLowerCase();
+
+    const headings = [
+      'about the role',
+      'about role',
+      'about the job',
+      'about the position',
+      'about the company',
+      'about the team',
+      'about the opportunity',
+      'about you',
+
+      'key responsibilities',
+      'responsibilities',
+      'responsibilities include',
+      'duties',
+      'key duties',
+
+      "what you'll do",
+      'what you’ll do',
+      'what you will do',
+      "what you'll be doing",
+      'what you’ll be doing',
+      'what you will be doing',
+
+      "what we're looking for",
+      'what we’re looking for',
+      'what we are looking for',
+
+      'who you are',
+      "who we're looking for",
+      'who we’re looking for',
+      'who we are looking for',
+
+      'requirement',
+      'requirements',
+
+      'qualification',
+      'qualifications',
+
+      'skills',
+      'skills and experience',
+
+      'experience',
+
+      'preferred qualification',
+      'preferred qualifications',
+      'preferred experience',
+
+      'nice to have',
+
+      'working style',
+
+      'compensation',
+      'salary',
+
+      'benefits',
+      'perks',
+      'perks and benefits',
+
+      'what we offer',
+
+      'the role',
+      'the opportunity',
+
+      'your role',
+      'your responsibilities'
+    ];
+
+    if (headings.includes(lower)) {
+      return true;
+    }
 
     /*
-      Typical imported job-description headings:
-      WHAT YOU'LL DO
-      REQUIREMENTS:
-      About You
-      Who You Are
-      AS A CSM YOU WILL BE:
+      Company-specific headings such as:
+
+      Why Join Assist World?
+      Why Join Us?
+      Why Work With Acme?
     */
-    const letters = clean.replace(/[^A-Za-z]/g, '');
+    if (
+      lower === 'why join us' ||
+      lower.startsWith('why join ') ||
+      lower.startsWith('why work with ')
+    ) {
+      return true;
+    }
 
-    const uppercase =
-      letters.length >= 4 &&
-      letters === letters.toUpperCase();
+    return false;
+  };
 
-    const headingPhrase =
-      /^(about|what|who|why|your|you'll|you will|requirements?|qualifications?|responsibilities|responsibilities include|skills|experience|benefits|nice to have|preferred|the role|the opportunity|what we offer|what you'll do|what you will do|who you are|about you)\b/i.test(
-        clean
-      );
+  const isUppercaseHeading = (line) => {
+    const clean = line
+      .trim()
+      .replace(/:\s*$/, '');
 
-    return uppercase || headingPhrase;
+    if (!clean) {
+      return false;
+    }
+
+    if (clean.length > 70) {
+      return false;
+    }
+
+    /*
+      These are usually promotional statements or benefits,
+      not section headings.
+
+      Examples:
+      100% REMOTE
+      $600 PER MONTH
+      NO TRACKER. NO PROBLEM
+    */
+    if (/\d/.test(clean)) {
+      return false;
+    }
+
+    if (clean.includes('.')) {
+      return false;
+    }
+
+    const words = clean
+      .split(/\s+/)
+      .filter(Boolean);
+
+    if (words.length > 8) {
+      return false;
+    }
+
+    const letters = clean.replace(
+      /[^A-Za-z]/g,
+      ''
+    );
+
+    if (letters.length < 4) {
+      return false;
+    }
+
+    return (
+      letters === letters.toUpperCase()
+    );
+  };
+
+  const isHeading = (line) => {
+    return (
+      isKnownHeading(line) ||
+      isUppercaseHeading(line)
+    );
+  };
+
+  const addListItem = (value) => {
+    flushParagraph();
+
+    if (!inList) {
+      html += '<ul>';
+      inList = true;
+    }
+
+    html += `<li>${esc(
+      value.trim()
+    )}</li>`;
   };
 
   for (const rawLine of lines) {
@@ -775,29 +931,37 @@ function formatJobDescription(text = '') {
       continue;
     }
 
+    /*
+      Standard bullets from different ATS platforms.
+    */
     const bulletMatch = line.match(
-      /^(?:[-–—•*▪◦]|\d+[.)])\s*(.+)$/
+      /^(?:[-–—•●*▪◦]|\d+[.)])\s*(.+)$/
     );
 
     if (bulletMatch) {
-      flushParagraph();
+      addListItem(
+        bulletMatch[1]
+      );
 
-      if (!inList) {
-        html += '<ul>';
-        inList = true;
-      }
-
-      html += `<li>${esc(bulletMatch[1])}</li>`;
       continue;
     }
 
+    /*
+      Recognised section heading.
+    */
     if (isHeading(line)) {
       flushParagraph();
       closeList();
 
-      const heading = line.replace(/:\s*$/, '');
+      const heading = line.replace(
+        /:\s*$/,
+        ''
+      );
 
-      html += `<h3>${esc(heading)}</h3>`;
+      html += `<h3>${esc(
+        heading
+      )}</h3>`;
+
       continue;
     }
 
