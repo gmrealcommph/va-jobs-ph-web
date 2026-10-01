@@ -28,15 +28,46 @@ export async function query(env, params, { offset = 0, limit = PAGE_SIZE, count 
   if (count && (!total || total === '*' || !/^\d+$/.test(total))) throw new Error('Missing job count.');
   return { rows, total: count ? Number(total) : null };
 }
-export function listJobs(env, { page = 1, search = '', category = '' } = {}) {
-  const params = { select: COLUMNS, order: 'posted_at.desc.nullslast,id.asc' };
-  if (category) params.category = `eq.${literal(category)}`;
-  if (search) {
-    // User wildcard characters are treated as spaces, never filter syntax.
-    const term = literal(`*${search.replace(/[%*_\\]/g, ' ').trim()}*`);
-    params.or = `(title.ilike.${term},company.ilike.${term},description.ilike.${term})`;
+export function listJobs(
+  env,
+  {
+    page = 1,
+    search = '',
+    category = ''
+  } = {}
+) {
+  const params = {
+    select: COLUMNS,
+    order: 'posted_at.desc.nullslast,id.asc'
+  };
+
+  if (category) {
+    params.category =
+      `eq.${category}`;
   }
-  return query(env, params, { offset: (page - 1) * PAGE_SIZE, count: true });
+
+  if (search) {
+    // User wildcard characters are treated as spaces,
+    // never PostgREST filter syntax.
+    const term = literal(
+      `*${search
+        .replace(/[%*_\\]/g, ' ')
+        .trim()}*`
+    );
+
+    params.or =
+      `(title.ilike.${term},company.ilike.${term},description.ilike.${term})`;
+  }
+
+  return query(
+    env,
+    params,
+    {
+      offset:
+        (page - 1) * PAGE_SIZE,
+      count: true
+    }
+  );
 }
 export async function getJob(env, id) {
   const numericId = String(id).trim();
