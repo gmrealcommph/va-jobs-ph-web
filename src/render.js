@@ -849,7 +849,7 @@ export function detail(job) {
 
           <a
             class="job-detail-back"
-            href="${job.category ? categoryPath(job.category) : '/'}"
+            href="/#opportunities"
           >
             ← Back to opportunities
           </a>
