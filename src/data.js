@@ -39,8 +39,24 @@ export function listJobs(env, { page = 1, search = '', category = '' } = {}) {
   return query(env, params, { offset: (page - 1) * PAGE_SIZE, count: true });
 }
 export async function getJob(env, id) {
-  const { rows } = await query(env, { select: COLUMNS, id: `eq.${literal(id)}` }, { limit: 1 });
-  return rows[0];
+  const numericId = String(id).trim();
+
+  if (!/^\d+$/.test(numericId)) {
+    return null;
+  }
+
+  const { rows } = await query(
+    env,
+    {
+      select: COLUMNS,
+      id: `eq.${numericId}`
+    },
+    {
+      limit: 1
+    }
+  );
+
+  return rows[0] || null;
 }
 export async function categories(env) {
   const names = new Set();
