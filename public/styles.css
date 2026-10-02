@@ -4506,7 +4506,23 @@ dd{margin:0;overflow-wrap:anywhere}
   color:#ff8b2b;
   transform:rotate(-7deg);
 }
+.job-detail-source {
+  margin-top: 8px;
+  font-size: 12px;
+  line-height: 1.5;
+  color: rgba(18, 62, 48, 0.62);
+}
 
+.job-detail-source a {
+  color: inherit;
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.job-detail-source a:hover {
+  color: #123e30;
+}
 
 /* =========================================================
    RESPONSIVE
