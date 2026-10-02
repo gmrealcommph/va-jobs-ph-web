@@ -24,6 +24,14 @@ async function defaultPostAuthPath(env, state) {
   } catch { return '/onboarding'; }
 }
 
+function hasCookie(request, name, expected = '1') {
+  for (const part of (request.headers.get('cookie') || '').split(';')) {
+    const [key, ...rest] = part.trim().split('=');
+    if (key === name && decodeURIComponent(rest.join('=')) === expected) return true;
+  }
+  return false;
+}
+
 function xml(body) { return new Response(`<?xml version="1.0" encoding="UTF-8"?>${body}`, { headers: { 'content-type': 'application/xml; charset=utf-8', 'cache-control': 'public, max-age=300' } }); }
 export async function handle(request, env) {
   const url = new URL(request.url);
@@ -135,6 +143,7 @@ export async function handle(request, env) {
 
   let base;
   let authState = { user: null, refreshed: null };
+  let showPreferencesPrompt = false;
 
   const render = (
     title,
@@ -157,7 +166,8 @@ export async function handle(request, env) {
           noindex ||
           !env.SITE_URL ||
           base !== url.origin,
-        user: authState.user
+        user: authState.user,
+        showPreferencesPrompt
       }),
       {
         status,
@@ -487,6 +497,22 @@ if (
      */
 
     authState = await sessionForRequest(request, env);
+
+    if (url.pathname === '/dismiss-preferences-prompt') {
+      const h = new Headers({ location: '/', 'cache-control': 'no-store' });
+      h.append('Set-Cookie', 'veeays_preferences_prompt_dismissed=1; Path=/; Max-Age=604800; Secure; HttpOnly; SameSite=Lax');
+      if (authState.refreshed && typeof authState.refreshed === 'object') setSessionCookies(h, authState.refreshed);
+      return new Response(null, { status: 303, headers: h });
+    }
+
+    if (authState.user && authState.accessToken && !hasCookie(request, 'veeays_preferences_prompt_dismissed')) {
+      try {
+        const profile = await getMyProfile(env, authState.accessToken, authState.user.id);
+        showPreferencesPrompt = profile?.onboarding_completed === false;
+      } catch (error) {
+        console.error('Profile prompt check failed:', error);
+      }
+    }
 
     if (url.pathname === '/logout') {
       const h = new Headers({ location: '/', 'cache-control': 'no-store' });

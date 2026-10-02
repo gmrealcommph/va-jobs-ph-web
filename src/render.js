@@ -4,7 +4,7 @@ export const categoryPath = name => `/categories/${encodeURIComponent(name)}`;
 export function safeUrl(value) { try { const u = new URL(value); return ['https:', 'http:'].includes(u.protocol) ? u.href : null; } catch { return null; } }
 export function date(value) { const d = new Date(value); return value && !Number.isNaN(+d) ? d.toLocaleDateString('en-PH', { year: 'numeric', month: 'short', day: 'numeric', timeZone: 'Asia/Manila' }) : ''; }
 
-export function layout({ title, description, canonical, body, noindex = false, user = null }) {
+export function layout({ title, description, canonical, body, noindex = false, user = null, showPreferencesPrompt = false }) {
   return `<!doctype html>
 <html lang="en-PH">
 <head>
@@ -101,6 +101,21 @@ export function layout({ title, description, canonical, body, noindex = false, u
   </div>
 
 </header>
+
+${showPreferencesPrompt ? `
+<section class="preferences-nudge" aria-label="Personalize your job recommendations">
+  <div class="wrap preferences-nudge-inner">
+    <div class="preferences-nudge-copy">
+      <strong>Want better job recommendations? ✈️</strong>
+      <span>Tell VeeAys what you're looking for and we'll surface jobs that fit your role, salary and working hours.</span>
+    </div>
+    <div class="preferences-nudge-actions">
+      <a class="button preferences-nudge-primary" href="/onboarding">Set my preferences</a>
+      <a class="preferences-nudge-dismiss" href="/dismiss-preferences-prompt">Not now</a>
+    </div>
+  </div>
+</section>
+` : ''}
 
 <main id="main">
   ${body}
