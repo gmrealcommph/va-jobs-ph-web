@@ -1385,13 +1385,20 @@ export function matchesPage({ matches = [], preferences = null, error = '' } = {
     return `<span class="match-diagnostic ${state}"><b aria-hidden="true">${icon}</b>${esc(label)}${suffix}</span>`;
   };
 
+  const schedulePrefs = Array.isArray(preferences?.schedule_preferences) ? preferences.schedule_preferences : [];
+  const scheduleUnrestricted = schedulePrefs.some(value => ['flexible/any', 'flexible', 'any'].includes(String(value).trim().toLowerCase()));
+  const confidenceLabel = available => available >= 5 ? 'High confidence' : available >= 3 ? 'Good confidence' : 'Limited data';
+  const unrestrictedDiagnostic = label => `<span class="match-diagnostic unrestricted"><b aria-hidden="true">↔</b>${esc(label)} unrestricted</span>`;
+
   const cards = matches.map(job => {
     const skillsAvailable = Array.isArray(preferences?.skills) && preferences.skills.length > 0 && Array.isArray(job.skills) && job.skills.length > 0;
     const salaryAvailable = preferences?.minimum_salary_usd != null && job.salary_period === 'monthly' && (job.salary_min_usd != null || job.salary_max_usd != null);
-    const scheduleAvailable = Array.isArray(preferences?.schedule_preferences) && preferences.schedule_preferences.length > 0 && !!job.schedule_region;
+    const scheduleAvailable = !scheduleUnrestricted && schedulePrefs.length > 0 && !!job.schedule_region;
     const employmentAvailable = Array.isArray(preferences?.employment_types) && preferences.employment_types.length > 0 && !!job.employment_type;
     const experienceAvailable = !!preferences?.experience_level && !!job.experience_level;
     const roleAvailable = Array.isArray(preferences?.target_roles) && preferences.target_roles.length > 0 && !!(job.category || job.title);
+    const availableFactors = Number(job.available_dimensions) || 0;
+    const confidence = confidenceLabel(availableFactors);
     return `
       <article class="match-card">
         <div class="match-score"><strong>${esc(job.match_score)}%</strong><span>match</span></div>
@@ -1403,12 +1410,12 @@ export function matchesPage({ matches = [], preferences = null, error = '' } = {
             ${diagnostic('Role', job.role_match, roleAvailable)}
             ${diagnostic('Skills', job.skills_match, skillsAvailable)}
             ${diagnostic('Salary', job.salary_match, salaryAvailable)}
-            ${diagnostic('Schedule', job.schedule_match, scheduleAvailable)}
+            ${scheduleUnrestricted ? unrestrictedDiagnostic('Schedule') : diagnostic('Schedule', job.schedule_match, scheduleAvailable)}
             ${diagnostic('Full-time / part-time', job.employment_match, employmentAvailable)}
             ${diagnostic('Experience', job.experience_match, experienceAvailable)}
           </div>
           <div class="match-card-footer">
-            <span>${esc(job.matched_dimensions)} of ${esc(job.available_dimensions)} available preferences matched</span>
+            <span>Based on ${esc(availableFactors)} matching factor${availableFactors === 1 ? '' : 's'} <strong class="match-confidence">${esc(confidence)}</strong></span>
             <a href="${jobPath(job)}">View job →</a>
           </div>
         </div>
