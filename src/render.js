@@ -4,7 +4,7 @@ export const categoryPath = name => `/categories/${encodeURIComponent(name)}`;
 export function safeUrl(value) { try { const u = new URL(value); return ['https:', 'http:'].includes(u.protocol) ? u.href : null; } catch { return null; } }
 export function date(value) { const d = new Date(value); return value && !Number.isNaN(+d) ? d.toLocaleDateString('en-PH', { year: 'numeric', month: 'short', day: 'numeric', timeZone: 'Asia/Manila' }) : ''; }
 
-export function layout({ title, description, canonical, body, noindex = false }) {
+export function layout({ title, description, canonical, body, noindex = false, user = null }) {
   return `<!doctype html>
 <html lang="en-PH">
 <head>
@@ -87,17 +87,14 @@ export function layout({ title, description, canonical, body, noindex = false })
 
     <div class="header-actions">
 
-      <span class="header-note">
-        Filipino talent. Global possibilities.
-      </span>
-
-      <a
-        class="post-job-cta"
-        href="/employers"
-      >
-        Post a job
-        <span aria-hidden="true">↗</span>
-      </a>
+      ${user ? `
+        <span class="auth-user">${esc(user.email || 'Your account')}</span>
+        <a class="auth-link" href="/onboarding">My account</a>
+        <a class="auth-link" href="/logout">Log out</a>
+      ` : `
+        <a class="auth-link" href="/login">Log in</a>
+        <a class="post-job-cta" href="/signup">Sign up</a>
+      `}
 
     </div>
 
@@ -1266,4 +1263,42 @@ ${
 
     </div>
   `;
+}
+
+
+export function authPage({ mode = 'login', error = '', message = '', email = '' } = {}) {
+  const signup = mode === 'signup';
+  return `
+    <section class="auth-shell">
+      <div class="auth-intro">
+        <div class="kicker">${signup ? 'JOIN VEEAYS' : 'WELCOME BACK'}</div>
+        <h1>${signup ? 'Your next remote role,<br><em>without the guesswork.</em>' : 'Pick up where<br><em>you left off.</em>'}</h1>
+        <p>${signup ? 'Create your free VeeAys account. We focus on remote opportunities that are open to Filipino talent.' : 'Log in to continue building your VeeAys profile and, soon, get job matches tailored to you.'}</p>
+      </div>
+      <div class="auth-card">
+        <h2>${signup ? 'Create your account' : 'Log in'}</h2>
+        <p>${signup ? 'Free to join. You can set your job preferences after verifying your email.' : 'Use the email and password you signed up with.'}</p>
+        ${error ? `<div class="auth-alert error" role="alert">${esc(error)}</div>` : ''}
+        ${message ? `<div class="auth-alert success">${esc(message)}</div>` : ''}
+        <form class="auth-form" method="post" action="${signup ? '/signup' : '/login'}">
+          ${signup ? `<div class="auth-field"><label for="full_name">Full name</label><input id="full_name" name="full_name" type="text" autocomplete="name" maxlength="100" required></div>` : ''}
+          <div class="auth-field"><label for="email">Email address</label><input id="email" name="email" type="email" autocomplete="email" maxlength="254" value="${esc(email)}" required></div>
+          <div class="auth-field"><label for="password">Password</label><input id="password" name="password" type="password" autocomplete="${signup ? 'new-password' : 'current-password'}" minlength="8" maxlength="128" required></div>
+          <button type="submit">${signup ? 'Create account' : 'Log in'}</button>
+        </form>
+        <p class="auth-switch">${signup ? 'Already have an account? <a href="/login">Log in</a>' : 'New to VeeAys? <a href="/signup">Create an account</a>'}</p>
+      </div>
+    </section>`;
+}
+
+export function checkEmailPage(email = '') {
+  return `<section class="auth-shell"><div class="auth-intro"><div class="kicker">ONE MORE STEP</div><h1>Check your<br><em>inbox.</em></h1><p>We sent a confirmation link${email ? ` to <strong>${esc(email)}</strong>` : ''}. Click it to verify your email and continue setting up your VeeAys account.</p></div><div class="auth-card"><h2>Verify your email</h2><p>The link will take you back to VeeAys. If you don't see the message, check your spam or junk folder.</p><a class="button" href="/login">Back to log in</a></div></section>`;
+}
+
+export function authCallbackPage() {
+  return `<section class="auth-callback"><div class="kicker">VERIFYING</div><h1>Finishing your sign in…</h1><p>Please keep this page open for a moment.</p></section><script src="/auth-callback.js" defer></script>`;
+}
+
+export function onboardingPlaceholder(user) {
+  return `<section class="auth-shell"><div class="auth-intro"><div class="kicker">ACCOUNT READY</div><h1>Welcome to<br><em>VeeAys.</em></h1><p>Your account is signed in${user?.email ? ` as <strong>${esc(user.email)}</strong>` : ''}. Next we'll build your job preferences and personalized matches here.</p></div><div class="auth-card"><h2>You're in ✈️</h2><p>Email verification and your secure VeeAys session are working. The full onboarding questionnaire is the next build step.</p><a class="button" href="/">Browse jobs</a></div></section>`;
 }
