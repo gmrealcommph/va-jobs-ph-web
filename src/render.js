@@ -43,7 +43,7 @@ export function layout({ title, description, canonical, body, noindex = false, u
     type="image/svg+xml"
   >
 
-  <link rel="stylesheet" href="/styles.css?v=20261002-reviewfix">
+  <link rel="stylesheet" href="/styles.css?v=20261002-mobilecategories">
 </head>
 
 <body>
