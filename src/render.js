@@ -1003,7 +1003,9 @@ export function detail(job) {
   const description =
     job.description ||
     'Visit the original listing for the full job description.';
-
+  const isHimalayas =
+  String(job.source || '').toLowerCase() === 'himalayas';
+  
   return `
     <div class="job-detail-page">
 
@@ -1226,9 +1228,22 @@ export function detail(job) {
                   </a>
 
                   <p class="job-detail-external">
-                    Opens the employer's original listing
-                    in a new tab.
-                  </p>`
+  Opens the original listing
+  in a new tab.
+</p>
+
+${
+  isHimalayas
+    ? `<p class="job-detail-source">
+        Job data sourced from
+        <a
+          href="https://himalayas.app/"
+          target="_blank"
+          rel="noopener noreferrer"
+        >Himalayas</a>.
+      </p>`
+    : ''
+}`
                 : `<p class="job-detail-unavailable">
                     The application link is currently unavailable.
                   </p>`
