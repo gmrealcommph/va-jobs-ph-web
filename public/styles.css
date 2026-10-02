@@ -5124,3 +5124,49 @@ dd{margin:0;overflow-wrap:anywhere}
     min-height: 34px !important;
   }
 }
+
+
+/* Onboarding completion */
+.onboarding-success {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: min(100%, 760px);
+  margin: 4px auto 28px;
+  padding: 16px 18px;
+  border: 1px solid #c7dfae;
+  border-radius: 14px;
+  background: #f0f8e8;
+  color: #244c22;
+  box-shadow: 0 8px 24px rgba(18, 62, 48, .06);
+}
+
+.onboarding-success-icon {
+  display: grid;
+  place-items: center;
+  flex: 0 0 34px;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: #dff4a8;
+  font-weight: 900;
+}
+
+.onboarding-success > div:last-child {
+  display: grid;
+  gap: 2px;
+}
+
+.onboarding-success strong {
+  font-size: 14px;
+}
+
+.onboarding-success span {
+  color: #587064;
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.onboard-actions [hidden] {
+  display: none !important;
+}

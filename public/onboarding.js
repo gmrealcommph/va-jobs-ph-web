@@ -28,7 +28,7 @@
   function review() {
     const groups = [
       ['Roles', checked('target_roles').map(x => x.value).join(', ')],
-      ['Minimum salary', salary.value ? `$${Number(salary.value).toLocaleString()} / month` : 'No minimum set'],
+      ['Minimum salary', salary.value ? `$${Number(salary.value).toLocaleString()} / month · approx. ₱${Math.round(Number(salary.value) * 58).toLocaleString()} / month` : 'No minimum set'],
       ['Employment', checked('employment_types').map(x => x.value).join(', ')],
       ['Schedule', checked('schedule_preferences').map(x => x.value).join(', ')],
       ['Experience', checked('experience_level')[0]?.value || ''],
@@ -40,10 +40,15 @@
   function show() {
     steps.forEach((el,i) => el.classList.toggle('active', i === step));
     dots.forEach((el,i) => { el.classList.toggle('active', i === step); el.classList.toggle('done', i < step); });
-    back.hidden = step === 0;
-    next.hidden = step === steps.length - 1;
-    finish.hidden = step !== steps.length - 1;
-    if (step === steps.length - 1) review();
+    const isFirst = step === 0;
+    const isLast = step === steps.length - 1;
+    back.hidden = isFirst;
+    next.hidden = isLast;
+    finish.hidden = !isLast;
+    back.style.display = isFirst ? 'none' : '';
+    next.style.display = isLast ? 'none' : '';
+    finish.style.display = isLast ? '' : 'none';
+    if (isLast) review();
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
   function updatePhp() {
