@@ -1,8 +1,7 @@
 import { categories, getJob, listJobs, query } from './data.js';
-import { layout, listing, detail, esc, jobPath, categoryPath, authPage, checkEmailPage, authCallbackPage, onboardingPlaceholder } from './render.js';
-import { signUp, signIn, getUser, sessionForRequest, setSessionCookies, clearSessionCookies, authError } from './auth.js';
+import { layout, listing, detail, esc, jobPath, categoryPath } from './render.js';
 
-const headers = { 'content-type': 'text/html; charset=utf-8', 'x-content-type-options': 'nosniff', 'referrer-policy': 'strict-origin-when-cross-origin', 'content-security-policy': "default-src 'none'; style-src 'self'; img-src 'self'; script-src 'self'; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-ancestors 'none'", 'permissions-policy': 'camera=(), microphone=(), geolocation=()' };
+const headers = { 'content-type': 'text/html; charset=utf-8', 'x-content-type-options': 'nosniff', 'referrer-policy': 'strict-origin-when-cross-origin', 'content-security-policy': "default-src 'none'; style-src 'self'; img-src 'self'; base-uri 'none'; form-action 'self'; frame-ancestors 'none'", 'permissions-policy': 'camera=(), microphone=(), geolocation=()' };
 function origin(env, url) {
   if (!env.SITE_URL) return url.origin;
   const value = new URL(env.SITE_URL);
@@ -13,60 +12,11 @@ function xml(body) { return new Response(`<?xml version="1.0" encoding="UTF-8"?>
 export async function handle(request, env) {
   const url = new URL(request.url);
 
-  const siteOrigin = origin(env, url);
-
-  const sameOriginPost = () => {
-    const requestOrigin = request.headers.get('origin');
-    return !requestOrigin || requestOrigin === url.origin;
-  };
-
-  if (request.method === 'POST' && ['/signup', '/login', '/auth/session'].includes(url.pathname)) {
-    if (!sameOriginPost()) return new Response('Forbidden', { status: 403 });
-
-    if (url.pathname === '/auth/session') {
-      let payload;
-      try { payload = await request.json(); } catch { return new Response('Invalid request', { status: 400 }); }
-      const accessToken = String(payload?.access_token || '');
-      const refreshToken = String(payload?.refresh_token || '');
-      if (!accessToken || !refreshToken || accessToken.length > 10000 || refreshToken.length > 10000) return new Response('Invalid session', { status: 400 });
-      const user = await getUser(env, accessToken);
-      if (!user) return new Response('Invalid session', { status: 401 });
-      const responseHeaders = new Headers({ location: '/onboarding', 'cache-control': 'no-store' });
-      setSessionCookies(responseHeaders, { access_token: accessToken, refresh_token: refreshToken, expires_in: Number(payload?.expires_in) || 3600 });
-      return new Response(null, { status: 204, headers: responseHeaders });
-    }
-
-    let form;
-    try { form = await request.formData(); } catch { return new Response('Invalid form', { status: 400 }); }
-    const email = String(form.get('email') || '').trim().toLowerCase().slice(0, 254);
-    const password = String(form.get('password') || '');
-    const fullName = String(form.get('full_name') || '').trim().slice(0, 100);
-    if (!email || !email.includes('@') || password.length < 8 || password.length > 128) {
-      const target = url.pathname === '/signup' ? '/signup' : '/login';
-      return Response.redirect(`${url.origin}${target}?error=${encodeURIComponent('Enter a valid email and a password of at least 8 characters.')}&email=${encodeURIComponent(email)}`, 303);
-    }
-
-    if (url.pathname === '/signup') {
-      if (!fullName) return Response.redirect(`${url.origin}/signup?error=${encodeURIComponent('Enter your full name.')}&email=${encodeURIComponent(email)}`, 303);
-      const { response, data } = await signUp(env, { email, password, fullName, redirectTo: `${siteOrigin}/auth/callback` });
-      if (!response.ok) return Response.redirect(`${url.origin}/signup?error=${encodeURIComponent(authError(data, 'We could not create your account.'))}&email=${encodeURIComponent(email)}`, 303);
-      if (data?.access_token && data?.refresh_token) {
-        const h = new Headers({ location: '/onboarding', 'cache-control': 'no-store' });
-        setSessionCookies(h, data);
-        return new Response(null, { status: 303, headers: h });
-      }
-      return Response.redirect(`${url.origin}/check-email?email=${encodeURIComponent(email)}`, 303);
-    }
-
-    const { response, data } = await signIn(env, { email, password });
-    if (!response.ok || !data?.access_token) return Response.redirect(`${url.origin}/login?error=${encodeURIComponent(authError(data, 'Email or password is incorrect.'))}&email=${encodeURIComponent(email)}`, 303);
-    const h = new Headers({ location: '/onboarding', 'cache-control': 'no-store' });
-    setSessionCookies(h, data);
-    return new Response(null, { status: 303, headers: h });
-  }
-
   if (!['GET', 'HEAD'].includes(request.method)) {
-    return new Response('Method not allowed', { status: 405, headers: { Allow: 'GET, HEAD, POST' } });
+    return new Response('Method not allowed', {
+      status: 405,
+      headers: { Allow: 'GET, HEAD' }
+    });
   }
 
   if (request.method === 'HEAD') {
@@ -82,7 +32,6 @@ export async function handle(request, env) {
   }
 
   let base;
-  let authState = { user: null, refreshed: null };
 
   const render = (
     title,
@@ -104,18 +53,17 @@ export async function handle(request, env) {
         noindex:
           noindex ||
           !env.SITE_URL ||
-          base !== url.origin,
-        user: authState.user
+          base !== url.origin
       }),
       {
         status,
-        headers: (() => {
-          const h = new Headers(headers);
-          h.set('cache-control', status === 200 && !authState.user ? 'public, max-age=60' : 'no-store');
-          if (authState.refreshed && typeof authState.refreshed === 'object') setSessionCookies(h, authState.refreshed);
-          else if (authState.refreshed === false) clearSessionCookies(h);
-          return h;
-        })()
+        headers: {
+          ...headers,
+          'cache-control':
+            status === 200
+              ? 'public, max-age=60'
+              : 'no-store'
+        }
       }
     );
 
@@ -433,40 +381,6 @@ if (
      * NORMAL SITE ROUTES
      * =====================================================
      */
-
-    authState = await sessionForRequest(request, env);
-
-    if (url.pathname === '/logout') {
-      const h = new Headers({ location: '/', 'cache-control': 'no-store' });
-      clearSessionCookies(h);
-      return new Response(null, { status: 303, headers: h });
-    }
-
-    if (url.pathname === '/signup' || url.pathname === '/login') {
-      if (authState.user) return Response.redirect(url.origin + '/onboarding', 303);
-      const mode = url.pathname === '/signup' ? 'signup' : 'login';
-      return render(mode === 'signup' ? 'Create your account' : 'Log in', authPage({
-        mode,
-        error: (url.searchParams.get('error') || '').slice(0, 240),
-        message: (url.searchParams.get('message') || '').slice(0, 240),
-        email: (url.searchParams.get('email') || '').slice(0, 254)
-      }), { noindex: true });
-    }
-
-    if (url.pathname === '/check-email') {
-      if (authState.user) return Response.redirect(url.origin + '/onboarding', 303);
-      return render('Check your email', checkEmailPage((url.searchParams.get('email') || '').slice(0, 254)), { noindex: true });
-    }
-
-    if (url.pathname === '/auth/callback') {
-      if (authState.user) return Response.redirect(url.origin + '/onboarding', 303);
-      return render('Verifying your email', authCallbackPage(), { noindex: true });
-    }
-
-    if (url.pathname === '/onboarding') {
-      if (!authState.user) return Response.redirect(url.origin + '/login?message=' + encodeURIComponent('Log in to continue setting up your account.'), 303);
-      return render('Set up your account', onboardingPlaceholder(authState.user), { noindex: true });
-    }
 
     if (
       url.pathname.endsWith('/') &&
