@@ -126,7 +126,7 @@ export async function completeOnboarding(env, accessToken) {
 }
 
 export async function getMyProfile(env, accessToken, userId) {
-  const { response, data } = await userRestFetch(env, accessToken, `/rest/v1/profiles?id=eq.${encodeURIComponent(userId)}&select=id,onboarding_completed`, { method: 'GET' });
+  const { response, data } = await userRestFetch(env, accessToken, `/rest/v1/profiles?id=eq.${encodeURIComponent(userId)}&select=id,full_name,onboarding_completed`, { method: 'GET' });
   if (!response.ok) throw new Error(`Could not load profile (${response.status}).`);
   return Array.isArray(data) ? (data[0] || null) : null;
 }
