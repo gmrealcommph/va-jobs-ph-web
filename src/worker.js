@@ -17,11 +17,9 @@ function safeReturnPath(value) {
   return '';
 }
 async function defaultPostAuthPath(env, state) {
-  if (!state?.user || !state?.accessToken) return '/onboarding';
-  try {
-    const profile = await getMyProfile(env, state.accessToken, state.user.id);
-    return profile?.onboarding_completed ? '/' : '/onboarding';
-  } catch { return '/onboarding'; }
+  // Onboarding is optional. Normal authentication always returns users to
+  // the public job board; incomplete profiles are invited to onboard there.
+  return '/';
 }
 
 function hasCookie(request, name, expected = '1') {
@@ -108,7 +106,7 @@ export async function handle(request, env) {
       const { response, data } = await signUp(env, { email, password, fullName, redirectTo: `${siteOrigin}/auth/callback${returnTo ? `?return=${encodeURIComponent(returnTo)}` : ''}` });
       if (!response.ok) return Response.redirect(`${url.origin}/signup?error=${encodeURIComponent(authError(data, 'We could not create your account.'))}&email=${encodeURIComponent(email)}${returnTo ? `&return=${encodeURIComponent(returnTo)}` : ''}`, 303);
       if (data?.access_token && data?.refresh_token) {
-        const target = returnTo || '/onboarding';
+        const target = returnTo || '/';
         const h = new Headers({ location: target, 'cache-control': 'no-store' });
         setSessionCookies(h, data);
         return new Response(null, { status: 303, headers: h });
