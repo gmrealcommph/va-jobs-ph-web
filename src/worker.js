@@ -142,6 +142,7 @@ export async function handle(request, env) {
   let base;
   let authState = { user: null, refreshed: null };
   let showPreferencesPrompt = false;
+  const onboardingComplete = url.searchParams.get('onboarding') === 'complete';
 
   const render = (
     title,
@@ -919,7 +920,8 @@ if (
         search,
         category,
         names,
-        showPreferencesPrompt
+        showPreferencesPrompt,
+        onboardingComplete
       }),
       {
         canonical:

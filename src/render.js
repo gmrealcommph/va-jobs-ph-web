@@ -42,7 +42,7 @@ export function layout({ title, description, canonical, body, noindex = false, u
     type="image/svg+xml"
   >
 
-  <link rel="stylesheet" href="/styles.css?v=20261002-cardfix2">
+  <link rel="stylesheet" href="/styles.css?v=20261002-reviewfix">
 </head>
 
 <body>
@@ -337,7 +337,7 @@ export function searchForm(search = '', category = '', action = '/') {
   return `<form class="search" role="search" action="${esc(action)}" method="get"><label for="q">Job title, company, or keyword</label><div class="search-row"><span aria-hidden="true">⌕</span><input id="q" name="q" type="search" maxlength="120" placeholder="e.g. virtual assistant, customer support" value="${esc(search)}">${category && action === '/' ? `<input type="hidden" name="category" value="${esc(category)}">` : ''}<button type="submit">Search jobs <span aria-hidden="true">↗</span></button></div></form>`;
 }
 
-export function listing({ rows, total, page, search, category, names, showPreferencesPrompt = false }) {
+export function listing({ rows, total, page, search, category, names, showPreferencesPrompt = false, onboardingComplete = false }) {
   const action = category ? categoryPath(category) : '/';
   const pages = Math.ceil(total / 15);
 
@@ -544,6 +544,17 @@ export function listing({ rows, total, page, search, category, names, showPrefer
     </aside>
 
     <div class="results">
+
+      ${onboardingComplete && !category ? `
+        <div class="onboarding-success" role="status">
+          <div class="onboarding-success-icon" aria-hidden="true">✓</div>
+          <div>
+            <strong>Preferences saved</strong>
+            <span>We'll use these to make your VeeAys recommendations more relevant.</span>
+          </div>
+        </div>
+        <script src="/onboarding-complete.js?v=20261002" defer></script>
+      ` : ''}
 
       ${showPreferencesPrompt && !category ? `
         <aside class="preferences-card" aria-label="Personalize your job recommendations">
@@ -1360,5 +1371,5 @@ export function onboardingPage({ user, preferences = null, error = '' } = {}) {
       <div class="onboard-actions"><button class="button secondary" type="button" id="onboard-back" hidden>Back</button><button type="button" id="onboard-next">Continue</button><button type="submit" id="onboard-finish" hidden>Save preferences &amp; find jobs</button></div>
     </form>
   </section>
-  <script src="/onboarding.js" defer></script>`;
+  <script src="/onboarding.js?v=20261002-reviewfix" defer></script>`;
 }
