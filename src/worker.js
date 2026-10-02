@@ -920,7 +920,8 @@ if (
         page,
         search,
         category,
-        names
+        names,
+        showPreferencesPrompt
       }),
       {
         canonical:

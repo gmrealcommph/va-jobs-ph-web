@@ -42,7 +42,7 @@ export function layout({ title, description, canonical, body, noindex = false, u
     type="image/svg+xml"
   >
 
-  <link rel="stylesheet" href="/styles.css?v=8">
+  <link rel="stylesheet" href="/styles.css?v=9">
 </head>
 
 <body>
@@ -102,20 +102,7 @@ export function layout({ title, description, canonical, body, noindex = false, u
 
 </header>
 
-${showPreferencesPrompt ? `
-<section class="preferences-nudge" aria-label="Personalize your job recommendations">
-  <div class="wrap preferences-nudge-inner">
-    <div class="preferences-nudge-copy">
-      <strong>Want better job recommendations? ✈️</strong>
-      <span>Tell VeeAys what you're looking for and we'll surface jobs that fit your role, salary and working hours.</span>
-    </div>
-    <div class="preferences-nudge-actions">
-      <a class="button preferences-nudge-primary" href="/onboarding">Set my preferences</a>
-      <a class="preferences-nudge-dismiss" href="/dismiss-preferences-prompt">Not now</a>
-    </div>
-  </div>
-</section>
-` : ''}
+
 
 <main id="main">
   ${body}
@@ -350,7 +337,7 @@ export function searchForm(search = '', category = '', action = '/') {
   return `<form class="search" role="search" action="${esc(action)}" method="get"><label for="q">Job title, company, or keyword</label><div class="search-row"><span aria-hidden="true">⌕</span><input id="q" name="q" type="search" maxlength="120" placeholder="e.g. virtual assistant, customer support" value="${esc(search)}">${category && action === '/' ? `<input type="hidden" name="category" value="${esc(category)}">` : ''}<button type="submit">Search jobs <span aria-hidden="true">↗</span></button></div></form>`;
 }
 
-export function listing({ rows, total, page, search, category, names }) {
+export function listing({ rows, total, page, search, category, names, showPreferencesPrompt = false }) {
   const action = category ? categoryPath(category) : '/';
   const pages = Math.ceil(total / 15);
 
@@ -557,6 +544,20 @@ export function listing({ rows, total, page, search, category, names }) {
     </aside>
 
     <div class="results">
+
+      ${showPreferencesPrompt && !category ? `
+        <aside class="preferences-card" aria-label="Personalize your job recommendations">
+          <div class="preferences-card-icon" aria-hidden="true">✈</div>
+          <div class="preferences-card-copy">
+            <strong>Get jobs matched to you</strong>
+            <span>Tell us your role, salary and preferred working hours. It takes about 2 minutes.</span>
+          </div>
+          <div class="preferences-card-actions">
+            <a class="preferences-card-primary" href="/onboarding">Set my preferences</a>
+            <a class="preferences-card-dismiss" href="/dismiss-preferences-prompt">Not now</a>
+          </div>
+        </aside>
+      ` : ''}
 
       <div class="results-heading opportunity-heading">
 
