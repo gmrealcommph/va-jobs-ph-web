@@ -5170,3 +5170,78 @@ dd{margin:0;overflow-wrap:anywhere}
 .onboard-actions [hidden] {
   display: none !important;
 }
+
+
+/* Mobile category scroller: keep category chips readable. */
+@media (max-width: 600px) {
+  .home-page .listings .opportunity-map {
+    width: 100%;
+  }
+
+  .home-page .category-panel {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding: 2px 0 10px;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+
+  .home-page .category-panel::-webkit-scrollbar {
+    display: none;
+  }
+
+  .home-page .category-panel .filter {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    flex: 0 0 auto;
+    width: auto;
+    min-height: 40px;
+    padding: 7px 13px 7px 8px;
+    border: 1px solid #dfe5d4;
+    border-radius: 999px;
+    white-space: nowrap;
+    background: #f2f5e8;
+    color: #173d32;
+  }
+
+  .home-page .category-panel .filter .filter-icon {
+    display: grid;
+    flex: 0 0 24px;
+    width: 24px;
+    height: 24px;
+    place-items: center;
+  }
+
+  .home-page .category-panel .filter .filter-name {
+    display: inline;
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 1;
+  }
+
+  .home-page .category-panel .filter.selected {
+    background: #123e30;
+    border-color: #123e30;
+    color: #fffdf3;
+  }
+
+  .home-page .category-panel .filter.selected .filter-icon {
+    background: #b3ef73;
+    color: #123e30;
+  }
+
+  .home-page .category-panel .filter .all-count,
+  .home-page .category-panel .filter .filter-chevron {
+    display: none;
+  }
+}
+
+/* Match signed-in greeting size to My account / Log out. */
+.header-actions .auth-user {
+  font-size: 13px;
+}
