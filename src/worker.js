@@ -1,6 +1,6 @@
 import { categories, getJob, listJobs, query } from './data.js';
-import { layout, listing, detail, esc, jobPath, categoryPath, authPage, checkEmailPage, authCallbackPage, onboardingPage } from './render.js';
-import { signUp, signIn, getUser, sessionForRequest, setSessionCookies, clearSessionCookies, authError, getJobPreferences, saveJobPreferences, completeOnboarding, getMyProfile } from './auth.js';
+import { layout, listing, detail, esc, jobPath, categoryPath, authPage, checkEmailPage, authCallbackPage, onboardingPage, matchesPage } from './render.js';
+import { signUp, signIn, getUser, sessionForRequest, setSessionCookies, clearSessionCookies, authError, getJobPreferences, saveJobPreferences, completeOnboarding, getMyProfile, getMyJobMatches } from './auth.js';
 
 const headers = { 'content-type': 'text/html; charset=utf-8', 'x-content-type-options': 'nosniff', 'referrer-policy': 'strict-origin-when-cross-origin', 'content-security-policy': "default-src 'none'; style-src 'self'; img-src 'self'; script-src 'self'; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-ancestors 'none'", 'permissions-policy': 'camera=(), microphone=(), geolocation=()' };
 function origin(env, url) {
@@ -554,6 +554,25 @@ if (
       try { preferences = await getJobPreferences(env, authState.accessToken, authState.user.id); }
       catch (error) { console.error('Preferences load failed:', error); }
       return render('Set up your account', onboardingPage({ user: authState.user, preferences, error: (url.searchParams.get('error') || '').slice(0, 240) }), { noindex: true });
+    }
+
+    if (url.pathname === '/matches') {
+      if (!authState.user || !authState.accessToken) {
+        return Response.redirect(url.origin + '/login?message=' + encodeURIComponent('Log in to see your job matches.') + '&return=' + encodeURIComponent('/matches'), 303);
+      }
+      let matches = [];
+      let preferences = null;
+      let matchError = '';
+      try {
+        [matches, preferences] = await Promise.all([
+          getMyJobMatches(env, authState.accessToken, 20),
+          getJobPreferences(env, authState.accessToken, authState.user.id)
+        ]);
+      } catch (error) {
+        console.error('Matches load failed:', error);
+        matchError = 'We could not load your matches right now. Please try again.';
+      }
+      return render('My matches', matchesPage({ matches, preferences, error: matchError }), { noindex: true });
     }
 
     const applyMatch = url.pathname.match(/^\/apply\/([^/]+)$/);

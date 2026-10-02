@@ -90,6 +90,7 @@ export function layout({ title, description, canonical, body, noindex = false, u
 
       ${user ? `
         <span class="auth-user">${firstName ? `Hi, ${esc(firstName)}! 👋` : 'Hi! 👋'}</span>
+        <a class="auth-link" href="/matches">My matches</a>
         <a class="auth-link" href="/onboarding">My account</a>
         <a class="auth-link" href="/logout">Log out</a>
       ` : `
@@ -1373,4 +1374,53 @@ export function onboardingPage({ user, preferences = null, error = '' } = {}) {
     </form>
   </section>
   <script src="/onboarding.js?v=20261002-reviewfix" defer></script>`;
+}
+
+
+export function matchesPage({ matches = [], preferences = null, error = '' } = {}) {
+  const diagnostic = (label, matched, available) => {
+    const state = !available ? 'unknown' : matched ? 'matched' : 'missed';
+    const icon = state === 'matched' ? '✓' : state === 'missed' ? '×' : '?';
+    const suffix = state === 'unknown' ? ' unavailable' : '';
+    return `<span class="match-diagnostic ${state}"><b aria-hidden="true">${icon}</b>${esc(label)}${suffix}</span>`;
+  };
+
+  const cards = matches.map(job => {
+    const skillsAvailable = Array.isArray(preferences?.skills) && preferences.skills.length > 0 && Array.isArray(job.skills) && job.skills.length > 0;
+    const salaryAvailable = preferences?.minimum_salary_usd != null && job.salary_period === 'monthly' && (job.salary_min_usd != null || job.salary_max_usd != null);
+    const scheduleAvailable = Array.isArray(preferences?.schedule_preferences) && preferences.schedule_preferences.length > 0 && !!job.schedule_region;
+    const employmentAvailable = Array.isArray(preferences?.employment_types) && preferences.employment_types.length > 0 && !!job.employment_type;
+    const experienceAvailable = !!preferences?.experience_level && !!job.experience_level;
+    const roleAvailable = Array.isArray(preferences?.target_roles) && preferences.target_roles.length > 0 && !!(job.category || job.title);
+    return `
+      <article class="match-card">
+        <div class="match-score"><strong>${esc(job.match_score)}%</strong><span>match</span></div>
+        <div class="match-card-main">
+          <div class="match-company">${esc(job.company || 'Company not specified')}</div>
+          <h2><a href="${jobPath(job)}">${esc(job.title || 'Job opportunity')}</a></h2>
+          <div class="match-meta">${job.location ? `<span>${esc(job.location)}</span>` : ''}${job.employment_type ? `<span>${esc(job.employment_type.replaceAll('_', ' '))}</span>` : ''}${job.engagement_type ? `<span>${esc(job.engagement_type)}</span>` : ''}</div>
+          <div class="match-diagnostics">
+            ${diagnostic('Role', job.role_match, roleAvailable)}
+            ${diagnostic('Skills', job.skills_match, skillsAvailable)}
+            ${diagnostic('Salary', job.salary_match, salaryAvailable)}
+            ${diagnostic('Schedule', job.schedule_match, scheduleAvailable)}
+            ${diagnostic('Full-time / part-time', job.employment_match, employmentAvailable)}
+            ${diagnostic('Experience', job.experience_match, experienceAvailable)}
+          </div>
+          <div class="match-card-footer">
+            <span>${esc(job.matched_dimensions)} of ${esc(job.available_dimensions)} available preferences matched</span>
+            <a href="${jobPath(job)}">View job →</a>
+          </div>
+        </div>
+      </article>`;
+  }).join('');
+
+  return `
+    <section class="wrap matches-page">
+      <div class="kicker">MATCHING TEST</div>
+      <h1>Your best matches,<br><em>ranked for you.</em></h1>
+      <p class="matches-intro">This is a temporary diagnostic view of your top 20 matches. The labels show which preference dimensions influenced each score.</p>
+      ${error ? `<div class="match-error">${esc(error)}</div>` : ''}
+      <div class="matches-list">${cards || '<div class="match-empty"><h2>No matches yet</h2><p>Complete your job preferences so VeeAys can rank opportunities for you.</p><a class="button" href="/onboarding">Set my preferences</a></div>'}</div>
+    </section>`;
 }

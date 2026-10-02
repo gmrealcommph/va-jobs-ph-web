@@ -130,3 +130,13 @@ export async function getMyProfile(env, accessToken, userId) {
   if (!response.ok) throw new Error(`Could not load profile (${response.status}).`);
   return Array.isArray(data) ? (data[0] || null) : null;
 }
+
+export async function getMyJobMatches(env, accessToken, resultLimit = 20) {
+  const safeLimit = Math.max(1, Math.min(Number(resultLimit) || 20, 100));
+  const { response, data } = await userRestFetch(env, accessToken, '/rest/v1/rpc/get_my_job_matches', {
+    method: 'POST',
+    body: JSON.stringify({ result_limit: safeLimit })
+  });
+  if (!response.ok) throw new Error(String(data?.message || data?.details || `Could not load job matches (${response.status}).`));
+  return Array.isArray(data) ? data : [];
+}
