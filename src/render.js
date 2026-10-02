@@ -4,7 +4,8 @@ export const categoryPath = name => `/categories/${encodeURIComponent(name)}`;
 export function safeUrl(value) { try { const u = new URL(value); return ['https:', 'http:'].includes(u.protocol) ? u.href : null; } catch { return null; } }
 export function date(value) { const d = new Date(value); return value && !Number.isNaN(+d) ? d.toLocaleDateString('en-PH', { year: 'numeric', month: 'short', day: 'numeric', timeZone: 'Asia/Manila' }) : ''; }
 
-export function layout({ title, description, canonical, body, noindex = false, user = null, showPreferencesPrompt = false }) {
+export function layout({ title, description, canonical, body, noindex = false, user = null, profile = null, showPreferencesPrompt = false }) {
+  const firstName = String(profile?.full_name || '').trim().split(/\s+/)[0] || '';
   return `<!doctype html>
 <html lang="en-PH">
 <head>
@@ -88,7 +89,7 @@ export function layout({ title, description, canonical, body, noindex = false, u
     <div class="header-actions">
 
       ${user ? `
-        <span class="auth-user">${esc(user.email || 'Your account')}</span>
+        <span class="auth-user">${firstName ? `Hi, ${esc(firstName)}! 👋` : 'Hi! 👋'}</span>
         <a class="auth-link" href="/onboarding">My account</a>
         <a class="auth-link" href="/logout">Log out</a>
       ` : `

@@ -142,6 +142,7 @@ export async function handle(request, env) {
   let base;
   let authState = { user: null, refreshed: null };
   let showPreferencesPrompt = false;
+  let currentProfile = null;
   const onboardingComplete = url.searchParams.get('onboarding') === 'complete';
 
   const render = (
@@ -166,6 +167,7 @@ export async function handle(request, env) {
           !env.SITE_URL ||
           base !== url.origin,
         user: authState.user,
+        profile: currentProfile,
         showPreferencesPrompt
       }),
       {
@@ -504,12 +506,14 @@ if (
       return new Response(null, { status: 303, headers: h });
     }
 
-    if (authState.user && authState.accessToken && !hasCookie(request, 'veeays_preferences_prompt_dismissed')) {
+    if (authState.user && authState.accessToken) {
       try {
-        const profile = await getMyProfile(env, authState.accessToken, authState.user.id);
-        showPreferencesPrompt = profile?.onboarding_completed === false;
+        currentProfile = await getMyProfile(env, authState.accessToken, authState.user.id);
+        if (!hasCookie(request, 'veeays_preferences_prompt_dismissed')) {
+          showPreferencesPrompt = currentProfile?.onboarding_completed === false;
+        }
       } catch (error) {
-        console.error('Profile prompt check failed:', error);
+        console.error('Profile check failed:', error);
       }
     }
 
