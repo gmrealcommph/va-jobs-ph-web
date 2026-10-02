@@ -4,7 +4,7 @@ export const categoryPath = name => `/categories/${encodeURIComponent(name)}`;
 export function safeUrl(value) { try { const u = new URL(value); return ['https:', 'http:'].includes(u.protocol) ? u.href : null; } catch { return null; } }
 export function date(value) { const d = new Date(value); return value && !Number.isNaN(+d) ? d.toLocaleDateString('en-PH', { year: 'numeric', month: 'short', day: 'numeric', timeZone: 'Asia/Manila' }) : ''; }
 
-export function layout({ title, description, canonical, body, noindex = false }) {
+export function layout({ title, description, canonical, body, noindex = false, user = null }) {
   return `<!doctype html>
 <html lang="en-PH">
 <head>
@@ -42,7 +42,7 @@ export function layout({ title, description, canonical, body, noindex = false })
     type="image/svg+xml"
   >
 
-  <link rel="stylesheet" href="/styles.css?v=7">
+  <link rel="stylesheet" href="/styles.css?v=8">
 </head>
 
 <body>
@@ -87,17 +87,14 @@ export function layout({ title, description, canonical, body, noindex = false })
 
     <div class="header-actions">
 
-      <span class="header-note">
-        Filipino talent. Global possibilities.
-      </span>
-
-      <a
-        class="post-job-cta"
-        href="/employers"
-      >
-        Post a job
-        <span aria-hidden="true">↗</span>
-      </a>
+      ${user ? `
+        <span class="auth-user">${esc(user.email || 'Your account')}</span>
+        <a class="auth-link" href="/onboarding">My account</a>
+        <a class="auth-link" href="/logout">Log out</a>
+      ` : `
+        <a class="auth-link" href="/login">Log in</a>
+        <a class="post-job-cta" href="/signup">Sign up</a>
+      `}
 
     </div>
 
@@ -1003,7 +1000,9 @@ export function detail(job) {
   const description =
     job.description ||
     'Visit the original listing for the full job description.';
-
+  const isHimalayas =
+  String(job.source || '').toLowerCase() === 'himalayas';
+  
   return `
     <div class="job-detail-page">
 
@@ -1217,18 +1216,30 @@ export function detail(job) {
               apply
                 ? `<a
                     class="job-detail-apply"
-                    href="${esc(apply)}"
-                    target="_blank"
-                    rel="noopener noreferrer nofollow"
+                    href="/apply/${encodeURIComponent(job.id)}"
+                    rel="nofollow"
                   >
                     <span>Apply for this role</span>
                     <b>↗</b>
                   </a>
 
                   <p class="job-detail-external">
-                    Opens the employer's original listing
-                    in a new tab.
-                  </p>`
+  Opens the original listing
+  in a new tab.
+</p>
+
+${
+  isHimalayas
+    ? `<p class="job-detail-source">
+        Job data sourced from
+        <a
+          href="https://himalayas.app/"
+          target="_blank"
+          rel="noopener noreferrer"
+        >Himalayas</a>.
+      </p>`
+    : ''
+}`
                 : `<p class="job-detail-unavailable">
                     The application link is currently unavailable.
                   </p>`
@@ -1251,4 +1262,87 @@ export function detail(job) {
 
     </div>
   `;
+}
+
+
+export function authPage({ mode = 'login', error = '', message = '', email = '', returnTo = '' } = {}) {
+  const signup = mode === 'signup';
+  const applyIntent = returnTo.startsWith('/apply/');
+  return `
+    <section class="auth-shell">
+      <div class="auth-intro">
+        <div class="kicker">${signup ? 'JOIN VEEAYS' : 'WELCOME BACK'}</div>
+        <h1>${signup ? 'Your next remote role,<br><em>without the guesswork.</em>' : 'Pick up where<br><em>you left off.</em>'}</h1>
+        <p>${applyIntent ? 'Create or log in to your free VeeAys account, then we’ll take you straight back to this application.' : (signup ? 'Create your free VeeAys account. We focus on remote opportunities that are open to Filipino talent.' : 'Log in to continue building your VeeAys profile and, soon, get job matches tailored to you.')}</p>
+      </div>
+      <div class="auth-card">
+        <h2>${signup ? 'Create your account' : 'Log in'}</h2>
+        <p>${applyIntent ? 'Your application is waiting. You won’t have to complete your profile first.' : (signup ? 'Free to join. You can set your job preferences after verifying your email.' : 'Use the email and password you signed up with.')}</p>
+        ${error ? `<div class="auth-alert error" role="alert">${esc(error)}</div>` : ''}
+        ${message ? `<div class="auth-alert success">${esc(message)}</div>` : ''}
+        <form class="auth-form" method="post" action="${signup ? '/signup' : '/login'}">
+          ${returnTo ? `<input type="hidden" name="return" value="${esc(returnTo)}">` : ''}
+          ${signup ? `<div class="auth-field"><label for="full_name">Full name</label><input id="full_name" name="full_name" type="text" autocomplete="name" maxlength="100" required></div>` : ''}
+          <div class="auth-field"><label for="email">Email address</label><input id="email" name="email" type="email" autocomplete="email" maxlength="254" value="${esc(email)}" required></div>
+          <div class="auth-field"><label for="password">Password</label><input id="password" name="password" type="password" autocomplete="${signup ? 'new-password' : 'current-password'}" minlength="8" maxlength="128" required></div>
+          <button type="submit">${signup ? 'Create account' : 'Log in'}</button>
+        </form>
+        <p class="auth-switch">${signup ? `Already have an account? <a href="/login${returnTo ? `?return=${encodeURIComponent(returnTo)}` : ''}">Log in</a>` : `New to VeeAys? <a href="/signup${returnTo ? `?return=${encodeURIComponent(returnTo)}` : ''}">Create an account</a>`}</p>
+      </div>
+    </section>`;
+}
+
+export function checkEmailPage(email = '', returnTo = '') {
+  const loginHref = '/login' + (returnTo ? `?return=${encodeURIComponent(returnTo)}` : '');
+  return `<section class="auth-shell"><div class="auth-intro"><div class="kicker">ONE MORE STEP</div><h1>Check your<br><em>inbox.</em></h1><p>We sent a confirmation link${email ? ` to <strong>${esc(email)}</strong>` : ''}. Click it to verify your email and continue setting up your VeeAys account.</p></div><div class="auth-card"><h2>Verify your email</h2><p>The link will take you back to VeeAys. If you don't see the message, check your spam or junk folder.</p><a class="button" href="${esc(loginHref)}">Back to log in</a></div></section>`;
+}
+
+export function authCallbackPage() {
+  return `<section class="auth-callback"><div class="kicker">VERIFYING</div><h1>Finishing your sign in…</h1><p>Please keep this page open for a moment.</p></section><script src="/auth-callback.js" defer></script>`;
+}
+
+export function onboardingPage({ user, preferences = null, error = '' } = {}) {
+  const roles = ['Executive Assistant','General VA','Customer Support','Social Media','Marketing','Sales','E-commerce','Bookkeeping','Graphic Design','Video Editing','Operations','Web/Development','Other'];
+  const employment = ['Full-time','Part-time','Contract/Freelance'];
+  const schedules = ['Philippines daytime','UK/Europe hours','Australia hours','US hours','Flexible/Any'];
+  const experience = ['Entry level','1–2 years','3–5 years','6+ years'];
+  const selected = (items, value) => Array.isArray(items) && items.includes(value);
+  const choices = (name, options, values = []) => options.map((value, i) => `<label class="onboard-choice"><input type="checkbox" name="${esc(name)}" value="${esc(value)}" ${selected(values,value)?'checked':''}><span>${esc(value)}</span></label>`).join('');
+  const radios = (name, options, value = '') => options.map((item, i) => `<label class="onboard-choice"><input type="radio" name="${esc(name)}" value="${esc(item)}" ${item===value?'checked':''}><span>${esc(item)}</span></label>`).join('');
+  const skills = Array.isArray(preferences?.skills) ? preferences.skills.join(', ') : '';
+  return `
+  <section class="onboard-shell">
+    <div class="onboard-top">
+      <div><div class="kicker">YOUR VEEAYS PROFILE</div><h1>Tell us what you're <em>looking for.</em></h1><p>We'll use these preferences to make VeeAys more relevant to you. You can change them later.</p></div>
+      <div class="onboard-progress" aria-label="Onboarding progress"><span class="active">1</span><span>2</span><span>3</span><span>4</span><span>5</span></div>
+    </div>
+    ${error ? `<div class="auth-alert error onboard-error" role="alert">${esc(error)}</div>` : ''}
+    <form class="onboard-card" method="post" action="/onboarding" id="onboarding-form">
+      <section class="onboard-step active" data-step="1">
+        <div class="onboard-step-label">STEP 1 OF 5</div><h2>What kind of roles are you looking for?</h2><p>Choose as many as you like.</p>
+        <div class="onboard-grid">${choices('target_roles', roles, preferences?.target_roles)}</div>
+      </section>
+      <section class="onboard-step" data-step="2">
+        <div class="onboard-step-label">STEP 2 OF 5</div><h2>What are you looking for?</h2><p>Set a salary floor and the types of work you're open to.</p>
+        <div class="salary-box"><label for="minimum_salary_usd">Minimum monthly salary</label><div class="salary-input"><span>$</span><input id="minimum_salary_usd" name="minimum_salary_usd" type="number" min="0" max="50000" step="50" inputmode="numeric" value="${esc(preferences?.minimum_salary_usd ?? '')}" placeholder="1000"></div><small id="salary-php">Optional. We'll use this as a matching preference.</small></div>
+        <h3>Employment type</h3><div class="onboard-grid compact">${choices('employment_types', employment, preferences?.employment_types)}</div>
+      </section>
+      <section class="onboard-step" data-step="3">
+        <div class="onboard-step-label">STEP 3 OF 5</div><h2>When can you work?</h2><p>Select all schedules you'd consider.</p>
+        <div class="onboard-grid compact">${choices('schedule_preferences', schedules, preferences?.schedule_preferences)}</div>
+      </section>
+      <section class="onboard-step" data-step="4">
+        <div class="onboard-step-label">STEP 4 OF 5</div><h2>Tell us about your experience.</h2><p>This helps us avoid showing roles that are clearly too junior or too senior.</p>
+        <h3>Experience level</h3><div class="onboard-grid compact">${radios('experience_level', experience, preferences?.experience_level)}</div>
+        <div class="skills-box"><label for="skills">Skills</label><textarea id="skills" name="skills" rows="4" maxlength="1200" placeholder="e.g. Google Workspace, Canva, HubSpot, customer support, bookkeeping">${esc(skills)}</textarea><small>Separate skills with commas.</small></div>
+      </section>
+      <section class="onboard-step" data-step="5">
+        <div class="onboard-step-label">STEP 5 OF 5</div><h2>Ready to find better-fit jobs?</h2><p>Review your choices below. You can go back to make changes before saving.</p>
+        <div class="onboard-review" id="onboard-review"></div>
+        <div class="onboard-ready"><strong>${esc(user?.email || 'Your account')}</strong><span>Your preferences will be saved securely to this account.</span></div>
+      </section>
+      <div class="onboard-actions"><button class="button secondary" type="button" id="onboard-back" hidden>Back</button><button type="button" id="onboard-next">Continue</button><button type="submit" id="onboard-finish" hidden>Save preferences &amp; find jobs</button></div>
+    </form>
+  </section>
+  <script src="/onboarding.js" defer></script>`;
 }

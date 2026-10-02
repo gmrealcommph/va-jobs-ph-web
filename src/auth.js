@@ -79,14 +79,54 @@ export async function getUser(env, accessToken) {
 export async function sessionForRequest(request, env) {
   const cookies = cookieMap(request);
   let user = await getUser(env, cookies[ACCESS_COOKIE]);
-  if (user) return { user, refreshed: null };
-  if (!cookies[REFRESH_COOKIE]) return { user: null, refreshed: null };
+  if (user) return { user, refreshed: null, accessToken: cookies[ACCESS_COOKIE] };
+  if (!cookies[REFRESH_COOKIE]) return { user: null, refreshed: null, accessToken: null };
   const { response, data } = await exchangeRefreshToken(env, cookies[REFRESH_COOKIE]);
-  if (!response.ok || !data?.access_token) return { user: null, refreshed: false };
+  if (!response.ok || !data?.access_token) return { user: null, refreshed: false, accessToken: null };
   user = data.user || await getUser(env, data.access_token);
-  return { user, refreshed: user ? data : false };
+  return { user, refreshed: user ? data : false, accessToken: user ? data.access_token : null };
 }
 
 export function authError(data, fallback) {
   return String(data?.msg || data?.message || data?.error_description || data?.error || fallback).slice(0, 240);
+}
+
+async function userRestFetch(env, accessToken, path, init = {}) {
+  const { key, url } = config(env);
+  const endpoint = new URL(path, url);
+  const response = await fetch(endpoint, {
+    ...init,
+    headers: { apikey: key, Authorization: `Bearer ${accessToken}`, 'content-type': 'application/json', ...(init.headers || {}) },
+    signal: AbortSignal.timeout(12000)
+  });
+  let data = null;
+  if (response.status !== 204) { try { data = await response.json(); } catch {} }
+  return { response, data };
+}
+
+export async function getJobPreferences(env, accessToken, userId) {
+  const { response, data } = await userRestFetch(env, accessToken, `/rest/v1/job_preferences?user_id=eq.${encodeURIComponent(userId)}&select=*`, { method: 'GET' });
+  if (!response.ok) throw new Error(`Could not load job preferences (${response.status}).`);
+  return Array.isArray(data) ? (data[0] || null) : null;
+}
+
+export async function saveJobPreferences(env, accessToken, preferences) {
+  const { response, data } = await userRestFetch(env, accessToken, '/rest/v1/job_preferences?on_conflict=user_id', {
+    method: 'POST', headers: { Prefer: 'resolution=merge-duplicates,return=representation' }, body: JSON.stringify(preferences)
+  });
+  if (!response.ok) throw new Error(String(data?.message || data?.details || `Could not save job preferences (${response.status}).`));
+  return Array.isArray(data) ? data[0] : data;
+}
+
+export async function completeOnboarding(env, accessToken) {
+  const { response, data } = await userRestFetch(env, accessToken, '/rest/v1/rpc/update_my_profile', {
+    method: 'POST', body: JSON.stringify({ new_full_name: null, new_onboarding_completed: true })
+  });
+  if (!response.ok) throw new Error(String(data?.message || data?.details || `Could not complete onboarding (${response.status}).`));
+}
+
+export async function getMyProfile(env, accessToken, userId) {
+  const { response, data } = await userRestFetch(env, accessToken, `/rest/v1/profiles?id=eq.${encodeURIComponent(userId)}&select=id,onboarding_completed`, { method: 'GET' });
+  if (!response.ok) throw new Error(`Could not load profile (${response.status}).`);
+  return Array.isArray(data) ? (data[0] || null) : null;
 }

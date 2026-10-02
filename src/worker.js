@@ -1,22 +1,124 @@
 import { categories, getJob, listJobs, query } from './data.js';
-import { layout, listing, detail, esc, jobPath, categoryPath } from './render.js';
+import { layout, listing, detail, esc, jobPath, categoryPath, authPage, checkEmailPage, authCallbackPage, onboardingPage } from './render.js';
+import { signUp, signIn, getUser, sessionForRequest, setSessionCookies, clearSessionCookies, authError, getJobPreferences, saveJobPreferences, completeOnboarding, getMyProfile } from './auth.js';
 
-const headers = { 'content-type': 'text/html; charset=utf-8', 'x-content-type-options': 'nosniff', 'referrer-policy': 'strict-origin-when-cross-origin', 'content-security-policy': "default-src 'none'; style-src 'self'; img-src 'self'; base-uri 'none'; form-action 'self'; frame-ancestors 'none'", 'permissions-policy': 'camera=(), microphone=(), geolocation=()' };
+const headers = { 'content-type': 'text/html; charset=utf-8', 'x-content-type-options': 'nosniff', 'referrer-policy': 'strict-origin-when-cross-origin', 'content-security-policy': "default-src 'none'; style-src 'self'; img-src 'self'; script-src 'self'; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-ancestors 'none'", 'permissions-policy': 'camera=(), microphone=(), geolocation=()' };
 function origin(env, url) {
   if (!env.SITE_URL) return url.origin;
   const value = new URL(env.SITE_URL);
   if (!['http:', 'https:'].includes(value.protocol)) throw new Error('Invalid SITE_URL');
   return value.origin;
 }
+
+function safeReturnPath(value) {
+  const v = String(value || '');
+  if (/^\/apply\/[A-Za-z0-9%._~-]{1,240}$/.test(v)) return v;
+  if (v === '/onboarding' || v === '/') return v;
+  return '';
+}
+async function defaultPostAuthPath(env, state) {
+  if (!state?.user || !state?.accessToken) return '/onboarding';
+  try {
+    const profile = await getMyProfile(env, state.accessToken, state.user.id);
+    return profile?.onboarding_completed ? '/' : '/onboarding';
+  } catch { return '/onboarding'; }
+}
+
 function xml(body) { return new Response(`<?xml version="1.0" encoding="UTF-8"?>${body}`, { headers: { 'content-type': 'application/xml; charset=utf-8', 'cache-control': 'public, max-age=300' } }); }
 export async function handle(request, env) {
   const url = new URL(request.url);
 
+  const siteOrigin = origin(env, url);
+
+  const sameOriginPost = () => {
+    const requestOrigin = request.headers.get('origin');
+    return !requestOrigin || requestOrigin === url.origin;
+  };
+
+  if (request.method === 'POST' && ['/signup', '/login', '/auth/session', '/onboarding'].includes(url.pathname)) {
+    if (!sameOriginPost()) return new Response('Forbidden', { status: 403 });
+
+    if (url.pathname === '/auth/session') {
+      let payload;
+      try { payload = await request.json(); } catch { return new Response('Invalid request', { status: 400 }); }
+      const accessToken = String(payload?.access_token || '');
+      const refreshToken = String(payload?.refresh_token || '');
+      const returnTo = safeReturnPath(payload?.return);
+      if (!accessToken || !refreshToken || accessToken.length > 10000 || refreshToken.length > 10000) return new Response('Invalid session', { status: 400 });
+      const user = await getUser(env, accessToken);
+      if (!user) return new Response('Invalid session', { status: 401 });
+      const state = { user, accessToken };
+      const target = returnTo || await defaultPostAuthPath(env, state);
+      const responseHeaders = new Headers({ 'content-type': 'application/json; charset=utf-8', 'cache-control': 'no-store' });
+      setSessionCookies(responseHeaders, { access_token: accessToken, refresh_token: refreshToken, expires_in: Number(payload?.expires_in) || 3600 });
+      return new Response(JSON.stringify({ redirect: target }), { status: 200, headers: responseHeaders });
+    }
+
+    let form;
+    try { form = await request.formData(); } catch { return new Response('Invalid form', { status: 400 }); }
+
+    if (url.pathname === '/onboarding') {
+      const state = await sessionForRequest(request, env);
+      if (!state.user || !state.accessToken) return Response.redirect(`${url.origin}/login?message=${encodeURIComponent('Log in to continue setting up your account.')}`, 303);
+      const values = name => form.getAll(name).map(v => String(v).trim()).filter(Boolean);
+      const allowedRoles = new Set(['Executive Assistant','General VA','Customer Support','Social Media','Marketing','Sales','E-commerce','Bookkeeping','Graphic Design','Video Editing','Operations','Web/Development','Other']);
+      const allowedEmployment = new Set(['Full-time','Part-time','Contract/Freelance']);
+      const allowedSchedules = new Set(['Philippines daytime','UK/Europe hours','Australia hours','US hours','Flexible/Any']);
+      const allowedExperience = new Set(['Entry level','1–2 years','3–5 years','6+ years']);
+      const targetRoles = values('target_roles').filter(v => allowedRoles.has(v));
+      const employmentTypes = values('employment_types').filter(v => allowedEmployment.has(v));
+      const schedulePreferences = values('schedule_preferences').filter(v => allowedSchedules.has(v));
+      const experienceLevel = String(form.get('experience_level') || '');
+      const salaryRaw = String(form.get('minimum_salary_usd') || '').trim();
+      const minimumSalary = salaryRaw === '' ? null : Number.parseInt(salaryRaw, 10);
+      const skills = String(form.get('skills') || '').split(',').map(v => v.trim()).filter(Boolean).slice(0, 30).map(v => v.slice(0, 60));
+      const invalid = !targetRoles.length || !employmentTypes.length || !schedulePreferences.length || !allowedExperience.has(experienceLevel) || (minimumSalary !== null && (!Number.isInteger(minimumSalary) || minimumSalary < 0 || minimumSalary > 50000));
+      if (invalid) return Response.redirect(`${url.origin}/onboarding?error=${encodeURIComponent('Please complete each step before finishing your profile.')}`, 303);
+      try {
+        await saveJobPreferences(env, state.accessToken, { user_id: state.user.id, target_roles: targetRoles, minimum_salary_usd: minimumSalary, employment_types: employmentTypes, schedule_preferences: schedulePreferences, experience_level: experienceLevel, skills });
+        await completeOnboarding(env, state.accessToken);
+      } catch (error) {
+        console.error('Onboarding save failed:', error);
+        return Response.redirect(`${url.origin}/onboarding?error=${encodeURIComponent('We could not save your preferences. Please try again.')}`, 303);
+      }
+      const h = new Headers({ location: '/?onboarding=complete', 'cache-control': 'no-store' });
+      if (state.refreshed && typeof state.refreshed === 'object') setSessionCookies(h, state.refreshed);
+      return new Response(null, { status: 303, headers: h });
+    }
+
+    const email = String(form.get('email') || '').trim().toLowerCase().slice(0, 254);
+    const password = String(form.get('password') || '');
+    const fullName = String(form.get('full_name') || '').trim().slice(0, 100);
+    const returnTo = safeReturnPath(form.get('return'));
+    if (!email || !email.includes('@') || password.length < 8 || password.length > 128) {
+      const target = url.pathname === '/signup' ? '/signup' : '/login';
+      return Response.redirect(`${url.origin}${target}?error=${encodeURIComponent('Enter a valid email and a password of at least 8 characters.')}&email=${encodeURIComponent(email)}${returnTo ? `&return=${encodeURIComponent(returnTo)}` : ''}`, 303);
+    }
+
+    if (url.pathname === '/signup') {
+      if (!fullName) return Response.redirect(`${url.origin}/signup?error=${encodeURIComponent('Enter your full name.')}&email=${encodeURIComponent(email)}${returnTo ? `&return=${encodeURIComponent(returnTo)}` : ''}`, 303);
+      const { response, data } = await signUp(env, { email, password, fullName, redirectTo: `${siteOrigin}/auth/callback${returnTo ? `?return=${encodeURIComponent(returnTo)}` : ''}` });
+      if (!response.ok) return Response.redirect(`${url.origin}/signup?error=${encodeURIComponent(authError(data, 'We could not create your account.'))}&email=${encodeURIComponent(email)}${returnTo ? `&return=${encodeURIComponent(returnTo)}` : ''}`, 303);
+      if (data?.access_token && data?.refresh_token) {
+        const target = returnTo || '/onboarding';
+        const h = new Headers({ location: target, 'cache-control': 'no-store' });
+        setSessionCookies(h, data);
+        return new Response(null, { status: 303, headers: h });
+      }
+      return Response.redirect(`${url.origin}/check-email?email=${encodeURIComponent(email)}${returnTo ? `&return=${encodeURIComponent(returnTo)}` : ''}`, 303);
+    }
+
+    const { response, data } = await signIn(env, { email, password });
+    if (!response.ok || !data?.access_token) return Response.redirect(`${url.origin}/login?error=${encodeURIComponent(authError(data, 'Email or password is incorrect.'))}&email=${encodeURIComponent(email)}${returnTo ? `&return=${encodeURIComponent(returnTo)}` : ''}`, 303);
+    const state = { user: data.user || await getUser(env, data.access_token), accessToken: data.access_token };
+    const target = returnTo || await defaultPostAuthPath(env, state);
+    const h = new Headers({ location: target, 'cache-control': 'no-store' });
+    setSessionCookies(h, data);
+    return new Response(null, { status: 303, headers: h });
+  }
+
   if (!['GET', 'HEAD'].includes(request.method)) {
-    return new Response('Method not allowed', {
-      status: 405,
-      headers: { Allow: 'GET, HEAD' }
-    });
+    return new Response('Method not allowed', { status: 405, headers: { Allow: 'GET, HEAD, POST' } });
   }
 
   if (request.method === 'HEAD') {
@@ -32,6 +134,7 @@ export async function handle(request, env) {
   }
 
   let base;
+  let authState = { user: null, refreshed: null };
 
   const render = (
     title,
@@ -53,17 +156,18 @@ export async function handle(request, env) {
         noindex:
           noindex ||
           !env.SITE_URL ||
-          base !== url.origin
+          base !== url.origin,
+        user: authState.user
       }),
       {
         status,
-        headers: {
-          ...headers,
-          'cache-control':
-            status === 200
-              ? 'public, max-age=60'
-              : 'no-store'
-        }
+        headers: (() => {
+          const h = new Headers(headers);
+          h.set('cache-control', status === 200 && !authState.user ? 'public, max-age=60' : 'no-store');
+          if (authState.refreshed && typeof authState.refreshed === 'object') setSessionCookies(h, authState.refreshed);
+          else if (authState.refreshed === false) clearSessionCookies(h);
+          return h;
+        })()
       }
     );
 
@@ -381,6 +485,65 @@ if (
      * NORMAL SITE ROUTES
      * =====================================================
      */
+
+    authState = await sessionForRequest(request, env);
+
+    if (url.pathname === '/logout') {
+      const h = new Headers({ location: '/', 'cache-control': 'no-store' });
+      clearSessionCookies(h);
+      return new Response(null, { status: 303, headers: h });
+    }
+
+    if (url.pathname === '/signup' || url.pathname === '/login') {
+      if (authState.user) {
+        const target = safeReturnPath(url.searchParams.get('return')) || await defaultPostAuthPath(env, authState);
+        return Response.redirect(url.origin + target, 303);
+      }
+      const mode = url.pathname === '/signup' ? 'signup' : 'login';
+      return render(mode === 'signup' ? 'Create your account' : 'Log in', authPage({
+        mode,
+        error: (url.searchParams.get('error') || '').slice(0, 240),
+        message: (url.searchParams.get('message') || '').slice(0, 240),
+        email: (url.searchParams.get('email') || '').slice(0, 254),
+        returnTo: safeReturnPath(url.searchParams.get('return'))
+      }), { noindex: true });
+    }
+
+    if (url.pathname === '/check-email') {
+      if (authState.user) return Response.redirect(url.origin + (safeReturnPath(url.searchParams.get('return')) || await defaultPostAuthPath(env, authState)), 303);
+      return render('Check your email', checkEmailPage((url.searchParams.get('email') || '').slice(0, 254), safeReturnPath(url.searchParams.get('return'))), { noindex: true });
+    }
+
+    if (url.pathname === '/auth/callback') {
+      if (authState.user) return Response.redirect(url.origin + (safeReturnPath(url.searchParams.get('return')) || await defaultPostAuthPath(env, authState)), 303);
+      return render('Verifying your email', authCallbackPage(), { noindex: true });
+    }
+
+    if (url.pathname === '/onboarding') {
+      if (!authState.user || !authState.accessToken) return Response.redirect(url.origin + '/login?message=' + encodeURIComponent('Log in to continue setting up your account.'), 303);
+      let preferences = null;
+      try { preferences = await getJobPreferences(env, authState.accessToken, authState.user.id); }
+      catch (error) { console.error('Preferences load failed:', error); }
+      return render('Set up your account', onboardingPage({ user: authState.user, preferences, error: (url.searchParams.get('error') || '').slice(0, 240) }), { noindex: true });
+    }
+
+    const applyMatch = url.pathname.match(/^\/apply\/([^/]+)$/);
+    if (applyMatch) {
+      let id;
+      try { id = decodeURIComponent(applyMatch[1]); } catch { return missing(); }
+      if (!id || id.length > 200) return missing();
+      const job = await getJob(env, id);
+      if (!job) return missing();
+      if (!authState.user) {
+        const returnTo = `/apply/${encodeURIComponent(id)}`;
+        return Response.redirect(url.origin + `/signup?return=${encodeURIComponent(returnTo)}`, 303);
+      }
+      const destination = String(job.job_url || '');
+      let external;
+      try { external = new URL(destination); } catch { return missing(); }
+      if (!['https:', 'http:'].includes(external.protocol)) return missing();
+      return Response.redirect(external.href, 302);
+    }
 
     if (
       url.pathname.endsWith('/') &&
