@@ -5245,3 +5245,38 @@ dd{margin:0;overflow-wrap:anywhere}
 .header-actions .auth-user {
   font-size: 13px;
 }
+
+/* Temporary authenticated match diagnostics. */
+.matches-page { padding: 72px 0 96px; }
+.matches-page h1 { margin: 10px 0 14px; max-width: 760px; }
+.matches-intro { max-width: 720px; margin-bottom: 34px; color: #52655d; }
+.matches-list { display: grid; gap: 18px; }
+.match-card { display: grid; grid-template-columns: 116px 1fr; overflow: hidden; border: 1px solid #dfe5d4; border-radius: 24px; background: #fffdf3; box-shadow: 0 12px 32px rgba(18,62,48,.06); }
+.match-score { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 190px; padding: 24px 14px; background: #b3ef73; color: #123e30; }
+.match-score strong { font-size: 34px; line-height: 1; }
+.match-score span { margin-top: 6px; font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: .08em; }
+.match-card-main { padding: 25px 28px 22px; }
+.match-company { margin-bottom: 6px; color: #63746c; font-size: 13px; font-weight: 800; text-transform: uppercase; letter-spacing: .06em; }
+.match-card h2 { margin: 0; font-size: 24px; }
+.match-card h2 a { color: #123e30; text-decoration: none; }
+.match-meta { display: flex; flex-wrap: wrap; gap: 8px 16px; margin: 10px 0 18px; color: #607068; font-size: 13px; text-transform: capitalize; }
+.match-diagnostics { display: flex; flex-wrap: wrap; gap: 8px; }
+.match-diagnostic { display: inline-flex; align-items: center; gap: 6px; padding: 7px 10px; border-radius: 999px; font-size: 12px; font-weight: 750; }
+.match-diagnostic b { display: grid; width: 18px; height: 18px; place-items: center; border-radius: 50%; }
+.match-diagnostic.matched { background: #eaf8dc; color: #24543f; }
+.match-diagnostic.matched b { background: #b3ef73; }
+.match-diagnostic.missed { background: #f8e8e3; color: #7c4035; }
+.match-diagnostic.missed b { background: #f2c5b9; }
+.match-diagnostic.unknown { background: #f0f0e9; color: #6d716c; }
+.match-diagnostic.unknown b { background: #dedfd7; }
+.match-card-footer { display: flex; justify-content: space-between; gap: 18px; margin-top: 20px; padding-top: 16px; border-top: 1px solid #e7eadf; color: #6b756f; font-size: 12px; }
+.match-card-footer a { color: #123e30; font-weight: 800; text-decoration: none; }
+.match-error, .match-empty { padding: 24px; border: 1px solid #e2dfcf; border-radius: 18px; background: #fffdf3; }
+@media (max-width: 700px) {
+  .matches-page { padding-top: 44px; }
+  .match-card { grid-template-columns: 1fr; }
+  .match-score { min-height: 0; flex-direction: row; gap: 7px; justify-content: flex-start; padding: 16px 20px; }
+  .match-score strong { font-size: 27px; }
+  .match-card-main { padding: 20px; }
+  .match-card-footer { flex-direction: column; }
+}
