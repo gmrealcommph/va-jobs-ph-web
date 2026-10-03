@@ -1427,15 +1427,13 @@ export function matchesPage({ matches = [], preferences = null, summary = null, 
     const salaryValue = job.salary_max_usd ?? job.salary_min_usd ?? '';
     return `
       <article class="match-card" data-match-card data-original-order="${index}" data-score="${esc(job.match_score)}" data-salary="${esc(salaryValue)}" data-salary-period="${esc(job.salary_period || '')}" data-schedule="${esc(job.schedule_region || '')}" data-work-type="${esc(job.employment_type || '')}">
-        <div class="match-score"><strong>${esc(job.match_score)}%</strong><span>match</span></div>
         <div class="match-card-main">
-          <div class="match-company">${esc(job.company || 'Company not specified')}</div>
+          <div class="match-card-top"><span class="match-score"><strong>${esc(job.match_score)}%</strong> match</span><span class="match-company">${esc(job.company || 'Company not specified')}</span><span class="match-confidence">${esc(confidence)}</span></div>
           <h2><a href="${jobPath({ id: job.job_id })}">${esc(job.title || 'Job opportunity')}</a></h2>
           <div class="match-meta">${job.location ? `<span>${esc(job.location)}</span>` : ''}${job.employment_type ? `<span>${esc(job.employment_type.replaceAll('_', ' '))}</span>` : ''}${job.engagement_type ? `<span>${esc(job.engagement_type)}</span>` : ''}</div>
-          ${reasons ? `<div class="match-reasons">${reasons}</div>` : ''}
           <div class="match-card-footer">
-            <span>Based on ${esc(availableFactors)} matching factor${availableFactors === 1 ? '' : 's'} <strong class="match-confidence">${esc(confidence)}</strong></span>
-            <span class="match-card-actions"><form method="post" action="${savedJobIds.includes(String(job.job_id)) ? '/unsave-job' : '/save-job'}"><input type="hidden" name="job_id" value="${esc(job.job_id)}"><input type="hidden" name="return_to" value="/matches"><button class="match-save-button${savedJobIds.includes(String(job.job_id)) ? ' is-saved' : ''}" type="submit">${savedJobIds.includes(String(job.job_id)) ? '♥ Saved' : '♡ Save'}</button></form><a href="${jobPath({ id: job.job_id })}">View job →</a></span>
+            ${reasons ? `<div class="match-reasons">${reasons}</div>` : ''}
+            <span class="match-card-actions"><form method="post" action="${savedJobIds.includes(String(job.job_id)) ? '/unsave-job' : '/save-job'}"><input type="hidden" name="job_id" value="${esc(job.job_id)}"><input type="hidden" name="return_to" value="/matches"><button class="match-save-button${savedJobIds.includes(String(job.job_id)) ? ' is-saved' : ''}" type="submit">${savedJobIds.includes(String(job.job_id)) ? '♥ Saved' : '♡ Save'}</button></form><a class="match-view-job" href="${jobPath({ id: job.job_id })}">View job <span aria-hidden="true">→</span></a></span>
           </div>
         </div>
       </article>`;
@@ -1463,9 +1461,8 @@ export function matchesPage({ matches = [], preferences = null, summary = null, 
     <section class="pro-match-dashboard" aria-label="Match controls">
       <div class="pro-match-dashboard-top">
         <div>
-          <div class="pro-feed-label"><span>VEEAYS PRO</span> PERSONALIZED JOB FEED</div>
-          <h2><strong id="visible-match-count">${esc(matches.length)}</strong> matches based on your preferences</h2>
-          <p>Refine the feed without changing your saved preferences.</p>
+          <h2><strong id="visible-match-count">${esc(matches.length)}</strong> matches</h2>
+          <div class="pro-feed-label"><span>VEEAYS PRO</span></div>
         </div>
         <a class="pro-edit-preferences" href="/onboarding">Edit preferences →</a>
       </div>
@@ -1480,61 +1477,7 @@ export function matchesPage({ matches = [], preferences = null, summary = null, 
       
     </section>` : '';
 
-  const proScript = isPro && matches.length ? `<script>
-  (() => {
-    const list = document.querySelector('.matches-list');
-    if (!list) return;
-    const cards = [...list.querySelectorAll('[data-match-card]')];
-    const scoreToggle = document.getElementById('match-90');
-    const salary = document.getElementById('match-salary');
-    const schedule = document.getElementById('match-schedule');
-    const work = document.getElementById('match-work');
-    const sort = document.getElementById('match-sort');
-    const clear = document.getElementById('match-clear');
-    const count = document.getElementById('visible-match-count');
-    let strongOnly = false;
-    const normalize = value => String(value || '').toLowerCase().replace(/[_-]+/g, ' ');
-    const scheduleMatches = (raw, wanted) => {
-      if (wanted === 'all') return true;
-      const value = normalize(raw);
-      if (!value) return false;
-      if (wanted === 'philippines') return value.includes('philipp') || value.includes('ph daytime');
-      if (wanted === 'uk') return value.includes('uk') || value.includes('europe') || value.includes('gmt') || value.includes('bst');
-      if (wanted === 'australia') return value.includes('austral') || value.includes('aest') || value.includes('aedt') || value.includes('acst') || value.includes('awst');
-      if (wanted === 'us') return value.includes('us') || value.includes('est') || value.includes('edt') || value.includes('cst') || value.includes('cdt') || value.includes('mst') || value.includes('mdt') || value.includes('pst') || value.includes('pdt');
-      return true;
-    };
-    const apply = () => {
-      const minSalary = Number(salary?.value || 0);
-      const wantedSchedule = schedule?.value || 'all';
-      const wantedWork = work?.value || 'all';
-      let visible = 0;
-      cards.forEach(card => {
-        const score = Number(card.dataset.score || 0);
-        const salaryValue = Number(card.dataset.salary || 0);
-        const salaryPeriod = normalize(card.dataset.salaryPeriod);
-        const workType = normalize(card.dataset.workType);
-        const salaryOk = !minSalary || (salaryPeriod === 'monthly' && salaryValue >= minSalary);
-        const scheduleOk = scheduleMatches(card.dataset.schedule, wantedSchedule);
-        const workOk = wantedWork === 'all' || (wantedWork === 'full' ? workType.includes('full') : workType.includes('part'));
-        const scoreOk = !strongOnly || score >= 90;
-        const show = salaryOk && scheduleOk && workOk && scoreOk;
-        card.hidden = !show;
-        if (show) visible += 1;
-      });
-      const ordered = [...cards].sort((a,b) => Number(b.dataset.score || 0) - Number(a.dataset.score || 0) || Number(a.dataset.originalOrder) - Number(b.dataset.originalOrder));
-      ordered.forEach(card => list.appendChild(card));
-      if (count) count.textContent = String(visible);
-      let empty = list.querySelector('.pro-filter-empty');
-      if (!visible) {
-        if (!empty) { empty = document.createElement('div'); empty.className = 'match-empty pro-filter-empty'; empty.innerHTML = '<h2>No matches with those filters</h2><p>Try widening one of the filters above.</p>'; list.appendChild(empty); }
-      } else if (empty) empty.remove();
-    };
-    scoreToggle?.addEventListener('click', () => { strongOnly = !strongOnly; scoreToggle.setAttribute('aria-pressed', String(strongOnly)); scoreToggle.classList.toggle('active', strongOnly); apply(); });
-    [salary, schedule, work, sort].forEach(el => el?.addEventListener('change', apply));
-    clear?.addEventListener('click', () => { strongOnly = false; scoreToggle?.setAttribute('aria-pressed','false'); scoreToggle?.classList.remove('active'); if (salary) salary.value='all'; if (schedule) schedule.value='all'; if (work) work.value='all'; if (sort) sort.value='strongest'; apply(); });
-  })();
-  </script>` : '';
+  const proScript = isPro && matches.length ? `<script src="/match-filters.js" defer></script>` : '';
 
   const intro = isPro
     ? 'Your full personalized feed, ranked around the preferences you gave us.'
