@@ -1582,26 +1582,76 @@ export function proPage({ isPro = false } = {}) {
 
 export function myJobsPage({ saved = [], applications = [], message = '', error = '' } = {}) {
   const statusLabel = value => ({ applied: 'Applied', interview: 'Interview', offer: 'Offer', hired: 'Hired', rejected: 'Rejected', withdrawn: 'Withdrawn' }[value] || value);
-  const appByStatus = status => applications.filter(item => item.status === status);
+  const formatAppliedDate = value => {
+    if (!value) return '';
+    const d = new Date(value);
+    if (Number.isNaN(d.getTime())) return '';
+    return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+  };
   const jobMini = job => `<article class="my-job-card"><div><div class="my-job-company">${esc(job.company || 'Company')}</div><h3><a href="${jobPath(job)}">${esc(job.title || 'Job opportunity')}</a></h3><p>${esc(job.location || 'Remote')} ${job.category ? `· ${esc(job.category)}` : ''}</p></div><a class="my-job-view" href="${jobPath(job)}">View job →</a></article>`;
-  const applicationCard = item => `<article class="tracker-card">
-    <div class="tracker-card-main"><div class="my-job-company">${esc(item.job?.company || 'Company')}</div><h3><a href="${item.job ? jobPath(item.job) : '#'}">${esc(item.job?.title || 'Job opportunity')}</a></h3><p>${esc(item.job?.location || '')}</p></div>
-    <form class="tracker-form" method="post" action="/update-application">
-      <input type="hidden" name="job_id" value="${esc(item.job_id)}">
-      <label>Status<select name="status">${['applied','interview','offer','hired','rejected','withdrawn'].map(s => `<option value="${s}"${s === item.status ? ' selected' : ''}>${statusLabel(s)}</option>`).join('')}</select></label>
-      <label>Private notes<textarea name="notes" maxlength="2000" placeholder="Interview details, follow-up dates, contact names…">${esc(item.notes || '')}</textarea></label>
-      <div class="tracker-actions"><button type="submit">Save changes</button><button class="tracker-remove" type="submit" formaction="/remove-application">Remove</button></div>
-    </form>
-  </article>`;
-  const stages = ['applied','interview','offer','hired','rejected','withdrawn'];
+  const applicationCard = item => {
+    const appliedDate = formatAppliedDate(item.applied_at);
+    return `<article class="tracker-card" data-status="${esc(item.status)}">
+      <div class="tracker-card-summary">
+        <div class="tracker-card-main"><div class="my-job-company">${esc(item.job?.company || 'Company')}</div><h3><a href="${item.job ? jobPath(item.job) : '#'}">${esc(item.job?.title || 'Job opportunity')}</a></h3><div class="tracker-meta"><span class="tracker-status tracker-status-${esc(item.status)}">${statusLabel(item.status)}</span>${appliedDate ? `<span>Applied ${esc(appliedDate)}</span>` : ''}${item.job?.location ? `<span>${esc(item.job.location)}</span>` : ''}</div></div>
+        <div class="tracker-card-links">${item.job ? `<a class="my-job-view" href="${jobPath(item.job)}">View job →</a>` : ''}<button class="tracker-edit-toggle" type="button" aria-expanded="false">Edit application</button></div>
+      </div>
+      <div class="tracker-edit-panel" hidden>
+        <form class="tracker-form" method="post" action="/update-application">
+          <input type="hidden" name="job_id" value="${esc(item.job_id)}">
+          <label>Status<select name="status">${['applied','interview','offer','hired','rejected','withdrawn'].map(s => `<option value="${s}"${s === item.status ? ' selected' : ''}>${statusLabel(s)}</option>`).join('')}</select></label>
+          <label>Private notes<textarea name="notes" maxlength="2000" placeholder="Interview details, follow-up dates, contact names…">${esc(item.notes || '')}</textarea></label>
+          <div class="tracker-actions"><button type="submit">Save changes</button><button class="tracker-remove" type="submit" formaction="/remove-application">Remove</button></div>
+        </form>
+      </div>
+    </article>`;
+  };
+  const counts = {
+    all: applications.length,
+    applied: applications.filter(i => i.status === 'applied').length,
+    interview: applications.filter(i => i.status === 'interview').length,
+    offer: applications.filter(i => i.status === 'offer').length,
+    hired: applications.filter(i => i.status === 'hired').length,
+    closed: applications.filter(i => i.status === 'rejected' || i.status === 'withdrawn').length,
+  };
+  const tabs = [['all','All'],['applied','Applied'],['interview','Interview'],['offer','Offer'],['hired','Hired'],['closed','Closed']];
+  const cards = applications.map(applicationCard).join('');
   return `<section class="wrap my-jobs-page">
     <div class="kicker">MY JOBS</div><h1>Your job search,<br><em>all in one place.</em></h1><p class="my-jobs-intro">Save opportunities for later and keep track of every application as it moves forward.</p>
     ${message ? `<div class="my-jobs-message">${esc(message)}</div>` : ''}${error ? `<div class="my-jobs-error">${esc(error)}</div>` : ''}
     <section class="saved-jobs-section"><div class="my-jobs-section-head"><div><span class="eyebrow">SAVED</span><h2>Jobs to come back to</h2></div><strong>${saved.length}</strong></div>
-      <div class="my-jobs-grid">${saved.length ? saved.map(jobMini).join('') : '<div class="my-jobs-empty"><h3>No saved jobs yet</h3><p>Save jobs while browsing and they’ll appear here.</p><a class="button" href="/">Find jobs</a></div>'}</div>
+      <div class="my-jobs-grid">${saved.length ? saved.map(jobMini).join('') : '<div class="my-jobs-empty"><h3>No saved jobs yet</h3><p>Save jobs while browsing and they’ll appear here.</p><a class="button" href="/jobs">Find jobs</a></div>'}</div>
     </section>
     <section class="application-tracker"><div class="my-jobs-section-head"><div><span class="eyebrow">APPLICATION TRACKER</span><h2>Keep every application moving</h2></div><strong>${applications.length}</strong></div>
-      <div class="tracker-stages">${stages.map(status => { const items=appByStatus(status); return `<section class="tracker-stage"><header><h3>${statusLabel(status)}</h3><span>${items.length}</span></header><div class="tracker-stage-list">${items.length ? items.map(applicationCard).join('') : '<p class="tracker-stage-empty">Nothing here yet.</p>'}</div></section>`; }).join('')}</div>
+      <div class="tracker-tabs" role="tablist" aria-label="Application status filters">${tabs.map(([key,label],idx) => `<button type="button" class="tracker-tab${idx===0?' active':''}" data-filter="${key}" aria-pressed="${idx===0?'true':'false'}">${label}<span>${counts[key]}</span></button>`).join('')}</div>
+      <div class="tracker-cards">${cards || '<div class="my-jobs-empty tracker-all-empty"><h3>No applications yet</h3><p>When you mark a job as applied, it will appear here.</p></div>'}<div class="my-jobs-empty tracker-filter-empty" hidden><h3>Nothing here yet</h3><p>No applications are in this stage.</p></div></div>
     </section>
-  </section>`;
+  </section>
+  <script>
+  (() => {
+    const root = document.querySelector('.application-tracker');
+    if (!root) return;
+    const tabs = [...root.querySelectorAll('.tracker-tab')];
+    const cards = [...root.querySelectorAll('.tracker-card')];
+    const empty = root.querySelector('.tracker-filter-empty');
+    const matches = (status, filter) => filter === 'all' || status === filter || (filter === 'closed' && (status === 'rejected' || status === 'withdrawn'));
+    tabs.forEach(tab => tab.addEventListener('click', () => {
+      const filter = tab.dataset.filter || 'all';
+      tabs.forEach(t => { const active=t===tab; t.classList.toggle('active',active); t.setAttribute('aria-pressed',String(active)); });
+      let visible=0;
+      cards.forEach(card => { const show=matches(card.dataset.status,filter); card.hidden=!show; if(show) visible++; });
+      if (empty) empty.hidden = visible !== 0 || cards.length === 0;
+    }));
+    root.querySelectorAll('.tracker-edit-toggle').forEach(button => button.addEventListener('click', () => {
+      const card = button.closest('.tracker-card');
+      const panel = card?.querySelector('.tracker-edit-panel');
+      if (!panel) return;
+      const open = panel.hidden;
+      panel.hidden = !open;
+      button.setAttribute('aria-expanded', String(open));
+      button.textContent = open ? 'Close editor' : 'Edit application';
+    }));
+  })();
+  </script>`;
 }
+
