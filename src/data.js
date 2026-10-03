@@ -87,7 +87,27 @@ export async function getJob(env, id) {
     }
   );
 
-  return rows[0] || null;
+  const job=rows[0] || null;
+  if (!job) return null;
+  job.quick_read=null;
+  // Rollout-safe: a missing migration retains the public V1 job and original fallback.
+  try {
+    const {key,url}=config(env);
+    const response=await fetch(new URL('/rest/v1/rpc/public_job_detail_enrichment',url),{
+      method:'POST',headers:{apikey:key,'content-type':'application/json'},
+      body:JSON.stringify({p_job_id:numericId}),signal:AbortSignal.timeout(12000)
+    });
+    if(response.ok) {
+      const extra=await response.json();
+      if(extra && typeof extra==='object' && !Array.isArray(extra)) {
+        for(const field of ['employment_type','engagement_type','salary_min','salary_max','salary_currency','salary_period','schedule_region','experience_level']) job[field]=extra[field];
+        // Verify the cached revision against the actual public source before rendering.
+        const {sourceFingerprint,validateStored}=await import('./quick-read-generation.js');
+        if(extra.quick_read && extra.quick_read_source_hash===await sourceFingerprint(job.description)) job.quick_read=validateStored(extra.quick_read,job.description);
+      }
+    }
+  } catch { /* Generation/enrichment availability must not break job navigation. */ }
+  return job;
 }
 export async function categories(env, { withCounts = false } = {}) {
   const names = new Set();

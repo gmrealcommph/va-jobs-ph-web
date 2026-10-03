@@ -1,4 +1,5 @@
 import { categories, getJob, getJobsByIds, listJobs, query } from './data.js';
+import { quickReadEndpoint } from './quick-read-service.js';
 import { manualNotification } from './notifications.js';
 import { scheduledStrongMatches } from './strong-matches.js';
 import { scheduledDailyDigest, DIGEST_CRON } from './daily-digest.js';
@@ -40,6 +41,8 @@ function hasCookie(request, name, expected = '1') {
 function xml(body) { return new Response(`<?xml version="1.0" encoding="UTF-8"?>${body}`, { headers: { 'content-type': 'application/xml; charset=utf-8', 'cache-control': 'public, max-age=300' } }); }
 export async function handle(request, env) {
   const url = new URL(request.url);
+  const quickReadMatch=url.pathname.match(/^\/internal\/quick-read\/([1-9]\d{0,18}|batch)$/);
+  if(quickReadMatch) return quickReadEndpoint(request,env,quickReadMatch[1]==='batch'?null:quickReadMatch[1]);
 
   const manualMatch = url.pathname.match(/^\/internal\/strong-match\/([1-9]\d{0,18})$/);
   if (manualMatch) {

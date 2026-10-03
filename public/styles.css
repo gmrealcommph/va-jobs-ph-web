@@ -5604,6 +5604,12 @@ body>header,body>footer{flex-shrink:0}
 
 
 /* Job Detail Quick Read V1: scoped to the public job detail. */
+.job-detail-page .job-detail-logo-wrap {position:relative;}
+.job-detail-page [data-company-logo] {visibility:hidden;}
+.job-detail-page .qr-logo-loaded [data-company-logo] {visibility:visible;}
+.job-detail-page .qr-logo-initials {position:absolute;inset:0;display:grid;place-items:center;background:#f0eee8;color:#275847;font-size:1.6rem;font-weight:700;border-radius:12px;}
+.job-detail-page .qr-logo-loaded .qr-logo-initials {display:none;}
+.job-detail-page .qr-logo-placeholder {display:grid;place-items:center;background:#f0eee8;color:#275847;font-size:1.6rem;font-weight:700;min-height:72px;}
 .job-detail-page .qr-glance {margin-bottom:2rem;padding:1.5rem;background:#f0f3dc;border:1px solid #234b35;border-radius:14px;color:#183e2c}
 .job-detail-page .qr-glance dl {display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1rem;margin-bottom:0}
 .job-detail-page .qr-glance dt {font-size:.8rem;text-transform:uppercase;letter-spacing:.06em}

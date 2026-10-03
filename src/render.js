@@ -1181,7 +1181,7 @@ export function detail(job, { user = null, saved = false, application = null, sa
 
 
           <div class="description job-detail-description">
-            ${renderJobRead(description)}
+            ${renderJobRead(description, job.quick_read ?? null)}
           </div>
 
         </article>
@@ -1204,15 +1204,17 @@ export function detail(job, { user = null, saved = false, application = null, sa
           ? ' job-detail-logo-wrap--assist-world'
           : ''
       }">
+        <span class="qr-logo-initials" aria-hidden="true">${esc(company.trim().split(/\s+/).slice(0,2).map(word=>word[0]).join('').toUpperCase())}</span>
         <img
           class="job-detail-logo"
           src="/company-logo/${encodeURIComponent(String(job.id))}"
-          alt="${esc(company)} logo"
+          alt=""
+          data-company-logo
           loading="lazy"
           referrerpolicy="no-referrer"
         >
       </div>`
-    : ''
+    : `<div class="job-detail-logo-wrap qr-logo-placeholder" aria-hidden="true">${esc(company.trim().split(/\s+/).slice(0,2).map(word=>word[0]).join('').toUpperCase())}</div>`
 }
 
 
@@ -1328,7 +1330,7 @@ ${
 
       </section>
 
-    </div>
+    </div><script type="module" src="/job-detail-logo.js"></script>
   `;
 }
 
