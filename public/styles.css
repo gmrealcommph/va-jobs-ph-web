@@ -5602,3 +5602,19 @@ body>header,body>footer{flex-shrink:0}
 @media(max-width:700px){.home-page .job-card.opportunity-card.discovery-card{padding:18px}.home-page .discovery-card .opportunity-title{font-size:1.18rem}.home-page .discovery-card .opportunity-card-top{flex-wrap:wrap}.home-page .discovery-card .opportunity-date{margin-left:0}.home-page .discovery-actions .job-save-button,.home-page .discovery-view-job{min-height:44px;padding:9px 12px}.home-page .discovery-search-row{gap:7px;padding-left:10px}.home-page .discovery-search input{font-size:.77rem}.home-page .discovery-search button{min-height:44px;padding:10px 11px}}
 @media(prefers-reduced-motion:reduce){.home-page .discovery-card,.home-page .discovery-card:before,.home-page .discovery-card:after,.home-page .discovery-view-job span,.home-page .discovery-heart{transition:none!important;animation:none!important}.home-page .discovery-card:hover,.home-page .discovery-card:focus-within,.home-page .discovery-card:hover:before,.home-page .discovery-card:hover .discovery-view-job span,.home-page .discovery-card:focus-within .discovery-view-job span{transform:none!important}}
 
+
+/* Job Detail Quick Read V1: scoped to the public job detail. */
+.job-detail-page .qr-glance {margin-bottom:2rem;padding:1.5rem;background:#f0f3dc;border:1px solid #234b35;border-radius:14px;color:#183e2c}
+.job-detail-page .qr-glance dl {display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1rem;margin-bottom:0}
+.job-detail-page .qr-glance dt {font-size:.8rem;text-transform:uppercase;letter-spacing:.06em}
+.job-detail-page .qr-glance dd {margin: .35rem 0 0;font-weight:700;overflow-wrap:anywhere}
+.job-detail-page .qr h2 {color:#183e2c}
+.job-detail-page .qr-disclosure {font-size:.9rem;line-height:1.6;color:#48614f}
+.job-detail-page .qr-section {margin:1.75rem 0}
+.job-detail-page .qr-section h3 {font-size:1.15rem;color:#183e2c;border-bottom:1px solid #d8deca;padding-bottom:.6rem}
+.job-detail-page .qr li {margin:.6rem 0;line-height:1.7;overflow-wrap:anywhere}
+.job-detail-page .qr-source {margin-top:2rem;border-top:1px solid #234b35;padding-top:1rem}
+.job-detail-page .qr-source summary {cursor:pointer;color:#183e2c;font-weight:700;padding:.8rem 0;min-height:44px}
+.job-detail-page .qr-source summary:focus-visible {outline:3px solid #72952f;outline-offset:4px}
+.job-detail-page .qr-original {white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.75;margin-top:1rem}
+@media(max-width:600px) {.job-detail-page .qr-glance dl {grid-template-columns:1fr}.job-detail-page .qr-glance {padding:1rem}.job-detail-page .qr ul {padding-left:1.25rem}}

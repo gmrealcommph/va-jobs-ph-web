@@ -1,3 +1,4 @@
+import { renderJobRead, renderAtAGlance } from './job-detail-read.js';
 export const esc = value => String(value ?? '').replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[char]));
 export const jobPath = job => `/jobs/${encodeURIComponent(job.id)}`;
 export const categoryPath = name => `/categories/${encodeURIComponent(name)}`;
@@ -1160,7 +1161,7 @@ export function detail(job, { user = null, saved = false, application = null, sa
 
       <section class="wrap job-detail-layout">
 
-        <article class="job-detail-content">
+        <article class="job-detail-content">${renderAtAGlance(job)}
 
           <div class="job-detail-section-heading">
 
@@ -1172,7 +1173,7 @@ export function detail(job, { user = null, saved = false, application = null, sa
               </div>
 
               <h2>
-                About this opportunity
+                The employer listing
               </h2>
             </div>
 
@@ -1180,7 +1181,7 @@ export function detail(job, { user = null, saved = false, application = null, sa
 
 
           <div class="description job-detail-description">
-            ${formatJobDescription(description)}
+            ${renderJobRead(description)}
           </div>
 
         </article>
