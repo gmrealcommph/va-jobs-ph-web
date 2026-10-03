@@ -140,3 +140,13 @@ export async function getMyJobMatches(env, accessToken, resultLimit = 20) {
   if (!response.ok) throw new Error(String(data?.message || data?.details || `Could not load job matches (${response.status}).`));
   return Array.isArray(data) ? data : [];
 }
+
+
+export async function getMyMatchSummary(env, accessToken) {
+  const { response, data } = await userRestFetch(env, accessToken, '/rest/v1/rpc/get_my_match_summary', {
+    method: 'POST',
+    body: JSON.stringify({})
+  });
+  if (!response.ok) throw new Error(String(data?.message || data?.details || `Could not load match summary (${response.status}).`));
+  return Array.isArray(data) ? (data[0] || null) : data;
+}

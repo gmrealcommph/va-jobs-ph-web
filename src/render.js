@@ -1377,18 +1377,20 @@ export function onboardingPage({ user, preferences = null, error = '' } = {}) {
 }
 
 
-export function matchesPage({ matches = [], preferences = null, error = '' } = {}) {
-  const diagnostic = (label, matched, available) => {
-    const state = !available ? 'unknown' : matched ? 'matched' : 'missed';
-    const icon = state === 'matched' ? '✓' : state === 'missed' ? '×' : '?';
-    const suffix = state === 'unknown' ? ' unavailable' : '';
-    return `<span class="match-diagnostic ${state}"><b aria-hidden="true">${icon}</b>${esc(label)}${suffix}</span>`;
-  };
-
+export function matchesPage({ matches = [], preferences = null, summary = null, error = '' } = {}) {
   const schedulePrefs = Array.isArray(preferences?.schedule_preferences) ? preferences.schedule_preferences : [];
   const scheduleUnrestricted = schedulePrefs.some(value => ['flexible/any', 'flexible', 'any'].includes(String(value).trim().toLowerCase()));
+  const isPro = summary?.is_pro === true;
+  const lockedMatches = Math.max(0, Number(summary?.locked_matches) || 0);
+  const totalMatches = Math.max(matches.length, Number(summary?.total_matches) || 0);
   const confidenceLabel = available => available >= 5 ? 'High confidence' : available >= 3 ? 'Good confidence' : 'Limited data';
-  const unrestrictedDiagnostic = label => `<span class="match-diagnostic unrestricted"><b aria-hidden="true">↔</b>${esc(label)} unrestricted</span>`;
+
+  const friendlyReason = (label, matched, available, unrestricted = false) => {
+    if (unrestricted) return `<span class="match-reason neutral"><b aria-hidden="true">↔</b>${esc(label)} flexible</span>`;
+    if (!available) return '';
+    if (matched) return `<span class="match-reason matched"><b aria-hidden="true">✓</b>${esc(label)}</span>`;
+    return `<span class="match-reason neutral"><b aria-hidden="true">•</b>${esc(label)} differs</span>`;
+  };
 
   const cards = matches.map(job => {
     const skillsAvailable = Array.isArray(preferences?.skills) && preferences.skills.length > 0 && Array.isArray(job.skills) && job.skills.length > 0;
@@ -1399,6 +1401,14 @@ export function matchesPage({ matches = [], preferences = null, error = '' } = {
     const roleAvailable = Array.isArray(preferences?.target_roles) && preferences.target_roles.length > 0 && !!(job.category || job.title);
     const availableFactors = Number(job.available_dimensions) || 0;
     const confidence = confidenceLabel(availableFactors);
+    const reasons = [
+      friendlyReason('Role fit', job.role_match, roleAvailable),
+      friendlyReason('Skills', job.skills_match, skillsAvailable),
+      friendlyReason('Salary', job.salary_match, salaryAvailable),
+      friendlyReason('Schedule', job.schedule_match, scheduleAvailable, scheduleUnrestricted),
+      friendlyReason('Work type', job.employment_match, employmentAvailable),
+      friendlyReason('Experience', job.experience_match, experienceAvailable)
+    ].filter(Boolean).join('');
     return `
       <article class="match-card">
         <div class="match-score"><strong>${esc(job.match_score)}%</strong><span>match</span></div>
@@ -1406,14 +1416,7 @@ export function matchesPage({ matches = [], preferences = null, error = '' } = {
           <div class="match-company">${esc(job.company || 'Company not specified')}</div>
           <h2><a href="${jobPath(job)}">${esc(job.title || 'Job opportunity')}</a></h2>
           <div class="match-meta">${job.location ? `<span>${esc(job.location)}</span>` : ''}${job.employment_type ? `<span>${esc(job.employment_type.replaceAll('_', ' '))}</span>` : ''}${job.engagement_type ? `<span>${esc(job.engagement_type)}</span>` : ''}</div>
-          <div class="match-diagnostics">
-            ${diagnostic('Role', job.role_match, roleAvailable)}
-            ${diagnostic('Skills', job.skills_match, skillsAvailable)}
-            ${diagnostic('Salary', job.salary_match, salaryAvailable)}
-            ${scheduleUnrestricted ? unrestrictedDiagnostic('Schedule') : diagnostic('Schedule', job.schedule_match, scheduleAvailable)}
-            ${diagnostic('Full-time / part-time', job.employment_match, employmentAvailable)}
-            ${diagnostic('Experience', job.experience_match, experienceAvailable)}
-          </div>
+          ${reasons ? `<div class="match-reasons">${reasons}</div>` : ''}
           <div class="match-card-footer">
             <span>Based on ${esc(availableFactors)} matching factor${availableFactors === 1 ? '' : 's'} <strong class="match-confidence">${esc(confidence)}</strong></span>
             <a href="${jobPath(job)}">View job →</a>
@@ -1422,12 +1425,63 @@ export function matchesPage({ matches = [], preferences = null, error = '' } = {
       </article>`;
   }).join('');
 
+  const freeUpgrade = !isPro && !error && totalMatches > 3 ? `
+    <section class="pro-unlock-card">
+      <div class="pro-unlock-icon" aria-hidden="true">✈</div>
+      <div class="pro-unlock-copy">
+        <div class="kicker">VEEAYS PRO</div>
+        <h2>${lockedMatches > 0 ? `${esc(lockedMatches)} more match${lockedMatches === 1 ? '' : 'es'} waiting for you.` : 'Your full match feed is waiting.'}</h2>
+        <p>Stop digging through every listing. Pro unlocks your full personalized feed and helps the strongest opportunities find you.</p>
+        <div class="pro-benefits">
+          <span>✓ All ranked matches</span><span>✓ Full match explanations</span><span>✓ Strong-match alerts</span><span>✓ Personalized job digest</span>
+        </div>
+      </div>
+      <div class="pro-unlock-action">
+        <div class="pro-price"><strong>₱499</strong><span>/ month</span></div>
+        <a class="button pro-button" href="/pro">Unlock VeeAys Pro</a>
+        <small>Cancel anytime.</small>
+      </div>
+    </section>` : '';
+
+  const proBadge = isPro ? '<span class="matches-pro-badge">PRO</span>' : '';
+  const intro = isPro
+    ? `Your full personalized feed, ranked around the preferences you gave us. ${totalMatches ? `${esc(totalMatches)} matches in your current feed.` : ''}`
+    : 'We compare your preferences with every eligible role and bring the strongest fits to the top. Your first 3 are free.';
+
   return `
     <section class="wrap matches-page">
-      <div class="kicker">MATCHING TEST</div>
-      <h1>Your best matches,<br><em>ranked for you.</em></h1>
-      <p class="matches-intro">This is a temporary diagnostic view of your top 20 matches. The labels show which preference dimensions influenced each score.</p>
+      <div class="matches-heading-row"><div><div class="kicker">MY MATCHES ${proBadge}</div><h1>Your best matches,<br><em>picked for you.</em></h1></div>${!isPro ? '<a class="matches-edit-link" href="/onboarding">Edit preferences</a>' : '<a class="matches-edit-link" href="/onboarding">Edit preferences</a>'}</div>
+      <p class="matches-intro">${intro}</p>
       ${error ? `<div class="match-error">${esc(error)}</div>` : ''}
-      <div class="matches-list">${cards || '<div class="match-empty"><h2>No matches yet</h2><p>Complete your job preferences so VeeAys can rank opportunities for you.</p><a class="button" href="/onboarding">Set my preferences</a></div>'}</div>
+      <div class="matches-list">${cards || (!error ? '<div class="match-empty"><h2>No matches yet</h2><p>Update your job preferences so VeeAys can find better-fit opportunities for you.</p><a class="button" href="/onboarding">Set my preferences</a></div>' : '')}</div>
+      ${freeUpgrade}
+    </section>`;
+}
+
+
+export function proPage({ isPro = false } = {}) {
+  return `
+    <section class="wrap pro-page">
+      <div class="kicker">VEEAYS PRO</div>
+      <h1>Less searching.<br><em>Better matches.</em></h1>
+      <p class="pro-page-intro">VeeAys Pro turns your preferences into a personalized job feed, so the strongest remote opportunities rise to the top.</p>
+      <div class="pro-pricing-card">
+        <div>
+          <span class="pro-plan-label">VeeAys Pro</span>
+          <div class="pro-page-price"><strong>₱499</strong><span>/ month</span></div>
+          <p>Built for Filipino professionals who want to spend less time searching and more time applying to the right roles.</p>
+        </div>
+        <div class="pro-page-benefits">
+          <span>✓ Unlock your full ranked match feed</span>
+          <span>✓ See why each opportunity fits you</span>
+          <span>✓ Get strong-match alerts</span>
+          <span>✓ Receive a personalized job digest</span>
+          <span>✓ Advanced match filters as they roll out</span>
+        </div>
+        <div class="pro-page-action">
+          ${isPro ? '<a class="button" href="/matches">View my Pro matches</a><small>Your account already has Pro access.</small>' : '<span class="button pro-coming-soon" aria-disabled="true">Upgrade checkout coming next</span><small>₱499/month · Cancel anytime.</small>'}
+        </div>
+      </div>
+      <p class="pro-free-note"><strong>Jobs stay free to browse.</strong> Pro is the personalized layer that finds and ranks the best opportunities for you.</p>
     </section>`;
 }
