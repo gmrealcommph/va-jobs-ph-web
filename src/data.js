@@ -102,3 +102,11 @@ export async function categories(env) {
   }
   return [...names].sort((a, b) => a.localeCompare(b));
 }
+
+
+export async function getJobsByIds(env, ids) {
+  const clean = [...new Set((ids || []).map(v => String(v)).filter(v => /^\d+$/.test(v)))];
+  if (!clean.length) return [];
+  const { rows } = await query(env, { select: COLUMNS, id: `in.(${clean.join(',')})` }, { limit: Math.min(clean.length, 500) });
+  return rows;
+}

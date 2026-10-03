@@ -91,6 +91,7 @@ export function layout({ title, description, canonical, body, noindex = false, u
       ${user ? `
         <span class="auth-user">${firstName ? `Hi, ${esc(firstName)}! 👋` : 'Hi! 👋'}</span>
         <a class="auth-link" href="/matches">My matches</a>
+        <a class="auth-link" href="/my-jobs">My jobs</a>
         <a class="auth-link" href="/onboarding">My account</a>
         <a class="auth-link" href="/logout">Log out</a>
       ` : `
@@ -239,7 +240,7 @@ export function layout({ title, description, canonical, body, noindex = false, u
 </html>`;
 }
 
-export function card(job) {
+export function card(job, { user = null, saved = false } = {}) {
   const location =
     job.location ||
     (job.remote ? 'Remote' : 'Location not specified');
@@ -269,6 +270,10 @@ export function card(job) {
 
       </div>
 
+
+      <div class="job-save-row">
+        ${user ? `<form method="post" action="${saved ? '/unsave-job' : '/save-job'}"><input type="hidden" name="job_id" value="${esc(job.id)}"><input type="hidden" name="return_to" value="${jobPath(job)}"><button class="job-save-button${saved ? ' is-saved' : ''}" type="submit">${saved ? '♥ Saved' : '♡ Save job'}</button></form>` : `<a class="job-save-button" href="/signup?return=${encodeURIComponent(jobPath(job) + '?save=1')}">♡ Save job</a>`}
+      </div>
 
       <h2 class="opportunity-title">
         <a href="${jobPath(job)}">
@@ -339,7 +344,7 @@ export function searchForm(search = '', category = '', action = '/') {
   return `<form class="search" role="search" action="${esc(action)}" method="get"><label for="q">Job title, company, or keyword</label><div class="search-row"><span aria-hidden="true">⌕</span><input id="q" name="q" type="search" maxlength="120" placeholder="e.g. virtual assistant, customer support" value="${esc(search)}">${category && action === '/' ? `<input type="hidden" name="category" value="${esc(category)}">` : ''}<button type="submit">Search jobs <span aria-hidden="true">↗</span></button></div></form>`;
 }
 
-export function listing({ rows, total, page, search, category, names, showPreferencesPrompt = false, onboardingComplete = false }) {
+export function listing({ rows, total, page, search, category, names, showPreferencesPrompt = false, onboardingComplete = false, user = null, savedJobIds = [] }) {
   const action = category ? categoryPath(category) : '/';
   const pages = Math.ceil(total / 15);
 
@@ -603,7 +608,7 @@ export function listing({ rows, total, page, search, category, names, showPrefer
       ${
   rows.length
     ? `<div class="opportunity-grid">
-        ${rows.map(card).join('')}
+        ${rows.map(job => card(job, { user, saved: savedJobIds.includes(String(job.id)) })).join('')}
       </div>`
     : `<div class="empty">
         <h2>No matching opportunities yet</h2>
@@ -1001,7 +1006,7 @@ function formatJobDescription(text = '') {
   return html;
 }
 
-export function detail(job) {
+export function detail(job, { user = null, saved = false, application = null, saveIntent = false } = {}) {
   const apply = safeUrl(job.job_url);
 
   const logo =
@@ -1241,12 +1246,20 @@ export function detail(job) {
             </dl>
 
 
+            <div class="job-detail-user-actions">
+              ${saveIntent && user && !saved ? '<p class="save-intent-note">You’re signed in. Save this job so you can come back to it anytime.</p>' : ''}
+              ${user ? `<form method="post" action="${saved ? '/unsave-job' : '/save-job'}"><input type="hidden" name="job_id" value="${esc(job.id)}"><input type="hidden" name="return_to" value="${jobPath(job)}"><button class="job-detail-save${saved ? ' is-saved' : ''}" type="submit">${saved ? '♥ Saved job' : '♡ Save job'}</button></form>` : `<a class="job-detail-save" href="/signup?return=${encodeURIComponent(jobPath(job) + '?save=1')}">♡ Save job</a>`}
+              ${user && !application ? `<form method="post" action="/mark-applied"><input type="hidden" name="job_id" value="${esc(job.id)}"><input type="hidden" name="return_to" value="${jobPath(job)}"><button class="job-detail-track" type="submit">✓ Mark as applied</button></form>` : ''}
+              ${user && application ? `<a class="job-detail-track is-tracked" href="/my-jobs">Tracked · ${esc(application.status.charAt(0).toUpperCase() + application.status.slice(1))}</a>` : ''}
+            </div>
+
             ${
               apply
                 ? `<a
                     class="job-detail-apply"
                     href="/apply/${encodeURIComponent(job.id)}"
-                    rel="nofollow"
+                    target="_blank"
+                    rel="nofollow noopener"
                   >
                     <span>Apply for this role</span>
                     <b>↗</b>
@@ -1377,7 +1390,7 @@ export function onboardingPage({ user, preferences = null, error = '' } = {}) {
 }
 
 
-export function matchesPage({ matches = [], preferences = null, summary = null, error = '' } = {}) {
+export function matchesPage({ matches = [], preferences = null, summary = null, error = '', savedJobIds = [] } = {}) {
   const schedulePrefs = Array.isArray(preferences?.schedule_preferences) ? preferences.schedule_preferences : [];
   const scheduleUnrestricted = schedulePrefs.some(value => ['flexible/any', 'flexible', 'any'].includes(String(value).trim().toLowerCase()));
   const isPro = summary?.is_pro === true;
@@ -1415,12 +1428,12 @@ export function matchesPage({ matches = [], preferences = null, summary = null, 
         <div class="match-score"><strong>${esc(job.match_score)}%</strong><span>match</span></div>
         <div class="match-card-main">
           <div class="match-company">${esc(job.company || 'Company not specified')}</div>
-          <h2><a href="${jobPath(job)}">${esc(job.title || 'Job opportunity')}</a></h2>
+          <h2><a href="${jobPath({ id: job.job_id })}">${esc(job.title || 'Job opportunity')}</a></h2>
           <div class="match-meta">${job.location ? `<span>${esc(job.location)}</span>` : ''}${job.employment_type ? `<span>${esc(job.employment_type.replaceAll('_', ' '))}</span>` : ''}${job.engagement_type ? `<span>${esc(job.engagement_type)}</span>` : ''}</div>
           ${reasons ? `<div class="match-reasons">${reasons}</div>` : ''}
           <div class="match-card-footer">
             <span>Based on ${esc(availableFactors)} matching factor${availableFactors === 1 ? '' : 's'} <strong class="match-confidence">${esc(confidence)}</strong></span>
-            <a href="${jobPath(job)}">View job →</a>
+            <span class="match-card-actions"><form method="post" action="${savedJobIds.includes(String(job.job_id)) ? '/unsave-job' : '/save-job'}"><input type="hidden" name="job_id" value="${esc(job.job_id)}"><input type="hidden" name="return_to" value="/matches"><button class="match-save-button${savedJobIds.includes(String(job.job_id)) ? ' is-saved' : ''}" type="submit">${savedJobIds.includes(String(job.job_id)) ? '♥ Saved' : '♡ Save'}</button></form><a href="${jobPath({ id: job.job_id })}">View job →</a></span>
           </div>
         </div>
       </article>`;
@@ -1462,7 +1475,7 @@ export function matchesPage({ matches = [], preferences = null, summary = null, 
         <button class="pro-quick-filter" id="match-90" type="button" aria-pressed="false">90%+ only</button>
         <button class="pro-clear-filters" id="match-clear" type="button">Clear</button>
       </div>
-      <p class="pro-filter-note">Newest sorting will switch on once VeeAys exposes posting dates to the match feed.</p>
+      
     </section>` : '';
 
   const proScript = isPro && matches.length ? `<script>
@@ -1521,14 +1534,13 @@ export function matchesPage({ matches = [], preferences = null, summary = null, 
   })();
   </script>` : '';
 
-  const proBadge = isPro ? '<span class="matches-pro-badge">PRO</span>' : '';
   const intro = isPro
     ? 'Your full personalized feed, ranked around the preferences you gave us.'
     : 'We compare your preferences with every eligible role and bring the strongest fits to the top. Your first 3 are free.';
 
   return `
     <section class="wrap matches-page">
-      <div class="matches-heading-row"><div><div class="kicker">MY MATCHES ${proBadge}</div><h1>Your best matches,<br><em>picked for you.</em></h1></div>${!isPro ? '<a class="matches-edit-link" href="/onboarding">Edit preferences</a>' : ''}</div>
+      <div class="matches-heading-row"><div><div class="kicker">MY MATCHES</div><h1>Your best matches,<br><em>picked for you.</em></h1></div>${!isPro ? '<a class="matches-edit-link" href="/onboarding">Edit preferences</a>' : ''}</div>
       <p class="matches-intro">${intro}</p>
       ${error ? `<div class="match-error">${esc(error)}</div>` : ''}
       ${proControls}
@@ -1563,4 +1575,31 @@ export function proPage({ isPro = false } = {}) {
       </div>
       <p class="pro-free-note"><strong>Jobs stay free to browse.</strong> Pro is the personalized layer that finds and ranks the best opportunities for you.</p>
     </section>`;
+}
+
+
+export function myJobsPage({ saved = [], applications = [], message = '', error = '' } = {}) {
+  const statusLabel = value => ({ applied: 'Applied', interview: 'Interview', offer: 'Offer', hired: 'Hired', rejected: 'Rejected', withdrawn: 'Withdrawn' }[value] || value);
+  const appByStatus = status => applications.filter(item => item.status === status);
+  const jobMini = job => `<article class="my-job-card"><div><div class="my-job-company">${esc(job.company || 'Company')}</div><h3><a href="${jobPath(job)}">${esc(job.title || 'Job opportunity')}</a></h3><p>${esc(job.location || 'Remote')} ${job.category ? `· ${esc(job.category)}` : ''}</p></div><a class="my-job-view" href="${jobPath(job)}">View job →</a></article>`;
+  const applicationCard = item => `<article class="tracker-card">
+    <div class="tracker-card-main"><div class="my-job-company">${esc(item.job?.company || 'Company')}</div><h3><a href="${item.job ? jobPath(item.job) : '#'}">${esc(item.job?.title || 'Job opportunity')}</a></h3><p>${esc(item.job?.location || '')}</p></div>
+    <form class="tracker-form" method="post" action="/update-application">
+      <input type="hidden" name="job_id" value="${esc(item.job_id)}">
+      <label>Status<select name="status">${['applied','interview','offer','hired','rejected','withdrawn'].map(s => `<option value="${s}"${s === item.status ? ' selected' : ''}>${statusLabel(s)}</option>`).join('')}</select></label>
+      <label>Private notes<textarea name="notes" maxlength="2000" placeholder="Interview details, follow-up dates, contact names…">${esc(item.notes || '')}</textarea></label>
+      <div class="tracker-actions"><button type="submit">Save changes</button><button class="tracker-remove" type="submit" formaction="/remove-application">Remove</button></div>
+    </form>
+  </article>`;
+  const stages = ['applied','interview','offer','hired','rejected','withdrawn'];
+  return `<section class="wrap my-jobs-page">
+    <div class="kicker">MY JOBS</div><h1>Your job search,<br><em>all in one place.</em></h1><p class="my-jobs-intro">Save opportunities for later and keep track of every application as it moves forward.</p>
+    ${message ? `<div class="my-jobs-message">${esc(message)}</div>` : ''}${error ? `<div class="my-jobs-error">${esc(error)}</div>` : ''}
+    <section class="saved-jobs-section"><div class="my-jobs-section-head"><div><span class="eyebrow">SAVED</span><h2>Jobs to come back to</h2></div><strong>${saved.length}</strong></div>
+      <div class="my-jobs-grid">${saved.length ? saved.map(jobMini).join('') : '<div class="my-jobs-empty"><h3>No saved jobs yet</h3><p>Save jobs while browsing and they’ll appear here.</p><a class="button" href="/">Find jobs</a></div>'}</div>
+    </section>
+    <section class="application-tracker"><div class="my-jobs-section-head"><div><span class="eyebrow">APPLICATION TRACKER</span><h2>Keep every application moving</h2></div><strong>${applications.length}</strong></div>
+      <div class="tracker-stages">${stages.map(status => { const items=appByStatus(status); return `<section class="tracker-stage"><header><h3>${statusLabel(status)}</h3><span>${items.length}</span></header><div class="tracker-stage-list">${items.length ? items.map(applicationCard).join('') : '<p class="tracker-stage-empty">Nothing here yet.</p>'}</div></section>`; }).join('')}</div>
+    </section>
+  </section>`;
 }

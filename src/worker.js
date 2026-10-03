@@ -1,6 +1,6 @@
-import { categories, getJob, listJobs, query } from './data.js';
-import { layout, listing, detail, esc, jobPath, categoryPath, authPage, checkEmailPage, authCallbackPage, onboardingPage, matchesPage, proPage } from './render.js';
-import { signUp, signIn, getUser, sessionForRequest, setSessionCookies, clearSessionCookies, authError, getJobPreferences, saveJobPreferences, completeOnboarding, getMyProfile, getMyJobMatches, getMyMatchSummary } from './auth.js';
+import { categories, getJob, getJobsByIds, listJobs, query } from './data.js';
+import { layout, listing, detail, esc, jobPath, categoryPath, authPage, checkEmailPage, authCallbackPage, onboardingPage, matchesPage, proPage, myJobsPage } from './render.js';
+import { signUp, signIn, getUser, sessionForRequest, setSessionCookies, clearSessionCookies, authError, getJobPreferences, saveJobPreferences, completeOnboarding, getMyProfile, getMyJobMatches, getMyMatchSummary, getSavedJobs, saveJobForUser, unsaveJobForUser, getJobApplications, markJobApplied, updateJobApplication, deleteJobApplication } from './auth.js';
 
 const headers = { 'content-type': 'text/html; charset=utf-8', 'x-content-type-options': 'nosniff', 'referrer-policy': 'strict-origin-when-cross-origin', 'content-security-policy': "default-src 'none'; style-src 'self'; img-src 'self'; script-src 'self'; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-ancestors 'none'", 'permissions-policy': 'camera=(), microphone=(), geolocation=()' };
 function origin(env, url) {
@@ -13,6 +13,8 @@ function origin(env, url) {
 function safeReturnPath(value) {
   const v = String(value || '');
   if (/^\/apply\/[A-Za-z0-9%._~-]{1,240}$/.test(v)) return v;
+  if (/^\/jobs\/[A-Za-z0-9%._~-]{1,240}(?:\?save=1)?$/.test(v)) return v;
+  if (v === '/my-jobs' || v === '/matches') return v;
   if (v === '/onboarding' || v === '/') return v;
   return '';
 }
@@ -41,7 +43,7 @@ export async function handle(request, env) {
     return !requestOrigin || requestOrigin === url.origin;
   };
 
-  if (request.method === 'POST' && ['/signup', '/login', '/auth/session', '/onboarding'].includes(url.pathname)) {
+  if (request.method === 'POST' && ['/signup', '/login', '/auth/session', '/onboarding', '/save-job', '/unsave-job', '/mark-applied', '/update-application', '/remove-application'].includes(url.pathname)) {
     if (!sameOriginPost()) return new Response('Forbidden', { status: 403 });
 
     if (url.pathname === '/auth/session') {
@@ -62,6 +64,35 @@ export async function handle(request, env) {
 
     let form;
     try { form = await request.formData(); } catch { return new Response('Invalid form', { status: 400 }); }
+
+    if (['/save-job', '/unsave-job', '/mark-applied', '/update-application', '/remove-application'].includes(url.pathname)) {
+      const state = await sessionForRequest(request, env);
+      if (!state.user || !state.accessToken) return Response.redirect(`${url.origin}/login?message=${encodeURIComponent('Log in to manage your jobs.')}&return=${encodeURIComponent('/my-jobs')}`, 303);
+      const jobId = String(form.get('job_id') || '');
+      if (!/^\d+$/.test(jobId)) return new Response('Invalid job', { status: 400 });
+      const returnRaw = String(form.get('return_to') || '');
+      const returnTo = (/^\/jobs\/\d+$/.test(returnRaw) || returnRaw === '/matches' || returnRaw === '/my-jobs') ? returnRaw : '/my-jobs';
+      try {
+        if (url.pathname === '/save-job') await saveJobForUser(env, state.accessToken, state.user.id, jobId);
+        if (url.pathname === '/unsave-job') await unsaveJobForUser(env, state.accessToken, state.user.id, jobId);
+        if (url.pathname === '/mark-applied') await markJobApplied(env, state.accessToken, state.user.id, jobId);
+        if (url.pathname === '/update-application') {
+          const allowed = new Set(['applied','interview','offer','hired','rejected','withdrawn']);
+          const status = String(form.get('status') || '');
+          if (!allowed.has(status)) return new Response('Invalid status', { status: 400 });
+          const notes = String(form.get('notes') || '').slice(0, 2000);
+          await updateJobApplication(env, state.accessToken, state.user.id, jobId, { status, notes });
+        }
+        if (url.pathname === '/remove-application') await deleteJobApplication(env, state.accessToken, state.user.id, jobId);
+      } catch (error) {
+        console.error('My jobs action failed:', error);
+        return Response.redirect(`${url.origin}/my-jobs?error=${encodeURIComponent('We could not update that job. Please try again.')}`, 303);
+      }
+      const suffix = url.pathname === '/mark-applied' ? '?tracked=1' : '';
+      const h = new Headers({ location: returnTo + suffix, 'cache-control': 'no-store' });
+      if (state.refreshed && typeof state.refreshed === 'object') setSessionCookies(h, state.refreshed);
+      return new Response(null, { status: 303, headers: h });
+    }
 
     if (url.pathname === '/onboarding') {
       const state = await sessionForRequest(request, env);
@@ -561,6 +592,24 @@ if (
       return render('VeeAys Pro', proPage({ isPro }), { noindex: false });
     }
 
+    if (url.pathname === '/my-jobs') {
+      if (!authState.user || !authState.accessToken) return Response.redirect(url.origin + '/login?message=' + encodeURIComponent('Log in to see your saved jobs and applications.') + '&return=' + encodeURIComponent('/my-jobs'), 303);
+      let savedRows = [], applications = [], error = '';
+      try {
+        [savedRows, applications] = await Promise.all([
+          getSavedJobs(env, authState.accessToken, authState.user.id),
+          getJobApplications(env, authState.accessToken, authState.user.id)
+        ]);
+        const ids = [...savedRows.map(r => r.job_id), ...applications.map(r => r.job_id)];
+        const jobs = await getJobsByIds(env, ids);
+        const byId = new Map(jobs.map(j => [String(j.id), j]));
+        savedRows = savedRows.map(r => byId.get(String(r.job_id))).filter(Boolean);
+        applications = applications.map(a => ({ ...a, job: byId.get(String(a.job_id)) || null }));
+      } catch (e) { console.error('My jobs load failed:', e); error = 'We could not load your jobs right now. Please try again.'; }
+      const message = url.searchParams.get('message') || '';
+      return render('My jobs', myJobsPage({ saved: savedRows, applications, message: message.slice(0,160), error: (url.searchParams.get('error') || error).slice(0,240) }), { noindex: true });
+    }
+
     if (url.pathname === '/matches') {
       if (!authState.user || !authState.accessToken) {
         return Response.redirect(url.origin + '/login?message=' + encodeURIComponent('Log in to see your job matches.') + '&return=' + encodeURIComponent('/matches'), 303);
@@ -568,18 +617,20 @@ if (
       let matches = [];
       let preferences = null;
       let matchSummary = null;
+      let savedRows = [];
       let matchError = '';
       try {
-        [matches, preferences, matchSummary] = await Promise.all([
+        [matches, preferences, matchSummary, savedRows] = await Promise.all([
           getMyJobMatches(env, authState.accessToken, 100),
           getJobPreferences(env, authState.accessToken, authState.user.id),
-          getMyMatchSummary(env, authState.accessToken)
+          getMyMatchSummary(env, authState.accessToken),
+          getSavedJobs(env, authState.accessToken, authState.user.id)
         ]);
       } catch (error) {
         console.error('Matches load failed:', error);
         matchError = 'We could not load your matches right now. Please try again.';
       }
-      return render('My matches', matchesPage({ matches, preferences, summary: matchSummary, error: matchError }), { noindex: true });
+      return render('My matches', matchesPage({ matches, preferences, summary: matchSummary, error: matchError, savedJobIds: savedRows.map(r => String(r.job_id)) }), { noindex: true });
     }
 
     const applyMatch = url.pathname.match(/^\/apply\/([^/]+)$/);
@@ -813,6 +864,18 @@ if (
           id
         );
 
+      let detailState = { user: authState.user, saved: false, application: null, saveIntent: url.searchParams.get('save') === '1' };
+      if (job && authState.user && authState.accessToken) {
+        try {
+          const [savedRows, applications] = await Promise.all([
+            getSavedJobs(env, authState.accessToken, authState.user.id),
+            getJobApplications(env, authState.accessToken, authState.user.id)
+          ]);
+          detailState.saved = savedRows.some(r => String(r.job_id) === String(job.id));
+          detailState.application = applications.find(a => String(a.job_id) === String(job.id)) || null;
+        } catch (e) { console.error('Job user state failed:', e); }
+      }
+
       return job
         ? render(
             `${
@@ -824,7 +887,7 @@ if (
                   job.company
                 : ''
             }`,
-            detail(job),
+            detail(job, detailState),
             {
               canonical:
                 base +
@@ -926,6 +989,12 @@ if (
       }
     );
 
+    let savedJobIds = [];
+    if (authState.user && authState.accessToken) {
+      try { savedJobIds = (await getSavedJobs(env, authState.accessToken, authState.user.id)).map(r => String(r.job_id)); }
+      catch (e) { console.error('Saved jobs listing state failed:', e); }
+    }
+
     if (
       page > 1 &&
       (page - 1) * 15 >=
@@ -951,7 +1020,9 @@ if (
         category,
         names,
         showPreferencesPrompt,
-        onboardingComplete
+        onboardingComplete,
+        user: authState.user,
+        savedJobIds
       }),
       {
         canonical:

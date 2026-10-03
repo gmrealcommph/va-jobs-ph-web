@@ -126,7 +126,7 @@ export async function completeOnboarding(env, accessToken) {
 }
 
 export async function getMyProfile(env, accessToken, userId) {
-  const { response, data } = await userRestFetch(env, accessToken, `/rest/v1/profiles?id=eq.${encodeURIComponent(userId)}&select=id,full_name,onboarding_completed`, { method: 'GET' });
+  const { response, data } = await userRestFetch(env, accessToken, `/rest/v1/profiles?id=eq.${encodeURIComponent(userId)}&select=id,full_name,onboarding_completed,plan,plan_status,pro_expires_at`, { method: 'GET' });
   if (!response.ok) throw new Error(`Could not load profile (${response.status}).`);
   return Array.isArray(data) ? (data[0] || null) : null;
 }
@@ -149,4 +149,50 @@ export async function getMyMatchSummary(env, accessToken) {
   });
   if (!response.ok) throw new Error(String(data?.message || data?.details || `Could not load match summary (${response.status}).`));
   return Array.isArray(data) ? (data[0] || null) : data;
+}
+
+
+export async function getSavedJobs(env, accessToken, userId) {
+  const { response, data } = await userRestFetch(env, accessToken, `/rest/v1/saved_jobs?user_id=eq.${encodeURIComponent(userId)}&select=job_id,created_at&order=created_at.desc`, { method: 'GET' });
+  if (!response.ok) throw new Error(`Could not load saved jobs (${response.status}).`);
+  return Array.isArray(data) ? data : [];
+}
+
+export async function saveJobForUser(env, accessToken, userId, jobId) {
+  const { response, data } = await userRestFetch(env, accessToken, '/rest/v1/saved_jobs?on_conflict=user_id,job_id', {
+    method: 'POST', headers: { Prefer: 'resolution=ignore-duplicates,return=minimal' }, body: JSON.stringify({ user_id: userId, job_id: Number(jobId) })
+  });
+  if (!response.ok) throw new Error(String(data?.message || `Could not save job (${response.status}).`));
+}
+
+export async function unsaveJobForUser(env, accessToken, userId, jobId) {
+  const { response } = await userRestFetch(env, accessToken, `/rest/v1/saved_jobs?user_id=eq.${encodeURIComponent(userId)}&job_id=eq.${encodeURIComponent(jobId)}`, { method: 'DELETE' });
+  if (!response.ok) throw new Error(`Could not remove saved job (${response.status}).`);
+}
+
+export async function getJobApplications(env, accessToken, userId) {
+  const { response, data } = await userRestFetch(env, accessToken, `/rest/v1/job_applications?user_id=eq.${encodeURIComponent(userId)}&select=id,job_id,status,applied_at,notes,updated_at&order=updated_at.desc`, { method: 'GET' });
+  if (!response.ok) throw new Error(`Could not load applications (${response.status}).`);
+  return Array.isArray(data) ? data : [];
+}
+
+export async function markJobApplied(env, accessToken, userId, jobId) {
+  const { response, data } = await userRestFetch(env, accessToken, '/rest/v1/job_applications?on_conflict=user_id,job_id', {
+    method: 'POST', headers: { Prefer: 'resolution=ignore-duplicates,return=representation' }, body: JSON.stringify({ user_id: userId, job_id: Number(jobId), status: 'applied' })
+  });
+  if (!response.ok) throw new Error(String(data?.message || `Could not track application (${response.status}).`));
+  return Array.isArray(data) ? data[0] : data;
+}
+
+export async function updateJobApplication(env, accessToken, userId, jobId, { status, notes }) {
+  const { response, data } = await userRestFetch(env, accessToken, `/rest/v1/job_applications?user_id=eq.${encodeURIComponent(userId)}&job_id=eq.${encodeURIComponent(jobId)}`, {
+    method: 'PATCH', headers: { Prefer: 'return=representation' }, body: JSON.stringify({ status, notes })
+  });
+  if (!response.ok) throw new Error(String(data?.message || `Could not update application (${response.status}).`));
+  return Array.isArray(data) ? data[0] : data;
+}
+
+export async function deleteJobApplication(env, accessToken, userId, jobId) {
+  const { response } = await userRestFetch(env, accessToken, `/rest/v1/job_applications?user_id=eq.${encodeURIComponent(userId)}&job_id=eq.${encodeURIComponent(jobId)}`, { method: 'DELETE' });
+  if (!response.ok) throw new Error(`Could not remove application (${response.status}).`);
 }
