@@ -1,4 +1,5 @@
 import { categories, getJob, getJobsByIds, listJobs, query } from './data.js';
+import { manualNotification } from './notifications.js';
 import { layout, listing, detail, esc, jobPath, categoryPath, authPage, checkEmailPage, authCallbackPage, onboardingPage, matchesPage, proPage, myJobsPage } from './render.js';
 import { signUp, signIn, getUser, sessionForRequest, setSessionCookies, clearSessionCookies, authError, getJobPreferences, saveJobPreferences, completeOnboarding, getMyProfile, getMyJobMatches, getMyMatchSummary, getSavedJobs, saveJobForUser, unsaveJobForUser, getJobApplications, markJobApplied, updateJobApplication, deleteJobApplication } from './auth.js';
 
@@ -35,6 +36,9 @@ function hasCookie(request, name, expected = '1') {
 function xml(body) { return new Response(`<?xml version="1.0" encoding="UTF-8"?>${body}`, { headers: { 'content-type': 'application/xml; charset=utf-8', 'cache-control': 'public, max-age=300' } }); }
 export async function handle(request, env) {
   const url = new URL(request.url);
+
+  const manualMatch = url.pathname.match(/^\/internal\/strong-match\/([1-9]\d{0,18})$/);
+  if (manualMatch) return manualNotification(request, env, manualMatch[1]);
 
   const siteOrigin = origin(env, url);
 
