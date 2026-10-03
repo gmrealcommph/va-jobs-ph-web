@@ -1,5 +1,7 @@
 # VA Jobs PH
 
+**Manual Resend integration:** Follow [MANUAL_RESEND.md](MANUAL_RESEND.md) for the private delivery-ledger migration, three additional runtime bindings, and the preview/send procedure for notification #165. Deployment sends no emails. Existing board, authentication, My Matches and My Jobs behavior is preserved.
+
 A complete, server-rendered jobs frontend for `va-jobs-ph-web`, deployed directly to **Cloudflare Workers with Static Assets**. No Next.js adapter, browser JavaScript, or frontend build framework is required. Search, category links, job details, and pagination work as ordinary HTML pages.
 
 ## 1. Put the project in GitHub
@@ -8,7 +10,7 @@ Extract the supplied ZIP, then copy **the contents of `va-jobs-ph-web`** into th
 
 ## 2. Configure Supabase
 
-The only key this application accepts is a modern **publishable key** beginning `sb_publishable_`. It is sent through the `apikey` header. No secret/service-role key or privileged database access is used. Legacy JWT anon keys are deliberately not accepted.
+The public job board continues to accept only a modern **publishable key** beginning `sb_publishable_`, sent through the `apikey` header. The separate protected manual notification module uses the server-side `SUPABASE_SERVICE_ROLE_KEY` and `RESEND_API_KEY` secrets; these are never used by the public board or exposed in HTML. Legacy JWT anon keys are deliberately not accepted by the public board.
 
 Required runtime variables:
 
@@ -69,7 +71,7 @@ Add `SITE_URL` under `vars` in `wrangler.jsonc` before committing your productio
 npx wrangler secret put SUPABASE_PUBLISHABLE_KEY
 ```
 
-Despite Cloudflare calling this a “secret” binding, enter **only the Supabase publishable key**, never a Supabase secret key. Cloudflare preserves secret bindings across deployments. Build-time environment variables alone are not runtime bindings. If the Worker does not yet exist, deploy once, add the binding, and reload; it will return a safe 503 until configured.
+For `SUPABASE_PUBLISHABLE_KEY`, enter only the publishable key. Keep the server key under the distinct `SUPABASE_SERVICE_ROLE_KEY` Secret binding, as described in MANUAL_RESEND.md. Cloudflare preserves secret bindings across deployments. Build-time environment variables alone are not runtime bindings. If the Worker does not yet exist, deploy once, add the bindings, and reload.
 
 For a manual deployment:
 
@@ -91,7 +93,7 @@ Cloudflare account authentication is required only for deployment. The build per
 - `/jobs/{encoded-id}`: full description, company, location, remote/workplace labels, source, dates, and original application link.
 - `/robots.txt`, `/sitemap.xml`, `/sitemaps/pages.xml`, `/sitemaps/jobs-{n}.xml`: crawl controls and segmented sitemaps.
 
-Unknown jobs/categories and invalid/out-of-range pages return HTTP 404. Unavailable Supabase responses return HTTP 503 with Retry-After. Null fields have explicit fallbacks. Unsafe application URL protocols are rejected. Arbitrary listing text is HTML-escaped. The site makes no database writes.
+Unknown jobs/categories and invalid/out-of-range pages return HTTP 404. Unavailable Supabase responses return HTTP 503 with Retry-After. Null fields have explicit fallbacks. Unsafe application URL protocols are rejected. Arbitrary listing text is HTML-escaped. Account features retain their existing authenticated writes; the protected manual processor writes only its delivery ledger and the selected notification's acknowledgement.
 
 ## SEO and Google
 
