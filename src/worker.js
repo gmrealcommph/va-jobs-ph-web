@@ -1,5 +1,7 @@
 import { categories, getJob, getJobsByIds, listJobs, query } from './data.js';
 import { manualNotification } from './notifications.js';
+import { scheduledStrongMatches } from './strong-matches.js';
+import { emailPreferences } from './email-preferences.js';
 import { layout, listing, detail, esc, jobPath, categoryPath, authPage, checkEmailPage, authCallbackPage, onboardingPage, matchesPage, proPage, myJobsPage } from './render.js';
 import { signUp, signIn, getUser, sessionForRequest, setSessionCookies, clearSessionCookies, authError, getJobPreferences, saveJobPreferences, completeOnboarding, getMyProfile, getMyJobMatches, getMyMatchSummary, getSavedJobs, saveJobForUser, unsaveJobForUser, getJobApplications, markJobApplied, updateJobApplication, deleteJobApplication } from './auth.js';
 
@@ -15,7 +17,7 @@ function safeReturnPath(value) {
   const v = String(value || '');
   if (/^\/apply\/[A-Za-z0-9%._~-]{1,240}$/.test(v)) return v;
   if (/^\/jobs\/[A-Za-z0-9%._~-]{1,240}(?:\?save=1)?$/.test(v)) return v;
-  if (v === '/my-jobs' || v === '/matches' || v === '/jobs') return v;
+  if (v === '/my-jobs' || v === '/matches' || v === '/jobs' || v === '/email-preferences') return v;
   if (v === '/onboarding' || v === '/') return v;
   return '';
 }
@@ -38,7 +40,11 @@ export async function handle(request, env) {
   const url = new URL(request.url);
 
   const manualMatch = url.pathname.match(/^\/internal\/strong-match\/([1-9]\d{0,18})$/);
-  if (manualMatch) return manualNotification(request, env, manualMatch[1]);
+  if (manualMatch) {
+    if (env.STRONG_MATCH_MODE !== undefined) return new Response('Manual sender retired',{status:410});
+    return manualNotification(request, env, manualMatch[1]);
+  }
+  if (url.pathname === '/email-preferences') return emailPreferences(request, env);
 
   const siteOrigin = origin(env, url);
 
@@ -1078,4 +1084,4 @@ if (
     return response;
   }
 }
-export default { fetch: handle };
+export default { fetch: handle, scheduled: scheduledStrongMatches };

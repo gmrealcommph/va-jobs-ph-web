@@ -118,6 +118,16 @@ export async function saveJobPreferences(env, accessToken, preferences) {
   return Array.isArray(data) ? data[0] : data;
 }
 
+export async function setStrongMatchPreference(env, accessToken, userId, enabled) {
+  const { response, data } = await userRestFetch(env, accessToken,
+    `/rest/v1/job_preferences?user_id=eq.${encodeURIComponent(userId)}`, {
+      method: 'PATCH', headers: { Prefer: 'return=representation' },
+      body: JSON.stringify({ email_strong_matches: enabled })
+    });
+  if (!response.ok || !Array.isArray(data) || data.length !== 1 || data[0].email_strong_matches !== enabled)
+    throw new Error('Email preference was not saved.');
+}
+
 export async function completeOnboarding(env, accessToken) {
   const { response, data } = await userRestFetch(env, accessToken, '/rest/v1/rpc/update_my_profile', {
     method: 'POST', body: JSON.stringify({ new_full_name: null, new_onboarding_completed: true })

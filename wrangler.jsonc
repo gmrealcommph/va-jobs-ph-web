@@ -8,7 +8,9 @@
     "binding": "ASSETS"
   },
   "keep_vars": true,
+  "triggers": { "crons": [] },
   "vars": {
+    "STRONG_MATCH_MODE": "disabled",
     "SUPABASE_URL": "https://nwqmhqiymtqkdihjadrp.supabase.co"
   }
 }

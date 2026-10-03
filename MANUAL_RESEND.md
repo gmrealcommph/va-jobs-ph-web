@@ -96,3 +96,6 @@ The processor handles any explicitly allowlisted ID using this same route and `S
 - The ledger migration and real Cloudflare/Supabase/Resend integration need the controlled live test above. No live deployment, database migration, or real email send was performed during packaging.
 
 Official references: [Resend idempotency](https://resend.com/changelog/idempotency-keys), [Supabase API keys](https://supabase.com/docs/guides/getting-started/api-keys).
+# Historical manual test instructions
+
+These instructions describe the previous successful manual test. Do not use them to send with this release. Follow `PRODUCTION_STRONG_MATCHES.md`: clear the manual allowlist after confirming #165, keep the ledger, deploy disabled and enable cron only after review. The production-mode binding retires the old endpoint with HTTP 410.

@@ -24,19 +24,19 @@ async function tokenMatches(actual, expected) {
   return diff === 0;
 }
 
-function configuration(env) {
+export function configuration(env, production = false) {
   const url = new URL(env.SUPABASE_URL);
   const site = new URL(env.SITE_URL);
   const key = env.SUPABASE_SERVICE_ROLE_KEY;
   if (url.protocol !== 'https:' || site.protocol !== 'https:' || site.username || site.password ||
-      !key || !env.RESEND_API_KEY || !env.STRONG_MATCH_TEST_EMAIL) stop('missing_or_invalid_runtime_configuration', 503);
+      !key || !env.RESEND_API_KEY || (!production && !env.STRONG_MATCH_TEST_EMAIL)) stop('missing_or_invalid_runtime_configuration', 503);
   const modernKey = key.startsWith('sb_secret_');
   if (!modernKey && !key.startsWith('eyJ')) stop('invalid_supabase_server_key', 503);
   return { url, site: site.origin, key, modernKey,
-    testEmail: email(env.STRONG_MATCH_TEST_EMAIL) };
+    testEmail: production ? null : email(env.STRONG_MATCH_TEST_EMAIL) };
 }
 
-async function rest(config, table, filters = {}, init = {}) {
+export async function rest(config, table, filters = {}, init = {}) {
   const endpoint = new URL(`/rest/v1/${table}`, config.url);
   for (const [name, value] of Object.entries(filters)) endpoint.searchParams.set(name, value);
   const response = await fetch(endpoint, {
@@ -50,7 +50,7 @@ async function rest(config, table, filters = {}, init = {}) {
   try { return await response.json(); } catch { stop(`invalid_${table}_response`, 502); }
 }
 
-async function one(config, table, filters) {
+export async function one(config, table, filters) {
   const rows = await rest(config, table, { ...filters, select: '*', limit: '2' });
   if (!Array.isArray(rows) || rows.length > 1) stop(`ambiguous_${table}_record`, 502);
   return rows[0] || null;
@@ -63,7 +63,7 @@ export function eligible(profile, preferences, now = Date.now()) {
     (profile.pro_expires_at === null || (Number.isFinite(expiry) && expiry > now)) && preferences?.email_strong_matches === true;
 }
 
-async function recipient(config, userId) {
+export async function recipient(config, userId) {
   if (typeof userId !== 'string' || !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(userId)) stop('invalid_notification_user_id');
   const profile = await one(config, 'profiles', { id: `eq.${userId}` });
   const preferences = await one(config, 'job_preferences', { user_id: `eq.${userId}` });
@@ -75,7 +75,9 @@ async function recipient(config, userId) {
   if (!response.ok) stop(`supabase_auth_${response.status}`, 502);
   const user = await response.json();
   if (user.id !== userId || !user.email_confirmed_at || user.deleted_at ||
-      (user.banned_until && Date.parse(user.banned_until) > Date.now()) || email(user.email) !== config.testEmail) stop('recipient_not_confirmed_test_address');
+      (user.banned_until && Date.parse(user.banned_until) > Date.now()) ||
+      !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email(user.email)) ||
+      (config.testEmail && email(user.email) !== config.testEmail)) stop('recipient_not_confirmed_test_address');
   if (!eligible(profile, preferences)) stop('recipient_not_eligible');
   return { profile, email: email(user.email) };
 }
