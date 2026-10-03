@@ -1428,12 +1428,12 @@ export function matchesPage({ matches = [], preferences = null, summary = null, 
     return `
       <article class="match-card" data-match-card data-original-order="${index}" data-score="${esc(job.match_score)}" data-salary="${esc(salaryValue)}" data-salary-period="${esc(job.salary_period || '')}" data-schedule="${esc(job.schedule_region || '')}" data-work-type="${esc(job.employment_type || '')}">
         <div class="match-card-main">
-          <div class="match-card-top"><span class="match-score"><strong>${esc(job.match_score)}%</strong> match</span><span class="match-company">${esc(job.company || 'Company not specified')}</span><span class="match-confidence">${esc(confidence)}</span></div>
-          <h2><a href="${jobPath({ id: job.job_id })}">${esc(job.title || 'Job opportunity')}</a></h2>
+          <div class="match-card-top"><span class="match-score"><strong>${esc(job.match_score)}%</strong> MATCH<svg class="match-badge-spark" viewBox="0 0 16 16" aria-hidden="true"><path d="m8 2 1.5 4.5L14 8l-4.5 1.5L8 14 6.5 9.5 2 8l4.5-1.5L8 2Z" fill="currentColor"/></svg></span><span class="match-company">${esc(job.company || 'Company not specified')}</span><span class="match-confidence">${esc(confidence)}</span></div>
+          <h2><a title="${esc(job.title || 'Job opportunity')}" href="${jobPath({ id: job.job_id })}">${esc(job.title || 'Job opportunity')}</a><span class="match-full-title" aria-hidden="true">${esc(job.title || 'Job opportunity')}</span></h2>
           <div class="match-meta">${job.location ? `<span>${esc(job.location)}</span>` : ''}${job.employment_type ? `<span>${esc(job.employment_type.replaceAll('_', ' '))}</span>` : ''}${job.engagement_type ? `<span>${esc(job.engagement_type)}</span>` : ''}</div>
           <div class="match-card-footer">
             ${reasons ? `<div class="match-reasons">${reasons}</div>` : ''}
-            <span class="match-card-actions"><form method="post" action="${savedJobIds.includes(String(job.job_id)) ? '/unsave-job' : '/save-job'}"><input type="hidden" name="job_id" value="${esc(job.job_id)}"><input type="hidden" name="return_to" value="/matches"><button class="match-save-button${savedJobIds.includes(String(job.job_id)) ? ' is-saved' : ''}" type="submit">${savedJobIds.includes(String(job.job_id)) ? '♥ Saved' : '♡ Save'}</button></form><a class="match-view-job" href="${jobPath({ id: job.job_id })}">View job <span aria-hidden="true">→</span></a></span>
+            <span class="match-card-actions"><form method="post" action="${savedJobIds.includes(String(job.job_id)) ? '/unsave-job' : '/save-job'}"><input type="hidden" name="job_id" value="${esc(job.job_id)}"><input type="hidden" name="return_to" value="/matches"><button class="match-save-button${savedJobIds.includes(String(job.job_id)) ? ' is-saved' : ''}" type="submit"><span class="match-heart" aria-hidden="true">${savedJobIds.includes(String(job.job_id)) ? '♥' : '♡'}</span> ${savedJobIds.includes(String(job.job_id)) ? 'Saved' : 'Save'}</button></form><a class="match-view-job" href="${jobPath({ id: job.job_id })}">View job <span aria-hidden="true">→</span></a></span>
           </div>
         </div>
       </article>`;
@@ -1461,8 +1461,8 @@ export function matchesPage({ matches = [], preferences = null, summary = null, 
     <section class="pro-match-dashboard" aria-label="Match controls">
       <div class="pro-match-dashboard-top">
         <div>
-          <h2><strong id="visible-match-count">${esc(matches.length)}</strong> matches</h2>
-          <div class="pro-feed-label"><span>VEEAYS PRO</span></div>
+          <h2><strong id="visible-match-count">${esc(matches.length)}</strong> matches for you</h2>
+          <div class="pro-feed-label"><span>PRO</span></div>
         </div>
         <a class="pro-edit-preferences" href="/onboarding">Edit preferences →</a>
       </div>
@@ -1485,7 +1485,7 @@ export function matchesPage({ matches = [], preferences = null, summary = null, 
 
   return `
     <section class="wrap matches-page">
-      <div class="matches-heading-row"><div><div class="kicker">MY MATCHES</div><h1>Your best matches,<br><em>picked for you.</em></h1></div>${!isPro ? '<a class="matches-edit-link" href="/onboarding">Edit preferences</a>' : ''}</div>
+      <div class="matches-heading-row"><div><div class="kicker">MY MATCHES</div><h1>Your best matches,<br><em>picked for you.</em></h1></div><svg class="matches-discovery" viewBox="0 0 210 160" aria-hidden="true"><circle class="matches-target-pulse" cx="74" cy="87" r="43" fill="#edf2d8" stroke="#b4c597" stroke-width="1.5"/><circle cx="74" cy="87" r="28" fill="none" stroke="currentColor" stroke-width="1.7"/><circle cx="74" cy="87" r="12" fill="#d8ed93" stroke="currentColor" stroke-width="1.7"/><path class="matches-flight-path" d="M12 142c32-10 2-48 49-47s52-30 75-40" fill="none" stroke="currentColor" stroke-width="1.5" stroke-dasharray="2 6" stroke-linecap="round"/><g class="matches-plane-float"><path d="m132 41 57-18-20 53-10-24-27-11Z" fill="#f2d36c" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="m159 52 30-29" stroke="currentColor" stroke-width="1.7"/></g><path d="M119 15v14m-7-7h14M185 103v9m-4.5-4.5h9" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>${!isPro ? '<a class="matches-edit-link" href="/onboarding">Edit preferences</a>' : ''}</div>
       <p class="matches-intro">${intro}</p>
       ${error ? `<div class="match-error">${esc(error)}</div>` : ''}
       ${proControls}
