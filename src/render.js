@@ -1392,7 +1392,7 @@ export function matchesPage({ matches = [], preferences = null, summary = null, 
     return `<span class="match-reason neutral"><b aria-hidden="true">•</b>${esc(label)} differs</span>`;
   };
 
-  const cards = matches.map(job => {
+  const cards = matches.map((job, index) => {
     const skillsAvailable = Array.isArray(preferences?.skills) && preferences.skills.length > 0 && Array.isArray(job.skills) && job.skills.length > 0;
     const salaryAvailable = preferences?.minimum_salary_usd != null && job.salary_period === 'monthly' && (job.salary_min_usd != null || job.salary_max_usd != null);
     const scheduleAvailable = !scheduleUnrestricted && schedulePrefs.length > 0 && !!job.schedule_region;
@@ -1409,8 +1409,9 @@ export function matchesPage({ matches = [], preferences = null, summary = null, 
       friendlyReason('Work type', job.employment_match, employmentAvailable),
       friendlyReason('Experience', job.experience_match, experienceAvailable)
     ].filter(Boolean).join('');
+    const salaryValue = job.salary_max_usd ?? job.salary_min_usd ?? '';
     return `
-      <article class="match-card">
+      <article class="match-card" data-match-card data-original-order="${index}" data-score="${esc(job.match_score)}" data-salary="${esc(salaryValue)}" data-salary-period="${esc(job.salary_period || '')}" data-schedule="${esc(job.schedule_region || '')}" data-work-type="${esc(job.employment_type || '')}">
         <div class="match-score"><strong>${esc(job.match_score)}%</strong><span>match</span></div>
         <div class="match-card-main">
           <div class="match-company">${esc(job.company || 'Company not specified')}</div>
@@ -1430,10 +1431,10 @@ export function matchesPage({ matches = [], preferences = null, summary = null, 
       <div class="pro-unlock-icon" aria-hidden="true">✈</div>
       <div class="pro-unlock-copy">
         <div class="kicker">VEEAYS PRO</div>
-        <h2>${lockedMatches > 0 ? `${esc(lockedMatches)} more match${lockedMatches === 1 ? '' : 'es'} waiting for you.` : 'Your full match feed is waiting.'}</h2>
+        <h2>${lockedMatches > 0 ? `Unlock ${esc(lockedMatches)} more match${lockedMatches === 1 ? '' : 'es'}.` : 'Unlock your full match feed.'}</h2>
         <p>Stop digging through every listing. Pro unlocks your full personalized feed and helps the strongest opportunities find you.</p>
         <div class="pro-benefits">
-          <span>✓ All ranked matches</span><span>✓ Full match explanations</span><span>✓ Strong-match alerts</span><span>✓ Personalized job digest</span>
+          <span>✓ All ranked matches</span><span>✓ Full match explanations</span><span>✓ Advanced match filters</span><span>✓ Alerts &amp; digest coming soon</span>
         </div>
       </div>
       <div class="pro-unlock-action">
@@ -1443,19 +1444,97 @@ export function matchesPage({ matches = [], preferences = null, summary = null, 
       </div>
     </section>` : '';
 
+  const proControls = isPro && !error && matches.length ? `
+    <section class="pro-match-dashboard" aria-label="Match controls">
+      <div class="pro-match-dashboard-top">
+        <div>
+          <div class="pro-feed-label"><span>VEEAYS PRO</span> PERSONALIZED JOB FEED</div>
+          <h2><strong id="visible-match-count">${esc(matches.length)}</strong> matches based on your preferences</h2>
+          <p>Refine the feed without changing your saved preferences.</p>
+        </div>
+        <a class="pro-edit-preferences" href="/onboarding">Edit preferences →</a>
+      </div>
+      <div class="pro-match-toolbar">
+        <label class="pro-filter-field"><span>Sort</span><select id="match-sort"><option value="strongest">Strongest match</option><option value="newest" disabled>Newest · coming soon</option></select></label>
+        <label class="pro-filter-field"><span>Salary</span><select id="match-salary"><option value="all">Any salary</option><option value="1000">$1,000+/mo</option><option value="1500">$1,500+/mo</option><option value="2000">$2,000+/mo</option><option value="3000">$3,000+/mo</option></select></label>
+        <label class="pro-filter-field"><span>Schedule</span><select id="match-schedule"><option value="all">Any schedule</option><option value="philippines">Philippines daytime</option><option value="uk">UK / Europe</option><option value="australia">Australia</option><option value="us">US hours</option></select></label>
+        <label class="pro-filter-field"><span>Work type</span><select id="match-work"><option value="all">Any work type</option><option value="full">Full-time</option><option value="part">Part-time</option></select></label>
+        <button class="pro-quick-filter" id="match-90" type="button" aria-pressed="false">90%+ only</button>
+        <button class="pro-clear-filters" id="match-clear" type="button">Clear</button>
+      </div>
+      <p class="pro-filter-note">Newest sorting will switch on once VeeAys exposes posting dates to the match feed.</p>
+    </section>` : '';
+
+  const proScript = isPro && matches.length ? `<script>
+  (() => {
+    const list = document.querySelector('.matches-list');
+    if (!list) return;
+    const cards = [...list.querySelectorAll('[data-match-card]')];
+    const scoreToggle = document.getElementById('match-90');
+    const salary = document.getElementById('match-salary');
+    const schedule = document.getElementById('match-schedule');
+    const work = document.getElementById('match-work');
+    const sort = document.getElementById('match-sort');
+    const clear = document.getElementById('match-clear');
+    const count = document.getElementById('visible-match-count');
+    let strongOnly = false;
+    const normalize = value => String(value || '').toLowerCase().replace(/[_-]+/g, ' ');
+    const scheduleMatches = (raw, wanted) => {
+      if (wanted === 'all') return true;
+      const value = normalize(raw);
+      if (!value) return false;
+      if (wanted === 'philippines') return value.includes('philipp') || value.includes('ph daytime');
+      if (wanted === 'uk') return value.includes('uk') || value.includes('europe') || value.includes('gmt') || value.includes('bst');
+      if (wanted === 'australia') return value.includes('austral') || value.includes('aest') || value.includes('aedt') || value.includes('acst') || value.includes('awst');
+      if (wanted === 'us') return value.includes('us') || value.includes('est') || value.includes('edt') || value.includes('cst') || value.includes('cdt') || value.includes('mst') || value.includes('mdt') || value.includes('pst') || value.includes('pdt');
+      return true;
+    };
+    const apply = () => {
+      const minSalary = Number(salary?.value || 0);
+      const wantedSchedule = schedule?.value || 'all';
+      const wantedWork = work?.value || 'all';
+      let visible = 0;
+      cards.forEach(card => {
+        const score = Number(card.dataset.score || 0);
+        const salaryValue = Number(card.dataset.salary || 0);
+        const salaryPeriod = normalize(card.dataset.salaryPeriod);
+        const workType = normalize(card.dataset.workType);
+        const salaryOk = !minSalary || (salaryPeriod === 'monthly' && salaryValue >= minSalary);
+        const scheduleOk = scheduleMatches(card.dataset.schedule, wantedSchedule);
+        const workOk = wantedWork === 'all' || (wantedWork === 'full' ? workType.includes('full') : workType.includes('part'));
+        const scoreOk = !strongOnly || score >= 90;
+        const show = salaryOk && scheduleOk && workOk && scoreOk;
+        card.hidden = !show;
+        if (show) visible += 1;
+      });
+      const ordered = [...cards].sort((a,b) => Number(b.dataset.score || 0) - Number(a.dataset.score || 0) || Number(a.dataset.originalOrder) - Number(b.dataset.originalOrder));
+      ordered.forEach(card => list.appendChild(card));
+      if (count) count.textContent = String(visible);
+      let empty = list.querySelector('.pro-filter-empty');
+      if (!visible) {
+        if (!empty) { empty = document.createElement('div'); empty.className = 'match-empty pro-filter-empty'; empty.innerHTML = '<h2>No matches with those filters</h2><p>Try widening one of the filters above.</p>'; list.appendChild(empty); }
+      } else if (empty) empty.remove();
+    };
+    scoreToggle?.addEventListener('click', () => { strongOnly = !strongOnly; scoreToggle.setAttribute('aria-pressed', String(strongOnly)); scoreToggle.classList.toggle('active', strongOnly); apply(); });
+    [salary, schedule, work, sort].forEach(el => el?.addEventListener('change', apply));
+    clear?.addEventListener('click', () => { strongOnly = false; scoreToggle?.setAttribute('aria-pressed','false'); scoreToggle?.classList.remove('active'); if (salary) salary.value='all'; if (schedule) schedule.value='all'; if (work) work.value='all'; if (sort) sort.value='strongest'; apply(); });
+  })();
+  </script>` : '';
+
   const proBadge = isPro ? '<span class="matches-pro-badge">PRO</span>' : '';
   const intro = isPro
-    ? `Your full personalized feed, ranked around the preferences you gave us. ${totalMatches ? `${esc(totalMatches)} matches in your current feed.` : ''}`
+    ? 'Your full personalized feed, ranked around the preferences you gave us.'
     : 'We compare your preferences with every eligible role and bring the strongest fits to the top. Your first 3 are free.';
 
   return `
     <section class="wrap matches-page">
-      <div class="matches-heading-row"><div><div class="kicker">MY MATCHES ${proBadge}</div><h1>Your best matches,<br><em>picked for you.</em></h1></div>${!isPro ? '<a class="matches-edit-link" href="/onboarding">Edit preferences</a>' : '<a class="matches-edit-link" href="/onboarding">Edit preferences</a>'}</div>
+      <div class="matches-heading-row"><div><div class="kicker">MY MATCHES ${proBadge}</div><h1>Your best matches,<br><em>picked for you.</em></h1></div>${!isPro ? '<a class="matches-edit-link" href="/onboarding">Edit preferences</a>' : ''}</div>
       <p class="matches-intro">${intro}</p>
       ${error ? `<div class="match-error">${esc(error)}</div>` : ''}
+      ${proControls}
       <div class="matches-list">${cards || (!error ? '<div class="match-empty"><h2>No matches yet</h2><p>Update your job preferences so VeeAys can find better-fit opportunities for you.</p><a class="button" href="/onboarding">Set my preferences</a></div>' : '')}</div>
       ${freeUpgrade}
-    </section>`;
+    </section>${proScript}`;
 }
 
 
