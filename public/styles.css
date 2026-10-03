@@ -5565,3 +5565,40 @@ body>header,body>footer{flex-shrink:0}
 @media(max-width:700px){.matches-page .match-info{width:24px;height:24px}.matches-page .match-info:before{inset:0}.matches-page .match-full-title{left:16px;right:16px}}
 @media(prefers-reduced-motion:reduce){.matches-page .match-card:has(h2 a:focus-visible),.matches-page .match-card:hover .match-view-job span,.matches-page .match-card:focus-within .match-view-job span{transform:none}}
 
+/* Homepage discovery polish, isolated from job listings and My Matches. */
+.home-page .job-card.opportunity-card.discovery-card{min-height:0;padding:19px 20px 17px;gap:0;text-align:left}
+.home-page .discovery-card .opportunity-card-top{gap:10px;margin-bottom:9px;align-items:baseline}
+.home-page .discovery-card .opportunity-company{max-width:none;flex:1;min-width:0;white-space:normal;overflow:visible;text-overflow:clip;text-align:left;font-size:.7rem;line-height:1.4;letter-spacing:.045em}
+.home-page .discovery-card .opportunity-date{text-align:right;font-size:.62rem;line-height:1.4}
+.home-page .discovery-card .opportunity-title{margin:0 0 9px;text-align:left;font-size:1.22rem;line-height:1.28;letter-spacing:-.025em}
+.home-page .discovery-card .opportunity-title a{position:static;color:#123e30;text-decoration:none}
+.home-page .discovery-card .opportunity-title a:after{content:'';position:absolute;inset:0;z-index:1;border-radius:14px;cursor:pointer}
+.home-page .discovery-card .opportunity-meta{justify-content:flex-start;flex-wrap:wrap;gap:4px 8px;margin:0 0 12px;font-size:.73rem;line-height:1.5;text-align:left;color:#61746a}
+.home-page .discovery-card .opportunity-meta span+span:before{content:'·';margin-right:8px;color:#8b978a}
+.home-page .discovery-salary{margin:0 0 12px;font-size:.8rem;line-height:1.4;font-weight:800;color:#2c573e}
+.home-page .discovery-card .opportunity-card-bottom{display:flex;align-items:center;flex-wrap:wrap;gap:9px;margin-top:auto}
+.home-page .discovery-card .opportunity-category{position:relative;z-index:2;font-size:.59rem;line-height:1.4;letter-spacing:.02em;padding:5px 8px;border-radius:999px;transform:none;max-width:100%;overflow-wrap:anywhere}
+.home-page .discovery-actions{position:relative;z-index:2;display:flex;align-items:center;gap:8px;margin-left:auto}
+.home-page .discovery-actions form{margin:0}
+.home-page .discovery-actions .job-save-button{font-size:.72rem;line-height:1.3;padding:7px 10px;min-height:36px;background:#fffdf8}
+.home-page .discovery-actions .job-save-button.is-saved{background:#e9f8d8;border-color:#9fd866}
+.home-page .discovery-view-job{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:36px;padding:7px 11px;border-radius:9px;background:#edf3df;color:#123e30;font-size:.74rem;line-height:1.3;font-weight:800;white-space:nowrap}
+.home-page .discovery-view-job:hover{background:#d8ed93;text-decoration:none}
+.home-page .discovery-view-job span{transition:transform .2s ease}
+.home-page .discovery-card:hover .discovery-view-job span,.home-page .discovery-card:focus-within .discovery-view-job span{transform:translateX(3px)}
+.home-page .discovery-card:before{transition:transform .2s ease;transform-origin:top right}
+.home-page .discovery-card:hover:before{transform:scale(1.08)}
+.home-page .job-card.opportunity-card.discovery-card:hover,.home-page .job-card.opportunity-card.discovery-card:focus-within{transform:translateY(-2px);border-color:#a8bd93;box-shadow:0 8px 24px #123e3014}
+.home-page .discovery-card:has(.opportunity-title a:focus-visible){outline:3px solid #7eaa33;outline-offset:3px}
+.home-page .discovery-heart{display:inline-block}
+.home-page .job-save-button.is-saved .discovery-heart,.home-page .job-save-button:hover .discovery-heart{animation:discovery-heart-pop .35s ease-out 1}
+.home-page .discovery-search{margin:0 0 20px}
+.home-page .discovery-search label{display:block;font-size:.72rem;font-weight:800;color:#526b5d;margin-bottom:7px}
+.home-page .discovery-search-row{display:flex;align-items:center;gap:10px;padding:6px 7px 6px 13px;border:1px solid #c9d6bd;border-radius:13px;background:#fffdf5;box-shadow:0 3px 12px #123e3005}
+.home-page .discovery-search svg{width:19px;height:19px;flex:none;color:#6d826e}
+.home-page .discovery-search input{min-width:0;flex:1;width:100%;background:transparent;border:0;border-radius:6px;padding:8px 2px;color:#123e30;font-size:.82rem;line-height:1.4}
+.home-page .discovery-search button{display:inline-flex;align-items:center;gap:10px;white-space:nowrap;border-radius:9px;padding:10px 14px;min-height:39px;font-size:.76rem;line-height:1.3}
+@keyframes discovery-heart-pop{0%,100%{transform:scale(1)}50%{transform:scale(1.18)}}
+@media(max-width:700px){.home-page .job-card.opportunity-card.discovery-card{padding:18px}.home-page .discovery-card .opportunity-title{font-size:1.18rem}.home-page .discovery-card .opportunity-card-top{flex-wrap:wrap}.home-page .discovery-card .opportunity-date{margin-left:0}.home-page .discovery-actions .job-save-button,.home-page .discovery-view-job{min-height:44px;padding:9px 12px}.home-page .discovery-search-row{gap:7px;padding-left:10px}.home-page .discovery-search input{font-size:.77rem}.home-page .discovery-search button{min-height:44px;padding:10px 11px}}
+@media(prefers-reduced-motion:reduce){.home-page .discovery-card,.home-page .discovery-card:before,.home-page .discovery-card:after,.home-page .discovery-view-job span,.home-page .discovery-heart{transition:none!important;animation:none!important}.home-page .discovery-card:hover,.home-page .discovery-card:focus-within,.home-page .discovery-card:hover:before,.home-page .discovery-card:hover .discovery-view-job span,.home-page .discovery-card:focus-within .discovery-view-job span{transform:none!important}}
+

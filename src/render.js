@@ -340,6 +340,26 @@ export function card(job, { user = null, saved = false } = {}) {
   `;
 }
 
+export function discoveryCard(job, { user = null, saved = false } = {}) {
+  const human = value => String(value || '').replaceAll('_', ' ');
+  const metadata = [job.location, human(job.employment_type), human(job.engagement_type)].filter(Boolean);
+  if (!metadata.length && job.workplace_type && !/^remote$/i.test(job.workplace_type)) metadata.push(job.workplace_type);
+  const periods = {monthly:'mo',annual:'yr',yearly:'yr',hourly:'hr',weekly:'wk'};
+  const min = job.salary_min_usd, max = job.salary_max_usd;
+  const validAmount = value => Number.isSafeInteger(value) && value > 0;
+  const money = value => '$' + value.toLocaleString('en-US');
+  let salary = '';
+  if (periods[job.salary_period] && (validAmount(min) || validAmount(max)) &&
+      (min == null || validAmount(min)) && (max == null || validAmount(max)) &&
+      !(validAmount(min) && validAmount(max) && min > max)) {
+    salary = (validAmount(min) && validAmount(max) ? (min === max ? money(min) : `${money(min)}–${money(max)}`) : validAmount(min) ? `From ${money(min)}` : `Up to ${money(max)}`) + '/' + periods[job.salary_period];
+  }
+  const posted = job.posted_at && Number.isFinite(Date.parse(job.posted_at)) ? date(job.posted_at) : '';
+  const heart = `<span class="discovery-heart" aria-hidden="true">${saved ? '♥' : '♡'}</span>`;
+  const save = user ? `<form method="post" action="${saved ? '/unsave-job' : '/save-job'}"><input type="hidden" name="job_id" value="${esc(job.id)}"><input type="hidden" name="return_to" value="${jobPath(job)}"><button class="job-save-button${saved ? ' is-saved' : ''}" type="submit">${heart} ${saved ? 'Saved' : 'Save'}</button></form>` : `<a class="job-save-button" href="/signup?return=${encodeURIComponent(jobPath(job) + '?save=1')}">${heart} Save</a>`;
+  return `<article class="job-card opportunity-card discovery-card"><div class="opportunity-card-top"><span class="opportunity-company">${esc(job.company || 'Company not specified')}</span>${posted ? `<span class="opportunity-date">Posted ${esc(posted)}</span>` : ''}</div><h2 class="opportunity-title"><a href="${jobPath(job)}">${esc(job.title || 'Job opportunity')}</a></h2>${metadata.length ? `<div class="opportunity-meta">${metadata.map(value=>`<span>${esc(value)}</span>`).join('')}</div>` : ''}${salary ? `<p class="discovery-salary">${esc(salary)}</p>` : ''}<div class="opportunity-card-bottom">${job.category ? `<a class="opportunity-category" href="${categoryPath(job.category)}">${esc(job.category)}</a>` : ''}<div class="discovery-actions">${save}<a class="discovery-view-job" href="${jobPath(job)}">View job <span aria-hidden="true">→</span></a></div></div></article>`;
+}
+
 export function searchForm(search = '', category = '', action = '/') {
   return `<form class="search" role="search" action="${esc(action)}" method="get"><label for="q">Job title, company, or keyword</label><div class="search-row"><span aria-hidden="true">⌕</span><input id="q" name="q" type="search" maxlength="120" placeholder="e.g. virtual assistant, customer support" value="${esc(search)}">${category && action === '/' ? `<input type="hidden" name="category" value="${esc(category)}">` : ''}<button type="submit">Search jobs <span aria-hidden="true">↗</span></button></div></form>`;
 }
@@ -594,9 +614,10 @@ export function listing({ rows, total, page, search, category, names, showPrefer
         ${!search && !category ? `
           <div
             class="opportunity-count"
+            ${!browseOnly ? 'role="img"' : ''}
             aria-label="${total.toLocaleString('en-US')} opportunities"
           >
-            <strong>${total.toLocaleString('en-US')}</strong>
+            <strong ${!browseOnly ? `data-live-opportunity-count="${total}" aria-hidden="true"` : ''}>${total.toLocaleString('en-US')}</strong>
 
             <span>
               opportunities<br>
@@ -607,10 +628,12 @@ export function listing({ rows, total, page, search, category, names, showPrefer
 
       </div>
 
+      ${!category && !browseOnly ? `<form class="discovery-search" role="search" action="/#opportunities" method="get"><label for="discovery-q">Search opportunities</label><div class="discovery-search-row"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="m16 16 5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg><input id="discovery-q" name="q" type="search" maxlength="120" placeholder="Search by job title, skill or company" value="${esc(search)}"><button type="submit">Search <span aria-hidden="true">→</span></button></div></form>` : ''}
+
       ${
   rows.length
     ? `<div class="opportunity-grid">
-        ${rows.map(job => card(job, { user, saved: savedJobIds.includes(String(job.id)) })).join('')}
+        ${rows.map(job => (category || browseOnly ? card : discoveryCard)(job, { user, saved: savedJobIds.includes(String(job.id)) })).join('')}
       </div>`
     : `<div class="empty">
         <h2>No matching opportunities yet</h2>
@@ -740,7 +763,7 @@ export function listing({ rows, total, page, search, category, names, showPrefer
   <div class="final-cta-tear" aria-hidden="true"></div>
 </section>
       </div>`
-  }`;
+  }${!category && !browseOnly ? '<script src="/home-discovery.js" defer></script>' : ''}`;
 }
 
 function formatJobDescription(text = '') {

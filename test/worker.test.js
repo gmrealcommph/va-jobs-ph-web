@@ -21,9 +21,9 @@ function mock(rows = [job], total = rows.length) {
   };
 }
 const request = path => new Request(env.SITE_URL + path);
-test('home renders real job content without client JavaScript', async () => {
+test('home renders real job content with optional progressive enhancement', async () => {
   mock(); const res = await handle(request('/'), env); const html = await res.text();
-  assert.equal(res.status, 200); assert.match(html, /Virtual Assistant/); assert.match(html, /\/jobs\/101/); assert.doesNotMatch(html, /<script/); assert.match(html, /index,follow/);
+  assert.equal(res.status, 200); assert.match(html, /Virtual Assistant/); assert.match(html, /\/jobs\/101/); assert.doesNotMatch(html, /<script>/); assert.match(html, /<script src="\/home-discovery.js" defer>/); assert.match(html, /index,follow/);
 });
 test('category URL round-trips spaces and punctuation', async () => {
   mock(); const res = await handle(request('/categories/Admin%20%26%20Support'), env);
