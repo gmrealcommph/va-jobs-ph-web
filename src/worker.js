@@ -78,12 +78,15 @@ export async function handle(request, env) {
     try { form = await request.formData(); } catch { return new Response('Invalid form', { status: 400 }); }
 
     if (['/save-job', '/unsave-job', '/mark-applied', '/update-application', '/remove-application'].includes(url.pathname)) {
+      const inlineSave = ['/save-job', '/unsave-job'].includes(url.pathname) && request.headers.get('accept') === 'application/json';
+      const json = (body, status = 200, headers = {}) => Response.json(body, { status, headers: { 'cache-control': 'no-store', ...headers } });
       const state = await sessionForRequest(request, env);
+      if (inlineSave && (!state.user || !state.accessToken)) return json({ error: 'Please sign in to save this job.' }, 401);
       if (!state.user || !state.accessToken) return Response.redirect(`${url.origin}/login?message=${encodeURIComponent('Log in to manage your jobs.')}&return=${encodeURIComponent('/my-jobs')}`, 303);
       const jobId = String(form.get('job_id') || '');
       if (!/^\d+$/.test(jobId)) return new Response('Invalid job', { status: 400 });
       const returnRaw = String(form.get('return_to') || '');
-      const returnTo = (/^\/jobs\/\d+$/.test(returnRaw) || returnRaw === '/matches' || returnRaw === '/my-jobs') ? returnRaw : '/my-jobs';
+      const returnTo = (/^\/jobs\/\d+$/.test(returnRaw) || returnRaw === '/matches' || returnRaw === '/my-jobs' || (['/save-job', '/unsave-job'].includes(url.pathname) && returnRaw === '/#opportunities')) ? returnRaw : '/my-jobs';
       try {
         if (url.pathname === '/save-job') await saveJobForUser(env, state.accessToken, state.user.id, jobId);
         if (url.pathname === '/unsave-job') await unsaveJobForUser(env, state.accessToken, state.user.id, jobId);
@@ -98,11 +101,13 @@ export async function handle(request, env) {
         if (url.pathname === '/remove-application') await deleteJobApplication(env, state.accessToken, state.user.id, jobId);
       } catch (error) {
         console.error('My jobs action failed:', error);
+        if (inlineSave) return json({ error: 'We could not update that job. Please try again.' }, 502);
         return Response.redirect(`${url.origin}/my-jobs?error=${encodeURIComponent('We could not update that job. Please try again.')}`, 303);
       }
       const suffix = url.pathname === '/mark-applied' ? '?tracked=1' : '';
       const h = new Headers({ location: returnTo + suffix, 'cache-control': 'no-store' });
       if (state.refreshed && typeof state.refreshed === 'object') setSessionCookies(h, state.refreshed);
+      if (inlineSave) { h.delete('location'); h.set('content-type', 'application/json'); return new Response(JSON.stringify({ saved: url.pathname === '/save-job' }), { headers: h }); }
       return new Response(null, { status: 303, headers: h });
     }
 

@@ -14,7 +14,7 @@ test('homepage discovery remains server-rendered, search/category links compose 
   for(const other of [listing({...options,category:'Executive Assistant'}),listing({...options,browseOnly:true})])assert.doesNotMatch(other,/discovery-card|home-discovery\.js|id="discovery-q"/);
 });
 test('cards preserve native job/category destinations, saved form fields and anonymous save intent; escape all content',()=>{
-  const saved=discoveryCard(job,{user:{id:'user'},saved:true});assert.match(saved,/action="\/unsave-job"/);assert.match(saved,/name="job_id" value="101"/);assert.match(saved,/name="return_to" value="\/jobs\/101"/);assert.match(saved,/href="\/jobs\/101"/);assert.match(saved,/href="\/categories\/Executive%20Assistant"/);assert.match(saved,/discovery-heart/);
+  const saved=discoveryCard(job,{user:{id:'user'},saved:true});assert.match(saved,/action="\/unsave-job"/);assert.match(saved,/name="job_id" value="101"/);assert.match(saved,/name="return_to" value="\/#opportunities"/);assert.match(saved,/href="\/jobs\/101"/);assert.match(saved,/href="\/categories\/Executive%20Assistant"/);assert.match(saved,/discovery-heart/);
   assert.match(discoveryCard(job,{user:{id:'user'}}),/action="\/save-job"/);assert.match(discoveryCard(job),/href="\/signup\?return=%2Fjobs%2F101%3Fsave%3D1"/);
   const escaped=discoveryCard({...job,title:'<script>bad</script>',company:'<img>',location:'<svg>',category:'<bad>'});assert.doesNotMatch(escaped,/<script|<img|<svg/);assert.match(escaped,/&lt;script&gt;bad/);assert.match(escaped,/&lt;img&gt;/);assert.match(escaped,/&lt;svg&gt;/);
 });
@@ -38,3 +38,4 @@ test('homepage query still searches existing public job fields and combines cate
   const query=requests.find(url=>url.searchParams.get('select')===COLUMNS);assert.equal(query.searchParams.get('category'),'eq.Executive Assistant');assert.match(query.searchParams.get('or'),/title.ilike.*Excel.*company.ilike.*description.ilike/);
   assert.match(await response.text(),/name="q".*value="Excel"/);
 });
+
