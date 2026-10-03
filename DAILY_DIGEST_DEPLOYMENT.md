@@ -59,7 +59,7 @@ Install locked dependencies using `pnpm install --frozen-lockfile`, then run `pn
 
 Verify the deployed Worker still has its dashboard secrets/bindings and original Strong Match activation. Confirm the regular Strong Match logs and batches continue naturally; do not manufacture notifications or alter its cooldown ledger.
 
-Visit `/email-preferences` while logged out and then logged in. It must redirect logged-out users to login, show independent Strong Match and Daily Job Digest controls, and save each control separately. Toggle digest Off/On and confirm only `daily_digest` changes on the logged-in user's row; target roles, salary, schedule, skills, experience and Strong Match opt-in must be unchanged. Restore the test user's intended opt-in. A cross-origin POST or a POST containing both preference controls must be rejected.
+Visit `/email-preferences` while logged out and then logged in. It must redirect logged-out users to login and show independent Strong Match and Daily Job Digest toggle switches with one **Save preferences** action. Both boolean email settings are saved together in one authenticated-user PATCH. Confirm target roles, salary, schedule, employment, experience, skills, industries and entitlement fields remain unchanged. Restore the test user's intended opt-ins. Cross-origin POSTs, missing/non-boolean values, unrelated fields and ambiguous duplicates must be rejected. The native hidden-false/checked-true checkbox pair is an intentional valid representation and works without JavaScript.
 
 ## 4. Read-only live runtime preflight
 
