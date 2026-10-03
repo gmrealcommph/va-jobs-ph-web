@@ -5342,3 +5342,29 @@ dd{margin:0;overflow-wrap:anywhere}
 .pro-coming-soon { cursor:default; opacity:.8; }
 .pro-free-note { max-width:720px; margin:28px auto 0; text-align:center; color:#52655d; }
 @media (max-width:900px) { .pro-pricing-card { grid-template-columns:1fr; gap:28px; } .pro-page-action { text-align:left; } }
+
+/* VeeAys Pro match dashboard */
+.pro-match-dashboard { margin: 0 0 26px; padding: 26px; border: 1px solid #d7e2ce; border-radius: 24px; background: #fffdf3; box-shadow: 0 12px 32px rgba(18,62,48,.05); }
+.pro-match-dashboard-top { display:flex; align-items:flex-start; justify-content:space-between; gap:24px; }
+.pro-feed-label { display:flex; align-items:center; gap:9px; color:#617169; font-size:11px; font-weight:850; letter-spacing:.07em; }
+.pro-feed-label span { padding:4px 8px; border-radius:999px; background:#123e30; color:#b3ef73; }
+.pro-match-dashboard h2 { margin:8px 0 4px; color:#123e30; font-size:22px; }
+.pro-match-dashboard p { margin:0; color:#68776f; font-size:13px; }
+.pro-edit-preferences { color:#123e30; font-size:13px; font-weight:800; text-decoration:none; white-space:nowrap; }
+.pro-match-toolbar { display:flex; flex-wrap:wrap; align-items:flex-end; gap:10px; margin-top:22px; padding-top:20px; border-top:1px solid #e5e9df; }
+.pro-filter-field { display:grid; gap:6px; }
+.pro-filter-field > span { color:#697870; font-size:10px; font-weight:850; letter-spacing:.06em; text-transform:uppercase; }
+.pro-filter-field select { min-width:145px; height:42px; padding:0 34px 0 12px; border:1px solid #d8dfd2; border-radius:12px; background:#f8f8ef; color:#123e30; font:inherit; font-size:12px; font-weight:700; }
+.pro-quick-filter,.pro-clear-filters { height:42px; padding:0 14px; border-radius:12px; font:inherit; font-size:12px; font-weight:800; cursor:pointer; }
+.pro-quick-filter { border:1px solid #a9d77a; background:#eef9e2; color:#24543f; }
+.pro-quick-filter.active { background:#b3ef73; border-color:#8fcf4f; }
+.pro-clear-filters { border:0; background:transparent; color:#617169; text-decoration:underline; text-underline-offset:3px; }
+.pro-filter-note { margin-top:12px !important; font-size:11px !important; color:#819087 !important; }
+.match-card[hidden] { display:none !important; }
+@media (max-width:700px) {
+  .pro-match-dashboard { padding:20px; }
+  .pro-match-dashboard-top { flex-direction:column; gap:10px; }
+  .pro-match-toolbar { display:grid; grid-template-columns:1fr 1fr; }
+  .pro-filter-field select { width:100%; min-width:0; }
+  .pro-quick-filter,.pro-clear-filters { width:100%; }
+}
