@@ -1399,12 +1399,14 @@ export function matchesPage({ matches = [], preferences = null, summary = null, 
   const lockedMatches = Math.max(0, Number(summary?.locked_matches) || 0);
   const totalMatches = Math.max(matches.length, Number(summary?.total_matches) || 0);
   const confidenceLabel = available => available >= 5 ? 'High confidence' : available >= 3 ? 'Good confidence' : 'Limited data';
+  const infoIcon = '<svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M8 7v4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><circle cx="8" cy="4.5" r=".9" fill="currentColor"/></svg>';
+  const infoButton = kind => `<button class="match-info" type="button" aria-label="About ${kind === 'score' ? 'match score' : 'confidence'}" aria-describedby="match-${kind}-tooltip" aria-expanded="false" data-match-info="${kind}">${infoIcon}</button>`;
 
   const friendlyReason = (label, matched, available, unrestricted = false) => {
-    if (unrestricted) return `<span class="match-reason neutral"><b aria-hidden="true">↔</b>${esc(label)} flexible</span>`;
+    if (unrestricted) return `<span class="match-reason neutral"><b aria-hidden="true">~</b>${esc(label)} flexible</span>`;
     if (!available) return '';
-    if (matched) return `<span class="match-reason matched"><b aria-hidden="true">✓</b>${esc(label)}</span>`;
-    return `<span class="match-reason neutral"><b aria-hidden="true">•</b>${esc(label)} differs</span>`;
+    if (matched === true) return `<span class="match-reason matched"><b aria-hidden="true">✓</b>${esc(label)}</span>`;
+    return `<span class="match-reason neutral"><b aria-hidden="true">~</b>${esc(label)}${matched === false ? ' differs' : ' not confirmed'}</span>`;
   };
 
   const cards = matches.map((job, index) => {
@@ -1428,7 +1430,7 @@ export function matchesPage({ matches = [], preferences = null, summary = null, 
     return `
       <article class="match-card" data-match-card data-original-order="${index}" data-score="${esc(job.match_score)}" data-salary="${esc(salaryValue)}" data-salary-period="${esc(job.salary_period || '')}" data-schedule="${esc(job.schedule_region || '')}" data-work-type="${esc(job.employment_type || '')}">
         <div class="match-card-main">
-          <div class="match-card-top"><span class="match-score"><strong>${esc(job.match_score)}%</strong> MATCH<svg class="match-badge-spark" viewBox="0 0 16 16" aria-hidden="true"><path d="m8 2 1.5 4.5L14 8l-4.5 1.5L8 14 6.5 9.5 2 8l4.5-1.5L8 2Z" fill="currentColor"/></svg></span><span class="match-company">${esc(job.company || 'Company not specified')}</span><span class="match-confidence">${esc(confidence)}</span></div>
+          <div class="match-card-top"><span class="match-score"><strong>${esc(job.match_score)}%</strong> MATCH${infoButton('score')}</span><span class="match-company">${esc(job.company || 'Company not specified')}</span><span class="match-confidence">${esc(confidence)}${infoButton('confidence')}</span></div>
           <h2><a title="${esc(job.title || 'Job opportunity')}" href="${jobPath({ id: job.job_id })}">${esc(job.title || 'Job opportunity')}</a><span class="match-full-title" aria-hidden="true">${esc(job.title || 'Job opportunity')}</span></h2>
           <div class="match-meta">${job.location ? `<span>${esc(job.location)}</span>` : ''}${job.employment_type ? `<span>${esc(job.employment_type.replaceAll('_', ' '))}</span>` : ''}${job.engagement_type ? `<span>${esc(job.engagement_type)}</span>` : ''}</div>
           <div class="match-card-footer">
@@ -1461,7 +1463,7 @@ export function matchesPage({ matches = [], preferences = null, summary = null, 
     <section class="pro-match-dashboard" aria-label="Match controls">
       <div class="pro-match-dashboard-top">
         <div>
-          <h2><strong id="visible-match-count">${esc(matches.length)}</strong> matches for you</h2>
+          <h2 aria-live="polite" aria-atomic="true"><strong id="visible-match-count">${esc(matches.length)}</strong> matches for you</h2>
           <div class="pro-feed-label"><span>PRO</span></div>
         </div>
         <a class="pro-edit-preferences" href="/onboarding">Edit preferences →</a>
@@ -1480,7 +1482,7 @@ export function matchesPage({ matches = [], preferences = null, summary = null, 
   const proScript = isPro && matches.length ? `<script src="/match-filters.js" defer></script>` : '';
 
   const intro = isPro
-    ? 'Your full personalized feed, ranked around the preferences you gave us.'
+    ? 'Jobs ranked around what matters to you.'
     : 'We compare your preferences with every eligible role and bring the strongest fits to the top. Your first 3 are free.';
 
   return `
@@ -1491,7 +1493,7 @@ export function matchesPage({ matches = [], preferences = null, summary = null, 
       ${proControls}
       <div class="matches-list">${cards || (!error ? '<div class="match-empty"><h2>No matches yet</h2><p>Update your job preferences so VeeAys can find better-fit opportunities for you.</p><a class="button" href="/onboarding">Set my preferences</a></div>' : '')}</div>
       ${freeUpgrade}
-    </section>${proScript}`;
+    </section>${matches.length ? `<div class="match-tooltip" id="match-score-tooltip" role="tooltip" popover="manual" hidden><strong>How your match score works</strong><p>We compare this job with your saved preferences using the details the employer provides. Missing job information doesn’t lower your score, so 100% means it matched all the factors we could evaluate.</p></div><div class="match-tooltip" id="match-confidence-tooltip" role="tooltip" popover="manual" hidden><strong>What does confidence mean?</strong><p>Confidence reflects how much job information was available to calculate your match. More comparable details means greater confidence in the score.</p></div><script src="/match-interactions.js" defer></script>` : ''}${proScript}`;
 }
 
 

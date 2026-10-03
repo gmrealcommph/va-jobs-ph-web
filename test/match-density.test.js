@@ -19,6 +19,12 @@ test('compact feed keeps score, confidence, all explanations, metadata and exact
   assert.match(html,/<svg class="matches-discovery"[^>]*aria-hidden="true"/);
   assert.equal((html.match(/class="matches-discovery"/g)||[]).length,1);
   assert.match(html,/title="NZ\/AU Senior Executive Assistant - Dayshift Remote"/);
+  assert.match(html,/Jobs ranked around what matters to you\./);
+  assert.equal((html.match(/role="tooltip"/g)||[]).length,2);
+  assert.equal((html.match(/data-match-info=/g)||[]).length,4);
+  assert.match(html,/aria-describedby="match-score-tooltip" aria-expanded="false"/);
+  assert.match(html,/How your match score works/);assert.match(html,/What does confidence mean\?/);
+  assert.match(html,/<script src="\/match-interactions.js" defer>/);
   assert.match(html,/<script src="\/match-filters.js" defer><\/script>/);assert.doesNotMatch(html,/<script>/);
 });
 test('free, empty, error and unknown-factor states retain existing entitlement and fallback behavior',()=>{
@@ -34,4 +40,11 @@ test('external filter asset is local and retains filtering, stable ties and clea
   const script=await readFile(new URL('../public/match-filters.js',import.meta.url),'utf8');
   assert.match(script,/score >= 90/);assert.match(script,/salaryPeriod === 'monthly'/);assert.match(script,/Number\(a.dataset.originalOrder\) - Number\(b.dataset.originalOrder\)/);
   assert.match(script,/clear\?\.addEventListener/);assert.doesNotMatch(script,/fetch\(|localStorage|supabase/);
+});
+test('factor presentation distinguishes confirmed true, explicit false and unknown without inventing mismatches',()=>{
+  const confirmed=matchesPage({matches:[job],preferences});assert.match(confirmed,/class="match-reason matched"[^>]*><b[^>]*>✓<\/b>Role fit/);
+  const unknown=matchesPage({matches:[{...job,role_match:null}],preferences});assert.match(unknown,/class="match-reason neutral"[^>]*><b[^>]*>~<\/b>Role fit not confirmed/);assert.doesNotMatch(unknown,/Role fit differs/);
+  const differs=matchesPage({matches:[{...job,role_match:false}],preferences});assert.match(differs,/Role fit differs/);
+  assert.match(confirmed,/class="match-reason neutral"[^>]*><b[^>]*>~<\/b>Schedule flexible/);
+  const unavailable=matchesPage({matches:[{...job,category:null,title:null}],preferences});assert.doesNotMatch(unavailable,/Role fit differs|Role fit not confirmed/);
 });

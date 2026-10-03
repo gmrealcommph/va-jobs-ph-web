@@ -42,6 +42,11 @@
       const ordered = [...cards].sort((a,b) => Number(b.dataset.score || 0) - Number(a.dataset.score || 0) || Number(a.dataset.originalOrder) - Number(b.dataset.originalOrder));
       ordered.forEach(card => list.appendChild(card));
       if (count) count.textContent = String(visible);
+      const filtersActive = strongOnly || minSalary > 0 || wantedSchedule !== 'all' || wantedWork !== 'all';
+      if (clear) {
+        clear.textContent = filtersActive ? 'Clear filters' : 'Clear';
+        clear.classList.toggle('has-active-filters', filtersActive);
+      }
       let empty = list.querySelector('.pro-filter-empty');
       if (!visible) {
         if (!empty) { empty = document.createElement('div'); empty.className = 'match-empty pro-filter-empty'; empty.innerHTML = '<h2>No matches with those filters</h2><p>Try widening one of the filters above.</p>'; list.appendChild(empty); }

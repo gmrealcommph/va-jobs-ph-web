@@ -5539,3 +5539,29 @@ body>header,body>footer{flex-shrink:0}
 @keyframes matches-heart-pop{0%,100%{transform:scale(1)}50%{transform:scale(1.18)}}
 @media(prefers-reduced-motion:reduce){.matches-page *,.matches-page *:before{animation:none!important;transition:none!important}}
 
+/* Final My Matches UX polish; grid and density remain unchanged. */
+.matches-page .match-card h2{position:static}
+.matches-page .match-card h2 a:after{content:'';position:absolute;inset:0;z-index:1;border-radius:18px;cursor:pointer}
+.matches-page .match-full-title{top:65px;left:18px;right:18px;z-index:4}
+.matches-page .match-card-actions{position:relative;z-index:2}
+.matches-page .match-info{position:relative;z-index:3;display:inline-flex;align-items:center;justify-content:center;flex:none;width:18px;height:18px;min-height:0;padding:0;border:0;border-radius:50%;background:transparent;color:inherit;cursor:help;line-height:1}
+.matches-page .match-info:before{content:'';position:absolute;inset:-4px;border-radius:50%}
+.matches-page .match-info svg{width:15px;height:15px;pointer-events:none}
+.matches-page .match-info:hover{background:#123e3010}
+.matches-page .match-info:focus-visible{outline:2px solid #648b32;outline-offset:2px}
+.matches-page .match-confidence{display:inline-flex;align-items:center;gap:4px}
+.matches-page .match-reason.neutral{background:#f1efe7;color:#737165;border:1px solid #e3dfd3;padding:2px 6px}
+.matches-page .match-reason.neutral b{background:transparent;color:#8a8371;font-size:.75rem}
+.matches-page .match-reason.matched{background:#e7f5d7;color:#24543f}
+.matches-page .match-card:focus-within{border-color:#adc495;box-shadow:0 7px 22px #123e300d}
+.matches-page .match-card:has(h2 a:focus-visible){outline:3px solid #7eaa33;outline-offset:3px;transform:translateY(-2px)}
+.matches-page .match-card:hover h2 a,.matches-page .match-card:focus-within h2 a{color:#2a6344;text-decoration:none}
+.matches-page .match-card:hover .match-view-job span,.matches-page .match-card:focus-within .match-view-job span{transform:translateX(3px)}
+.matches-page .pro-clear-filters.has-active-filters{background:#edf3df;border:1px solid #b8cb9e;color:#123e30;text-decoration:none;font-weight:800}
+.match-tooltip{position:fixed;inset:auto;margin:0;z-index:1000;width:340px;max-width:calc(100vw - 24px);max-height:calc(100dvh - 24px);overflow:auto;padding:15px 17px;border:1px solid #b9c99e;border-radius:15px;background:#fffdf5;color:#123e30;box-shadow:0 10px 32px #123e3024;font-family:Arial,Helvetica,sans-serif;font-size:.82rem;line-height:1.55;text-align:left}
+.match-tooltip[hidden]{display:none}
+.match-tooltip strong{font-size:.86rem;line-height:1.4}
+.match-tooltip p{margin:7px 0 0;color:#5f7065}
+@media(max-width:700px){.matches-page .match-info{width:24px;height:24px}.matches-page .match-info:before{inset:0}.matches-page .match-full-title{left:16px;right:16px}}
+@media(prefers-reduced-motion:reduce){.matches-page .match-card:has(h2 a:focus-visible),.matches-page .match-card:hover .match-view-job span,.matches-page .match-card:focus-within .match-view-job span{transform:none}}
+
