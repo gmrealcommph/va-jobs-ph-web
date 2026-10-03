@@ -89,18 +89,23 @@ export async function getJob(env, id) {
 
   return rows[0] || null;
 }
-export async function categories(env) {
+export async function categories(env, { withCounts = false } = {}) {
   const names = new Set();
+  const counts = new Map();
   let offset = 0;
   // Honor the server's actual row cap rather than assuming it is 1,000.
   while (true) {
     const { rows, total } = await query(env, { select: 'category', order: 'id.asc' }, { offset, limit: 1000, count: true });
-    for (const row of rows) if (typeof row.category === 'string' && row.category.trim()) names.add(row.category);
+    for (const row of rows) if (typeof row.category === 'string' && row.category.trim()) {
+      names.add(row.category);
+      if (withCounts) counts.set(row.category, (counts.get(row.category) || 0) + 1);
+    }
     offset += rows.length;
     if (offset >= total) break;
     if (!rows.length) throw new Error('Incomplete category response.');
   }
-  return [...names].sort((a, b) => a.localeCompare(b));
+  const sorted = [...names].sort((a, b) => a.localeCompare(b));
+  return withCounts ? sorted.map(name => ({ name, count: counts.get(name) })) : sorted;
 }
 
 

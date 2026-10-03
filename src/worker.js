@@ -3,6 +3,7 @@ import { manualNotification } from './notifications.js';
 import { scheduledStrongMatches } from './strong-matches.js';
 import { scheduledDailyDigest, DIGEST_CRON } from './daily-digest.js';
 import { emailPreferences } from './email-preferences.js';
+import { categoryPage } from './category-page.js';
 import { layout, listing, detail, esc, jobPath, categoryPath, authPage, checkEmailPage, authCallbackPage, onboardingPage, matchesPage, proPage, myJobsPage } from './render.js';
 import { signUp, signIn, getUser, sessionForRequest, setSessionCookies, clearSessionCookies, authError, getJobPreferences, saveJobPreferences, completeOnboarding, getMyProfile, getMyJobMatches, getMyMatchSummary, getSavedJobs, saveJobForUser, unsaveJobForUser, getJobApplications, markJobApplied, updateJobApplication, deleteJobApplication } from './auth.js';
 
@@ -825,25 +826,8 @@ if (
       url.pathname ===
       '/categories'
     ) {
-      const names =
-        await categories(env);
-
-      return render(
-        'Explore job categories',
-        `<section class="wrap category-page"><div class="kicker">FIND YOUR DIRECTION</div><h1>Work that fits<br><em>your strengths.</em></h1><p>Explore opportunities by category.</p><div class="category-grid">${
-          names
-            .map(
-              name =>
-                `<a href="${categoryPath(
-                  name
-                )}"><h2>${esc(
-                  name
-                )}</h2><span>Explore jobs ↗</span></a>`
-            )
-            .join('') ||
-          '<p>No categories are available yet. Check back soon.</p>'
-        }</div></section>`
-      );
+      const entries = await categories(env, { withCounts: true });
+      return render('Explore job categories', categoryPage(entries));
     }
 
     const jobMatch =
