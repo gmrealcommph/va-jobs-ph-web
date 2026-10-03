@@ -138,6 +138,22 @@ export async function setDailyDigestPreference(env, accessToken, userId, enabled
     throw new Error('Daily digest preference was not saved.');
 }
 
+export async function setEmailPreferences(env, accessToken, userId, preferences) {
+  const fields = ['email_strong_matches', 'daily_digest'];
+  if (!preferences || Object.keys(preferences).length !== fields.length ||
+      fields.some(field => typeof preferences[field] !== 'boolean'))
+    throw new Error('Invalid email preferences.');
+  // Construct the payload explicitly; never spread submitted preferences into a write.
+  const payload = { email_strong_matches: preferences.email_strong_matches, daily_digest: preferences.daily_digest };
+  const { response, data } = await userRestFetch(env, accessToken,
+    `/rest/v1/job_preferences?user_id=eq.${encodeURIComponent(userId)}`, {
+      method: 'PATCH', headers: { Prefer: 'return=representation' }, body: JSON.stringify(payload)
+    });
+  if (!response.ok || !Array.isArray(data) || data.length !== 1 ||
+      fields.some(field => data[0][field] !== payload[field]))
+    throw new Error('Email preferences were not saved.');
+}
+
 export async function completeOnboarding(env, accessToken) {
   const { response, data } = await userRestFetch(env, accessToken, '/rest/v1/rpc/update_my_profile', {
     method: 'POST', body: JSON.stringify({ new_full_name: null, new_onboarding_completed: true })
