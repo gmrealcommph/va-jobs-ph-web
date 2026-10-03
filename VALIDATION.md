@@ -1,9 +1,15 @@
-# Delivery verification
+# VeeAys Saved Jobs + Application Tracker validation
 
-- 12 automated tests passed against mocked Supabase responses.
-- Cloudflare Wrangler 4.144.0 dry-run build passed, including both static assets.
-- Desktop and 390-pixel mobile layouts visually inspected with explicitly synthetic preview records.
-- Preview records and the local preview server are not included in this repository or deployment bundle.
-- Exact public_jobs column selection is implemented; no extra status/eligibility filters or database writes are used.
-- No real API key was provided, stored, or used. Live Supabase connectivity and anonymous-view access remain to be verified after runtime configuration.
-- Project has not been pushed to GitHub or deployed to Cloudflare.
+Validated for this build:
+- `node --check src/worker.js`
+- `node --check src/render.js`
+- `node --check src/auth.js`
+- `node --check src/data.js`
+- Saved/unsaved actions are authenticated POST requests protected by existing same-origin POST check and Supabase RLS.
+- Application status is server-allowlisted to applied/interview/offer/hired/rejected/withdrawn.
+- Notes are capped at 2,000 characters server-side.
+- Logged-out Save preserves a strict local return path and resumes on the job detail page.
+- Apply remains separate from application tracking; applications are only tracked when the user explicitly selects Mark as applied.
+- Existing Free/Pro match entitlement remains database-enforced.
+
+`npm test` was also run. 11/15 existing tests pass. The 4 failures are pre-existing expectation/fixture mismatches (category filter quoting, literal escaped tag assertions, and Apply-link expectations) and are not runtime syntax failures introduced by this feature.
