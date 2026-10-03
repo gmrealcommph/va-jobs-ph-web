@@ -116,3 +116,6 @@ Official references: [Workers static assets](https://developers.cloudflare.com/w
 # Production Strong Match release
 
 See [PRODUCTION_STRONG_MATCHES.md](PRODUCTION_STRONG_MATCHES.md) for the corrected live-schema migration, disabled deployment, scheduled sender, retry/reconciliation rules and manual-control transition. Notification age/order uses existing `discovered_at`; no notification `created_at` column is added. That document supersedes the manual-only setup below. The supplied configuration retires the manual route, disables sending and has no cron trigger. Existing frontend instructions continue below.
+# Daily Digest V1 addition
+
+Use [DAILY_DIGEST_DEPLOYMENT.md](DAILY_DIGEST_DEPLOYMENT.md) for this release's deployment order and effective configuration. Daily Digest is disabled by default; the supplied configuration preserves the reported live Strong Match activation and its original cron. Apply only migration 003 on the already-migrated production database. [DAILY_DIGEST_VALIDATION.md](DAILY_DIGEST_VALIDATION.md) contains the current validation results. Older deployment notes below describe earlier release states.

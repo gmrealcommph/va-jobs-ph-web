@@ -128,6 +128,16 @@ export async function setStrongMatchPreference(env, accessToken, userId, enabled
     throw new Error('Email preference was not saved.');
 }
 
+export async function setDailyDigestPreference(env, accessToken, userId, enabled) {
+  const { response, data } = await userRestFetch(env, accessToken,
+    `/rest/v1/job_preferences?user_id=eq.${encodeURIComponent(userId)}`, {
+      method: 'PATCH', headers: { Prefer: 'return=representation' },
+      body: JSON.stringify({ daily_digest: enabled })
+    });
+  if (!response.ok || !Array.isArray(data) || data.length !== 1 || data[0].daily_digest !== enabled)
+    throw new Error('Daily digest preference was not saved.');
+}
+
 export async function completeOnboarding(env, accessToken) {
   const { response, data } = await userRestFetch(env, accessToken, '/rest/v1/rpc/update_my_profile', {
     method: 'POST', body: JSON.stringify({ new_full_name: null, new_onboarding_completed: true })

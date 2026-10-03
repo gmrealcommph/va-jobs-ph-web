@@ -1,6 +1,7 @@
 import { categories, getJob, getJobsByIds, listJobs, query } from './data.js';
 import { manualNotification } from './notifications.js';
 import { scheduledStrongMatches } from './strong-matches.js';
+import { scheduledDailyDigest, DIGEST_CRON } from './daily-digest.js';
 import { emailPreferences } from './email-preferences.js';
 import { layout, listing, detail, esc, jobPath, categoryPath, authPage, checkEmailPage, authCallbackPage, onboardingPage, matchesPage, proPage, myJobsPage } from './render.js';
 import { signUp, signIn, getUser, sessionForRequest, setSessionCookies, clearSessionCookies, authError, getJobPreferences, saveJobPreferences, completeOnboarding, getMyProfile, getMyJobMatches, getMyMatchSummary, getSavedJobs, saveJobForUser, unsaveJobForUser, getJobApplications, markJobApplied, updateJobApplication, deleteJobApplication } from './auth.js';
@@ -1084,4 +1085,7 @@ if (
     return response;
   }
 }
-export default { fetch: handle, scheduled: scheduledStrongMatches };
+export default { fetch: handle, scheduled(controller,env) {
+  // Separate cron invocations preserve Strong Match behavior and its subrequest budget.
+  return controller.cron===DIGEST_CRON ? scheduledDailyDigest(controller,env) : scheduledStrongMatches(controller,env);
+} };

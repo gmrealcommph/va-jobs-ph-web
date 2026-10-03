@@ -1,4 +1,4 @@
-import { sessionForRequest, getJobPreferences, setStrongMatchPreference, setSessionCookies } from './auth.js';
+import { sessionForRequest, getJobPreferences, setStrongMatchPreference, setDailyDigestPreference, setSessionCookies } from './auth.js';
 import { layout } from './render.js';
 
 export async function emailPreferences(request, env) {
@@ -14,15 +14,21 @@ export async function emailPreferences(request, env) {
   try {
     if (request.method==='POST') {
       const form=await request.formData();
-      const value=form.get('email_strong_matches');
+      const fields=['email_strong_matches','daily_digest'].filter(key=>form.has(key));
+      if (fields.length!==1 || form.getAll(fields[0]).length!==1) return new Response('Invalid preference',{status:400});
+      const field=fields[0];
+      const value=form.get(field);
       if (!['true','false'].includes(value)) return new Response('Invalid preference',{status:400});
-      await setStrongMatchPreference(env,state.accessToken,state.user.id,value==='true');
+      const save=field==='daily_digest' ? setDailyDigestPreference : setStrongMatchPreference;
+      await save(env,state.accessToken,state.user.id,value==='true');
       headers.set('location','/email-preferences?saved=1');
       return new Response(null,{status:303,headers});
     }
     const prefs=await getJobPreferences(env,state.accessToken,state.user.id);
     const body=`<section class="wrap"><h1>Email preferences</h1>${url.searchParams.get('saved')==='1' ? '<p>Your email preference has been saved.</p>' : ''}${prefs ? `<form method="post" action="/email-preferences"><fieldset><legend>Strong Match Alerts</legend><p>Receive grouped alerts for strong matches while your Pro subscription is active.</p><label><input type="radio" name="email_strong_matches" value="true" ${prefs.email_strong_matches===true ? 'checked' : ''}> On</label><label><input type="radio" name="email_strong_matches" value="false" ${prefs.email_strong_matches!==true ? 'checked' : ''}> Off</label></fieldset><button type="submit">Save email preference</button></form>` : '<p>Complete your job preferences first.</p><a href="/onboarding">Set up job preferences</a>'}<p><a href="/matches">My Matches</a></p></section>`;
-    return new Response(layout({title:'Email preferences',description:'Manage your VeeAys email alerts.',canonical:`${url.origin}/email-preferences`,body,noindex:true,user:state.user}),{headers});
+    const digest=prefs ? `<form method="post" action="/email-preferences"><fieldset><legend>Daily Job Digest</legend><p>Get your best new matches in one daily email while your Pro subscription is active.</p><label><input type="radio" name="daily_digest" value="true" ${prefs.daily_digest===true ? 'checked' : ''}> On</label><label><input type="radio" name="daily_digest" value="false" ${prefs.daily_digest!==true ? 'checked' : ''}> Off</label></fieldset><button type="submit">Save daily digest preference</button></form>` : '';
+    const page=body.replace('<p><a href="/matches">My Matches</a></p>',`${digest}<p><a href="/matches">My Matches</a></p>`);
+    return new Response(layout({title:'Email preferences',description:'Manage your VeeAys email alerts.',canonical:`${url.origin}/email-preferences`,body:page,noindex:true,user:state.user}),{headers});
   } catch {
     return new Response('We could not load or save your email preference. Please try again.',{status:503,headers});
   }
