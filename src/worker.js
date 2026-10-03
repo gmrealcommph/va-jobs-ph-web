@@ -14,7 +14,7 @@ function safeReturnPath(value) {
   const v = String(value || '');
   if (/^\/apply\/[A-Za-z0-9%._~-]{1,240}$/.test(v)) return v;
   if (/^\/jobs\/[A-Za-z0-9%._~-]{1,240}(?:\?save=1)?$/.test(v)) return v;
-  if (v === '/my-jobs' || v === '/matches') return v;
+  if (v === '/my-jobs' || v === '/matches' || v === '/jobs') return v;
   if (v === '/onboarding' || v === '/') return v;
   return '';
 }
@@ -919,8 +919,11 @@ if (
         /^\/categories\/([^/]+)$/
       );
 
+    const browseOnly = url.pathname === '/jobs';
+
     if (
       url.pathname !== '/' &&
+      !browseOnly &&
       !categoryMatch
     ) {
       return missing();
@@ -1022,7 +1025,8 @@ if (
         showPreferencesPrompt,
         onboardingComplete,
         user: authState.user,
-        savedJobIds
+        savedJobIds,
+        browseOnly
       }),
       {
         canonical:
@@ -1032,7 +1036,7 @@ if (
               ? categoryPath(
                   category
                 )
-              : '/'
+              : browseOnly ? '/jobs' : '/'
           ) +
           (
             page > 1

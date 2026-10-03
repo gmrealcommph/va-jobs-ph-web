@@ -43,7 +43,7 @@ export function layout({ title, description, canonical, body, noindex = false, u
     type="image/svg+xml"
   >
 
-  <link rel="stylesheet" href="/styles.css?v=20261002-mobilecategories">
+  <link rel="stylesheet" href="/styles.css?v=20261003-savedjobs2">
 </head>
 
 <body>
@@ -163,7 +163,7 @@ export function layout({ title, description, canonical, body, noindex = false, u
 
         <h2>Jobs</h2>
 
-        <a href="/">
+        <a href="/jobs">
           Find a job
         </a>
 
@@ -344,8 +344,8 @@ export function searchForm(search = '', category = '', action = '/') {
   return `<form class="search" role="search" action="${esc(action)}" method="get"><label for="q">Job title, company, or keyword</label><div class="search-row"><span aria-hidden="true">⌕</span><input id="q" name="q" type="search" maxlength="120" placeholder="e.g. virtual assistant, customer support" value="${esc(search)}">${category && action === '/' ? `<input type="hidden" name="category" value="${esc(category)}">` : ''}<button type="submit">Search jobs <span aria-hidden="true">↗</span></button></div></form>`;
 }
 
-export function listing({ rows, total, page, search, category, names, showPreferencesPrompt = false, onboardingComplete = false, user = null, savedJobIds = [] }) {
-  const action = category ? categoryPath(category) : '/';
+export function listing({ rows, total, page, search, category, names, showPreferencesPrompt = false, onboardingComplete = false, user = null, savedJobIds = [], browseOnly = false }) {
+  const action = category ? categoryPath(category) : (browseOnly ? '/jobs' : '/');
   const pages = Math.ceil(total / 15);
 
   const pageUrl = n => `${action}?${new URLSearchParams({
@@ -370,7 +370,9 @@ export function listing({ rows, total, page, search, category, names, showPrefer
     'Writing & Content': '✐'
   }[name] || '•');
 
-  const hero = category
+  const hero = browseOnly
+    ? `<section class="jobs-browse-hero"><div class="wrap"><div class="kicker"><span></span> REMOTE JOBS FOR FILIPINO TALENT</div><h1>Find your next<br><em>opportunity.</em></h1><p>Search and explore roles open to talent in the Philippines.</p>${searchForm(search, '', '/jobs')}</div></section>`
+    : category
     ? `<section class="hero"><div class="wrap"><div class="kicker"><span></span> BUILT FOR FILIPINO TALENT</div><h1>${category ? `${esc(category)}<br><em>opportunities.</em>` : 'Great work.<br><em>Closer than you think.</em>'}</h1><p>Find your next opportunity in virtual assistance and beyond.<br>Explore roles open to talent in the Philippines.</p>${searchForm(search, category, action)}<div class="hero-foot"><span>Find your fit. Make your move.</span><span>PH <span aria-hidden="true">✳</span> WORLDWIDE POSSIBILITIES</span></div></div></section>`
     : `<section class="home-hero">
         <div class="wrap">
@@ -503,7 +505,7 @@ export function listing({ rows, total, page, search, category, names, showPrefer
       ? `${esc(category)} opportunities`
       : 'Fresh opportunities<br><em>for Filipino talent.</em>';
 
-  return `${category ? '' : '<div class="home-page">'}${hero}
+  return `${category || browseOnly ? '' : '<div class="home-page">'}${hero}
 
   <section class="wrap listings" id="opportunities">
 
@@ -521,7 +523,7 @@ export function listing({ rows, total, page, search, category, names, showPrefer
 
         <a
           class="filter all-filter ${category ? '' : 'selected'}"
-          href="/${search ? '?' + new URLSearchParams({ q: search }) : ''}"
+          href="${browseOnly ? '/jobs' : '/'}${search ? '?' + new URLSearchParams({ q: search }) : ''}"
         >
           <span class="filter-icon" aria-hidden="true">⊞</span>
           <span class="filter-name">All opportunities</span>
@@ -613,7 +615,7 @@ export function listing({ rows, total, page, search, category, names, showPrefer
     : `<div class="empty">
         <h2>No matching opportunities yet</h2>
         <p>Try another keyword or explore all categories.</p>
-        <a class="button" href="/">Browse all jobs</a>
+        <a class="button" href="/jobs">Browse all jobs</a>
       </div>`
 }
 
