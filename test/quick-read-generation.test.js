@@ -202,7 +202,7 @@ test('At a glance uses authoritative values, omits absent ones and never assumes
   assert.equal(formatSalary({salary_min_usd:500}), '');assert.equal(formatSalary({salary_min:37500}), '');
   assert.equal(formatSalary({salary_min:46000,salary_max:37500,salary_currency:'PHP'}),'');
   const html=renderAtAGlance({salary_min:37500,salary_max:46000,salary_currency:'PHP',salary_period:'month',schedule_region:'PH night shift',employment_type:'Full Time',engagement_type:'Employee',experience_level:'Entry Level'});
-  for(const s of ['37,500','46,000','month','PH night shift','Full Time','Employee','Entry Level']) assert.ok(html.includes(s));
+  for(const s of ['37,500','46,000','month','PH night shift','Full-time','Employee','Entry Level']) assert.ok(html.includes(s));
   assert.doesNotMatch(html,/Location|Work setup/);
 });
 test('logo load/error/decode failure keeps accessible decorative fallback and never reveals broken image',()=>{

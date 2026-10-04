@@ -1181,7 +1181,7 @@ export function detail(job, { user = null, saved = false, application = null, sa
 
 
           <div class="description job-detail-description">
-            ${renderJobRead(description, job.quick_read ?? null)}
+            ${renderJobRead(description, job.quick_read ?? null, job)}
           </div>
 
         </article>
