@@ -1,0 +1,199 @@
+diff --git a/src/quick-read-generation.js b/src/quick-read-generation.js
+index cea895a..5571971 100644
+--- a/src/quick-read-generation.js
++++ b/src/quick-read-generation.js
+@@ -99,10 +99,13 @@ const instructions = `Organize employer source units into the supplied schema. T
+ export async function generateWithProvider(env, description, fetcher=fetch) {
+   if ((env.QUICK_READ_PROVIDER || 'openai')!=='openai' || !env.OPENAI_API_KEY || !env.QUICK_READ_MODEL) throw new Error('provider_not_configured');
+   const units=sourceUnits(description);
++  // Expose the existing conservative keyword guard to the organizer. Context
++  // hints do not override it; this adds guidance without relaxing validation.
++  const materialConditionIds=units.filter(u=>material.test(u.text)).map(u=>u.id);
+   const response=await fetcher('https://api.openai.com/v1/responses',{
+     method:'POST',headers:{Authorization:`Bearer ${env.OPENAI_API_KEY}`,'content-type':'application/json'},
+     signal:AbortSignal.timeout(90000),body:JSON.stringify({model:env.QUICK_READ_MODEL,store:false,
+-      instructions,input:JSON.stringify({source_units:units,application_note_ids:units.filter(u=>application.test(u.text)).map(u=>u.id)}),max_output_tokens:8000,
++      instructions:instructions+' material_condition_ids flag the validator\'s conservative material keyword matches, even within duties, benefits, qualifications, headings or concatenated text. For non-preferred entries, only important_requirements, application_notes or other_details are permitted; section_hint does not override this restriction. Use other_details for keyword matches that describe ordinary duties (such as scheduling appointments) or aggregator metadata, rather than turning them into candidate conditions. Preserve entire mixed/concatenated units. Existing preference and application routing rules take precedence; these IDs do not establish mandatory qualifications.',input:JSON.stringify({source_units:units,application_note_ids:units.filter(u=>application.test(u.text)).map(u=>u.id),material_condition_ids:materialConditionIds}),max_output_tokens:8000,
+       text:{format:{type:'json_schema',name:'veeays_quick_read',strict:true,schema:outputSchema}}})
+   });
+   if(!response.ok) throw new Error(`provider_http_${response.status}`);
+diff --git a/test/quick-read-43635.test.js b/test/quick-read-43635.test.js
+new file mode 100644
+index 0000000..441874a
+--- /dev/null
++++ b/test/quick-read-43635.test.js
+@@ -0,0 +1,104 @@
++import test from 'node:test';
++import assert from 'node:assert/strict';
++import {readFileSync} from 'node:fs';
++import {createHash} from 'node:crypto';
++import {sourceUnits,SECTIONS,validateSelection,validateStored,generateWithProvider,sourceFingerprint} from '../src/quick-read-generation.js';
++import {generateJob} from '../src/quick-read-service.js';
++import {presentQuickRead} from '../src/quick-read-presentation.js';
++import {renderJobRead} from '../src/job-detail-read.js';
++
++// Genuine HTML-decoded public Original description GET, 2026-10-05 Asia/Manila,
++// https://veeays.com/jobs/43635. Not historical DB bytes or failed provider output.
++// All selections/provider responses below are local mocks. Synthetic additions
++// are explicitly labeled and never become fixture data.
++const source=readFileSync(new URL('./fixtures/business-development-43635.txt',import.meta.url),'utf8');
++const response=q=>Response.json({status:'completed',output:[{content:[{type:'output_text',text:JSON.stringify(q)}]}]});
++function selection() {
++  const q=Object.fromEntries(SECTIONS.map(k=>[k,[]]));
++  for(const u of sourceUnits(source)) {
++    const key=u.id>=21 && u.id<=28?'requirements':[3,29].includes(u.id)?'important_requirements':
++      [6,7,8,10,12].includes(u.id)?'responsibilities':'other_details';
++    q[key].push(u.id);
++  }
++  return q;
++}
++function move(q,id,key) {
++  for(const k of SECTIONS) q[k]=q[k].filter(n=>n!==id);
++  if(key) q[key].push(id);return q;
++}
++test('43635: genuine source boundaries and safe complete selection',()=>{
++  const u=sourceUnits(source);assert.equal(u.length,36);
++  assert.equal(createHash('sha256').update(source).digest('hex'),'2430d7fe36be3d353521a3ddfc13d48fcdb924da8cecb11930815066b5bd73fc');
++  assert.equal(u[9].text,'Schedule appointments and demos of eZee Products/Services.');
++  assert.equal(u[29].text,'Personal vehicle, laptop, and good internet connection');
++  assert.equal(u[29].section_hint,'requirements');
++  assert.equal(u[9].section_hint,'responsibilities');
++  // Existing unrecognized competencies heading is distinct from material routing.
++  assert.equal(u[13].is_heading,false);
++  assert.equal(u[14].section_hint,'responsibilities');
++  const q=validateSelection(selection(),source);
++  assert.equal(q.requirements.length,8);assert.deepEqual(validateStored(q,source),q);
++});
++test('43635: genuine material matches reproduce failure; allowed sections retain safeguards',()=>{
++  for(const [id,target] of [[0,'about_role'],[3,'about_role'],[9,'responsibilities'],[29,'requirements'],[35,'about_role']]) {
++    assert.throws(()=>validateSelection(move(selection(),id,target),source),/material_condition_misplaced/);
++    for(const allowed of ['important_requirements','application_notes','other_details'])
++      assert.ok(validateSelection(move(selection(),id,allowed),source));
++    for(const forbidden of ['about_role','responsibilities','nice_to_have','benefits','company_overview'])
++      assert.throws(()=>validateSelection(move(selection(),id,forbidden),source),/material_condition_misplaced/);
++  }
++  // Other validators may reject before the material check; do not weaken them.
++  assert.throws(()=>validateSelection(move(selection(),9,'requirements'),source),/unsupported_requirement/);
++  assert.throws(()=>validateSelection(move(selection(),11,'responsibilities'),source),/application_condition_misplaced/);
++  for(const u of sourceUnits(source)) assert.throws(()=>validateSelection(move(selection(),u.id,null),source),/source_omitted/);
++  const q=selection();q.requirements.unshift(999);
++  assert.throws(()=>validateSelection(q,source),/invalid_source_reference/);
++  const corrupt=validateSelection(selection(),source);corrupt.requirements.push(sourceUnits(source)[29].text);
++  assert.equal(validateStored(corrupt,source),null);
++  assert.match(renderJobRead(source,corrupt,{}),/Quick Read is unavailable/);
++});
++test('43635: guidance exposes exact guard matches and preference/application precedence (local mocks)',async()=>{
++  const env={OPENAI_API_KEY:'test-only',QUICK_READ_MODEL:'mock'};
++  const payload=await generateWithProvider(env,source,async(url,init)=>{
++    const sent=JSON.parse(init.body),input=JSON.parse(sent.input);
++    assert.equal(sent.store,false);assert.equal(sent.text.format.strict,true);
++    assert.deepEqual(input.material_condition_ids,[0,3,9,29,35]);
++    assert.deepEqual(input.application_note_ids,[11]);
++    assert.deepEqual(input.source_units,sourceUnits(source));
++    assert.match(sent.instructions,/section_hint does not override this restriction/);
++    assert.match(sent.instructions,/Use other_details for keyword matches that describe ordinary duties/);
++    assert.match(sent.instructions,/Existing preference and application routing rules take precedence/);
++    return response(selection());
++  });
++  for(const [id,target] of [[9,'responsibilities'],[29,'requirements']])
++    await assert.rejects(generateWithProvider(env,source,async()=>response(move(selection(),id,target))),/material_condition_misplaced/);
++  let finish;
++  const result=await generateJob(env,'43635',{call:async(e,name,args)=>name==='claim_job_quick_read'
++    ?{status:'claimed',description:source,source_hash:await sourceFingerprint(source)}
++    :(finish=args,{status:'ready'}),generate:async()=>payload});
++  assert.equal(result.status,'ready');assert.equal(finish.p_error,null);
++  const bad=await generateJob(env,'43635',{call:async(e,name,args)=>name==='claim_job_quick_read'
++    ?{status:'claimed',description:source,source_hash:await sourceFingerprint(source)}
++    :(finish=args,{status:'failed'}),generate:async()=>generateWithProvider(env,source,async()=>response(move(selection(),29,'requirements')))});
++  assert.equal(bad.error,'material_condition_misplaced');assert.equal(finish.p_payload,null);
++});
++test('43635: synthetic material/preference/mixed/application probes remain fail closed',()=>{
++  for(const [line,allowed,error] of [['Laptop preferred.','nice_to_have','preference_upgraded'],['Laptop required; backup preferred.','other_details','preference_upgraded'],['Must supply equipment for pre-employment screening.','application_notes','application_condition_misplaced']]) {
++    const changed=source.replace('Requirements:',`Requirements:\n${line}`),u=sourceUnits(changed);
++    const id=u.find(x=>x.text===line).id,q=Object.fromEntries(SECTIONS.map(k=>[k,[]]));q.other_details=u.map(x=>x.id);
++    assert.throws(()=>validateSelection(move(q,id,'requirements'),changed),new RegExp(error));
++    assert.ok(validateSelection(move(q,id,allowed),changed));
++    if(line.includes('backup')) assert.throws(()=>validateSelection(move(q,id,'nice_to_have'),changed),/mixed_obligation/);
++  }
++});
++test('43635: presentation keeps material prose and entire Original, without mutation',()=>{
++  const payload=validateSelection(selection(),source),before=structuredClone(payload);
++  const view=presentQuickRead(payload,source,{}),visible=Object.values(view).filter(Array.isArray).flat();
++  assert.deepEqual(payload,before);
++  for(const id of [0,3,9,11,29]) assert.ok(visible.includes(sourceUnits(source)[id].text));
++  assert.ok(!visible.includes('Timezone restrictions: 8'));
++  const html=renderJobRead(source,payload,{});
++  const original=html.match(/<div class="qr-original">([\s\S]*?)<\/div>/)[1]
++    .replace(/&quot;/g,'"').replace(/&#39;/g,"'").replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&amp;/g,'&');
++  assert.equal(original,source);
++});
+diff --git a/test/fixtures/business-development-43635.txt b/test/fixtures/business-development-43635.txt
+new file mode 100644
+index 0000000..3acd21f
+--- /dev/null
++++ b/test/fixtures/business-development-43635.txt
+@@ -0,0 +1,63 @@
++About the job: Business Development Executive (Remote) | DayshiftWork Setup: Remote / Client Visits Work Schedule: PH Dayshift HC: Cagayan De Oro City - 1 Responsibilities:• Follow up on inbound marketing leads and identify qualified opportunities, providing appropriate levels of information at the right time for interested prospects.
++
++About the job: Business Development Executive (Remote) | Dayshift
++ Work Setup: Remote / Client Visits
++ Work Schedule: PH Dayshift
++ HC: Cagayan De Oro City - 1
++ Responsibilities:
++
++ Follow up on inbound marketing leads and identify qualified opportunities, providing appropriate levels of information at the right time for interested prospects.
++
++ Cold calls into prospects are generated by a variety of outside sources.
++
++ Profile strategic accounts, identify key individuals, research and obtain business requirements, and present solutions to start the sales cycle.
++
++ Schedule appointments and demos of eZee Products/Services.
++
++ Occasionally visit local properties to demonstrate our SaaS..
++
++ Ensure successful follow-through of the sales cycle by maintaining accurate activity and lead qualification information in the CRM application.
++
++ Prepare reports by collecting sales information and statistics.
++
++ Key Competencies for the Role:
++
++ Sales Expertise: Proven track record with 2+ years of experience, particularly in hospitality tech or SaaS sales, with a passion for driving revenue growth.
++
++ Customer Relationship Management: Strong ability to build and maintain relationships with clients, addressing their needs and ensuring long-term satisfaction.
++
++ Lead Generation & Conversion: Skilled in identifying qualified leads, cold calling, and converting opportunities into business growth.
++
++ Communication Skills: Professional verbal and written communication in English and regional languages, with the ability to engage and persuade prospects effectively.
++
++ CRM Proficiency: Familiarity with CRM tools to ensure accurate activity tracking and reporting.
++
++ Time Management & Multitasking: Adept at managing multiple priorities, meeting deadlines, and achieving sales targets efficiently.
++
++ Requirements:
++
++ A true passion for sales and 2+ years of sales experience. (SaaS)
++
++ Strong and professional communication skills.
++
++ Should read, write, and speak English and regional languages.
++
++ Excitement for new technology and a strong technical aptitude.
++
++ Great phone presence and the ability to engage and excite potential customers.
++
++ Hospitality experience / Hotel Tech or SaaS sales experience.
++
++ Positive and outgoing attitude—aptitude to manage numerous requests and time demands concurrently while achieving production goals from assigned territory or set of accounts.
++
++ Promotes a strong sense of urgency for reaching goals and key deliverables (time management skills).
++
++ Personal vehicle, laptop, and good internet connection
++
++ Originally posted on Himalayas
++
++Employment type: Full Time
++Seniority: Senior
++Categories: Business-Development-Executive, Business-Development-Manager, Sales-Executive, SaaS-Sales, B2B-Sales, Sales-Business-Development-Executive, Business-Development-Account-Executive, Sales-Executive-Business-Development, Business-Development-Officer, Business-Development
++Job functions: Sales
++Timezone restrictions: 8
+\ No newline at end of file

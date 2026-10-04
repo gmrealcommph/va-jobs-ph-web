@@ -99,10 +99,13 @@ const instructions = `Organize employer source units into the supplied schema. T
 export async function generateWithProvider(env, description, fetcher=fetch) {
   if ((env.QUICK_READ_PROVIDER || 'openai')!=='openai' || !env.OPENAI_API_KEY || !env.QUICK_READ_MODEL) throw new Error('provider_not_configured');
   const units=sourceUnits(description);
+  // Expose the existing conservative keyword guard to the organizer. Context
+  // hints do not override it; this adds guidance without relaxing validation.
+  const materialConditionIds=units.filter(u=>material.test(u.text)).map(u=>u.id);
   const response=await fetcher('https://api.openai.com/v1/responses',{
     method:'POST',headers:{Authorization:`Bearer ${env.OPENAI_API_KEY}`,'content-type':'application/json'},
     signal:AbortSignal.timeout(90000),body:JSON.stringify({model:env.QUICK_READ_MODEL,store:false,
-      instructions,input:JSON.stringify({source_units:units,application_note_ids:units.filter(u=>application.test(u.text)).map(u=>u.id)}),max_output_tokens:8000,
+      instructions:instructions+' material_condition_ids flag the validator\'s conservative material keyword matches, even within duties, benefits, qualifications, headings or concatenated text. For non-preferred entries, only important_requirements, application_notes or other_details are permitted; section_hint does not override this restriction. Use other_details for keyword matches that describe ordinary duties (such as scheduling appointments) or aggregator metadata, rather than turning them into candidate conditions. Preserve entire mixed/concatenated units. Existing preference and application routing rules take precedence; these IDs do not establish mandatory qualifications.',input:JSON.stringify({source_units:units,application_note_ids:units.filter(u=>application.test(u.text)).map(u=>u.id),material_condition_ids:materialConditionIds}),max_output_tokens:8000,
       text:{format:{type:'json_schema',name:'veeays_quick_read',strict:true,schema:outputSchema}}})
   });
   if(!response.ok) throw new Error(`provider_http_${response.status}`);

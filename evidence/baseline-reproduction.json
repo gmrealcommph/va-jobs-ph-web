@@ -1,10 +1,23 @@
-{
-  "selection": "local mock, not production response",
-  "unit": {
-    "id": 12,
-    "text": "Strong portfolio showcasing digital design, social media content, video editing, campaign assets, and print materials .",
-    "section_hint": "unknown",
-    "is_heading": false
+[
+  {
+    "id": 29,
+    "text": "Personal vehicle, laptop, and good internet connection",
+    "target": "requirements",
+    "error": "material_condition_misplaced",
+    "selection": "local mock, not production response"
   },
-  "error": "unsupported_requirement"
-}
+  {
+    "id": 9,
+    "text": "Schedule appointments and demos of eZee Products/Services.",
+    "target": "responsibilities",
+    "error": "material_condition_misplaced",
+    "selection": "local mock, not production response"
+  },
+  {
+    "id": 3,
+    "text": "Work Schedule: PH Dayshift",
+    "target": "about_role",
+    "error": "material_condition_misplaced",
+    "selection": "local mock, not production response"
+  }
+]
