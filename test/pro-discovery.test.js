@@ -5,7 +5,7 @@ import {emailPreferences} from '../src/email-preferences.js';
 const original=globalThis.fetch;afterEach(()=>{globalThis.fetch=original;});
 test('public Pro page makes free access and pre-payment state explicit with working auth links',()=>{
  const html=proPage();
- for(const text of ['YOUR JOB SEARCH,','ON AUTOPILOT.','₱499/month','Cancel anytime','membership is coming soon','Browsing and applying stay free.','Top 3 matches','Strong Match Alerts','Daily Job Digest'])assert.ok(html.includes(text),text);
+ for(const text of ['YOUR JOB SEARCH,','ON AUTOPILOT.','₱499/month','Cancel anytime','membership is coming soon','Every public job stays free.','Your top 3 personalized matches','Strong Match Alerts','Daily Job Digest'])assert.ok(html.includes(text),text);
  assert.match(html,/href="\/signup\?return=%2Fonboarding"/);
  assert.doesNotMatch(html,/checkout|thousands|AI|as they roll out/);
  assert.doesNotMatch(html,/current feed limit|product limit|Full ranked feed|full personalized feed|100-result|charge you|—/);
@@ -41,4 +41,20 @@ test('Free email discovery has no writable controls and keeps saved preferences 
  };
  const response=await emailPreferences(new Request('https://test/email-preferences',{headers:{cookie:'veeays_access=token'}}),{SUPABASE_URL:'https://db.test',SUPABASE_PUBLISHABLE_KEY:'sb_publishable_test'});
  const html=await response.text();assert.equal(response.status,200);assert.match(html,/Strong Match Alerts/);assert.match(html,/Daily Job Digest/);assert.match(html,/href="\/pro"/);assert.doesNotMatch(html,/role="switch"|type="submit"/);assert.equal(writes,0);
+});
+
+test('Pro comparison uses ordered accessible paper cards and preserves free access',()=>{
+ const html=proPage();
+ assert.doesNotMatch(html,/<table|pro-comparison-scroll|Not included/);
+ assert.match(html,/role="group" aria-label="Find your fit: Free and VeeAys Pro"/);
+ assert.ok(html.indexOf('id="pro-free-title"')<html.indexOf('id="pro-plus-title"'));
+ for(const copy of ['You search.','VeeAys searches<br>with you.','Free to use','Everything in Free, plus:','Every public job stays free.','Pro adds matching, alerts and convenience, not access to jobs.'])assert.ok(html.includes(copy),copy);
+});
+test('Match filter claim follows existing Pro-only controls',()=>{
+ const free=matchesPage({matches:[{job_id:1,title:'Role',match_score:92}],summary:{is_pro:false}});
+ const pro=matchesPage({matches:[{job_id:1,title:'Role',match_score:92}],summary:{is_pro:true}});
+ for(const id of ['match-salary','match-schedule','match-work']){
+  assert.ok(!free.includes('id="'+id+'"'));
+  assert.ok(pro.includes('id="'+id+'"'));
+ }
 });

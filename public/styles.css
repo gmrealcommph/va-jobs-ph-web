@@ -25,15 +25,9 @@
 .pro-marketing-plane{position:absolute;right:0;top:35px;width:210px;color:#e8eeac;transform:rotate(-8deg)}
 .pro-marketing-details{padding-top:50px;padding-bottom:60px}
 .pro-marketing-details>h2:not(:first-child){margin-top:60px}
-.pro-comparison-scroll{overflow-x:auto}
-.pro-comparison{width:100%;border-collapse:collapse;background:#fffdf3;min-width:460px;font-size:14px}
-.pro-comparison caption{text-align:left;font-weight:700;margin-bottom:14px}
-.pro-comparison th,.pro-comparison td{padding:18px;text-align:left;border-bottom:1px solid #d2dbc6}
-.pro-comparison thead{background:#123e30;color:#fffdf3}
-.pro-comparison tbody td:last-child{background:#edf2d8}
 .pro-availability-note{font-size:12px;max-width:760px}
 .ep-pro-discovery{padding:30px;border:1px solid #d2dbc6;border-radius:20px;background:#fffdf3}
-@media(max-width:800px){.pro-marketing-hero{padding:42px 0}.pro-marketing-hero .wrap{padding-right:0}.pro-marketing-plane{position:static;display:block;width:110px;height:84px;margin:12px 0}.pro-marketing-benefits{grid-template-columns:1fr;gap:12px}.pro-discovery{padding:24px;width:calc(100% - 40px)}.pro-discovery h2,.pro-marketing-details h2{font-size:29px}.pro-comparison th,.pro-comparison td{padding:12px}.header-actions{flex-wrap:wrap}}
+@media(max-width:800px){.pro-marketing-hero{padding:42px 0}.pro-marketing-hero .wrap{padding-right:0}.pro-marketing-plane{position:static;display:block;width:110px;height:84px;margin:12px 0}.pro-marketing-benefits{grid-template-columns:1fr;gap:12px}.pro-discovery{padding:24px;width:calc(100% - 40px)}.pro-discovery h2,.pro-marketing-details h2{font-size:29px}.header-actions{flex-wrap:wrap}}
 *{box-sizing:border-box}
 body{margin:0;color:var(--ink);background:var(--paper);font-family:Arial,Helvetica,sans-serif;line-height:1.6}
 a{color:inherit;text-decoration:none}
@@ -5687,4 +5681,26 @@ body>header,body>footer{flex-shrink:0}
 @keyframes pro-pages{0%,100%{transform:translateY(-3px)}40%,65%{transform:translateY(4px)}}
 @media(max-width:800px){.pro-marketing-plane{width:150px;height:auto}.pro-story{max-width:210px}.pro-flight-divider{gap:10px}.pro-flight-divider span:last-child{font-size:15px}}
 @media(prefers-reduced-motion:reduce){.pro-marketing svg *,.pro-discovery svg *{animation:none!important;transition:none!important}}
-@media(max-width:800px){.pro-comparison{min-width:0;table-layout:fixed;font-size:12px}.pro-comparison th,.pro-comparison td{padding:10px 8px;overflow-wrap:anywhere}.pro-comparison thead th:first-child{width:48%}.pro-comparison thead th:nth-child(2){width:22%}.pro-comparison thead th:last-child{width:30%}}
+
+
+/* Editorial Free / Pro board. Decorative motion inherits the SVG reduction above. */
+.pro-comparison-board{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:32px;margin:42px 8px 32px 0;align-items:start}
+.pro-plan-paper{position:relative;min-width:0;padding:36px;background:#fffdf3;border:1px solid #b7c9a5;box-shadow:4px 5px 0 #e2e5d7;color:#123e30}
+.pro-plan-paper:before{content:"";position:absolute;top:-8px;left:30px;width:58px;height:17px;background:#f2bb5266;transform:rotate(-6deg)}
+.pro-plan-plus{margin-top:-10px;border-color:#123e30;box-shadow:8px 9px 0 #d9ec89}
+.pro-plan-paper .pro-plan-label{font-size:12px;font-weight:700;letter-spacing:2px;margin:0 0 16px}
+.pro-plan-paper h3{font:400 clamp(28px,3vw,40px)/1.12 Georgia,serif;letter-spacing:-1px;margin:0 0 24px;min-height:2.24em}
+.pro-plan-paper .pro-plan-price{display:flex;flex-wrap:wrap;align-items:baseline;gap:8px 14px;margin:0 0 28px;padding-bottom:22px;border-bottom:1px solid #d2dbc6}
+.pro-plan-price strong{font-size:34px;line-height:1.2;letter-spacing:-1px}
+.pro-plan-price strong span{font-size:16px;letter-spacing:0}
+.pro-plan-price>span{font-size:14px}
+.pro-plan-paper .pro-plan-includes{font-size:14px;font-weight:700;margin:0 0 14px}
+.pro-plan-benefits{list-style:none;margin:0;padding:0}
+.pro-plan-benefits li{position:relative;padding-left:30px;margin:0 0 16px;font-size:16px;line-height:1.5;overflow-wrap:break-word}
+.pro-plan-benefits li:last-child{margin-bottom:0}
+.pro-plan-benefits li:before{content:"";position:absolute;left:2px;top:7px;width:14px;height:14px;background:#e8eeac;transform:rotate(-7deg)}
+.pro-plan-benefits li:after{content:"";position:absolute;left:6px;top:8px;width:6px;height:10px;border:solid #123e30;border-width:0 2px 2px 0;transform:rotate(38deg)}
+.pro-plan-note{position:absolute;right:18px;top:-15px;padding:6px 10px;background:#f2bb52;font-size:10px;font-weight:700;letter-spacing:.7px;transform:rotate(2deg);box-shadow:2px 2px 0 #123e3020}
+.pro-board-flight{position:absolute;right:18px;top:28px;width:105px;height:auto;color:#123e30}
+.pro-free-note{max-width:760px;border-left:3px solid #f2bb52;padding-left:16px}
+@media(max-width:800px){.pro-comparison-board{grid-template-columns:1fr;gap:36px;margin-top:36px}.pro-plan-paper{padding:28px 24px}.pro-plan-plus{margin-top:0}.pro-plan-paper h3{min-height:0;font-size:32px}.pro-plan-plus h3{padding-right:54px}.pro-board-flight{width:80px;top:40px;right:12px}.pro-plan-note{right:12px;font-size:9px}}
