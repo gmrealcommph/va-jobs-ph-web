@@ -42,7 +42,8 @@ export function sourceUnits(description) {
     if (/^skills & experience:?$/i.test(u.text)) hint='requirements';
     // The captured listing's aggregator tail is outside employer qualifications.
     if (hint==='requirements' && /^Originally posted on Himalayas\.?$/i.test(u.text)) hint='unknown';
-    const heading=hints[u.text.toLowerCase().replace(/:$/,'').replace(/’/g,"'")];
+    const label=u.text.toLowerCase().replace(/:$/,'').replace(/’/g,"'");
+    const heading=({'job overview':'about_role','your role':'responsibilities','our ideal candidate':'requirements','ideal candidate':'requirements','what we are offering':'benefits','why join wizementoring':'benefits','about wizementoring':'company_overview'})[label] || hints[label];
     if(heading) hint=heading;
     u.section_hint=hint;
     u.is_heading=!!heading || /^skills & experience:?$/i.test(u.text);

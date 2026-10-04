@@ -2,7 +2,7 @@ import { formatQuickRead } from './quick-read.js';
 import { validateStored } from './quick-read-generation.js';
 import { presentQuickRead, displayValue } from './quick-read-presentation.js';
 const escape = value => String(value).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const labels = {salary:'Salary', about_role:'About the role', responsibilities:"What you'll do", requirements:"What they're looking for", nice_to_have:'Nice to have', important_requirements:'Important requirements', benefits:'Benefits', company_overview:'About the company', application_notes:'Application notes', other_details:'Other source details'};
+const labels = {salary:'Salary', about_role:'About the role', responsibilities:"What you'll do", requirements:"What they're looking for", nice_to_have:'Nice to have', important_requirements:'Important requirements', benefits:'Benefits', company_overview:'About the company', application_notes:'Application notes', source_metadata:'Source metadata', conflicting_source_details:'Conflicting source details', other_details:'Other source details'};
 export function renderJobRead(description, stored = undefined, job = {}) {
   // Explicit null means persisted generation is unavailable/invalid: original only.
   const validated = stored === undefined ? formatQuickRead(description) : validateStored(stored, description);

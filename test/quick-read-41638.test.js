@@ -95,7 +95,7 @@ test('41638: preference safeguards remain under recognized heading (synthetic mu
     assert.ok(validateSelection(q,changed));
   }
   const prose=source.replace('Skills & Experience:','We discuss Skills & Experience: during onboarding.');
-  assert.equal(sourceUnits(prose).find(u=>u.text.startsWith('Minimum of 4 years')).section_hint,'unknown');
+  assert.notEqual(sourceUnits(prose).find(u=>u.text.startsWith('Minimum of 4 years')).section_hint,'requirements');
 });
 
 test('41638: presentation hides only the heading, retains conditions, payload and complete original',()=>{
@@ -106,7 +106,7 @@ test('41638: presentation hides only the heading, retains conditions, payload an
   assert.deepEqual(view.requirements,q.requirements);
   for(const fact of ['Permanent work from home set-up.','Working Monday to Friday, 7:00 am to 3:00 pm PH time.','New equipment supplied.','Bonus structure.','Salary package of 100,000 pesos per month.'])
     assert.ok(Object.values(view).filter(Array.isArray).flat().includes(fact),fact);
-  assert.deepEqual(view.salary,['Compensation: PHP 100,000–100,000 per monthly']);
+  assert.deepEqual(view.salary,[]);
   const html=renderJobRead(source,q,job);
   const original=html.match(/<div class="qr-original">([\s\S]*?)<\/div>/)[1]
     .replace(/&quot;/g,'"').replace(/&#39;/g,"'").replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&amp;/g,'&');

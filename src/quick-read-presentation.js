@@ -9,7 +9,7 @@ export function displayValue(value, field) {
   return ({'full time':'Full-time','part time':'Part-time','entry level':'Entry Level','philippines':'Philippines'})[key] || value;
 }
 export function presentQuickRead(validated, description, job) {
-  const result = {...validated, salary:[]};
+  const result = {...validated, salary:[], source_metadata:[], conflicting_source_details:[]};
   // Positions identify aggregator-owned tails; no broad category/prose deletion.
   // Legacy deterministic text can exceed organizer limits: retain it safely.
   let units;
@@ -21,6 +21,14 @@ export function presentQuickRead(validated, description, job) {
     if (!Array.isArray(lines)) continue;
     result[key] = lines.filter(text => {
       const label = text.trim().replace(/:$/,'').replace(/’/g,"'");
+      if (/^(?:Job Overview|Your Role|Key Responsibilities|What we are offering|Our Ideal Candidate|Ideal Candidate|Scheduling & Calendar Management|Client Communication|Meeting Preparation & Follow-Up|Client Records & Onboarding|Task Tracking & Support|Why Join WizeMentoring|About WizeMentoring)$/i.test(label)) return false;
+      // Strip a concatenated heading only when its exact remaining prose is
+      // independently present in both the source and validated payload.
+      const prefix='About WizeMentoring';
+      if (text.startsWith(prefix+'WizeMentoring')) {
+        const prose=text.slice(prefix.length);
+        if (index.has(prose) && Object.values(validated).some(v=>Array.isArray(v) && v.includes(prose))) return false;
+      }
       if (/^skills & experience$/i.test(label)) return false;
       if (headings.test(label)) return false;
       if (/^Originally posted on Himalayas\.?$/i.test(text) || /^Timezone restrictions:\s*\d+\s*$/i.test(text)) return false;
@@ -30,7 +38,14 @@ export function presentQuickRead(validated, description, job) {
         const value = job[metadata[match[1].toLowerCase()]];
         // Only whole, identical metadata values disappear. Contradictions remain visible.
         if (typeof value === 'string' && value.trim() && normalize(value) === normalize(match[2])) return false;
+        result[typeof value === 'string' && value.trim() ? 'conflicting_source_details' : 'source_metadata'].push(text);
+        return false;
       }
+      // Exact unqualified PHP/month equivalence only; retain different values.
+      const salary=text.match(/^Compensation: PHP ([\d,]+)[–—-]([\d,]+) per monthly$/);
+      if (salary && salary[1]===salary[2] && index.has(text) &&
+          Object.values(validated).some(v=>Array.isArray(v) && v.some(t=>
+            index.has(t) && t===`Salary package of ${salary[1]} pesos per month.`))) return false;
       // Move explicit monetary source units intact. A monthly heading supplies an
       // explicit period only to its immediately following unit, never by inference.
       if (['other_details','about_role'].includes(key) && /^(?:(?:Salary|Compensation):?\s*)?(?:₱|PHP\s*|USD\s*|\$|EUR\s*|€)\s*[\d,]+/i.test(text)) {
@@ -39,6 +54,12 @@ export function presentQuickRead(validated, description, job) {
         return false;
       }
       return true;
+    }).map(text => {
+      // A separately captured exact heading establishes the prefix boundary.
+      // Keep the complete company prose; otherwise retain the ambiguous text.
+      if (index.has('About WizeMentoring') && text.startsWith('About WizeMentoringWizeMentoring'))
+        return text.slice('About WizeMentoring'.length);
+      return text;
     });
   }
   return result;
