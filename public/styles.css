@@ -31,7 +31,7 @@
 .pro-comparison th,.pro-comparison td{padding:18px;text-align:left;border-bottom:1px solid #d2dbc6}
 .pro-comparison thead{background:#123e30;color:#fffdf3}
 .pro-comparison tbody td:last-child{background:#edf2d8}
-.pro-limit-note{font-size:12px;max-width:760px}
+.pro-availability-note{font-size:12px;max-width:760px}
 .ep-pro-discovery{padding:30px;border:1px solid #d2dbc6;border-radius:20px;background:#fffdf3}
 @media(max-width:800px){.pro-marketing-hero{padding:42px 0}.pro-marketing-hero .wrap{padding-right:0}.pro-marketing-plane{position:static;display:block;width:110px;height:84px;margin:12px 0}.pro-marketing-benefits{grid-template-columns:1fr;gap:12px}.pro-discovery{padding:24px;width:calc(100% - 40px)}.pro-discovery h2,.pro-marketing-details h2{font-size:29px}.pro-comparison th,.pro-comparison td{padding:12px}.header-actions{flex-wrap:wrap}}
 *{box-sizing:border-box}
@@ -5659,3 +5659,32 @@ body>header,body>footer{flex-shrink:0}
 .job-detail-page .qr-source summary:focus-visible {outline:3px solid #72952f;outline-offset:4px}
 .job-detail-page .qr-original {white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.75;margin-top:1rem}
 @media(max-width:600px) {.job-detail-page .qr-glance dl {grid-template-columns:1fr}.job-detail-page .qr-glance {padding:1rem}.job-detail-page .qr ul {padding-left:1.25rem}}
+
+/* VeeAys paper stories: bounded transforms; decorative examples stay readable at rest. */
+.pro-story{display:block;width:100%;max-width:240px;height:auto;color:#123e30;margin:0 auto 8px;overflow:hidden}
+.pro-marketing-benefits article{position:relative;box-shadow:3px 4px 0 #e8eeac}
+.pro-marketing-benefits article:before{content:"";position:absolute;top:-6px;left:24px;width:42px;height:13px;background:#f2bb5266;transform:rotate(-7deg)}
+.pro-hero-flight,.pro-alert-plane{transform-box:fill-box;transform-origin:center;animation:pro-flight 7s ease-in-out infinite}
+.pro-route{animation:pro-route 12s linear infinite}
+.pro-rank-back{animation:pro-rank-back 8s ease-in-out infinite}
+.pro-rank-mid{animation:pro-rank-mid 8s ease-in-out infinite}
+.pro-rank-front{animation:pro-rank-front 8s ease-in-out infinite}
+.pro-alert-stamp{transform-box:fill-box;transform-origin:center;animation:pro-stamp 7s ease-in-out infinite}
+.pro-sun{animation:pro-sun 9s ease-in-out infinite}
+.pro-digest-pages{animation:pro-pages 9s ease-in-out infinite}
+.pro-flight-divider{display:flex;align-items:center;gap:16px;margin:48px 0 22px;color:#66736a}
+.pro-flight-divider svg{width:clamp(60px,30vw,300px);height:36px;min-width:0}
+.pro-flight-divider span:first-child{font-size:11px;letter-spacing:2px;border:1px solid #b7c9a5;padding:4px 8px;transform:rotate(-4deg);white-space:nowrap}
+.pro-flight-divider span:last-child{font:italic 17px Georgia,serif}
+.pro-discovery-promise{border-left:3px solid #f2bb52;padding-left:14px;font-weight:700}
+@keyframes pro-flight{0%,100%{transform:translate(0,0) rotate(0)}45%{transform:translate(3px,-5px) rotate(3deg)}70%{transform:translate(-2px,2px) rotate(-2deg)}}
+@keyframes pro-route{to{stroke-dashoffset:-80}}
+@keyframes pro-rank-back{0%,100%{transform:translate(0,0)}35%,65%{transform:translate(5px,-4px)}}
+@keyframes pro-rank-mid{0%,100%{transform:translate(0,0)}35%,65%{transform:translate(2px,-2px)}}
+@keyframes pro-rank-front{0%,100%{transform:translate(0,0)}35%,65%{transform:translate(-4px,-7px)}}
+@keyframes pro-stamp{0%,45%,75%,100%{transform:scale(1)}60%{transform:scale(1.04)}}
+@keyframes pro-sun{0%,100%{transform:translateY(5px)}40%,65%{transform:translateY(-3px)}}
+@keyframes pro-pages{0%,100%{transform:translateY(-3px)}40%,65%{transform:translateY(4px)}}
+@media(max-width:800px){.pro-marketing-plane{width:150px;height:auto}.pro-story{max-width:210px}.pro-flight-divider{gap:10px}.pro-flight-divider span:last-child{font-size:15px}}
+@media(prefers-reduced-motion:reduce){.pro-marketing svg *,.pro-discovery svg *{animation:none!important;transition:none!important}}
+@media(max-width:800px){.pro-comparison{min-width:0;table-layout:fixed;font-size:12px}.pro-comparison th,.pro-comparison td{padding:10px 8px;overflow-wrap:anywhere}.pro-comparison thead th:first-child{width:48%}.pro-comparison thead th:nth-child(2){width:22%}.pro-comparison thead th:last-child{width:30%}}

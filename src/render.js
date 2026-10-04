@@ -44,7 +44,7 @@ export function layout({ title, description, canonical, body, noindex = false, u
     type="image/svg+xml"
   >
 
-  <link rel="stylesheet" href="/styles.css?v=20261004-pro-discovery">
+  <link rel="stylesheet" href="/styles.css?v=20261004-pro-stories">
 </head>
 
 <body>
@@ -1528,15 +1528,84 @@ export function matchesPage({ matches = [], preferences = null, summary = null, 
 }
 
 
-const proPlane = '<svg class="pro-marketing-plane" viewBox="0 0 210 160" aria-hidden="true"><path d="M10 140c60-10 0-65 85-55s35-40 60-45" fill="none" stroke="currentColor" stroke-width="2" stroke-dasharray="3 7"/><path d="m120 40 75-25-25 70-17-30Z" fill="#f2bb52" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="m153 55 42-40" stroke="currentColor" stroke-width="2"/></svg>';
-const proBenefits = () => '<div class="pro-marketing-benefits"><article><span aria-hidden="true">◎</span><h3>Your full personalized feed</h3><p>See eligible matches ranked around your preferences, within the current feed limit.</p></article><article><span aria-hidden="true">↗</span><h3>Strong Match Alerts</h3><p>Get an email when an especially strong match appears.</p></article><article><span aria-hidden="true">☀</span><h3>Daily Job Digest</h3><p>Your best new matches, gathered into one daily email.</p></article></div>';
+// Decorative examples, never live match data. Shared by homepage and Pro discovery.
+const proPlane = `<svg class="pro-marketing-plane" viewBox="0 0 210 160" aria-hidden="true" focusable="false">
+  <path class="pro-route" d="M10 140c60-10 0-65 85-55s35-40 60-45" fill="none" stroke="currentColor" stroke-width="2" stroke-dasharray="3 7"/>
+  <g class="pro-hero-flight">
+  <path d="m120 40 75-25-25 70-17-30Z" fill="#f2bb52" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+  <path d="m153 55 42-40" stroke="currentColor" stroke-width="2"/>
+  </g>
+  <g transform="rotate(-6 65 123)">
+  <rect x="22" y="111" width="86" height="24" rx="3" fill="#e8eeac"/>
+  <text x="65" y="127" text-anchor="middle" fill="#123e30" font-size="10" font-weight="700">96% MATCH</text>
+  </g>
+  </svg>`;
+const proBenefits = () => `<div class="pro-marketing-benefits">
+  <article>
+  <svg class="pro-story" viewBox="0 0 240 140" aria-hidden="true" focusable="false">
+  <g class="pro-rank-back">
+  <rect x="70" y="22" width="142" height="66" rx="4" fill="#fffdf3" stroke="currentColor" stroke-width="1.5"/>
+  <path d="M82 40h45m-45 10h70" stroke="#b7c9a5" stroke-width="3" stroke-linecap="round"/>
+  <text x="183" y="35" fill="currentColor" font-size="12" font-weight="700">72%</text>
+  </g>
+  <g class="pro-rank-mid">
+  <rect x="52" y="39" width="142" height="66" rx="4" fill="#fffdf3" stroke="currentColor" stroke-width="1.5"/>
+  <path d="M64 57h45m-45 10h70" stroke="#b7c9a5" stroke-width="3" stroke-linecap="round"/>
+  <text x="165" y="52" fill="currentColor" font-size="12" font-weight="700">86%</text>
+  </g>
+  <g class="pro-rank-front">
+  <rect x="34" y="56" width="142" height="66" rx="4" fill="#fffdf3" stroke="currentColor" stroke-width="1.5"/>
+  <path d="M46 74h45m-45 10h70" stroke="#b7c9a5" stroke-width="3" stroke-linecap="round"/>
+  <text x="46" y="108" fill="currentColor" font-size="12" font-weight="700">96% MATCH</text>
+  </g>
+  <path d="m38 50 28-8-3 13-25-5Z" fill="#f2bb52" opacity=".8"/>
+  </svg>
+  <h3>Your personalized job feed</h3>
+  <p>See your best opportunities ranked around your preferences.</p>
+  </article>
+  <article>
+  <svg class="pro-story" viewBox="0 0 240 140" aria-hidden="true" focusable="false">
+  <path class="pro-route" d="M18 95c35 12 34-38 73-38" fill="none" stroke="currentColor" stroke-dasharray="2 6"/>
+  <g class="pro-alert-plane">
+  <path d="m26 41 52-19-17 46-12-17-23-10Z" fill="#f2bb52" stroke="currentColor" stroke-width="1.5"/>
+  <path d="m49 51 29-29" stroke="currentColor" stroke-width="1.5"/>
+  </g>
+  <rect x="99" y="52" width="108" height="65" rx="4" fill="#fffdf3" stroke="currentColor" stroke-width="1.5"/>
+  <path d="m100 54 53 36 53-36" fill="none" stroke="currentColor" stroke-width="1.5"/>
+  <g class="pro-alert-stamp">
+  <rect x="125" y="26" width="94" height="26" rx="3" fill="#e8eeac" stroke="currentColor"/>
+  <text x="172" y="43" text-anchor="middle" font-size="11" font-weight="700">NEW MATCH</text>
+  </g>
+  </svg>
+  <h3>Strong Match Alerts</h3>
+  <p>Get an email when an especially strong match appears.</p>
+  </article>
+  <article>
+  <svg class="pro-story" viewBox="0 0 240 140" aria-hidden="true" focusable="false">
+  <path d="M25 63h190" stroke="#b7c9a5" stroke-width="1.5"/>
+  <g class="pro-sun">
+  <circle cx="120" cy="45" r="21" fill="#f2bb52"/>
+  <path d="M120 12V5m-31 18-5-5m67 5 5-5M87 44h-8m74 0h8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+  </g>
+  <g class="pro-digest-pages">
+  <rect x="76" y="54" width="80" height="47" rx="3" fill="#edf2d8" stroke="currentColor" transform="rotate(-8 116 77)"/>
+  <rect x="87" y="51" width="80" height="47" rx="3" fill="#fffdf3" stroke="currentColor" transform="rotate(6 127 74)"/>
+  <path d="M102 64h45m-45 9h34" stroke="#b7c9a5" stroke-width="3"/>
+  </g>
+  <path d="M58 78h124v48H58Z" fill="#fffdf3" stroke="currentColor" stroke-width="1.5"/>
+  <path d="m58 78 62 31 62-31" fill="#e8eeac" stroke="currentColor" stroke-width="1.5"/>
+  </svg>
+  <h3>Daily Job Digest</h3>
+  <p>Your best new matches, gathered into one daily email.</p>
+  </article>
+  </div>`;
 export function proDiscovery() {
-  return '<section class="wrap pro-discovery" aria-labelledby="pro-discovery-title"><div class="kicker">VEEAYS PRO</div><h2 id="pro-discovery-title">Stop searching.<br><em>Let the right jobs find you.</em></h2>'+proBenefits()+'<div class="pro-discovery-action"><a class="button" href="/pro">Explore VeeAys Pro →</a><p><strong>₱499/month</strong> · Cancel anytime</p></div><p>All the jobs are free. Pro helps you find the right ones faster.</p></section>';
+  return '<section class="wrap pro-discovery" aria-labelledby="pro-discovery-title"><div class="kicker">VEEAYS PRO</div><h2 id="pro-discovery-title">Stop searching.<br><em>Let the right jobs find you.</em></h2>'+proBenefits()+'<div class="pro-discovery-action"><a class="button" href="/pro">Explore VeeAys Pro →</a><p><strong>₱499/month</strong> · Cancel anytime</p></div><p class="pro-discovery-promise">All the jobs are free. Pro helps you find the right ones faster.</p></section>';
 }
 export function proPage({ isPro = false, user = null, profile = null } = {}) {
-  const action = isPro ? '<a class="button" href="/matches">View my Pro matches →</a><p>Your account already has Pro access.</p>' : user ? '<a class="button" href="'+(profile?.onboarding_completed ? '/matches' : '/onboarding')+'">'+(profile?.onboarding_completed ? 'See my free matches →' : 'Set my job preferences →')+'</a>' : '<a class="button" href="/signup?return=%2Fonboarding">Start with free matches →</a><p>Already a member? <a href="/login?return=%2Fpro">Log in</a></p>';
-  const rows = [['Browse and apply to all public jobs','Included','Included'],['Search and categories','Included','Included'],['Save jobs and track applications','Included','Included'],['Personalized matches','Top 3 matches','Full ranked feed*'],['Salary, schedule and work type match filters','—','Included'],['Strong Match Alerts','—','Included'],['Daily Job Digest','—','Included']];
-  return '<div class="pro-marketing"><section class="pro-marketing-hero"><div class="wrap"><div class="kicker">VEEAYS PRO</div><h1>YOUR JOB SEARCH,<br><em>ON AUTOPILOT.</em></h1><p class="pro-marketing-intro">Stop searching. Let the right jobs find you.</p><p>VeeAys Pro watches opportunities and surfaces the ones that fit your preferences, so you can spend more time making your next move.</p>'+proPlane+'<p class="pro-marketing-price"><strong>₱499/month</strong> · Cancel anytime</p>'+action+(!isPro ? '<p class="pro-launch-note">Pro membership signup is coming soon. Start free today. Creating an account does not activate Pro or charge you.</p>' : '')+'</div></section><section class="wrap pro-marketing-details"><h2>A little less searching.<br><em>A little more possibility.</em></h2>'+proBenefits()+'<p>Pro members can sort and filter their match feed by salary, schedule, work type and 90%+ scores. Email preferences stay in your control.</p><h2>All the jobs are free.<br><em>Pro helps you find the right ones faster.</em></h2><div class="pro-comparison-scroll"><table class="pro-comparison"><caption>Find your fit: Free and VeeAys Pro</caption><thead><tr><th scope="col">What you get</th><th scope="col">Free</th><th scope="col">VeeAys Pro<br>₱499/month</th></tr></thead><tbody>'+rows.map(([feature,free,pro])=>'<tr><th scope="row">'+feature+'</th><td>'+free+'</td><td>'+pro+'</td></tr>').join('')+'</tbody></table></div><p class="pro-limit-note">*The full feed includes eligible matches up to the current product limit. Match availability depends on your preferences and available job information. Alerts and digests require active Pro access and enabled email preferences.</p><p class="pro-free-note"><strong>Browsing and applying stay free.</strong> Pro adds matching convenience, not access to jobs.</p></section></div>';
+  const action = isPro ? '<a class="button" href="/matches">View my Pro matches →</a><p>Your account already has Pro access.</p>' : user ? '<a class="button" href="'+(profile?.onboarding_completed ? '/matches' : '/onboarding')+'">Try your free matches →</a>' : '<a class="button" href="/signup?return=%2Fonboarding">Try your free matches →</a><p>Already a member? <a href="/login?return=%2Fpro">Log in</a></p>';
+  const rows = [['Browse and apply to all public jobs','Included','Included'],['Search and categories','Included','Included'],['Save jobs and track applications','Included','Included'],['Personalized matches','Top 3 matches','Your personalized job feed'],['Salary, schedule and work type match filters','Not included','Included'],['Strong Match Alerts','Not included','Included'],['Daily Job Digest','Not included','Included']];
+  return '<div class="pro-marketing"><section class="pro-marketing-hero"><div class="wrap"><div class="kicker">VEEAYS PRO</div><h1>YOUR JOB SEARCH,<br><em>ON AUTOPILOT.</em></h1><p class="pro-marketing-intro">Stop searching. Let the right jobs find you.</p><p>VeeAys Pro watches new opportunities for you, ranks the ones that fit your preferences, and lets you know when a great match appears.</p>'+proPlane+'<p class="pro-marketing-price"><strong>₱499/month</strong> · Cancel anytime</p>'+action+(!isPro ? '<p class="pro-launch-note">Pro membership is coming soon. Start free and we&#39;ll let you know when upgrades open.</p>' : '')+'</div></section><section class="wrap pro-marketing-details"><h2>A little less searching.<br><em>A little more possibility.</em></h2>'+proBenefits()+'<p>Pro members can sort and filter their match feed by salary, schedule, work type and 90%+ scores. Email preferences stay in your control.</p><div class="pro-flight-divider" aria-hidden="true"><span>PH → WORLD</span><svg viewBox="0 0 300 36" focusable="false"><path d="M2 25c50-36 62 26 126 0s78-20 151-9" fill="none" stroke="currentColor" stroke-dasharray="2 6"/><path d="m275 8 21 7-20 9 4-9Z" fill="#f2bb52" stroke="currentColor"/></svg><span>Your next move</span></div><h2>All the jobs are free.<br><em>Pro helps you find the right ones faster.</em></h2><div class="pro-comparison-scroll"><table class="pro-comparison"><caption>Find your fit: Free and VeeAys Pro</caption><thead><tr><th scope="col">What you get</th><th scope="col">Free</th><th scope="col">VeeAys Pro<br>₱499/month</th></tr></thead><tbody>'+rows.map(([feature,free,pro])=>'<tr><th scope="row">'+feature+'</th><td>'+free+'</td><td>'+pro+'</td></tr>').join('')+'</tbody></table></div><p class="pro-availability-note">Matches depend on your preferences and available job information. Alerts and digests require active Pro access and enabled email preferences.</p><p class="pro-free-note"><strong>Browsing and applying stay free.</strong> Pro adds matching convenience, not access to jobs.</p></section></div>';
 }
 
 

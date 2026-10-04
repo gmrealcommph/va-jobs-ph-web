@@ -5,12 +5,15 @@ import {emailPreferences} from '../src/email-preferences.js';
 const original=globalThis.fetch;afterEach(()=>{globalThis.fetch=original;});
 test('public Pro page makes free access and pre-payment state explicit with working auth links',()=>{
  const html=proPage();
- for(const text of ['YOUR JOB SEARCH,','ON AUTOPILOT.','₱499/month','Cancel anytime','membership signup is coming soon','Browsing and applying stay free.','Top 3 matches','Strong Match Alerts','Daily Job Digest'])assert.ok(html.includes(text),text);
+ for(const text of ['YOUR JOB SEARCH,','ON AUTOPILOT.','₱499/month','Cancel anytime','membership is coming soon','Browsing and applying stay free.','Top 3 matches','Strong Match Alerts','Daily Job Digest'])assert.ok(html.includes(text),text);
  assert.match(html,/href="\/signup\?return=%2Fonboarding"/);
  assert.doesNotMatch(html,/checkout|thousands|AI|as they roll out/);
+ assert.doesNotMatch(html,/current feed limit|product limit|Full ranked feed|full personalized feed|100-result|charge you|—/);
+ assert.match(html,/Try your free matches →/);
+ assert.match(html,/Your personalized job feed/);
  assert.match(proPage({user:{id:'u'},profile:{onboarding_completed:false}}),/href="\/onboarding"/);
  assert.match(proPage({user:{id:'u'},profile:{onboarding_completed:true}}),/href="\/matches"/);
- assert.doesNotMatch(proPage({isPro:true}),/membership signup is coming soon/);
+ assert.doesNotMatch(proPage({isPro:true}),/membership is coming soon/);
 });
 test('navigation distinguishes Free and active Pro without changing plan',()=>{
  const props={title:'Test',body:'',canonical:'https://test',user:{id:'u'}};
