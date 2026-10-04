@@ -29,7 +29,7 @@ test('compact feed keeps score, confidence, all explanations, metadata and exact
 });
 test('free, empty, error and unknown-factor states retain existing entitlement and fallback behavior',()=>{
   const free=matchesPage({matches:[job],preferences,summary:{is_pro:false,total_matches:100,locked_matches:97}});
-  assert.match(free,/Unlock 97 more matches/);assert.doesNotMatch(free,/id="match-sort"|match-filters\.js/);
+  assert.match(free,/97 more matches found/);assert.doesNotMatch(free,/id="match-sort"|match-filters\.js/);
   assert.match(matchesPage(),/No matches yet/);
   const error=matchesPage({error:'<error>',summary:{is_pro:true}});assert.match(error,/&lt;error&gt;/);assert.doesNotMatch(error,/No matches yet|match-filters\.js/);
   const sparse=matchesPage({matches:[{job_id:9,match_score:50,available_dimensions:0}],summary:{is_pro:true}});

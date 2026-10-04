@@ -609,7 +609,7 @@ if (
 
     if (url.pathname === '/pro') {
       const isPro = currentProfile?.plan === 'pro' && currentProfile?.plan_status === 'active';
-      return render('VeeAys Pro', proPage({ isPro }), { noindex: false });
+      return render('VeeAys Pro', proPage({ isPro, user: authState.user, profile: currentProfile }), { noindex: false });
     }
 
     if (url.pathname === '/my-jobs') {

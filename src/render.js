@@ -44,7 +44,7 @@ export function layout({ title, description, canonical, body, noindex = false, u
     type="image/svg+xml"
   >
 
-  <link rel="stylesheet" href="/styles.css?v=20261003-savedjobs2">
+  <link rel="stylesheet" href="/styles.css?v=20261004-pro-discovery">
 </head>
 
 <body>
@@ -72,6 +72,7 @@ export function layout({ title, description, canonical, body, noindex = false, u
     </a>
 
     <nav aria-label="Main navigation">
+      <a href="/pro">VeeAys Pro</a>
 
       <a href="/">
         Find a job
@@ -91,6 +92,7 @@ export function layout({ title, description, canonical, body, noindex = false, u
 
       ${user ? `
         <span class="auth-user">${firstName ? `Hi, ${esc(firstName)}! 👋` : 'Hi! 👋'}</span>
+        ${profile?.plan === 'pro' && profile?.plan_status === 'active' ? '<span class="pro-nav-status">PRO</span>' : '<a class="pro-nav-pill" href="/pro">Upgrade to Pro</a>'}
         <a class="auth-link" href="/matches">My matches</a>
         <a class="auth-link" href="/my-jobs">My jobs</a>
         <a class="auth-link" href="/onboarding">My account</a>
@@ -194,6 +196,7 @@ export function layout({ title, description, canonical, body, noindex = false, u
       <div class="footer-column">
 
         <h2>VeeAys</h2>
+        <a href="/pro">VeeAys Pro</a>
 
         <a href="/about">
           About
@@ -674,6 +677,8 @@ export function listing({ rows, total, page, search, category, names, showPrefer
     </div>
 
   </section>
+
+  ${!category && !browseOnly ? proDiscovery() : ''}
 
   ${
     category
@@ -1467,21 +1472,21 @@ export function matchesPage({ matches = [], preferences = null, summary = null, 
       </article>`;
   }).join('');
 
-  const freeUpgrade = !isPro && !error && totalMatches > 3 ? `
+  const freeUpgrade = !isPro && !error && lockedMatches > 0 ? `
     <section class="pro-unlock-card">
       <div class="pro-unlock-icon" aria-hidden="true">✈</div>
       <div class="pro-unlock-copy">
         <div class="kicker">VEEAYS PRO</div>
-        <h2>${lockedMatches > 0 ? `Unlock ${esc(lockedMatches)} more match${lockedMatches === 1 ? '' : 'es'}.` : 'Unlock your full match feed.'}</h2>
+        <h2>${lockedMatches > 0 ? `${esc(lockedMatches)} more match${lockedMatches === 1 ? '' : 'es'} found.` : 'Unlock your full match feed.'}</h2>
         <p>Stop digging through every listing. Pro unlocks your full personalized feed and helps the strongest opportunities find you.</p>
         <div class="pro-benefits">
-          <span>✓ All ranked matches</span><span>✓ Full match explanations</span><span>✓ Advanced match filters</span><span>✓ Alerts &amp; digest coming soon</span>
+          <span>✓ Full ranked feed</span><span>✓ Match filters</span><span>✓ Strong Match Alerts</span><span>✓ Daily Job Digest</span>
         </div>
       </div>
       <div class="pro-unlock-action">
         <div class="pro-price"><strong>₱499</strong><span>/ month</span></div>
-        <a class="button pro-button" href="/pro">Unlock VeeAys Pro</a>
-        <small>Cancel anytime.</small>
+        <a class="button pro-button" href="/pro">Explore VeeAys Pro</a>
+        <small>Cancel anytime. Membership signup coming soon.<br>Browsing and applying stay free.</small>
       </div>
     </section>` : '';
 
@@ -1523,31 +1528,15 @@ export function matchesPage({ matches = [], preferences = null, summary = null, 
 }
 
 
-export function proPage({ isPro = false } = {}) {
-  return `
-    <section class="wrap pro-page">
-      <div class="kicker">VEEAYS PRO</div>
-      <h1>Less searching.<br><em>Better matches.</em></h1>
-      <p class="pro-page-intro">VeeAys Pro turns your preferences into a personalized job feed, so the strongest remote opportunities rise to the top.</p>
-      <div class="pro-pricing-card">
-        <div>
-          <span class="pro-plan-label">VeeAys Pro</span>
-          <div class="pro-page-price"><strong>₱499</strong><span>/ month</span></div>
-          <p>Built for Filipino professionals who want to spend less time searching and more time applying to the right roles.</p>
-        </div>
-        <div class="pro-page-benefits">
-          <span>✓ Unlock your full ranked match feed</span>
-          <span>✓ See why each opportunity fits you</span>
-          <span>✓ Get strong-match alerts</span>
-          <span>✓ Receive a personalized job digest</span>
-          <span>✓ Advanced match filters as they roll out</span>
-        </div>
-        <div class="pro-page-action">
-          ${isPro ? '<a class="button" href="/matches">View my Pro matches</a><small>Your account already has Pro access.</small>' : '<span class="button pro-coming-soon" aria-disabled="true">Upgrade checkout coming next</span><small>₱499/month · Cancel anytime.</small>'}
-        </div>
-      </div>
-      <p class="pro-free-note"><strong>Jobs stay free to browse.</strong> Pro is the personalized layer that finds and ranks the best opportunities for you.</p>
-    </section>`;
+const proPlane = '<svg class="pro-marketing-plane" viewBox="0 0 210 160" aria-hidden="true"><path d="M10 140c60-10 0-65 85-55s35-40 60-45" fill="none" stroke="currentColor" stroke-width="2" stroke-dasharray="3 7"/><path d="m120 40 75-25-25 70-17-30Z" fill="#f2bb52" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="m153 55 42-40" stroke="currentColor" stroke-width="2"/></svg>';
+const proBenefits = () => '<div class="pro-marketing-benefits"><article><span aria-hidden="true">◎</span><h3>Your full personalized feed</h3><p>See eligible matches ranked around your preferences, within the current feed limit.</p></article><article><span aria-hidden="true">↗</span><h3>Strong Match Alerts</h3><p>Get an email when an especially strong match appears.</p></article><article><span aria-hidden="true">☀</span><h3>Daily Job Digest</h3><p>Your best new matches, gathered into one daily email.</p></article></div>';
+export function proDiscovery() {
+  return '<section class="wrap pro-discovery" aria-labelledby="pro-discovery-title"><div class="kicker">VEEAYS PRO</div><h2 id="pro-discovery-title">Stop searching.<br><em>Let the right jobs find you.</em></h2>'+proBenefits()+'<div class="pro-discovery-action"><a class="button" href="/pro">Explore VeeAys Pro →</a><p><strong>₱499/month</strong> · Cancel anytime</p></div><p>All the jobs are free. Pro helps you find the right ones faster.</p></section>';
+}
+export function proPage({ isPro = false, user = null, profile = null } = {}) {
+  const action = isPro ? '<a class="button" href="/matches">View my Pro matches →</a><p>Your account already has Pro access.</p>' : user ? '<a class="button" href="'+(profile?.onboarding_completed ? '/matches' : '/onboarding')+'">'+(profile?.onboarding_completed ? 'See my free matches →' : 'Set my job preferences →')+'</a>' : '<a class="button" href="/signup?return=%2Fonboarding">Start with free matches →</a><p>Already a member? <a href="/login?return=%2Fpro">Log in</a></p>';
+  const rows = [['Browse and apply to all public jobs','Included','Included'],['Search and categories','Included','Included'],['Save jobs and track applications','Included','Included'],['Personalized matches','Top 3 matches','Full ranked feed*'],['Salary, schedule and work type match filters','—','Included'],['Strong Match Alerts','—','Included'],['Daily Job Digest','—','Included']];
+  return '<div class="pro-marketing"><section class="pro-marketing-hero"><div class="wrap"><div class="kicker">VEEAYS PRO</div><h1>YOUR JOB SEARCH,<br><em>ON AUTOPILOT.</em></h1><p class="pro-marketing-intro">Stop searching. Let the right jobs find you.</p><p>VeeAys Pro watches opportunities and surfaces the ones that fit your preferences, so you can spend more time making your next move.</p>'+proPlane+'<p class="pro-marketing-price"><strong>₱499/month</strong> · Cancel anytime</p>'+action+(!isPro ? '<p class="pro-launch-note">Pro membership signup is coming soon. Start free today. Creating an account does not activate Pro or charge you.</p>' : '')+'</div></section><section class="wrap pro-marketing-details"><h2>A little less searching.<br><em>A little more possibility.</em></h2>'+proBenefits()+'<p>Pro members can sort and filter their match feed by salary, schedule, work type and 90%+ scores. Email preferences stay in your control.</p><h2>All the jobs are free.<br><em>Pro helps you find the right ones faster.</em></h2><div class="pro-comparison-scroll"><table class="pro-comparison"><caption>Find your fit: Free and VeeAys Pro</caption><thead><tr><th scope="col">What you get</th><th scope="col">Free</th><th scope="col">VeeAys Pro<br>₱499/month</th></tr></thead><tbody>'+rows.map(([feature,free,pro])=>'<tr><th scope="row">'+feature+'</th><td>'+free+'</td><td>'+pro+'</td></tr>').join('')+'</tbody></table></div><p class="pro-limit-note">*The full feed includes eligible matches up to the current product limit. Match availability depends on your preferences and available job information. Alerts and digests require active Pro access and enabled email preferences.</p><p class="pro-free-note"><strong>Browsing and applying stay free.</strong> Pro adds matching convenience, not access to jobs.</p></section></div>';
 }
 
 

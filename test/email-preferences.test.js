@@ -12,6 +12,7 @@ function mock(options={}) {
     const url=new URL(input);assert.equal(init.headers.apikey,env.SUPABASE_PUBLISHABLE_KEY);
     assert.equal(init.headers.Authorization,'Bearer user_access');
     if(url.pathname==='/auth/v1/user')return new Response(JSON.stringify({id:uid,email:'alex@example.com'}));
+    if(url.pathname==='/rest/v1/profiles')return new Response(JSON.stringify([{plan:options.free ? 'free' : 'pro',plan_status:'active'}]));
     assert.equal(url.pathname,'/rest/v1/job_preferences');assert.equal(url.searchParams.get('user_id'),'eq.'+uid);
     if(init.method==='PATCH'){
       const payload=JSON.parse(init.body);writes.push(payload);
