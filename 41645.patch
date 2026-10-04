@@ -1,0 +1,237 @@
+diff --git a/src/quick-read-generation.js b/src/quick-read-generation.js
+index 88e3fe8..cea895a 100644
+--- a/src/quick-read-generation.js
++++ b/src/quick-read-generation.js
+@@ -43,7 +43,9 @@ export function sourceUnits(description) {
+     // The captured listing's aggregator tail is outside employer qualifications.
+     if (hint==='requirements' && /^Originally posted on Himalayas\.?$/i.test(u.text)) hint='unknown';
+     const label=u.text.toLowerCase().replace(/:$/,'').replace(/’/g,"'");
+-    const heading=({'job overview':'about_role','your role':'responsibilities','our ideal candidate':'requirements','ideal candidate':'requirements','what we are offering':'benefits','why join wizementoring':'benefits','about wizementoring':'company_overview'})[label] || hints[label];
++    // Exact captured 41645 headings; the duties boundary is necessary to end
++    // qualification context. Do not match generic "have what it takes" prose.
++    const heading=({'have what it takes to be our graphic designer / video editor?':'requirements','day in the life of a graphic designer / video editor':'responsibilities','job overview':'about_role','your role':'responsibilities','our ideal candidate':'requirements','ideal candidate':'requirements','what we are offering':'benefits','why join wizementoring':'benefits','about wizementoring':'company_overview'})[label] || hints[label];
+     if(heading) hint=heading;
+     u.section_hint=hint;
+     u.is_heading=!!heading || /^skills & experience:?$/i.test(u.text);
+diff --git a/src/quick-read-presentation.js b/src/quick-read-presentation.js
+index f8b6255..2bcbd65 100644
+--- a/src/quick-read-presentation.js
++++ b/src/quick-read-presentation.js
+@@ -21,6 +21,7 @@ export function presentQuickRead(validated, description, job) {
+     if (!Array.isArray(lines)) continue;
+     result[key] = lines.filter(text => {
+       const label = text.trim().replace(/:$/,'').replace(/’/g,"'");
++      if (/^(?:HAVE WHAT IT TAKES TO BE OUR GRAPHIC DESIGNER \/ VIDEO EDITOR\?|DAY IN THE LIFE OF A GRAPHIC DESIGNER \/ VIDEO EDITOR)$/i.test(label)) return false;
+       if (/^(?:Job Overview|Your Role|Key Responsibilities|What we are offering|Our Ideal Candidate|Ideal Candidate|Scheduling & Calendar Management|Client Communication|Meeting Preparation & Follow-Up|Client Records & Onboarding|Task Tracking & Support|Why Join WizeMentoring|About WizeMentoring)$/i.test(label)) return false;
+       // Strip a concatenated heading only when its exact remaining prose is
+       // independently present in both the source and validated payload.
+diff --git a/test/quick-read-41645.test.js b/test/quick-read-41645.test.js
+new file mode 100644
+index 0000000..87856bd
+--- /dev/null
++++ b/test/quick-read-41645.test.js
+@@ -0,0 +1,86 @@
++import test from 'node:test';
++import assert from 'node:assert/strict';
++import {readFileSync} from 'node:fs';
++import {createHash} from 'node:crypto';
++import {sourceUnits,SECTIONS,validateSelection,validateStored,generateWithProvider} from '../src/quick-read-generation.js';
++import {presentQuickRead} from '../src/quick-read-presentation.js';
++import {renderJobRead} from '../src/job-detail-read.js';
++
++// Genuine public Original description capture from https://veeays.com/jobs/41645,
++// 2026-10-04 Asia/Manila. HTML entities decoded; not a production DB hash or
++// recovered failed response. Every selection below is a local mock.
++const source=readFileSync(new URL('./fixtures/video-editor-designer-41645.txt',import.meta.url),'utf8');
++const start='HAVE WHAT IT TAKES TO BE OUR GRAPHIC DESIGNER / VIDEO EDITOR?';
++const end='DAY IN THE LIFE OF A GRAPHIC DESIGNER / VIDEO EDITOR';
++function selection(description=source) {
++  const q=Object.fromEntries(SECTIONS.map(k=>[k,[]]));
++  for(const u of sourceUnits(description)) {
++    const key=u.id>=12 && u.id<=21?'requirements':u.id===11?'nice_to_have':
++      u.id>=54 && u.id<=56?'application_notes':u.id===7 || u.id===9?'important_requirements':
++      u.id>=3 && u.id<=6?'benefits':u.id>=23 && u.id<=49?'responsibilities':'other_details';
++    q[key].push(u.id);
++  }
++  return q;
++}
++function move(q,id,key) {
++  for(const k of SECTIONS) q[k]=q[k].filter(n=>n!==id);
++  if(key) q[key].push(id);
++  return q;
++}
++test('41645: exact headings support ten qualifications and end before duties',()=>{
++  const units=sourceUnits(source);
++  assert.equal(createHash('sha256').update(source).digest('hex'),'24b0bb39e8b87e87fe5365a07adc328b5d4a03f55968aed3a797cd6457b198b8');
++  assert.equal(units.length,63);
++  assert.equal(units[10].text,start);assert.equal(units[22].text,end);
++  assert.ok(units[10].is_heading);assert.ok(units[22].is_heading);
++  for(const u of units.slice(11,22)) assert.equal(u.section_hint,'requirements');
++  for(const u of units.slice(23)) assert.notEqual(u.section_hint,'requirements');
++  const payload=validateSelection(selection(),source);
++  assert.deepEqual(payload.requirements,units.slice(12,22).map(u=>u.text));
++  assert.deepEqual(payload.nice_to_have,[units[11].text]);
++  assert.deepEqual(validateStored(payload,source),payload);
++  // Reproduce the genuine qualification failure when the captured heading is
++  // unknown (synthetic heading mutation, preserving genuine qualification text).
++  const unknown=source.replace(start,`We discuss ${start} during onboarding.`);
++  assert.equal(sourceUnits(unknown)[12].section_hint,'unknown');
++  assert.throws(()=>validateSelection(selection(unknown),unknown),/unsupported_requirement/);
++});
++test('41645: genuine duties, benefits, preferences, application and metadata cannot upgrade',()=>{
++  for(const id of [0,1,2,3,4,5,6,8,...Array.from({length:27},(_,n)=>23+n),50,51,52,53,57,58,59,60,61]) {
++    assert.throws(()=>validateSelection(move(selection(),id,'requirements'),source),/unsupported_requirement/);
++  }
++  assert.throws(()=>validateSelection(move(selection(),11,'requirements'),source),/preference_upgraded/);
++  for(const id of [7,9,54,55,56,62])
++    assert.throws(()=>validateSelection(move(selection(),id,'requirements'),source),/unsupported_requirement|material_condition_misplaced|application_condition_misplaced/);
++  for(const u of sourceUnits(source)) assert.throws(()=>validateSelection(move(selection(),u.id,null),source),/source_omitted/);
++  const invalid=selection();invalid.requirements.unshift(999);
++  assert.throws(()=>validateSelection(invalid,source),/invalid_source_reference/);
++  const corrupt=validateSelection(selection(),source);corrupt.requirements.push('Invented qualification');
++  assert.equal(validateStored(corrupt,source),null);
++  assert.match(renderJobRead(source,corrupt,{}),/Quick Read is unavailable/);
++});
++test('41645: synthetic preference, mixed obligation and application probes stay fail closed',()=>{
++  for(const [line,error] of [['Adobe certification preferred.','preference_upgraded'],['Adobe required; Canva preferred.','preference_upgraded'],['Incomplete application answers are auto-rejected.','application_condition_misplaced']]) {
++    const changed=source.replace(start,`${start}\n${line}`);
++    const units=sourceUnits(changed),id=units.find(u=>u.text===line).id;
++    const q=Object.fromEntries(SECTIONS.map(k=>[k,[]]));q.other_details=units.map(u=>u.id);
++    assert.throws(()=>validateSelection(move(q,id,'requirements'),changed),new RegExp(error));
++    if(line.includes('required')) assert.throws(()=>validateSelection(move(q,id,'nice_to_have'),changed),/mixed_obligation/);
++    assert.ok(validateSelection(move(q,id,line.includes('application')?'application_notes':line.includes('required')?'other_details':'nice_to_have'),changed));
++  }
++});
++test('41645: mocked provider receives hints; presentation retains substantive source and original',async()=>{
++  const payload=await generateWithProvider({OPENAI_API_KEY:'test-only',QUICK_READ_MODEL:'mock'},source,async(url,init)=>{
++    const sent=JSON.parse(init.body);assert.equal(sent.store,false);
++    assert.equal(JSON.parse(sent.input).source_units[12].section_hint,'requirements');
++    return Response.json({status:'completed',output:[{content:[{type:'output_text',text:JSON.stringify(selection())}]}]});
++  });
++  const before=structuredClone(payload),view=presentQuickRead(payload,source,{});
++  assert.deepEqual(payload,before);assert.deepEqual(view.requirements,payload.requirements);
++  const visible=Object.values(view).filter(Array.isArray).flat();
++  assert.ok(!visible.includes(start));assert.ok(!visible.includes(end));
++  for(const id of [7,9,11,24,49,54,55,56]) assert.ok(visible.includes(sourceUnits(source)[id].text));
++  const html=renderJobRead(source,payload,{});
++  assert.ok(html.includes('8:00 PM to 5:00 AM (PH Time)'));
++  assert.ok(html.includes('HAVE WHAT IT TAKES TO BE OUR GRAPHIC DESIGNER / VIDEO EDITOR?'));
++});
+diff --git a/test/fixtures/video-editor-designer-41645.txt b/test/fixtures/video-editor-designer-41645.txt
+new file mode 100644
+index 0000000..d65dec3
+--- /dev/null
++++ b/test/fixtures/video-editor-designer-41645.txt
+@@ -0,0 +1,111 @@
++BRING STORIES TO LIFE THROUGH DESIGN, VIDEO, AND CREATIVITY! 
++ Create compelling visual content that brings campaigns to life and connects future students with our brand.
++ Guide, Uplift, and Soar in a #GreatPlaceToWork:
++
++ Health & Security: HMO (up to 2 dependents) + Life Insurance
++
++ Growth & Development: Training Programs & Learning Opportunities
++
++ Work-Life Balance: 30 PTOs and Leave Conversion
++
++ Family Support: Parental & Maternity Benefits
++
++ Additional Perks: Transportation, Internet, Clothing, Laundry & Rice Allowances
++
++ 100% Work From Home: Work remotely from anywhere in the Philippines
++
++ Work Schedule: Monday to Friday | 8:00 PM to 5:00 AM (PH Time)
++
++ HAVE WHAT IT TAKES TO BE OUR GRAPHIC DESIGNER / VIDEO EDITOR? 
++
++ 2-3 years of experience in graphic design and video editing , preferably in a marketing, education, or student recruitment environment.
++
++ Strong portfolio showcasing digital design, social media content, video editing, campaign assets, and print materials .
++
++ Proficiency in Adobe Creative Suite , particularly Photoshop, Illustrator, InDesign, Premiere Pro, and After Effects.
++
++ Strong understanding of Instagram, TikTok, YouTube, and other digital content platforms , including formats and creative approaches that drive engagement.
++
++ Experience creating both short-form and long-form video content for promotional, informational, and campaign purposes.
++
++ Ability to manage multiple creative projects, prioritize tasks, and meet tight deadlines in a fast-paced environment.
++
++ Strong attention to detail and commitment to maintaining brand consistency across digital and print materials.
++
++ Basic knowledge of print production and file preparation for professional printing.
++
++ Good communication and collaboration skills, with the ability to work effectively with marketing and internal teams.
++
++ Ability to take creative direction while also contributing fresh ideas and proactive creative solutions .
++
++ Willingness to stay updated on social media trends, design styles, content formats, and video editing techniques .
++
++ DAY IN THE LIFE OF A GRAPHIC DESIGNER / VIDEO EDITOR 
++ Creating Video Content for Digital Campaigns
++
++ Create and edit engaging short-form videos , including Reels, TikToks, and YouTube Shorts, to support marketing campaigns and increase audience engagement.
++
++ Edit longer-form videos for promotional, informational, campus, and student-life content.
++
++ Develop eye-catching video thumbnails, covers, and supporting visual assets optimized for social media platforms.
++
++ Optimize video formats, dimensions, and outputs for Instagram, TikTok, YouTube, websites, and other digital channels.
++
++ Designing Social Media & Digital Assets
++
++ Develop creative assets for social media, including static posts, carousels, stories, and campaign visuals .
++
++ Translate campaign objectives and concepts into visually compelling content that attracts and informs prospective students.
++
++ Ensure all digital content follows brand guidelines and maintains a consistent visual identity.
++
++ Collaborate with the marketing team to align creative output with campaign goals, messaging, and brand voice.
++
++ Producing Print & Marketing Materials
++
++ Create print-ready materials such as brochures, flyers, posters, event signage, and other promotional collateral .
++
++ Prepare artwork and files according to professional printing requirements.
++
++ Maintain consistency across digital and physical marketing materials.
++
++ Supporting Campaigns & Student Recruitment
++
++ Contribute creative concepts for marketing campaigns, events, and student recruitment initiatives .
++
++ Work closely with the marketing team to brainstorm and execute ideas from concept through final production.
++
++ Create visual content that supports the student journey and strengthens engagement with prospective students.
++
++ Managing Creative Projects & Deadlines
++
++ Manage multiple design and video projects simultaneously while meeting established timelines.
++
++ Prioritize tasks based on campaign requirements and business needs.
++
++ Incorporate feedback and creative direction while proactively identifying opportunities to improve content.
++
++ Maintain organized working files and ensure final assets are properly prepared and delivered.
++
++ Staying Current & Creating On-Site Content
++
++ Stay informed about emerging social media trends, design styles, editing techniques, and content formats .
++
++ Identify creative opportunities to keep content fresh, relevant, and competitive.
++
++ Support on-site content creation when needed, including filming campus activities, events, and student life .
++
++ GUS Education PH: Empowered by knowledge, guided by heart. 
++ A certified Great Place to Work company, we guide with purpose, uplift through holistic support, and soar by empowering those who empower education. As a strategic partner, we turn every challenge into an opportunity for growth through collaboration, innovation, and operational excellence.
++ Big careers start with big learning—and yours could start here. 
++ Ready to turn ideas into visuals that inspire, inform, and engage future students? Join us as a Graphic Designer / Video Editor and bring creativity to campaigns with global impact.
++ Our 100% remote application process lets you connect with us from anywhere while exploring a career with global impact. Apply now! 
++ By submitting your application, you acknowledge and consent for GUS Education PH to collect, process, and store your personal information for recruitment and employment-related purposes. Your information will be used solely to assess your qualifications, communicate with you regarding your application, and facilitate the recruitment process. Personal data will be handled confidentially, accessed only by authorized personnel, and processed in accordance with the Company's Data Privacy Policy and applicable data privacy laws. 
++ Please note that all applications are routed through our Applicant Tracking System and are reviewed by our recruitment team. Due to the volume of applications we receive, processing times may vary, but every application is carefully considered. 
++ Originally posted on Himalayas
++
++Employment type: Full Time
++Seniority: Mid-level
++Categories: Video-Editor, Graphic-Designer, Content-Creator, Creative-Designer, Motion-Graphics-Designer, Video-Editor-+-Designer, Video-Designer, Design-Video-Editor, Video-Motion-Designer, Video-Content-Editor
++Job functions: Content Creator, Design
++Timezone restrictions: 8
+\ No newline at end of file

@@ -43,7 +43,9 @@ export function sourceUnits(description) {
     // The captured listing's aggregator tail is outside employer qualifications.
     if (hint==='requirements' && /^Originally posted on Himalayas\.?$/i.test(u.text)) hint='unknown';
     const label=u.text.toLowerCase().replace(/:$/,'').replace(/’/g,"'");
-    const heading=({'job overview':'about_role','your role':'responsibilities','our ideal candidate':'requirements','ideal candidate':'requirements','what we are offering':'benefits','why join wizementoring':'benefits','about wizementoring':'company_overview'})[label] || hints[label];
+    // Exact captured 41645 headings; the duties boundary is necessary to end
+    // qualification context. Do not match generic "have what it takes" prose.
+    const heading=({'have what it takes to be our graphic designer / video editor?':'requirements','day in the life of a graphic designer / video editor':'responsibilities','job overview':'about_role','your role':'responsibilities','our ideal candidate':'requirements','ideal candidate':'requirements','what we are offering':'benefits','why join wizementoring':'benefits','about wizementoring':'company_overview'})[label] || hints[label];
     if(heading) hint=heading;
     u.section_hint=hint;
     u.is_heading=!!heading || /^skills & experience:?$/i.test(u.text);

@@ -21,6 +21,7 @@ export function presentQuickRead(validated, description, job) {
     if (!Array.isArray(lines)) continue;
     result[key] = lines.filter(text => {
       const label = text.trim().replace(/:$/,'').replace(/’/g,"'");
+      if (/^(?:HAVE WHAT IT TAKES TO BE OUR GRAPHIC DESIGNER \/ VIDEO EDITOR\?|DAY IN THE LIFE OF A GRAPHIC DESIGNER \/ VIDEO EDITOR)$/i.test(label)) return false;
       if (/^(?:Job Overview|Your Role|Key Responsibilities|What we are offering|Our Ideal Candidate|Ideal Candidate|Scheduling & Calendar Management|Client Communication|Meeting Preparation & Follow-Up|Client Records & Onboarding|Task Tracking & Support|Why Join WizeMentoring|About WizeMentoring)$/i.test(label)) return false;
       // Strip a concatenated heading only when its exact remaining prose is
       // independently present in both the source and validated payload.

@@ -1,0 +1,10 @@
+{
+  "selection": "local mock, not production response",
+  "unit": {
+    "id": 12,
+    "text": "Strong portfolio showcasing digital design, social media content, video editing, campaign assets, and print materials .",
+    "section_hint": "unknown",
+    "is_heading": false
+  },
+  "error": "unsupported_requirement"
+}
