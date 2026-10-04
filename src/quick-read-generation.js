@@ -38,10 +38,14 @@ export function sourceUnits(description) {
   let hint='unknown';
   const hints={'the opportunity':'about_role','about the role':'about_role',"what you'll do":'responsibilities','responsibilities':'responsibilities','who you are':'requirements','requirements':'requirements','qualifications':'requirements','what we offer you':'benefits','benefits':'benefits','about us':'company_overview','about the company':'company_overview','work authorization':'important_requirements','application notes':'application_notes','how to apply':'application_notes','salary range':'other_details','monthly pay range':'other_details','eoe statement':'other_details'};
   for(const u of compact) {
+    // Exact employer qualification heading from job 41638; no keyword/prose match.
+    if (/^skills & experience:?$/i.test(u.text)) hint='requirements';
+    // The captured listing's aggregator tail is outside employer qualifications.
+    if (hint==='requirements' && /^Originally posted on Himalayas\.?$/i.test(u.text)) hint='unknown';
     const heading=hints[u.text.toLowerCase().replace(/:$/,'').replace(/’/g,"'")];
     if(heading) hint=heading;
     u.section_hint=hint;
-    u.is_heading=!!heading;
+    u.is_heading=!!heading || /^skills & experience:?$/i.test(u.text);
   }
   if (compact.length < 3 || compact.length > 250) throw new Error('unsupported_source');
   return compact;

@@ -21,6 +21,7 @@ export function presentQuickRead(validated, description, job) {
     if (!Array.isArray(lines)) continue;
     result[key] = lines.filter(text => {
       const label = text.trim().replace(/:$/,'').replace(/’/g,"'");
+      if (/^skills & experience$/i.test(label)) return false;
       if (headings.test(label)) return false;
       if (/^Originally posted on Himalayas\.?$/i.test(text) || /^Timezone restrictions:\s*\d+\s*$/i.test(text)) return false;
       if (marker >= 0 && index.get(text) > marker && /^(?:Categories|Job functions):/i.test(text)) return false;
