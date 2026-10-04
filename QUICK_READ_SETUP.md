@@ -72,3 +72,28 @@ Leave batch disabled now. After approval, set `QUICK_READ_BATCH_ENABLED=true`. O
 New eligible active jobs can receive Quick Read through the same single-job endpoint after collection/enrichment is complete, invoked by a trusted server operator/orchestrator using the admin token. No collector or frozen cron is changed. Automatic post-collection invocation is not installed because collectors are outside this snapshot; this is an explicit integration point, not a claim that new jobs automatically generate merely by setting a secret.
 
 Emergency disable: set `QUICK_READ_MODE=disabled`; stored valid results can still render. To hide one result while investigating, in Supabase SQL Editor set that private cache record status to `failed` and payload to null. Jobs/original content are never mutated. To roll back code, restore the previous five edited source/asset files; additive SQL can remain private and unused.
+
+## October 4, 2026: job 37688 application-condition correction
+
+The old application detector and prompt classified the standalone word answers as an application condition. In the checked-in TechnologyAdvice fixture, source ID 28 is "Proactive about spotting issues, finding answers, and escalating problems when needed." Its source section is requirements; assigning it there reproducibly throws application_condition_misplaced in the old validator. The existing acceptance test hid this defect by routing every answers occurrence into application_notes. The actual failed provider selection is not stored: generateJob persists only an allowlisted error code and a null payload on failure. Therefore this is a confirmed reproducible defect, not proof of the exact ID selected during the production attempt.
+
+The detector now requires explicit application/apply, screening/pre-employment, auto-rejection, or AI-generated/incomplete-answer context. The prompt distinguishes ordinary finding answers and the provider input supplies application_note_ids from that same detector. The complete source warning (fixture ID 52) and screening (ID 50) are explicitly routed to Application Notes. Model output still undergoes the same integer-reference, uniqueness, complete-coverage, stored-output, source-hash, preference, requirement-upgrade and material-condition checks. No output is silently repaired or partially published. Schema 2 and source-organizer-v2 remain compatible; no migration or cache reset is required. Source and service failure handling are unchanged.
+
+Regression coverage uses the real fixture, keeps finding answers in Requirements, verifies provider routing cues and exact warning/screening text, exercises mocked persistence for job 37688, and rejects misplaced/omitted warnings. Provider calls and database claims in these tests are mocked; no real generation is performed.
+
+Deployment and manual retest:
+
+1. Review the three changed files: src/quick-read-generation.js, test/quick-read-generation.test.js, QUICK_READ_SETUP.md. Deploy through the existing GitHub/Cloudflare flow after local validation. Keep QUICK_READ_BATCH_ENABLED=false, QUICK_READ_MODE=manual and existing model/secrets. No SQL migration or matching/classifier/notification/config changes are needed.
+2. Inspect job 37688 in Supabase SQL Editor before requesting generation:
+
+```sql
+select job_id, status, error_code, model, formatter_version, schema_version,
+       generated_at, retry_after, updated_at
+from public.job_quick_reads
+where job_id = '37688';
+```
+
+3. Respect the current retry_after; do not clear cooldown or edit the cache to force a retry. The supplied record's retry_after was October 4, 2026 at 11:30:52 UTC (7:30:52 PM Asia/Manila). Recheck the row for a newer cooldown. After deployment and cooldown, the operator may manually run the ONE-job command in section 4 above. This patch does not run it.
+4. Expect ready, then inspect /jobs/37688: finding answers remains in Requirements; the full AI-generated/incomplete-answer auto-rejection warning and pre-employment screening appear in Application Notes. Verify seasonal hours, equipment/backup, authorization/no sponsorship, benefits and unchanged Original. Inspect the private row for ready, error_code null, model gpt-5-mini, formatter source-organizer-v2 and schema 2. A subsequent operator request should be unchanged. If it fails again, inspect error_code and retry_after before any further request; no automatic retry or batch rollout.
+
+Local validation for this correction: 30/30 focused Quick Read tests pass; full suite has 98 passed, 5 failed and 4 skipped (107 total). All five failures reproduce on the untouched baseline: four existing worker/frontend assertions and daily-digest.test.js expecting disabled while the current checked-in configuration is enabled. Wrangler deployment dry-run passes. No deployment, production database access, real provider request or retry occurred.

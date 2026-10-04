@@ -35,17 +35,23 @@ test('TechnologyAdvice acceptance facts survive source organization, exact dupli
   assert.match(q.nice_to_have[0],/highly preferred/);
   assert.equal(validateStored(q,technologySource)?.formatter,'source-organizer-v2');
 });
-test('real live job 37688: source coverage, duplicated introduction, benefits and material conditions',()=>{
-  const source=readFileSync(new URL('./fixtures/technologyadvice-37688.txt',import.meta.url),'utf8');
+const liveTechnologySource=readFileSync(new URL('./fixtures/technologyadvice-37688.txt',import.meta.url),'utf8');
+function liveTechnologySelection(source=liveTechnologySource) {
   const units=sourceUnits(source);
-  assert.equal(units.filter(u=>u.text.includes('Headquartered in Nashville')).length,1);
   const selection=Object.fromEntries(SECTIONS.map(k=>[k,[]]));
   for(const u of units) {
     let key=u.is_heading?'other_details':u.section_hint==='unknown'?'company_overview':u.section_hint;
-    if(/\b(application|apply|answers?|auto[- ]reject|screening|pre[- ]employment)\b/i.test(u.text)) key='application_notes';
+    if(/\b(application|apply|auto[- ]reject|screening|pre[- ]employment)\b/i.test(u.text)) key='application_notes';
     else if(/\b(authori[sz]|sponsorship|visa|permit|laptop|PC|computer|equipment|internet|backup|shift|schedule|PHT|timezone)\w*/i.test(u.text)) key='important_requirements';
     selection[key].push(u.id);
   }
+  return selection;
+}
+test('real live job 37688: source coverage, duplicated introduction, benefits and material conditions',()=>{
+  const source=liveTechnologySource;
+  const units=sourceUnits(source);
+  assert.equal(units.filter(u=>u.text.includes('Headquartered in Nashville')).length,1);
+  const selection=liveTechnologySelection();
   const q=validateSelection(selection,source);
   assert.ok(q.benefits.some(t=>t.includes('Plus 5 additional days')));
   assert.ok(q.benefits.some(t=>t.includes('Speaker Series Bonus')));
@@ -53,8 +59,52 @@ test('real live job 37688: source coverage, duplicated introduction, benefits an
   assert.ok(q.important_requirements.some(t=>t.includes('must maintain authorization')));
   assert.ok(q.application_notes.some(t=>t.includes('AI-generated or incomplete')));
   assert.ok(q.requirements.some(t=>t.includes('Google Sheets or Excel')));
+  assert.ok(q.requirements.includes('Proactive about spotting issues, finding answers, and escalating problems when needed.'));
   assert.ok(JSON.stringify(q).includes('₱37,500—₱46,000 PHP'));
   assert.equal(source.includes('Hi, we\'re TechnologyAdvice. Headquartered'),true);
+});
+
+test('37688 provider routing cues identify real application conditions, not ordinary finding answers',async()=>{
+  const units=sourceUnits(liveTechnologySource);
+  const warning=units.find(u=>u.text==='Any AI-generated or incomplete application answers will be auto-rejected.');
+  const screening=units.find(u=>u.text==='Pre-employment screening required.');
+  const qualification=units.find(u=>u.text==='Proactive about spotting issues, finding answers, and escalating problems when needed.');
+  const selection=liveTechnologySelection();
+  const env={OPENAI_API_KEY:'test-only',QUICK_READ_MODEL:'gpt-5-mini'};
+  const result=await generateWithProvider(env,liveTechnologySource,async(url,init)=>{
+    const body=JSON.parse(init.body);
+    const ids=JSON.parse(body.input).application_note_ids;
+    for(const unit of [warning,screening]) assert.ok(ids.includes(unit.id));
+    assert.equal(ids.includes(qualification.id),false);
+    assert.match(body.instructions,/finding answers are not application conditions/);
+    return Response.json({status:'completed',output:[{content:[{type:'output_text',text:JSON.stringify(selection)}]}]});
+  });
+  assert.ok(result.application_notes.includes(warning.text));
+  assert.ok(result.application_notes.includes(screening.text));
+  assert.ok(result.requirements.includes(qualification.text));
+  assert.deepEqual(validateStored(result,liveTechnologySource),result);
+  let finish;
+  const hash=await sourceFingerprint(liveTechnologySource);
+  const persisted=await generateJob(env,'37688',{
+    call:async(e,name,args)=>name==='claim_job_quick_read'
+      ?{status:'claimed',description:liveTechnologySource,source_hash:hash}
+      :(finish=args,{status:'ready'}),
+    generate:async()=>result
+  });
+  assert.equal(persisted.status,'ready');
+  assert.equal(finish.p_error,null);
+  assert.ok(finish.p_payload.application_notes.includes(warning.text));
+  assert.ok(finish.p_payload.requirements.includes(qualification.text));
+  for(const key of ['requirements','responsibilities','important_requirements','benefits']) {
+    const misplaced=structuredClone(selection);
+    misplaced.application_notes=misplaced.application_notes.filter(id=>id!==warning.id);
+    misplaced[key].push(warning.id);
+    assert.throws(()=>validateSelection(misplaced,liveTechnologySource),/application_condition_misplaced|unsupported_requirement/);
+    await assert.rejects(generateWithProvider(env,liveTechnologySource,async()=>Response.json({status:'completed',output:[{content:[{type:'output_text',text:JSON.stringify(misplaced)}]}]})),/application_condition_misplaced|unsupported_requirement/);
+  }
+  const omitted=structuredClone(selection);
+  omitted.application_notes=omitted.application_notes.filter(id=>id!==warning.id);
+  assert.throws(()=>validateSelection(omitted,liveTechnologySource),/source_omitted/);
 });
 test('strict schema rejects malformed, empty, additional keys, invented source IDs, duplicate and missing material',()=>{
   for(const q of [null,[],{}, {...validSelection(),salary:'invented'}, {...validSelection(),requirements:[999]}, {...validSelection(),application_notes:[]}, {...validSelection(),benefits:'free meals'}, {...validSelection(),company_overview:[0,0]}]) assert.throws(()=>validateSelection(q,technologySource));
