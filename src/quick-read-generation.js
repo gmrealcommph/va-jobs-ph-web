@@ -2,7 +2,7 @@
 export const FORMATTER_VERSION = 'source-organizer-v2';
 export const SCHEMA_VERSION = 2;
 export const SECTIONS = ['about_role','responsibilities','requirements','nice_to_have','important_requirements','benefits','company_overview','application_notes','other_details'];
-export const preference = /\b(prefer(?:red|ably)|highly preferred|nice[- ]to[- ]have|(?:a|an) (?:plus|advantage|bonus)|desirable|optional)\b/i;
+export const preference = /\b(prefer(?:red|ably)|highly preferred|nice[- ]to[- ]have|(?:a|an) (?:big )?(?:plus|advantage|bonus)|desirable|optional)\b/i;
 const mandatory = /\b(required|must|mandatory|need to)\b/i;
 // Ordinary qualifications can mention "finding answers". Answers alone do not
 // establish an application condition; explicit application/rejection cues do.
@@ -46,9 +46,11 @@ export function sourceUnits(description) {
     // Exact captured 41645 headings; the duties boundary is necessary to end
     // qualification context. Do not match generic "have what it takes" prose.
     const heading=({'have what it takes to be our graphic designer / video editor?':'requirements','day in the life of a graphic designer / video editor':'responsibilities','job overview':'about_role','your role':'responsibilities','our ideal candidate':'requirements','ideal candidate':'requirements','what we are offering':'benefits','why join wizementoring':'benefits','about wizementoring':'company_overview'})[label] || hints[label];
-    if(heading) hint=heading;
+    // Exact section labels captured across public listings; optional skills end qualifications.
+    const boundary=({'what we are looking for in you':'requirements','additional skills that you might also bring':'nice_to_have','what your day will look like':'responsibilities','the role entails':'responsibilities','what we offer colleagues':'benefits'})[label];
+    if(heading || boundary) hint=heading || boundary;
     u.section_hint=hint;
-    u.is_heading=!!heading || /^skills & experience:?$/i.test(u.text);
+    u.is_heading=!!heading || !!boundary || /^skills & experience:?$/i.test(u.text);
   }
   if (compact.length < 3 || compact.length > 250) throw new Error('unsupported_source');
   return compact;
@@ -60,6 +62,12 @@ export async function sourceFingerprint(description) {
 export const outputSchema = { type:'object', additionalProperties:false, required:SECTIONS,
   properties:Object.fromEntries(SECTIONS.map(k=>[k,{type:'array',items:{type:'integer'}}])) };
 
+function isPreferred(u) {
+  return u.section_hint==='nice_to_have' || (preference.test(u.text) && !(u.section_hint==='benefits' && /\b(?:earn|paid|payment|present|speaker|cash|compensation)\b/i.test(u.text) && !/\b(?:prefer(?:red|ably)|nice[- ]to[- ]have|desirable|optional)\b/i.test(u.text)));
+}
+function supportsRequirement(u) {
+  return u.is_heading || u.section_hint==='requirements' || mandatory.test(u.text);
+}
 export function validateSelection(selection, description) {
   const units=sourceUnits(description);
   if (!selection || typeof selection !== 'object' || Array.isArray(selection) || Object.keys(selection).length!==SECTIONS.length || Object.keys(selection).some(k=>!SECTIONS.includes(k))) throw new Error('invalid_schema');
@@ -71,10 +79,10 @@ export function validateSelection(selection, description) {
       if (!Number.isInteger(id) || !units[id] || used.has(id)) throw new Error('invalid_source_reference');
       used.add(id);
       const text=units[id].text;
-      const preferred=preference.test(text) && !(units[id].section_hint==='benefits' && /\b(?:earn|paid|payment|present|speaker|cash|compensation)\b/i.test(text) && !/\b(?:prefer(?:red|ably)|nice[- ]to[- ]have|desirable|optional)\b/i.test(text));
+      const preferred=isPreferred(units[id]);
       // Mixed required/preferred clauses stay visibly mixed under Other source details.
       if (preferred && !['nice_to_have','other_details','application_notes'].includes(key)) throw new Error('preference_upgraded');
-      if(key==='requirements' && !units[id].is_heading && units[id].section_hint!=='requirements' && !mandatory.test(text)) throw new Error('unsupported_requirement');
+      if(key==='requirements' && !supportsRequirement(units[id])) throw new Error('unsupported_requirement');
       if (preferred && mandatory.test(text) && key==='nice_to_have') throw new Error('mixed_obligation');
       if (application.test(text) && !['application_notes','other_details'].includes(key)) throw new Error('application_condition_misplaced');
       if (material.test(text) && !preferred && !['important_requirements','application_notes','other_details'].includes(key)) {
@@ -105,11 +113,13 @@ export async function generateWithProvider(env, description, fetcher=fetch) {
   const units=sourceUnits(description);
   // Expose the existing conservative keyword guard to the organizer. Context
   // hints do not override it; this adds guidance without relaxing validation.
+  const preferenceIds=units.filter(isPreferred).map(u=>u.id);
+  const requirementSupportedIds=units.filter(u=>supportsRequirement(u) && !isPreferred(u)).map(u=>u.id);
   const materialConditionIds=units.filter(u=>material.test(u.text)).map(u=>u.id);
   const response=await fetcher('https://api.openai.com/v1/responses',{
     method:'POST',headers:{Authorization:`Bearer ${env.OPENAI_API_KEY}`,'content-type':'application/json'},
     signal:AbortSignal.timeout(90000),body:JSON.stringify({model:env.QUICK_READ_MODEL,store:false,
-      instructions:instructions+' material_condition_ids flag the validator\'s conservative material keyword matches, even within duties, benefits, qualifications, headings or concatenated text. For non-preferred entries, only important_requirements, application_notes or other_details are permitted; section_hint does not override this restriction. Use other_details for keyword matches that describe ordinary duties (such as scheduling appointments) or aggregator metadata, rather than turning them into candidate conditions. Preserve entire mixed/concatenated units. Existing preference and application routing rules take precedence; these IDs do not establish mandatory qualifications.',input:JSON.stringify({source_units:units,application_note_ids:units.filter(u=>application.test(u.text)).map(u=>u.id),material_condition_ids:materialConditionIds}),max_output_tokens:8000,
+      instructions:instructions+' preference_ids flag every preference guard match, including preferred platforms in company prose and all entries under optional-skills headings. Assign these only to nice_to_have, other_details or application_notes; use other_details for company prose rather than presenting it as a candidate preference. Never put optional-section text in requirements, even when it lacks an explicit preference word. requirement_supported_ids are the only IDs eligible for requirements; this is eligibility, not an instruction to make every eligible ID a requirement. Duties mentioning experience remain duties; unknown qualifications stay in other_details. Preference, application and material restrictions still take precedence.'+' material_condition_ids flag the validator\'s conservative material keyword matches, even within duties, benefits, qualifications, headings or concatenated text. For non-preferred entries, only important_requirements, application_notes or other_details are permitted; section_hint does not override this restriction. Use other_details for keyword matches that describe ordinary duties (such as scheduling appointments) or aggregator metadata, rather than turning them into candidate conditions. Preserve entire mixed/concatenated units. Existing preference and application routing rules take precedence; these IDs do not establish mandatory qualifications.',input:JSON.stringify({source_units:units,preference_ids:preferenceIds,requirement_supported_ids:requirementSupportedIds,application_note_ids:units.filter(u=>application.test(u.text)).map(u=>u.id),material_condition_ids:materialConditionIds}),max_output_tokens:8000,
       text:{format:{type:'json_schema',name:'veeays_quick_read',strict:true,schema:outputSchema}}})
   });
   if(!response.ok) throw new Error(`provider_http_${response.status}`);
