@@ -12,6 +12,8 @@ Get-Help .\scripts\quick-read-backfill.ps1 -Full
 param(
     [string]$AfterId,
     [ValidateRange(5,500)][int]$MaxJobs = 50,
+    [switch]$UntilExhausted,
+    [ValidateRange(5,100000)][int]$EmergencyMaxJobs = 10000,
     [ValidateRange(10,300)][int]$WaitSeconds = 15,
     [ValidateRange(1,10)][int]$MaxRetries = 3,
     [string]$ReportDirectory = (Join-Path ([IO.Path]::GetTempPath()) 'VeeAys-QuickRead')
@@ -33,7 +35,12 @@ function Invoke-QuickReadHttp {
         return @{ HttpStatus = [int]$response.StatusCode; Data = $data; RetryAfter = $null }
     } catch {
         $http = $_.Exception.Response
-        if ($null -eq $http) { return @{ HttpStatus = 0; Data = $null; RetryAfter = $null } }
+        if ($null -eq $http) {
+            # Only failures known to precede sending the request can be replayed.
+            $safe = $_.Exception -is [Net.WebException] -and
+                $_.Exception.Status -in @([Net.WebExceptionStatus]::NameResolutionFailure,[Net.WebExceptionStatus]::ProxyNameResolutionFailure)
+            return @{ HttpStatus = 0; Data = $null; RetryAfter = $null; RetrySafe = $safe }
+        }
         $retryAfter = $null
         if ([int]$http.StatusCode -eq 429) { $retryAfter = $http.Headers['Retry-After'] }
         return @{ HttpStatus = [int]$http.StatusCode; Data = $null; RetryAfter = $retryAfter }
@@ -48,6 +55,8 @@ function Invoke-QuickReadBackfill {
     param(
         [Parameter(Mandatory=$true)][string]$AfterId,
         [ValidateRange(5,500)][int]$MaxJobs = 50,
+        [switch]$UntilExhausted,
+        [ValidateRange(5,100000)][int]$EmergencyMaxJobs = 10000,
         [ValidateRange(10,300)][int]$WaitSeconds = 15,
         [ValidateRange(1,10)][int]$MaxRetries = 3,
         [string]$ReportDirectory = (Join-Path ([IO.Path]::GetTempPath()) 'VeeAys-QuickRead'),
@@ -58,12 +67,20 @@ function Invoke-QuickReadBackfill {
     $ErrorActionPreference = 'Stop'
     if ($AfterId -cnotmatch '^(0|[1-9][0-9]{0,18})$') { throw 'Supply an explicit numeric -AfterId (for example 444).' }
     if ($MaxJobs % 5 -ne 0) { throw 'MaxJobs must be a multiple of 5, between 5 and 500.' }
+    if ($UntilExhausted -and $PSBoundParameters.ContainsKey('MaxJobs')) { throw 'Use either -UntilExhausted or -MaxJobs, not both.' }
+    if ($EmergencyMaxJobs % 5 -ne 0) { throw 'EmergencyMaxJobs must be a multiple of 5.' }
+    $jobCeiling = $MaxJobs
+    if ($UntilExhausted) { $jobCeiling = $EmergencyMaxJobs }
+    # Even a server returning one result per response cannot exceed this request bound.
+    $requestCeiling = ($jobCeiling + 1) * ($MaxRetries + 1)
     if ([string]::IsNullOrWhiteSpace($env:QUICK_READ_ADMIN_TOKEN) -or
         $env:QUICK_READ_ADMIN_TOKEN.Length -lt 32 -or $env:QUICK_READ_ADMIN_TOKEN.Length -gt 512 -or
         $env:QUICK_READ_ADMIN_TOKEN -match '[\r\n]') { throw 'Set a valid QUICK_READ_ADMIN_TOKEN in the process environment.' }
     $report = [ordered]@{
         started_at = [DateTime]::UtcNow.ToString('o'); finished_at = $null
         starting_cursor = $AfterId; final_cursor = $AfterId; max_jobs = $MaxJobs
+        until_exhausted = [bool]$UntilExhausted; emergency_max_jobs = $EmergencyMaxJobs
+        request_ceiling = $requestCeiling
         attempted = 0; ready = 0; failed = 0; other = 0; failed_by_error = @{}
         completed_normally = $false; reason = 'interrupted'; batches = @()
     }
@@ -77,7 +94,9 @@ function Invoke-QuickReadBackfill {
         New-Item -ItemType Directory -Path $ReportDirectory -Force | Out-Null
         $path = Join-Path $ReportDirectory ('quick-read-' + [DateTime]::UtcNow.ToString('yyyyMMdd-HHmmss') + '-' + [Guid]::NewGuid().ToString('N') + '.json')
         $report | ConvertTo-Json -Depth 10 | Set-Content -LiteralPath $path -Encoding UTF8
-        while ($report.attempted -lt $MaxJobs) {
+        Write-Host ('Progress report: ' + $path)
+        while ($report.attempted -lt $jobCeiling) {
+            if ($batchNumber -ge $requestCeiling) { $report.reason = 'emergency_request_ceiling_reached'; break }
             $batchNumber++
             $start = $cursor
             Write-Host ('Batch {0}: cursor {1}, limit {2}' -f $batchNumber,$start,$remainingLimit)
@@ -85,9 +104,11 @@ function Invoke-QuickReadBackfill {
             catch { $report.reason = 'request_failed_unknown_outcome'; break }
             $delay = $WaitSeconds
             $blocked = $false
-            if ($envelope.HttpStatus -eq 429) {
+            if ($null -eq $envelope -or $null -eq $envelope.HttpStatus -or
+                [string]$envelope.HttpStatus -notmatch '^(0|[1-5][0-9]{2})$') { $report.reason = 'malformed_response'; break }
+            if ($envelope.HttpStatus -eq 429 -or ($envelope.HttpStatus -eq 0 -and $envelope.RetrySafe -eq $true)) {
                 $blocked = $true
-                if ($null -ne $envelope.RetryAfter) {
+                if ($envelope.HttpStatus -eq 429 -and $null -ne $envelope.RetryAfter) {
                     $seconds = 0
                     $date = [DateTimeOffset]::MinValue
                     if ([int]::TryParse([string]$envelope.RetryAfter, [ref]$seconds) -and $seconds -ge 0) {
@@ -97,7 +118,7 @@ function Invoke-QuickReadBackfill {
                     } else { $report.reason = 'invalid_retry_after'; break }
                     if ($delay -gt 900) { $report.reason = 'retry_after_exceeds_safe_wait'; break }
                 }
-                $report.batches += [ordered]@{ number=$batchNumber; starting_cursor=$start; ending_cursor=$cursor; http_status=429; results=@() }
+                $report.batches += [ordered]@{ number=$batchNumber; starting_cursor=$start; ending_cursor=$cursor; http_status=[int]$envelope.HttpStatus; results=@(); outcome_uncertain=($envelope.HttpStatus -ne 429) }
             } elseif ($envelope.HttpStatus -ne 200) {
                 if ($envelope.HttpStatus -in @(401,403)) { $report.reason = 'authentication_or_authorization_error' }
                 elseif ($envelope.HttpStatus -eq 0) { $report.reason = 'network_error_unknown_outcome' }
@@ -153,19 +174,27 @@ function Invoke-QuickReadBackfill {
                 $cursor = [string]$data.next_after_id
                 $report.final_cursor = $cursor
                 $report.batches += [ordered]@{ number=$batchNumber; starting_cursor=$start; ending_cursor=$cursor; http_status=200; results=$validated }
+                # Persist every confirmed batch, including fatal results and the ceiling batch.
+                $report | ConvertTo-Json -Depth 10 | Set-Content -LiteralPath ($path + '.tmp') -Encoding UTF8
+                [IO.File]::Replace(($path + '.tmp'),$path,($path + '.previous'))
                 Write-Host ('  Ending cursor {0}; attempted {1}, ready {2}, failed {3}' -f $cursor,$report.attempted,$report.ready,$report.failed)
                 if ($fatal) { $report.reason = 'job_infrastructure_or_state_error'; break }
             }
-            if ($report.attempted -ge $MaxJobs) { $report.completed_normally = $true; $report.reason = 'max_jobs_reached'; break }
+            if ($report.attempted -ge $jobCeiling) {
+                if ($UntilExhausted) { $report.reason = 'emergency_job_ceiling_reached' }
+                else { $report.completed_normally = $true; $report.reason = 'max_jobs_reached' }
+                break
+            }
             # A partial batch consumes only completed candidates. Never exceed the cap.
-            $remainingLimit = [Math]::Min(5,$MaxJobs - $report.attempted)
+            $remainingLimit = [Math]::Min(5,$jobCeiling - $report.attempted)
             if ($blocked) {
                 $retryCount++
                 if ($retryCount -gt $MaxRetries) { $report.reason = 'busy_or_rate_limit_retry_exhausted'; break }
                 $delay = [Math]::Max($delay,[Math]::Min(300,30 * [Math]::Pow(2,$retryCount - 1)))
-                Write-Host ('  Busy/rate limited: retry {0}/{1} from returned cursor {2} after {3}s.' -f $retryCount,$MaxRetries,$cursor,$delay)
+                Write-Host ('  Transient busy/rate-limit/transport condition: retry {0}/{1} from confirmed cursor {2} after {3}s.' -f $retryCount,$MaxRetries,$cursor,$delay)
             } else { $retryCount = 0 }
-            $report | ConvertTo-Json -Depth 10 | Set-Content -LiteralPath $path -Encoding UTF8
+            $report | ConvertTo-Json -Depth 10 | Set-Content -LiteralPath ($path + '.tmp') -Encoding UTF8
+            [IO.File]::Replace(($path + '.tmp'),$path,($path + '.previous'))
             & $Sleep $delay
         }
     } catch {
@@ -175,7 +204,10 @@ function Invoke-QuickReadBackfill {
     } finally {
         $report.finished_at = [DateTime]::UtcNow.ToString('o')
         if ($null -ne $path) {
-            try { $report | ConvertTo-Json -Depth 10 | Set-Content -LiteralPath $path -Encoding UTF8 }
+            try {
+                $report | ConvertTo-Json -Depth 10 | Set-Content -LiteralPath ($path + '.tmp') -Encoding UTF8
+                [IO.File]::Replace(($path + '.tmp'),$path,($path + '.previous'))
+            }
             catch { Write-Host 'Could not save report; use the summary cursor below.'; $report.completed_normally=$false; $report.reason='report_write_failed' }
         }
         Write-Host ('Summary: {0} -> {1}; attempted {2}, ready {3}, failed {4}, other {5}; {6}' -f $AfterId,$report.final_cursor,$report.attempted,$report.ready,$report.failed,$report.other,$report.reason)
@@ -187,7 +219,10 @@ function Invoke-QuickReadBackfill {
 }
 
 if ($MyInvocation.InvocationName -ne '.') {
-    if ([string]::IsNullOrWhiteSpace($AfterId)) { throw 'Required: -AfterId. First production run: -AfterId 444 -MaxJobs 50.' }
-    $result = Invoke-QuickReadBackfill -AfterId $AfterId -MaxJobs $MaxJobs -WaitSeconds $WaitSeconds -MaxRetries $MaxRetries -ReportDirectory $ReportDirectory
+    if ([string]::IsNullOrWhiteSpace($AfterId)) { throw 'Required: -AfterId. Overnight production run: -AfterId 5438 -UntilExhausted.' }
+    $arguments = @{ AfterId=$AfterId; UntilExhausted=$UntilExhausted; EmergencyMaxJobs=$EmergencyMaxJobs; WaitSeconds=$WaitSeconds; MaxRetries=$MaxRetries; ReportDirectory=$ReportDirectory }
+    if ($PSBoundParameters.ContainsKey('MaxJobs') -or -not $UntilExhausted) { $arguments.MaxJobs=$MaxJobs }
+    $result = Invoke-QuickReadBackfill @arguments
     if (-not $result.completed_normally) { exit 1 }
 }
+

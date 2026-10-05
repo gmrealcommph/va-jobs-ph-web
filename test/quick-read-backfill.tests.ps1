@@ -9,7 +9,7 @@ $script:passed = 0
 function Assert($condition, $message) { if (-not $condition) { throw $message } }
 function Job($id,$status='ready',$error='') { return @{ job_id=[string]$id; status=$status; error=$error } }
 function Response($jobs,$cursor) { return @{ HttpStatus=200; Data=@{ results=@($jobs); next_after_id=[string]$cursor } } }
-function Run($responses,$max=5,$retries=3) {
+function Run($responses,$max=5,$retries=3,[switch]$overnight,$ceiling=10000) {
     $state = @{ index=0; calls=@(); sleeps=@(); responses=@($responses) }
     $request = {
         param($cursor,$limit)
@@ -18,7 +18,10 @@ function Run($responses,$max=5,$retries=3) {
         $value = $state.responses[$state.index]; $state.index++; return $value
     }.GetNewClosure()
     $sleep = { param($seconds) $state.sleeps += $seconds }.GetNewClosure()
-    $result = Invoke-QuickReadBackfill -AfterId 444 -MaxJobs $max -MaxRetries $retries -ReportDirectory $testRoot -Request $request -Sleep $sleep
+    $arguments = @{AfterId='444'; MaxRetries=$retries; ReportDirectory=$testRoot; Request=$request; Sleep=$sleep}
+    if ($overnight) { $arguments.UntilExhausted=$true; $arguments.EmergencyMaxJobs=$ceiling }
+    else { $arguments.MaxJobs=$max }
+    $result = Invoke-QuickReadBackfill @arguments
     return @{ result=$result; state=$state }
 }
 function Case($name,[scriptblock]$test) {
@@ -69,11 +72,60 @@ try {
             Assert ($r.state.calls.Count -eq 1 -and -not $r.result.completed_normally) 'Bad retry-after continued'
         }
     }
-    Case 'auth, server and uncertain network errors stop without retries' {
-        foreach ($status in @(401,403,500,503,0,302)) {
+    Case 'auth and nontransient errors stop without retries' {
+        foreach ($status in @(401,403,500,502,503,504,0,302)) {
             $r=Run @(@{HttpStatus=$status})
             Assert ($r.state.calls.Count -eq 1 -and $r.result.final_cursor -eq '444' -and -not $r.result.completed_normally) 'Unsafe retry'
         }
+    }
+    Case 'overnight sparse IDs and validation failure continue until explicit empty batch' {
+        $r=Run @((Response @((Job 5438 'failed' 'unsupported_requirement')) 5438),(Response @((Job 9001)) 9001),(Response @() 9001)) -overnight
+        Assert ($r.result.completed_normally -and $r.result.reason -eq 'no_more_candidates' -and $r.result.failed -eq 1 -and $r.result.attempted -eq 2) 'Incorrect exhaustion'
+        Assert ($r.state.calls.Count -eq 3 -and $r.state.calls[2].cursor -eq '9001' -and $r.state.sleeps.Count -eq 2) 'Did not continue safely'
+        Assert (@($r.state.calls | Where-Object {$_.limit -ne 5}).Count -eq 0) 'Overnight batch size changed'
+    }
+    Case 'overnight busy retries then exhausts' {
+        $r=Run @((Response @((Job 445 'busy')) 444),(Response @((Job 445)) 445),(Response @() 445)) -overnight
+        Assert ($r.result.completed_normally -and $r.result.attempted -eq 1 -and $r.state.calls[1].cursor -eq '444' -and $r.state.sleeps[0] -eq 30) 'Busy mishandled'
+    }
+    Case 'confirmed pre-send network errors retry with finite backoff' {
+        foreach ($status in @(0)) {
+            $r=Run @(@{HttpStatus=$status;RetrySafe=$true},(Response @((Job 445)) 445),(Response @() 445)) -overnight
+            Assert ($r.result.completed_normally -and $r.state.calls[1].cursor -eq '444' -and $r.state.sleeps[0] -eq 30) 'Transport retry skipped cursor'
+            $r=Run @(@{HttpStatus=$status;RetrySafe=$true},@{HttpStatus=$status;RetrySafe=$true},@{HttpStatus=$status;RetrySafe=$true},@{HttpStatus=$status;RetrySafe=$true}) -overnight
+            Assert (-not $r.result.completed_normally -and $r.state.calls.Count -eq 4 -and $r.state.sleeps.Count -eq 3) 'Persistent failure not bounded'
+        }
+    }
+    Case 'overnight cursor stall and malformed response fail closed' {
+        foreach ($response in @((Response @((Job 445)) 444),@{HttpStatus=200;Data=$null},@{},(Response @() 445))) {
+            $r=Run @($response) -overnight
+            Assert (-not $r.result.completed_normally -and $r.result.final_cursor -eq '444' -and $r.state.calls.Count -eq 1) 'Unsafe response trusted'
+        }
+    }
+    Case 'overnight emergency ceiling stops without claiming exhaustion' {
+        $r=Run @((Response @((Job 445),(Job 446),(Job 447),(Job 448),(Job 449)) 449)) -overnight -ceiling 5
+        Assert (-not $r.result.completed_normally -and $r.result.reason -eq 'emergency_job_ceiling_reached' -and $r.result.final_cursor -eq '449' -and $r.state.calls.Count -eq 1) 'Emergency ceiling not enforced'
+    }
+    Case 'checkpoint exists before wait and interrupted run resumes from confirmed cursor' {
+        $directory=Join-Path $testRoot 'interrupted'
+        $request={param($cursor,$limit) Response @((Job 445 'failed' 'mixed_obligation')) 445}
+        $sleep={param($seconds)
+            $file=Get-ChildItem -LiteralPath $directory -Filter '*.json' | Select-Object -First 1
+            $saved=Get-Content -LiteralPath $file.FullName -Raw | ConvertFrom-Json
+            Assert ($saved.final_cursor -eq '445' -and $saved.failed -eq 1 -and $null -eq $saved.finished_at) 'Missing live checkpoint'
+            throw 'Simulated interruption'
+        }.GetNewClosure()
+        $r=Invoke-QuickReadBackfill -AfterId 444 -UntilExhausted -ReportDirectory $directory -Request $request -Sleep $sleep
+        Assert (-not $r.completed_normally -and $r.final_cursor -eq '445') 'Interruption lost cursor'
+        $state=@{cursor=$null}
+        $resume={param($cursor,$limit) $state.cursor=$cursor; Response @() $cursor}.GetNewClosure()
+        $r=Invoke-QuickReadBackfill -AfterId $r.final_cursor -UntilExhausted -ReportDirectory $directory -Request $resume -Sleep {param($s)}
+        Assert ($r.completed_normally -and $state.cursor -eq '445') 'Resume skipped cursor'
+    }
+    Case 'overnight rejects ambiguous caps' {
+        $threw=$false
+        try { Invoke-QuickReadBackfill -AfterId 444 -UntilExhausted -MaxJobs 50 -Request {throw 'must not request'} | Out-Null } catch {$threw=$true}
+        Assert $threw 'Ambiguous mode accepted'
     }
     Case 'empty inventory completes only with unchanged cursor' {
         $r=Run @((Response @() 444))
@@ -167,3 +219,5 @@ try {
     $env:QUICK_READ_ADMIN_TOKEN=$previousToken
     # Test artifacts remain in TEMP, outside the repository.
 }
+
+
