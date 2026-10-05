@@ -70,8 +70,11 @@ test('43635: guidance exposes exact guard matches and preference/application pre
     assert.match(sent.instructions,/Existing preference and application routing rules take precedence/);
     return response(selection());
   });
-  for(const [id,target] of [[9,'responsibilities'],[29,'requirements']])
-    await assert.rejects(generateWithProvider(env,source,async()=>response(move(selection(),id,target))),/material_condition_misplaced/);
+  for(const [id,target] of [[0,'about_role'],[3,'about_role'],[9,'responsibilities'],[29,'requirements'],[35,'about_role']]) {
+    const corrected=await generateWithProvider(env,source,async()=>response(move(selection(),id,target)));
+    assert.ok(corrected.other_details.includes(sourceUnits(source)[id].text));
+    assert.deepEqual(validateStored(corrected,source),corrected);
+  }
   let finish;
   const result=await generateJob(env,'43635',{call:async(e,name,args)=>name==='claim_job_quick_read'
     ?{status:'claimed',description:source,source_hash:await sourceFingerprint(source)}
@@ -79,8 +82,25 @@ test('43635: guidance exposes exact guard matches and preference/application pre
   assert.equal(result.status,'ready');assert.equal(finish.p_error,null);
   const bad=await generateJob(env,'43635',{call:async(e,name,args)=>name==='claim_job_quick_read'
     ?{status:'claimed',description:source,source_hash:await sourceFingerprint(source)}
-    :(finish=args,{status:'failed'}),generate:async()=>generateWithProvider(env,source,async()=>response(move(selection(),29,'requirements')))});
+    :(finish=args,{status:'failed'}),generate:async()=>validateSelection(move(selection(),29,'requirements'),source)});
   assert.equal(bad.error,'material_condition_misplaced');assert.equal(finish.p_payload,null);
+});
+test('43635: provider correction preserves all units and rejects unrelated corruption',async()=>{
+  const env={OPENAI_API_KEY:'test-only',QUICK_READ_MODEL:'mock'};
+  const q=selection();
+  for(const [id,key] of [[0,'about_role'],[3,'about_role'],[9,'responsibilities'],[29,'requirements'],[35,'about_role']]) move(q,id,key);
+  const result=await generateWithProvider(env,source,async()=>response(q));
+  assert.deepEqual(SECTIONS.flatMap(k=>result[k]).sort(),sourceUnits(source).map(u=>u.text).sort());
+  for(const [id,key,error] of [[11,'responsibilities','application_condition_misplaced'],[9,'requirements','unsupported_requirement'],[6,null,'source_omitted']])
+    await assert.rejects(generateWithProvider(env,source,async()=>response(move(selection(),id,key))),new RegExp(error));
+  const duplicate=move(selection(),29,'requirements');duplicate.other_details.push(29);
+  await assert.rejects(generateWithProvider(env,source,async()=>response(duplicate)),/invalid_source_reference/);
+  const repeated=move(selection(),29,'requirements');repeated.requirements.push(29);
+  await assert.rejects(generateWithProvider(env,source,async()=>response(repeated)),/invalid_source_reference/);
+  const invalid=move(selection(),29,'requirements');invalid.other_details.push(999);
+  await assert.rejects(generateWithProvider(env,source,async()=>response(invalid)),/invalid_source_reference/);
+  const unknown=selection();unknown.extra=[];
+  await assert.rejects(generateWithProvider(env,source,async()=>response(unknown)),/invalid_schema/);
 });
 test('43635: synthetic material/preference/mixed/application probes remain fail closed',()=>{
   for(const [line,allowed,error] of [['Laptop preferred.','nice_to_have','preference_upgraded'],['Laptop required; backup preferred.','other_details','preference_upgraded'],['Must supply equipment for pre-employment screening.','application_notes','application_condition_misplaced']]) {

@@ -77,7 +77,11 @@ export function validateSelection(selection, description) {
       if(key==='requirements' && !units[id].is_heading && units[id].section_hint!=='requirements' && !mandatory.test(text)) throw new Error('unsupported_requirement');
       if (preferred && mandatory.test(text) && key==='nice_to_have') throw new Error('mixed_obligation');
       if (application.test(text) && !['application_notes','other_details'].includes(key)) throw new Error('application_condition_misplaced');
-      if (material.test(text) && !preferred && !['important_requirements','application_notes','other_details'].includes(key)) throw new Error('material_condition_misplaced');
+      if (material.test(text) && !preferred && !['important_requirements','application_notes','other_details'].includes(key)) {
+        const error=new Error('material_condition_misplaced');
+        error.sourceId=id; error.section=key;
+        throw error;
+      }
       return text;
     });
   }
@@ -117,5 +121,25 @@ export async function generateWithProvider(env, description, fetcher=fetch) {
   if(texts.length!==1) throw new Error('provider_invalid_output');
   let selection;
   try { selection=JSON.parse(texts[0].text); } catch { throw new Error('provider_invalid_json'); }
-  return validateSelection(selection,description);
+  // Correct only a material placement rejected by the unchanged validator.
+  // Keep the whole source unit in the existing conservative fallback section.
+  // Every pass rechecks schema, references, preferences and full coverage; no
+  // other validation error is repaired or suppressed. Stored reads stay strict.
+  for(let corrections=0; corrections<=units.length; corrections++) {
+    try { return validateSelection(selection,description); }
+    catch(error) {
+      if(error.message!=='material_condition_misplaced' || corrections===units.length) throw error;
+      const seen=new Set();
+      for(const key of SECTIONS) {
+        if(!Array.isArray(selection[key])) throw new Error('invalid_schema');
+        for(const id of selection[key]) {
+          if(!Number.isInteger(id) || !units[id] || seen.has(id)) throw new Error('invalid_source_reference');
+          seen.add(id);
+        }
+      }
+      if(seen.size!==units.length) throw new Error('source_omitted');
+      selection[error.section]=selection[error.section].filter(id=>id!==error.sourceId);
+      selection.other_details.push(error.sourceId);
+    }
+  }
 }
