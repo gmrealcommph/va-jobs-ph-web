@@ -1,121 +1,38 @@
-# VA Jobs PH
+# VeeAys legal and support package
 
-**Manual Resend integration:** Follow [MANUAL_RESEND.md](MANUAL_RESEND.md) for the private delivery-ledger migration, three additional runtime bindings, and the preview/send procedure for notification #165. Deployment sends no emails. Existing board, authentication, My Matches and My Jobs behavior is preserved.
+Prepared 5 October 2026 against the current local VeeAys repository commit `97dfc44` (Guide Quick Read material condition placement 5.). No deployment performed.
 
-A complete, server-rendered jobs frontend for `va-jobs-ph-web`, deployed directly to **Cloudflare Workers with Static Assets**. No Next.js adapter, browser JavaScript, or frontend build framework is required. Search, category links, job details, and pagination work as ordinary HTML pages.
+## Changes
 
-## 1. Put the project in GitHub
+- Added public `/terms`, `/privacy`, `/refund-policy`, and `/contact` routes using the existing Worker and shared layout.
+- Reused VeeAys typography, colors, page width, header and footer. Added page navigation and mobile wrapping.
+- Retained existing Terms and Privacy footer links; added Refund Policy and Contact to the same visible footer row.
+- Identified Jocelle Parungao as sole proprietor in the Philippines, with the supplied email, phone and website. No invented address, registration or tax information.
+- Covered job aggregation, accounts, preferences, saved jobs, application tracking, matching, alerts/digests, Pro access, external employers and application links, data providers and authentication/session information.
+- Clearly distinguished the advertised ₱499/month offer from the current absence of live payments. Future cancellation provisions are marked as planned. Paddle is not represented as processing current transactions.
 
-Extract the supplied ZIP, then copy **the contents of `va-jobs-ph-web`** into the root of the existing `va-jobs-ph-web` repository. Replace the starter README. Include dotfiles, `pnpm-lock.yaml`, `src`, `public`, and `test`; do not nest the project inside another folder. The separate `va-jobs-ph` backend is untouched.
+## Files
 
-## 2. Configure Supabase
+`src/legal-pages.js`, `src/worker.js`, `src/render.js`, `public/styles.css`, `test/legal-pages.test.js`.
 
-The public job board continues to accept only a modern **publishable key** beginning `sb_publishable_`, sent through the `apikey` header. The separate protected manual notification module uses the server-side `SUPABASE_SERVICE_ROLE_KEY` and `RESEND_API_KEY` secrets; these are never used by the public board or exposed in HTML. Legacy JWT anon keys are deliberately not accepted by the public board.
+Worker changes consist only of a legal-page import and route dispatch. Renderer changes consist only of footer links and the stylesheet cache version. CSS additions target legal pages and footer wrapping. No Quick Read, payment, job-data, scheduler, authentication, homepage, Pro, categories or matches implementation was changed.
 
-Required runtime variables:
+## Validation
 
-| Variable | Value |
-| --- | --- |
-| `SUPABASE_URL` | `https://nwqmhqiymtqkdihjadrp.supabase.co` (already in `wrangler.jsonc`) |
-| `SUPABASE_PUBLISHABLE_KEY` | Your project's `sb_publishable_...` key |
-| `SITE_URL` | Your final public origin, e.g. `https://your-domain.example` |
+- New tests: 6 passed. Cover public GET/HEAD routes without upstream job requests, canonical/index metadata, business contacts, footer links, payment status, hiring disclaimers and statutory-rights wording.
+- Full suite: 146 tests; 135 passed, 7 failed, 4 skipped.
+- Untouched baseline: 140 tests; 129 passed, the same 7 failed, 4 skipped. No new full-suite failures.
+- Existing failures: digest activation test; Quick Read 41645 boundary test; Quick Read 43635 boundary test; search query expectations; job-detail escaping/application-link expectation; search pagination canonical expectation; numeric detail application-link expectation. Left unchanged to honor the requested scope.
+- Wrangler 4.144.0 build dry-run passed: bundled Worker and 12 public assets, 203.73 KiB total / 52.84 KiB gzip. No upload or deployment performed.
+- Browser checks: all four pages at 1440px and 390px widths; no horizontal overflow, all four footer links visible. Desktop Terms and mobile Contact screenshots reviewed.
+- `git diff --check` passed.
 
-Set `SITE_URL` to the actual Workers URL or custom domain you launch with. Until it is configured, HTML pages are marked `noindex` and robots.txt disallows crawling. Requests on a different origin (such as a preview URL) are also marked noindex. A production domain should use HTTPS.
+## Apply later
 
-The existing `public.public_jobs` view must be readable through Supabase REST by the publishable key's anonymous role. Retain the existing database permissions and security policies; if access fails, review those rather than granting privileged access to this frontend.
+Use either `veeays-legal-support.patch` or the ZIP’s changed files, not both. From a clean repository matching the base, run `git apply --check <path-to-patch>` before `git apply <path-to-patch>`. Alternatively, copy ZIP files into the corresponding repository paths. The ZIP preserves `src/`, `public/`, and `test/` paths and contains no dependencies, secrets or unrelated files. Run the repository tests and build dry-run before your normal deployment process. This package does not deploy anything.
 
-Exact data contract:
+## Before enabling paid checkout
 
-```
-id, title, company, description, category, location, remote,
-workplace_type, source, job_url, posted_at, collected_at
-```
+Update the centralized copy in `src/legal-pages.js`: replace pre-launch statements with the actual merchant-of-record disclosure, provider buyer-terms/support links, tax/currency/renewal information, functioning cancellation method and agreed refund/withdrawal rules. Confirm those statements against the actual integration. Current policy text deliberately does not claim a live purchase agreement or finalized refund window. Confirm provider use, retention and privacy-contact procedures continue to match operations.
 
-`id` must be unique, stable, and convertible to a URL path segment. Title, company, description, category, location, workplace_type, source, and job_url are text or null. `remote` is boolean or null; dates are ISO timestamp strings or null. The view already restricts results to active, Philippines-eligible jobs; the frontend does not duplicate those filters. Descriptions are rendered as escaped plain text with preserved line breaks. HTML in a source description is intentionally displayed literally rather than executed.
-
-## 3. Local development
-
-Install Node.js 22 or newer, then from the project directory:
-
-```sh
-npm install
-```
-
-Copy `.dev.vars.example` to `.dev.vars` and replace the placeholder with the publishable key. `.dev.vars` is ignored by Git. For local development, keep `SITE_URL="http://localhost:8787"`.
-
-```sh
-npm run dev
-```
-
-Open `http://localhost:8787`. An unconfigured key or unavailable database produces a friendly HTTP 503 page, never fabricated job listings. No real key is included in this project.
-
-The project also includes a pnpm lockfile. For a fully locked dependency install with pnpm 11, use `pnpm install --frozen-lockfile`; the included workspace file allows the official esbuild/workerd installation scripts. npm users can use the commands above and commit the generated `package-lock.json` instead of the pnpm lockfile. Wrangler itself is pinned to the version verified for this delivery.
-
-## 4. Cloudflare deployment
-
-In Cloudflare's Git-connected **Workers** flow, select `va-jobs-ph-web`:
-
-| Setting | Value |
-| --- | --- |
-| Root directory | Repository root |
-| Build command | `npm run build` |
-| Deploy command | `npm run deploy` |
-| Dependency installation | Cloudflare automatic installation (detects the included pnpm lockfile), or `npm install` |
-| Static asset directory | `public` (already in Wrangler configuration) |
-
-This is a Workers project, not a Pages static export. It needs the Worker to render job pages at request time. No `out`/`.next` directory or Pages framework preset is used.
-
-Add `SITE_URL` under `vars` in `wrangler.jsonc` before committing your production configuration so future Git deployments keep it. Store the publishable key as a Worker runtime secret using the Cloudflare dashboard or:
-
-```sh
-npx wrangler secret put SUPABASE_PUBLISHABLE_KEY
-```
-
-For `SUPABASE_PUBLISHABLE_KEY`, enter only the publishable key. Keep the server key under the distinct `SUPABASE_SERVICE_ROLE_KEY` Secret binding, as described in MANUAL_RESEND.md. Cloudflare preserves secret bindings across deployments. Build-time environment variables alone are not runtime bindings. If the Worker does not yet exist, deploy once, add the bindings, and reload.
-
-For a manual deployment:
-
-```sh
-npm install
-npm test
-npm run build
-npm run deploy
-```
-
-Cloudflare account authentication is required only for deployment. The build performs a local Wrangler dry run and writes its bundle to ignored `dist/`. For a custom domain, add it in the Worker's Domains & Routes settings and set `SITE_URL` to that origin.
-
-## Pages and behavior
-
-- `/`: keyword search across title, company, and description; 15 jobs per page, ordered by posted date and stable ID.
-- `/?q=assistant&page=2`: shareable search and pagination.
-- `/categories`: all category values found in the public view.
-- `/categories/{encoded-category}`: exact category filtering with search and pagination.
-- `/jobs/{encoded-id}`: full description, company, location, remote/workplace labels, source, dates, and original application link.
-- `/robots.txt`, `/sitemap.xml`, `/sitemaps/pages.xml`, `/sitemaps/jobs-{n}.xml`: crawl controls and segmented sitemaps.
-
-Unknown jobs/categories and invalid/out-of-range pages return HTTP 404. Unavailable Supabase responses return HTTP 503 with Retry-After. Null fields have explicit fallbacks. Unsafe application URL protocols are rejected. Arbitrary listing text is HTML-escaped. Account features retain their existing authenticated writes; the protected manual processor writes only its delivery ledger and the selected notification's acknowledgement.
-
-## SEO and Google
-
-Pages include server-rendered content, titles, descriptions, canonical links, Open Graph tags, and semantic headings. Category pages and pagination are crawlable; keyword search results are noindex to avoid a large search-results index. Sitemaps include active-view job URLs and category pages. Removed jobs return 404 after the short response cache expires.
-
-After launch, verify the final domain in Google Search Console and submit `https://YOUR_DOMAIN/sitemap.xml`. Indexing is Google's decision and is not guaranteed. Google Jobs `JobPosting` structured data is intentionally omitted: the view does not reliably provide all details needed to distinguish remote eligibility, physical job locations, and complete hiring-organization requirements. Do not invent these details for rich results.
-
-## Validation and operating notes
-
-```sh
-npm test
-npm run build
-```
-
-Automated tests mock Supabase and cover server rendering, search quoting, pagination, schema filters, missing pages, XSS/URL safety, key rejection, upstream failures, sitemap routes, and preview indexing. A real database connection still needs to be smoke-tested after adding your publishable key; no live access is claimed by these tests.
-
-The category list is derived from public view rows, scanning in batches that respect the API row limit. Job results are paginated in Supabase, not downloaded in full. For very large datasets, add a separately authorized distinct-category endpoint/materialized view and database search indexes as a backend enhancement. Exact counts and substring description searches may be costly at scale. Sitemap job files contain at most 1,000 URLs; concurrent ingestion can shift offset-based sitemap boundaries until the next crawl. HTML responses use a short 60-second public cache; sitemap responses use 300 seconds. No analytics, cookies, external fonts, or tracking scripts are included.
-
-Official references: [Workers static assets](https://developers.cloudflare.com/workers/static-assets/), [Wrangler configuration](https://developers.cloudflare.com/workers/wrangler/configuration/), [Supabase API keys](https://supabase.com/docs/guides/getting-started/api-keys), [Supabase REST API](https://supabase.com/docs/guides/api).
-# Production Strong Match release
-
-See [PRODUCTION_STRONG_MATCHES.md](PRODUCTION_STRONG_MATCHES.md) for the corrected live-schema migration, disabled deployment, scheduled sender, retry/reconciliation rules and manual-control transition. Notification age/order uses existing `discovered_at`; no notification `created_at` column is added. That document supersedes the manual-only setup below. The supplied configuration retires the manual route, disables sending and has no cron trigger. Existing frontend instructions continue below.
-# Daily Digest V1 addition
-
-Use [DAILY_DIGEST_DEPLOYMENT.md](DAILY_DIGEST_DEPLOYMENT.md) for this release's deployment order and effective configuration. Daily Digest is disabled by default; the supplied configuration preserves the reported live Strong Match activation and its original cron. Apply only migration 003 on the already-migrated production database. [DAILY_DIGEST_VALIDATION.md](DAILY_DIGEST_VALIDATION.md) contains the current validation results. Older deployment notes below describe earlier release states.
+Copy was informed by [Paddle domain-review requirements](https://www.paddle.com/help/start/account-verification/what-is-domain-verification), [Paddle customer handbook](https://www.paddle.com/seller-guides/seller-handbook), [Paddle buyer terms](https://www.paddle.com/legal/buyer-terms) and [Philippine National Privacy Commission data-subject rights](https://privacy.gov.ph/data-subject-rights/). This package prepares public legal/support pages; it does not certify Paddle approval.

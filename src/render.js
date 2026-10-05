@@ -44,7 +44,7 @@ export function layout({ title, description, canonical, body, noindex = false, u
     type="image/svg+xml"
   >
 
-  <link rel="stylesheet" href="/styles.css?v=20261004-pro-stories">
+  <link rel="stylesheet" href="/styles.css?v=20261005-legal-support">
 </head>
 
 <body>
@@ -230,6 +230,9 @@ export function layout({ title, description, canonical, body, noindex = false, u
       <a href="/terms">
         Terms
       </a>
+
+      <a href="/refund-policy">Refund Policy</a>
+      <a href="/contact">Contact</a>
 
     </div>
 
