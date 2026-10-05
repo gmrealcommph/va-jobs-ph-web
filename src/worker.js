@@ -609,7 +609,12 @@ if (
     }
 
     const legal = legalPage(url.pathname);
-    if (legal) return render(legal.title, legal.body, { description: legal.description });
+    if (legal) {
+      const noindex = url.pathname !== '/contact';
+      const response = render(legal.title, legal.body, { description: legal.description, noindex });
+      if (noindex) response.headers.set('X-Robots-Tag', 'noindex, follow');
+      return response;
+    }
 
     if (url.pathname === '/pro') {
       const isPro = currentProfile?.plan === 'pro' && currentProfile?.plan_status === 'active';

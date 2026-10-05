@@ -7,14 +7,18 @@ afterEach(() => { globalThis.fetch = originalFetch; });
 const env = { SITE_URL: 'https://veeays.com' };
 const routes = ['/terms', '/privacy', '/refund-policy', '/contact'];
 for (const path of routes) {
-  test(`${path} is public, indexed and independent of job data`, async () => {
+  test(`${path} is public with route-specific indexing and independent of job data`, async () => {
     globalThis.fetch = () => { throw new Error('Public legal pages must not need an upstream request'); };
     const response = await handle(new Request(env.SITE_URL + path), env);
     const html = await response.text();
     assert.equal(response.status, 200);
-    assert.match(html, /index,follow/);
+    const noindex = path !== '/contact';
+    assert.match(html, new RegExp('name="robots"\\s+content="' + (noindex ? 'noindex,follow' : 'index,follow') + '"'));
+    assert.equal(response.headers.get('x-robots-tag'), noindex ? 'noindex, follow' : null);
     assert.ok(html.includes(`href="${env.SITE_URL + path}"`));
-    assert.match(html, /Jocelle Parungao/);
+    assert.match(html, /VeeAys is operated by <strong>Alfred Parungao<\/strong>, a sole proprietor based in the Philippines/);
+    assert.doesNotMatch(html, /Jocelle Parungao/);
+    assert.match(html, /\+63 975 810 4597/);
     assert.match(html, /sole proprietor/);
     assert.match(html, /href="mailto:support@veeays.com"/);
     assert.match(html, /href="tel:\+639758104597"/);
@@ -22,6 +26,7 @@ for (const path of routes) {
     for (const route of routes) assert.ok(html.includes(`href="${route}"`));
     const head = await handle(new Request(env.SITE_URL + path, { method: 'HEAD' }), env);
     assert.equal(head.status, 200);
+    assert.equal(head.headers.get('x-robots-tag'), noindex ? 'noindex, follow' : null);
     assert.equal(await head.text(), '');
   });
 }
