@@ -29,3 +29,26 @@ test('Live webhook uses Live acceptance RPC, remains active while new checkout d
  await mocked(async(url,init)=>{const u=new URL(url);if(u.hostname==='api.paymongo.com')return Response.json({data:session()});if(u.pathname==='/rest/v1/pro_payments')return Response.json([record]);assert.equal(u.pathname,'/rest/v1/rpc/accept_pro_payment');assert.equal(JSON.parse(init.body).p_livemode,true);writes++;return Response.json({duplicate:false});},async()=>{const response=await proCheckoutEndpoint(new Request(env.SITE_URL+'/webhooks/paymongo',{method:'POST',headers:{'paymongo-signature':await signed(raw)},body:raw}),{...env,PAYMONGO_LIVE_CHECKOUT_ENABLED:'false'});assert.equal(response.status,200);assert.equal(writes,1);});
 });
 test('Live purchase copy states real price and removes test/coming-soon claims',()=>{const html=proPage({user:{id:uid},liveCheckout:true});assert.match(html,/action="\/pro\/checkout"/);assert.match(html,/₱499/);assert.ok(!/TEST MODE|No real money|coming soon/.test(html));});
+
+test('signed Live webhook for a deleted account is acknowledged only after authoritative payment validation',async()=>{
+ const raw=JSON.stringify({data:{id:'evt_fixture',type:'event',attributes:{type:'checkout_session.payment.paid',livemode:true,data:session()}}});let writes=0;
+ await mocked(async(url,init)=>{const u=new URL(url);if(u.hostname==='api.paymongo.com')return Response.json({data:session()});if(u.pathname==='/rest/v1/pro_payments')return Response.json([{...record,user_id:null}]);assert.equal(u.pathname,'/rest/v1/rpc/accept_pro_payment');assert.equal(JSON.parse(init.body).p_livemode,true);writes++;return Response.json({duplicate:false,expires_at:null,outcome:'account_deleted'});},async()=>{
+ const response=await proCheckoutEndpoint(new Request(env.SITE_URL+'/webhooks/paymongo',{method:'POST',headers:{'paymongo-signature':await signed(raw)},body:raw}),env);
+ assert.equal(response.status,200);assert.deepEqual(await response.json(),{received:true,outcome:{duplicate:false,expires_at:null,outcome:'account_deleted'}});assert.equal(writes,1);
+ });
+});
+
+test('deleted-account receipt still rejects an unpaid authoritative checkout without invoking acceptance',async()=>{
+ const raw=JSON.stringify({data:{id:'evt_fixture',type:'event',attributes:{type:'checkout_session.payment.paid',livemode:true,data:session()}}});
+ await mocked(async(url)=>{const u=new URL(url);if(u.hostname==='api.paymongo.com'){const s=session();s.attributes.payments[0].attributes.status='pending';return Response.json({data:s});}if(u.pathname==='/rest/v1/pro_payments')return Response.json([{...record,user_id:null}]);throw new Error('Acceptance must not be called');},async()=>{
+ const response=await proCheckoutEndpoint(new Request(env.SITE_URL+'/webhooks/paymongo',{method:'POST',headers:{'paymongo-signature':await signed(raw)},body:raw}),env);
+ assert.equal(response.status,422);
+ });
+});
+
+test('receipt return uses authenticated ownership filter and cannot expose a deleted-account receipt',async()=>{
+ await mocked(async(url,init)=>{const u=new URL(url);if(u.pathname==='/auth/v1/user')return Response.json({id:uid});assert.equal(u.pathname,'/rest/v1/pro_payments');assert.equal(u.searchParams.get('user_id'),'eq.'+uid);assert.ok(!init.method || init.method==='GET');return Response.json([]);},async()=>{
+ const response=await proCheckoutEndpoint(new Request(env.SITE_URL+'/pro/return?payment='+id,{headers:{cookie:'veeays_access=fixture'}}),env);
+ assert.equal(response.status,404);
+ });
+});
