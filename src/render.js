@@ -44,7 +44,7 @@ export function layout({ title, description, canonical, body, noindex = false, u
     type="image/svg+xml"
   >
 
-  <link rel="stylesheet" href="/styles.css?v=20261005-legal-support">
+  <link rel="stylesheet" href="/styles.css?v=20261006-approved-hero">
 </head>
 
 <body>
@@ -446,31 +446,16 @@ export function listing({ rows, total, page, search, category, names, showPrefer
               </a>
             </div>
 
-            <div class="premium-collage" aria-hidden="true">
-
-              <div class="collage-glow"></div>
-
+            <div class="premium-collage approved-hero-art">
               <img
-                src="/veeays-hero-collage.png"
-                alt=""
-                width="1728"
-                height="864"
+                src="/veeays-hero-approved.png"
+                alt="Remote work possibilities: earn in USD, work with global companies, build skills and grow your career, skip the commute, work from anywhere, and enjoy better work-life balance."
+                width="1591"
+                height="989"
                 loading="eager"
                 fetchpriority="high"
+                decoding="async"
               >
-
-              <span class="float-note note-one">
-                Different time zones.<br>
-                <strong>Same drive.</strong>
-              </span>
-
-              <span class="float-badge">
-                PH <b>↗</b> WORLD
-              </span>
-
-              <span class="hero-spark spark-one">✳</span>
-              <span class="hero-spark spark-two">✦</span>
-
             </div>
 
           </div>
@@ -717,23 +702,54 @@ export function listing({ rows, total, page, search, category, names, showPrefer
     </div>
 
 
-    <div class="final-cta-art final-journey" aria-hidden="true">
-      <svg class="journey-route" viewBox="0 0 520 430" fill="none">
-        <path d="M35 105C100 25 320 25 438 100S490 255 397 239" stroke="#79ad45" stroke-width="2" stroke-dasharray="2 7" stroke-linecap="round"/>
-      </svg>
-      <div class="journey-destination"><span>FROM <b>PH</b></span><i>→</i><span>TO <b>GLOBAL</b></span></div>
-      <svg class="journey-plane" viewBox="0 0 64 54" fill="none"><path d="M3 21 60 4 41 49 29 31Z" fill="#f69b38" stroke="#dc7d22" stroke-width="1.2" stroke-linejoin="round"/><path d="m29 31 31-27-39 20Z" fill="#ffbd69"/><path d="m29 31 2 12 10 6" fill="#e78528"/><path d="m29 31 31-27" stroke="#b86822" stroke-width="1.2"/></svg>
-      <div class="journey-job journey-job-back"><span class="journey-company">STUDIO NORTH · DEMO</span><strong>Social Media<br>Manager</strong><span class="journey-meta">Remote · Full-time</span><span class="journey-tag">Marketing</span></div>
-      <div class="journey-job journey-job-middle"><span class="journey-company">BRIGHT DESK · DEMO</span><strong>Customer Support</strong><span class="journey-meta">Remote · Philippines eligible</span></div>
-      <div class="journey-job journey-job-front">
-        <span class="journey-tape"></span><span class="journey-company"><i class="journey-monogram">✳</i> OPEN HORIZON · DEMO</span>
-        <strong>Executive<br>Assistant</strong><span class="journey-meta">Remote · Philippines eligible</span>
-        <div class="journey-card-footer"><span class="journey-tag">Full-time</span><span class="journey-card-arrow">↗</span></div>
+    <div class="final-cta-art" aria-hidden="true">
+
+      <span class="final-art-star star-one">✳</span>
+      <span class="final-art-star star-two">✦</span>
+
+      <div class="final-map-stamp">
+        <span>PH</span>
+        <b>↗</b>
+        <span>WORLD</span>
       </div>
-      <div class="journey-match"><b>94<span>%</span></b><span>MATCH</span><svg viewBox="0 0 32 18"><path d="m3 9 8 6L28 2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></div>
-      <div class="journey-borders"><span>WORK</span><strong>WITHOUT<br>BORDERS</strong><small>VEEAYS · PH → GLOBAL</small></div>
-      <div class="journey-annotation"><svg viewBox="0 0 75 40"><path d="M70 34C22 37 12 23 13 5m-9 9 9-9 9 8" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg><span>opportunities that<br>fit your skills</span></div>
-      <span class="journey-spark">✦</span>
+
+      <div class="final-paper-card">
+        <span class="final-paper-pin">✦</span>
+
+        <strong>
+          Ready when<br>
+          you are.
+        </strong>
+
+        <small>
+          Your skills can travel.
+        </small>
+      </div>
+
+      <div class="final-flight-path">
+        <span class="final-path-dot dot-one"></span>
+        <span class="final-path-dot dot-two"></span>
+        <span class="final-path-dot dot-three"></span>
+        <span class="final-path-dot dot-four"></span>
+        <span class="final-path-dot dot-five"></span>
+        <span class="final-path-dot dot-six"></span>
+      </div>
+
+      <span class="final-paper-plane">➤</span>
+
+      <div class="final-postcard">
+        <span>WORK</span>
+
+        <strong>
+          WITHOUT<br>
+          BORDERS
+        </strong>
+
+        <small>
+          VEEAYS · PH → WORLD
+        </small>
+      </div>
+
     </div>
 
   </div>

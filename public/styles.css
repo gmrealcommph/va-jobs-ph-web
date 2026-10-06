@@ -5721,35 +5721,28 @@ body>header,body>footer{flex-shrink:0}
 .pro-board-flight{position:absolute;right:18px;top:28px;width:105px;height:auto;color:#123e30}
 .pro-free-note{max-width:760px;border-left:3px solid #f2bb52;padding-left:16px}
 @media(max-width:800px){.pro-comparison-board{grid-template-columns:1fr;gap:36px;margin-top:36px}.pro-plan-paper{padding:28px 24px}.pro-plan-plus{margin-top:0}.pro-plan-paper h3{min-height:0;font-size:32px}.pro-plan-plus h3{padding-right:54px}.pro-board-flight{width:80px;top:40px;right:12px}.pro-plan-note{right:12px;font-size:9px}}
-/* Final CTA: decorative demo opportunities, isolated from live listing cards. */
-.final-cta-art.final-journey{height:auto;aspect-ratio:520/430;max-width:520px;min-width:0;container-type:inline-size;isolation:isolate}
-.final-journey:before{width:70%;height:80%;right:4%;top:10%;background:#e4efc6;opacity:.75}
-.journey-route{position:absolute;inset:0;width:100%;height:100%;z-index:0}
-.journey-destination{position:absolute;top:3%;left:13%;display:flex;align-items:center;gap:12px;padding:10px 16px;border:1.5px solid #f69b38;border-radius:50% 45% 45% 40%;background:#fffbef;transform:rotate(-5deg);color:#123e30;font-size:10px;font-weight:700;letter-spacing:.08em}
-.journey-destination b{font-size:12px}.journey-destination i{font-style:normal;font-size:19px;color:#e9892d}
-.journey-plane{position:absolute;right:2%;top:22%;width:12%;z-index:6;filter:drop-shadow(0 4px 2px #123e3014);transform:rotate(17deg);animation:journey-flight 9s ease-in-out infinite}
-.journey-job{position:absolute;box-sizing:border-box;display:flex;flex-direction:column;gap:12px;padding:22px;background:#fffdf5;color:#123e30;border:1px solid #d6d9c9;border-radius:9px;box-shadow:3px 7px 0 #123e3008,0 15px 25px #123e3010;transition:translate .4s ease}
-.journey-company{font-size:10px;font-weight:800;letter-spacing:.07em;display:flex;align-items:center;gap:8px}
-.journey-job strong{font-family:Georgia,serif;font-size:26px;line-height:1.1;letter-spacing:-.6px}.journey-meta{font-size:12px;line-height:1.5;color:#61746a}
-.journey-job-back{width:53%;height:48%;top:19%;left:3%;transform:rotate(-10deg);z-index:1;background:#f1f1df}
-.journey-job-middle{width:56%;height:45%;top:16%;right:8%;transform:rotate(9deg);z-index:2;background:#f7f6e9}
-.journey-job-front{width:65%;height:54%;top:32%;left:16%;transform:rotate(-4deg);z-index:4;gap:16px}
-.journey-monogram{display:grid;place-items:center;width:29px;height:29px;border-radius:7px;background:#e9f3d3;font-size:24px;font-style:normal;color:#72ad3d;flex-shrink:0}
-.journey-tape{position:absolute;top:-10px;left:35%;width:30%;height:22px;background:#edc37499;transform:rotate(3deg);clip-path:polygon(2% 0,98% 5%,100% 90%,0 100%)}
-.journey-card-footer{display:flex;align-items:center;justify-content:space-between;border-top:1px solid #e4e5d7;padding-top:13px;margin-top:auto}
-.journey-tag{align-self:flex-start;padding:5px 9px;background:#e8f1d3;border-radius:20px;font-size:11px;font-weight:600}.journey-card-arrow{display:grid;place-items:center;border:1px solid #b4cba0;border-radius:50%;width:28px;height:28px;font-size:20px}
-.journey-match{position:absolute;top:27%;right:8%;z-index:5;display:flex;flex-direction:column;align-items:center;width:21%;padding:12px 5px 10px;background:#d9ee88;color:#123e30;box-shadow:2px 5px 0 #123e3014,0 7px 12px #123e3010;transform:rotate(8deg);animation:journey-note 7s ease-in-out infinite;clip-path:polygon(0 0,100% 2%,98% 94%,85% 100%,0 96%)}
-.journey-match b{font-family:Georgia,serif;font-size:35px;line-height:1}.journey-match b span{font-size:22px}.journey-match>span{font-size:10px;letter-spacing:.18em;font-weight:800;margin-top:5px}.journey-match svg{width:26px;height:17px;margin-top:4px}
-.journey-borders{position:absolute;right:0;bottom:4%;width:37%;padding:17px;background:#123e30;color:#fffdf0;transform:rotate(8deg);z-index:3;box-shadow:5px 6px 0 #f69b38;outline:1px dashed #91b65e;outline-offset:-9px}
-.journey-borders>span{font-size:9px;letter-spacing:.22em;color:#b4ef76;font-weight:900}.journey-borders strong{display:block;font-family:Georgia,serif;font-size:22px;line-height:.95;margin:8px 0}.journey-borders small{font-size:7px;letter-spacing:.06em;font-weight:800}
-.journey-annotation{position:absolute;left:5%;bottom:1%;z-index:5;display:flex;align-items:center;gap:6px;color:#456b45;transform:rotate(-6deg)}.journey-annotation svg{width:50px;height:40px}.journey-annotation span{font-family:'Segoe Print','Bradley Hand',cursive;font-size:16px;line-height:1.35}.journey-spark{position:absolute;right:0;top:7%;font-size:30px;color:#e9892d}
-@media(hover:hover) and (prefers-reduced-motion:no-preference){.final-journey:hover .journey-job-front{translate:0 -3px}.final-journey:hover .journey-job-back{translate:-2px -2px}.final-journey:hover .journey-job-middle{translate:2px -2px}}
-@keyframes journey-flight{0%,100%{transform:translate(0,0) rotate(17deg)}50%{transform:translate(-9px,-6px) rotate(12deg)}}
-@keyframes journey-note{0%,100%{transform:translateY(0) rotate(8deg)}50%{transform:translateY(-3px) rotate(7deg)}}
-@container(max-width:440px){.journey-job{padding:17px;gap:10px}.journey-job strong{font-size:22px}.journey-job-front{gap:10px}.journey-company{font-size:8px;letter-spacing:.04em}.journey-meta{font-size:11px}.journey-match b{font-size:29px}.journey-borders{padding:14px}.journey-borders strong{font-size:19px}.journey-annotation span{font-size:14px}}
-@media(max-width:760px){.final-cta-art.final-journey{width:100%;margin:38px auto 0;max-width:460px}}
-@media(max-width:400px){.final-cta-art.final-journey{aspect-ratio:320/330}.journey-job-middle{display:none}.journey-job-back{top:20%;height:43%;width:66%;left:3%}.journey-job-back strong{font-size:19px}.journey-job-back .journey-meta,.journey-job-back .journey-tag{display:none}.journey-job-front{top:35%;left:4%;width:82%;height:49%;padding:17px}.journey-job-front strong{font-size:24px}.journey-company{font-size:8px}.journey-match{right:0;top:25%;width:26%}.journey-borders{display:none}.journey-annotation{bottom:0;left:8%}.journey-destination{left:3%;gap:8px;padding:8px 12px}.journey-plane{top:18%;right:1%;width:15%}.journey-spark{display:none}.journey-card-footer{padding-top:8px}}
-@media(prefers-reduced-motion:reduce){.final-journey *{animation:none!important;transition:none!important;translate:none!important}}
-/* Keep supporting lettering visible and give narrow cards room for their footer. */
-.journey-borders{z-index:5;bottom:0;width:34%;right:0}
-@media(max-width:400px){.final-cta-art.final-journey{aspect-ratio:320/390}.journey-job-front{top:32%;height:52%}.journey-job-back{top:18%;height:42%}.journey-match{top:24%}.journey-annotation{bottom:0}}
+
+/* Original 1591 × 989 transparent PNG; crop only its empty left margin.
+   A 580px frame displays the 1160px artwork region at up to 2x density. */
+.home-hero .premium-collage.approved-hero-art,
+.home-hero .premium-collage.approved-hero-art:hover{
+  width:100%;
+  max-width:580px;
+  aspect-ratio:1160 / 989;
+  margin:0 0 0 auto;
+  overflow:hidden;
+  transform:none;
+  transition:none;
+  filter:none;
+}
+.home-hero .approved-hero-art img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  object-position:right center;
+  animation:none;
+  transform:none;
+}
+@media(max-width:600px){
+  .home-hero .premium-collage.approved-hero-art{margin:16px auto 0}
+}
