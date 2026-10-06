@@ -46,7 +46,7 @@ export function layout({ title, description, canonical, body, noindex = false, u
     type="image/svg+xml"
   >
 
-  <link rel="stylesheet" href="/styles.css?v=20261006-category-sidebar">
+  <link rel="stylesheet" href="/styles.css?v=20261006-company-pages">
 </head>
 
 <body>
@@ -188,7 +188,7 @@ export function layout({ title, description, canonical, body, noindex = false, u
         </a>
 
         <a href="/employers">
-          Post a job
+          Employer enquiries
           <span aria-hidden="true">↗</span>
         </a>
 

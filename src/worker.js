@@ -6,6 +6,7 @@ import { scheduledDailyDigest, DIGEST_CRON } from './daily-digest.js';
 import { emailPreferences } from './email-preferences.js';
 import { categoryPage } from './category-page.js';
 import { legalPage } from './legal-pages.js';
+import { companyPage } from './company-pages.js';
 import { layout, listing, detail, esc, jobPath, categoryPath, authPage, checkEmailPage, authCallbackPage, onboardingPage, matchesPage, proPage, myJobsPage } from './render.js';
 import { signUp, signIn, getUser, sessionForRequest, setSessionCookies, clearSessionCookies, authError, getJobPreferences, saveJobPreferences, completeOnboarding, getMyProfile, getMyJobMatches, getMyMatchSummary, getSavedJobs, saveJobForUser, unsaveJobForUser, getJobApplications, markJobApplied, updateJobApplication, deleteJobApplication } from './auth.js';
 
@@ -607,6 +608,9 @@ if (
       catch (error) { console.error('Preferences load failed:', error); }
       return render('Set up your account', onboardingPage({ user: authState.user, preferences, error: (url.searchParams.get('error') || '').slice(0, 240) }), { noindex: true });
     }
+
+    const company = companyPage(url.pathname);
+    if (company) return render(company.title, company.body, { description: company.description });
 
     const legal = legalPage(url.pathname);
     if (legal) {
