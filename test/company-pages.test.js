@@ -14,7 +14,7 @@ for (const route of ['/employers', '/about']) {
     const html = await response.text();
     assert.match(html, /name="robots"\s+content="index,follow"/);
     assert.ok(html.includes(`href="${env.SITE_URL + route}"`));
-    assert.match(html, /class="site-header"/);
+    assert.match(html, /class="site-header veeays-navigation"/);
     assert.match(html, /class="site-footer"/);
     for (const match of companyPage(route).body.matchAll(/href="(\/[^"#?]*)"/g)) {
       const target = await handle(new Request(env.SITE_URL + match[1]), env);
@@ -30,7 +30,7 @@ test('guest/member shared header/footer route every company link to a live desti
   for (const user of [null, { id: 'user' }]) {
     const html = layout({ title: 'Test', description: '', canonical: env.SITE_URL, body: '', user });
     const links = [...html.matchAll(/href="(\/(?:employers|about))"/g)];
-    assert.deepEqual(links.map(m => m[1]), ['/employers', '/employers', '/employers', '/about']);
+    assert.deepEqual(links.map(m => m[1]), ['/employers', '/employers', '/employers', '/employers', '/about']);
     for (const [, route] of links) assert.equal((await handle(new Request(env.SITE_URL + route), env)).status, 200);
     assert.doesNotMatch(html, /Post a job/);
     assert.match(html, /Employer enquiries/);

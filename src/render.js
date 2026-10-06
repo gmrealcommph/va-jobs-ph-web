@@ -8,7 +8,13 @@ export function safeUrl(value) { try { const u = new URL(value); return ['https:
 export function date(value) { const d = new Date(value); return value && !Number.isNaN(+d) ? d.toLocaleDateString('en-PH', { year: 'numeric', month: 'short', day: 'numeric', timeZone: 'Asia/Manila' }) : ''; }
 
 export function layout({ title, description, canonical, body, noindex = false, user = null, profile = null, showPreferencesPrompt = false }) {
-  const firstName = String(profile?.full_name || '').trim().split(/\s+/)[0] || '';
+  const firstName = String(profile?.full_name || '').trim().split(/\s+/)[0] || 'Your account';
+  const isPro = profile?.plan === 'pro' && profile?.plan_status === 'active';
+  let currentPath = '/';
+  try { currentPath = new URL(canonical).pathname; } catch {}
+  const navLink = (href, label, cls = '') => '<a class="' + cls + '" href="' + href + '"' + ((href === '/' ? currentPath === '/' || currentPath.startsWith('/jobs') : currentPath === href || currentPath.startsWith(href + '/')) ? ' aria-current="page"' : '') + '>' + label + '</a>';
+  const accountLinks = navLink('/onboarding', 'My account') + navLink('/email-preferences', 'Email preferences') + navLink('/pro', isPro ? 'Your Pro membership' : 'Explore VeeAys Pro', 'member-plan-link') + '<a class="member-logout" href="/logout">Log out <span aria-hidden="true">↗</span></a>';
+  const discoveryLinks = navLink('/', 'Find a job') + navLink('/categories', 'Categories') + navLink('/employers', 'For Employers');
   return `<!doctype html>
 <html lang="en-PH">
 <head>
@@ -46,7 +52,7 @@ export function layout({ title, description, canonical, body, noindex = false, u
     type="image/svg+xml"
   >
 
-  <link rel="stylesheet" href="/styles.css?v=20261006-flip-counter-fix">
+  <link rel="stylesheet" href="/styles.css?v=20261006-member-navigation">
 </head>
 
 <body>
@@ -55,60 +61,25 @@ export function layout({ title, description, canonical, body, noindex = false, u
   Skip to content
 </a>
 
-<header class="site-header">
-
+<header class="site-header veeays-navigation">
   <div class="wrap header">
-
-    <a
-      class="veeays-brand"
-      href="/"
-      aria-label="VeeAys home"
-    >
-      <img
-        class="veeays-logo-img"
-        src="/veeays-logo.png"
-        alt="VeeAys"
-        width="1200"
-        height="400"
-      >
-    </a>
-
-    <nav aria-label="Main navigation">
-      <a href="/pro">VeeAys Pro</a>
-
-      <a href="/">
-        Find a job
-      </a>
-
-      <a href="/categories">
-        Categories
-      </a>
-
-      <a href="/employers">
-        For Employers
-      </a>
-
-    </nav>
-
+    <a class="veeays-brand" href="/" aria-label="VeeAys home"><img class="veeays-logo-img" src="/veeays-logo.png" alt="VeeAys" width="1200" height="400"></a>
+    <nav class="discovery-nav" aria-label="Explore">${discoveryLinks}${!user ? navLink('/pro', 'VeeAys Pro', 'nav-pro') : ''}</nav>
     <div class="header-actions">
-
-      ${user ? `
-        <span class="auth-user">${firstName ? `Hi, ${esc(firstName)}! 👋` : 'Hi! 👋'}</span>
-        ${profile?.plan === 'pro' && profile?.plan_status === 'active' ? '<span class="pro-nav-status">PRO</span>' : '<a class="pro-nav-pill" href="/pro">Upgrade to Pro</a>'}
-        <a class="auth-link" href="/matches">My matches</a>
-        <a class="auth-link" href="/my-jobs">My jobs</a>
-        <a class="auth-link" href="/onboarding">My account</a>
-        <a class="auth-link" href="/logout">Log out</a>
-      ` : `
-        <a class="auth-link" href="/login">Log in</a>
-        <a class="post-job-cta" href="/signup">Sign up</a>
-      `}
-
+      ${user ? `<nav class="workspace-nav" aria-label="Your workspace">${navLink('/matches', 'My matches')}${navLink('/my-jobs', 'My jobs')}</nav>
+      <details class="member-menu nav-disclosure">
+        <summary aria-controls="member-panel"><span class="member-avatar" aria-hidden="true">${esc(firstName.slice(0,1).toUpperCase())}</span><span class="member-name">${esc(firstName)}</span>${isPro ? '<span class="member-pro">PRO</span>' : ''}<span class="nav-chevron" aria-hidden="true"></span></summary>
+        <div class="member-panel" id="member-panel"><div class="member-panel-heading"><span>Your VeeAys</span><small>${isPro ? 'Pro member' : 'Free member'}</small></div>${accountLinks}</div>
+      </details>` : `${navLink('/login', 'Log in', 'auth-link')}${navLink('/signup', 'Sign up', 'post-job-cta')}`}
     </div>
-
+    <details class="mobile-menu nav-disclosure">
+      <summary aria-controls="mobile-panel"><span class="menu-lines" aria-hidden="true"></span><span>Menu</span></summary>
+      <div class="mobile-panel" id="mobile-panel"><nav aria-label="Mobile explore"><p class="nav-section-label">Explore</p>${discoveryLinks}${!user ? navLink('/pro', 'VeeAys Pro', 'nav-pro') : ''}</nav>
+      <nav aria-label="Mobile account"><p class="nav-section-label">${user ? 'Your VeeAys' : 'Make your next move'}</p>${user ? `<div class="mobile-member"><span class="member-avatar" aria-hidden="true">${esc(firstName.slice(0,1).toUpperCase())}</span><strong>${esc(firstName)}</strong><span class="${isPro ? 'member-pro' : 'member-free'}">${isPro ? 'PRO' : 'Free member'}</span></div>${navLink('/matches', 'My matches')}${navLink('/my-jobs', 'My jobs')}${accountLinks}` : `${navLink('/login', 'Log in')}${navLink('/signup', 'Sign up', 'mobile-signup')}`}</nav></div>
+    </details>
   </div>
-
 </header>
+<script src="/navigation.js?v=20261006" defer></script>
 
 
 

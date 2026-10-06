@@ -17,9 +17,9 @@ test('public Pro page makes free access and pre-payment state explicit with work
 });
 test('navigation distinguishes Free and active Pro without changing plan',()=>{
  const props={title:'Test',body:'',canonical:'https://test',user:{id:'u'}};
- assert.match(layout({...props,profile:{plan:'free'}}),/Upgrade to Pro/);
+ assert.match(layout({...props,profile:{plan:'free'}}),/Explore VeeAys Pro/);
  const pro=layout({...props,profile:{plan:'pro',plan_status:'active'}});
- assert.match(pro,/pro-nav-status/);assert.doesNotMatch(pro,/Upgrade to Pro/);
+ assert.match(pro,/member-pro/);assert.doesNotMatch(pro,/Explore VeeAys Pro/);
 });
 test('locked panel uses only summary count and stays absent for unknown, zero, Pro or error',()=>{
  assert.match(matchesPage({summary:{locked_matches:97,total_matches:100}}),/97 more matches found/);
