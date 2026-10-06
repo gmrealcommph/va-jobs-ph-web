@@ -2,7 +2,7 @@
   const form = document.getElementById('onboarding-form');
   if (!form) return;
   const steps = [...form.querySelectorAll('.onboard-step')];
-  const dots = [...document.querySelectorAll('.onboard-progress span')];
+  const dots = [...document.querySelectorAll('.onboard-progress li')];
   const back = document.getElementById('onboard-back');
   const next = document.getElementById('onboard-next');
   const finish = document.getElementById('onboard-finish');
@@ -20,7 +20,7 @@
     const current = steps[step];
     let message = current.querySelector('.onboard-validation');
     if (!ok) {
-      if (!message) { message = document.createElement('p'); message.className = 'onboard-validation'; current.appendChild(message); }
+      if (!message) { message = document.createElement('p'); message.className = 'onboard-validation'; message.setAttribute('role', 'alert'); current.appendChild(message); }
       message.textContent = 'Choose at least one option to continue.';
     } else if (message) message.remove();
     return ok;
@@ -37,9 +37,14 @@
     document.getElementById('onboard-review').innerHTML = groups.map(([a,b]) => `<div><span>${a}</span><strong>${escapeHtml(b)}</strong></div>`).join('');
   }
   function escapeHtml(v) { const d=document.createElement('div'); d.textContent=v; return d.innerHTML; }
-  function show() {
-    steps.forEach((el,i) => el.classList.toggle('active', i === step));
-    dots.forEach((el,i) => { el.classList.toggle('active', i === step); el.classList.toggle('done', i < step); });
+  function show(focus = false) {
+    steps.forEach((el,i) => { el.classList.toggle('active', i === step); el.hidden = i !== step; });
+    dots.forEach((el,i) => {
+      el.classList.toggle('active', i === step); el.classList.toggle('done', i < step);
+      if (i === step) el.setAttribute('aria-current', 'step'); else el.removeAttribute('aria-current');
+      el.querySelector('.onboard-progress-number').textContent = i < step ? '✓' : i + 1;
+      el.querySelector('.onboard-progress-state').textContent = i < step ? ': completed' : i === step ? ': current step' : ': upcoming';
+    });
     const isFirst = step === 0;
     const isLast = step === steps.length - 1;
     back.hidden = isFirst;
@@ -49,14 +54,15 @@
     next.style.display = isLast ? 'none' : '';
     finish.style.display = isLast ? '' : 'none';
     if (isLast) review();
+    if (focus) steps[step].querySelector('h2').focus({ preventScroll: true });
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
   function updatePhp() {
     const usd = Number(salary.value);
     php.textContent = usd > 0 ? `About ₱${Math.round(usd * 58).toLocaleString()} / month (rough estimate at ₱58/USD).` : `Optional. We'll use this as a matching preference.`;
   }
-  next.addEventListener('click', () => { if (validate()) { step++; show(); } });
-  back.addEventListener('click', () => { if (step > 0) { step--; show(); } });
+  next.addEventListener('click', () => { if (validate()) { step++; show(true); } });
+  back.addEventListener('click', () => { if (step > 0) { step--; show(true); } });
   salary.addEventListener('input', updatePhp);
   updatePhp(); show();
 })();

@@ -1,0 +1,67 @@
+/* Onboarding only: leave approved global navigation and other pages untouched. */
+.onboard-shell{max-width:1040px;padding:46px 24px 80px;color:#173d32;box-sizing:border-box}
+.onboard-top{grid-template-columns:minmax(0,1fr) 205px;gap:48px;margin-bottom:32px;align-items:center}
+.onboard-top .kicker{font-size:11px;letter-spacing:1.8px;color:#476344}
+.onboard-top h1{font-family:Georgia,serif;font-weight:400;font-size:clamp(38px,4.3vw,55px);line-height:1.08;letter-spacing:-1.8px;max-width:650px;margin:14px 0 18px}
+.onboard-top h1 em{position:relative;white-space:nowrap}
+.onboard-top h1 em:after{content:"";position:absolute;left:0;right:0;bottom:-5px;height:8px;border-top:3px solid #d78b5c;border-radius:50%;transform:rotate(-1deg)}
+.onboard-top p{font-size:15px;max-width:550px;line-height:1.7}
+.onboard-profile-note{background:#edf0d5;border:1px solid #d3d9b9;padding:24px 18px 18px;transform:rotate(3deg);border-radius:3px 18px 3px 3px;box-shadow:4px 5px 0 #173d3209}
+.onboard-profile-note>span{font-size:9px;letter-spacing:1.4px;font-weight:800;display:block;margin-bottom:14px}
+.onboard-profile-note strong{font:italic 24px/1.2 Georgia,serif;display:block}
+.onboard-profile-note svg{color:#cf8154;width:130px;height:12px;margin-top:14px}
+.onboard-progress{position:relative;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px;margin:0 0 26px;padding:0;list-style:none;overflow:visible}
+.onboard-progress:before{content:"";position:absolute;top:20px;left:10%;right:10%;border-top:1px dashed #acb49f}
+.onboard-progress li{position:relative;display:flex;align-items:center;flex-direction:column;gap:8px;min-width:0;color:#66736a}
+.onboard-progress .onboard-progress-number{box-sizing:border-box;width:40px;height:40px;display:grid;place-items:center;border:1px solid #bec7b8;border-radius:8px;background:#faf8ef;color:#65715e;font-size:13px;font-weight:800;box-shadow:2px 2px 0 #173d3208}
+.onboard-progress .onboard-progress-title{width:auto;height:auto;border:0;background:none;border-radius:0;font-size:12px;font-weight:650;color:inherit;text-align:center}
+.onboard-progress li.active{color:#173d32}
+.onboard-progress li.active .onboard-progress-number{background:#173d32;border-color:#173d32;color:#ecf4c8;transform:rotate(-4deg);box-shadow:3px 3px 0 #dce7b1}
+.onboard-progress li.done .onboard-progress-number{background:#ddecad;border-color:#9eaf79;color:#173d32}
+.onboard-progress li.active .onboard-progress-title{font-weight:850}
+.onboard-sr-only{position:absolute!important;width:1px!important;height:1px!important;margin:-1px!important;overflow:hidden!important;clip-path:inset(50%);white-space:nowrap;padding:0!important;border:0!important}
+.onboard-card{background:#fffdf6;background-image:radial-gradient(#173d3208 .6px,transparent .6px);background-size:9px 9px;border:1px solid #d4d8c6;border-radius:8px 24px 8px 8px;padding:32px 36px;box-shadow:5px 6px 0 #e6e9d8,0 16px 40px #173d3205}
+.onboard-step-label{color:#5e7042;font-size:10px;letter-spacing:1.7px;margin-bottom:12px}
+.onboard-step h2{font-family:Georgia,serif;font-weight:400;font-size:32px;line-height:1.18;letter-spacing:-.7px;margin-bottom:12px;outline:none}
+.onboard-step>p{font-size:14px;line-height:1.7;margin-bottom:24px;max-width:740px}
+.onboard-grid{gap:10px}
+.onboard-grid.compact{grid-template-columns:repeat(2,minmax(0,1fr))}
+.onboard-choice{min-width:0}
+.onboard-choice .onboard-choice-face{display:flex;gap:10px;min-height:60px;padding:12px;box-sizing:border-box;border:1px solid #d3d9c8;background:#fafaf1;border-radius:9px;box-shadow:0 2px 0 #173d3205;font-size:13px;font-weight:700;line-height:1.35;transition:background .15s,border-color .15s}
+.onboard-choice .onboard-choice-copy{display:block;min-height:0;padding:0;background:none;border:0;border-radius:0;box-shadow:none;font:inherit;flex:1;min-width:0;overflow-wrap:anywhere}
+.onboard-choice-icon{display:grid;place-items:center;width:28px;height:28px;border-radius:6px;color:#526a47;flex-shrink:0;font-style:normal}
+.onboard-choice-icon svg{width:24px;height:24px}
+.onboard-choice-check{flex-shrink:0;display:grid;place-items:center;width:19px;height:19px;border:1px solid #bec8ae;border-radius:5px;background:#fffdf6;color:transparent;font-size:12px}
+.onboard-choice input[type=radio]+.onboard-choice-face .onboard-choice-check{border-radius:50%}
+.onboard-choice input:checked+.onboard-choice-face{background:#eaf1ce;border-color:#173d32;box-shadow:inset 0 0 0 1px #173d32}
+.onboard-choice input:checked+.onboard-choice-face .onboard-choice-check{color:#173d32;background:#ddec89;border-color:#9eb358}
+.onboard-choice input:checked+.onboard-choice-face .onboard-choice-icon{color:#173d32}
+.onboard-choice input:focus-visible+.onboard-choice-face{outline:3px solid #b7834c;outline-offset:3px}
+.onboard-choice:hover .onboard-choice-face{border-color:#7a8e62}
+.onboard-choice-copy small{display:block;margin-top:5px;color:#64725c;font-weight:400;font-size:12px;line-height:1.4}
+.onboard-optional{color:#6a755d;font-size:11px;font-weight:400;margin-left:6px}
+.salary-box{padding:20px;background:#f1f3e1;border:1px solid #dce1c6;border-radius:10px;max-width:480px;box-sizing:border-box}
+.salary-box label,.skills-box label{font-size:14px}
+.salary-input{border-color:#a6b598;max-width:100%}
+.salary-input input{min-width:0;font-size:24px;font-weight:650;background:#fffdf8;padding:12px}
+.salary-input>span{font-size:23px;padding-left:16px}
+.salary-box small,.skills-box small{font-size:12px;line-height:1.55;color:#606e58}
+.salary-input:focus-within,.skills-box textarea:focus-visible{outline:3px solid #b7834c;outline-offset:2px}
+.skills-box textarea{background:#fffef9;font-size:15px;line-height:1.65;min-height:110px;border-color:#bdc8af}
+.onboard-step h3{font-size:14px;margin-top:24px}
+.onboard-actions{border-color:#dce1d0;margin-top:28px;padding-top:22px;align-items:center}
+.onboard-actions button{min-height:48px;border-radius:8px;padding:12px 24px;font-size:14px;background:#173d32;color:#fffdf5;font-weight:750;cursor:pointer}
+.onboard-actions .secondary{margin-right:auto;background:transparent;border-color:#bec8ae}
+.onboard-actions button:focus-visible{outline:3px solid #b7834c;outline-offset:3px}
+.onboard-validation{background:#fff0df;border:1px solid #dfbc92;border-left:3px solid #bf6d38;border-radius:6px;padding:12px 14px;font-size:13px;color:#813d23!important}
+.onboard-error{background:#fff0df;border-color:#dfbc92;color:#813d23}
+.onboard-review{border-color:#d4dbc3;background:#fffdf8}
+.onboard-review div{padding:15px 18px;border-color:#e2e6d5;grid-template-columns:140px minmax(0,1fr)}
+.onboard-review strong{font-size:13px;line-height:1.65;font-weight:650;overflow-wrap:anywhere}
+.onboard-review span{font-size:10px;color:#637253;line-height:1.7}
+.onboard-ready{background:#edf2dc;border:1px solid #d9e2bf;font-size:13px;padding:14px 18px}
+.onboard-ready strong{overflow-wrap:anywhere}
+.onboard-ready span{font-size:12px;line-height:1.6}
+@media(max-width:760px){.onboard-shell{padding:30px 18px 52px}.onboard-top{display:block;margin-bottom:26px}.onboard-top h1{font-size:39px;letter-spacing:-1.3px;max-width:560px}.onboard-top p{font-size:14px}.onboard-profile-note{display:none}.onboard-progress{gap:4px;margin-bottom:22px}.onboard-progress .onboard-progress-title{font-size:10px}.onboard-progress .onboard-progress-number{width:34px;height:34px}.onboard-progress:before{top:17px}.onboard-card{padding:25px 20px;box-shadow:3px 4px 0 #e6e9d8}.onboard-step h2{font-size:28px}.onboard-step>p{font-size:13px}.onboard-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.onboard-choice .onboard-choice-face{padding:11px 10px;gap:8px;font-size:12px;min-height:64px}.onboard-choice-icon{width:22px}.onboard-choice-icon svg{width:21px}.onboard-choice-check{width:16px;height:16px;font-size:10px}.onboard-grid.compact{grid-template-columns:1fr}.salary-box{padding:16px}.salary-box label .onboard-optional{display:block;margin:5px 0 0}.onboard-review div{grid-template-columns:1fr;gap:5px;padding:13px 15px}.onboard-actions{gap:10px}.onboard-actions button{padding:12px 15px}.onboard-actions .secondary{flex:0 0 auto}.onboard-ready{padding:13px 15px}}
+@media(max-width:400px){.onboard-top h1{font-size:35px}.onboard-grid{grid-template-columns:1fr}.onboard-choice .onboard-choice-face{min-height:54px}.onboard-shell{padding-inline:14px}.onboard-card{padding-inline:17px}.onboard-progress .onboard-progress-title{font-size:9px}.onboard-actions button{font-size:13px;padding-inline:12px}}
+@media(prefers-reduced-motion:reduce){.onboard-choice .onboard-choice-face{transition:none}}
