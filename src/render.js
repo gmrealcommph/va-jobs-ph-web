@@ -1165,7 +1165,7 @@ export function authPage({ mode = 'login', error = '', message = '', email = '',
           ${returnTo ? `<input type="hidden" name="return" value="${esc(returnTo)}">` : ''}
           ${signup ? `<div class="auth-field"><label for="full_name">Full name</label><input id="full_name" name="full_name" type="text" autocomplete="name" maxlength="100" required></div>` : ''}
           <div class="auth-field"><label for="email">Email address</label><input id="email" name="email" type="email" autocomplete="email" maxlength="254" value="${esc(email)}" required></div>
-          <div class="auth-field"><label for="password">Password</label><input id="password" name="password" type="password" autocomplete="${signup ? 'new-password' : 'current-password'}" minlength="8" maxlength="128" aria-describedby="auth-password-help" required><small id="auth-password-help">${signup ? 'Use 8–128 characters for your password.' : 'Enter your password (8–128 characters).'}</small></div>
+          <div class="auth-field"><label for="password">Password</label><input id="password" name="password" type="password" autocomplete="${signup ? 'new-password' : 'current-password'}" minlength="8" maxlength="128" ${signup ? 'aria-describedby="auth-password-help" ' : ''}required>${signup ? '<small id="auth-password-help">Use 8–128 characters for your password.</small>' : ''}</div>
           <button type="submit">${signup ? 'Create account' : 'Log in'}</button>
         </form>
         <p class="auth-switch">${signup ? `Already have an account? <a href="/login${returnTo ? `?return=${encodeURIComponent(returnTo)}` : ''}">Log in</a>` : `New to VeeAys? <a href="/signup${returnTo ? `?return=${encodeURIComponent(returnTo)}` : ''}">Create an account</a>`}</p>
