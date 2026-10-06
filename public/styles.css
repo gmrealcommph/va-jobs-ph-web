@@ -6067,3 +6067,7 @@ body:has(.employer-page)>.site-footer .footer-main{padding-top:43px;padding-bott
 body:has(.employer-page)>.site-footer .footer-bottom{padding-top:15px;padding-bottom:17px}
 @media(max-width:1000px){.employer-page .ep-steps li{padding:21px 20px}.employer-page .ep-steps li:not(:last-child):after{right:-25px;font-size:31px}}
 @media(max-width:760px){.employer-page .ep-talent{top:276px}.employer-page .ep-steps li:nth-child(n){padding:23px}.employer-page .ep-steps li:not(:last-child):after{top:auto;right:35px;bottom:-29px;transform:rotate(90deg);font-size:32px}.employer-page .ep-role-tags{gap:13px 10px}.employer-page .ep-role-tags li{padding:10px 12px;font-size:14px}.employer-page .ep-actions{gap:10px}body:has(.employer-page)>.site-footer .footer-main{padding-top:37px;padding-bottom:26px}body:has(.employer-page)>.site-footer .footer-bottom{padding-top:15px;padding-bottom:18px}}
+
+/* Decorative employer collages; preserve the approved illustration slots. */
+.employer-page .ep-collage>.ep-workspace-art{display:block;position:absolute;inset:0;width:100%;height:100%;object-fit:contain}
+.employer-page .ep-letter>.ep-enquiry-art{display:block;width:100%;height:auto;aspect-ratio:190/135;margin:18px 0}

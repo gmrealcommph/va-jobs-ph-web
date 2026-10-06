@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 190 135" fill="none">
+ <defs><filter id="s" x="-30%" y="-30%" width="170%" height="180%"><feDropShadow dx="1" dy="3" stdDeviation="2" flood-color="#123e30" flood-opacity=".2"/></filter></defs>
+ <!-- Decorative stationery, not an inbox or interactive form. -->
+ <g transform="rotate(-9 80 60)" filter="url(#s)"><path d="M21 9h112v103H21Z" fill="#fffdf3" stroke="#c5bd9e"/><text x="32" y="26" fill="#123e30" font-family="Arial,sans-serif" font-size="7" letter-spacing="1.1">A NOTE TO VEEAYS</text><path d="M32 35h70m-70 9h84m-84 9h77m-77 9h50" stroke="#123e30" stroke-opacity=".4"/><path d="m57 2 39-2 2 13-39 2Z" fill="#e0cea2" fill-opacity=".85"/></g>
+ <g transform="translate(28 36) rotate(3 70 40)" filter="url(#s)" stroke="#123e30" stroke-width="1.8" stroke-linejoin="round"><path d="M0 26 69 0l70 26v61H0Z" fill="#d9ec89"/><path d="M19 47V9h100v38" fill="#fffdf3"/><path d="M32 22h52m-52 9h71" stroke-opacity=".55"/><path d="m0 26 69 43 70-43M0 87l52-34m87 34-52-34"/><path d="m112 13 3 7 8 1-6 5 1 8-7-4-7 4 2-8-6-5 8-1Z" fill="#e99a65" stroke="none"/></g>
+ <g transform="translate(142 17) rotate(12)" filter="url(#s)"><rect width="40" height="28" fill="#e9eacb" stroke="#123e30" stroke-width=".7" stroke-dasharray="2 2"/><text x="20" y="13" text-anchor="middle" fill="#123e30" font-family="Arial,sans-serif" font-size="7" font-weight="700">VEEAYS</text><path d="M9 19h22" stroke="#b96e42" stroke-width="2"/></g>
+ <g transform="translate(176 57) rotate(16)" stroke="#123e30" stroke-width="1"><path d="M0 0h6v57l-3 9-3-9Z" fill="#e99a65"/><path d="M0 0v-7h6v7M3 7v45"/><path d="m1 62 2 4 2-4" fill="#123e30"/></g>
+</svg>
