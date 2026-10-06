@@ -52,7 +52,7 @@ export function layout({ title, description, canonical, body, noindex = false, u
     type="image/svg+xml"
   >
 
-  <link rel="stylesheet" href="/styles.css?v=20261006-member-navigation">
+  <link rel="stylesheet" href="/styles.css?v=20261006-my-jobs">
 </head>
 
 <body>
@@ -1445,7 +1445,7 @@ export function myJobsPage({ saved = [], applications = [], message = '', error 
       <div class="tracker-edit-panel" hidden>
         <form class="tracker-form" method="post" action="/update-application">
           <input type="hidden" name="job_id" value="${esc(item.job_id)}">
-          <label>Status<select name="status">${['applied','interview','offer','hired','rejected','withdrawn'].map(s => `<option value="${s}"${s === item.status ? ' selected' : ''}>${statusLabel(s)}</option>`).join('')}</select></label>
+          <p class="workspace-editor-heading">A little update. A clearer next step.</p><label>Status<select name="status">${['applied','interview','offer','hired','rejected','withdrawn'].map(s => `<option value="${s}"${s === item.status ? ' selected' : ''}>${statusLabel(s)}</option>`).join('')}</select></label>
           <label>Private notes<textarea name="notes" maxlength="2000" placeholder="Interview details, follow-up dates, contact names…">${esc(item.notes || '')}</textarea></label>
           <div class="tracker-actions"><button type="submit">Save changes</button><button class="tracker-remove" type="submit" formaction="/remove-application">Remove</button></div>
         </form>
@@ -1463,14 +1463,14 @@ export function myJobsPage({ saved = [], applications = [], message = '', error 
   const tabs = [['all','All'],['applied','Applied'],['interview','Interview'],['offer','Offer'],['hired','Hired'],['closed','Closed']];
   const cards = applications.map(applicationCard).join('');
   return `<section class="wrap my-jobs-page">
-    <div class="kicker">MY JOBS</div><h1>Your job search,<br><em>all in one place.</em></h1><p class="my-jobs-intro">Save opportunities for later and keep track of every application as it moves forward.</p>
+    <header class="workspace-intro"><div><div class="kicker">YOUR JOB SEARCH</div><h1>Keep your opportunities <em>moving.</em></h1><p class="my-jobs-intro">Save roles, track applications and keep your next steps in one place.</p><a class="workspace-discover" href="/jobs">Find your next opportunity <span aria-hidden="true">↗</span></a></div><div class="workspace-sketch" aria-hidden="true"><span class="sketch-label">Your next move</span><div class="sketch-paper"><span>THE SHORTLIST</span><i>✓ &nbsp; Find a role you love</i><i>✓ &nbsp; Make your application</i><i>○ &nbsp; Keep in touch</i><b>one step at a time</b></div></div></header>
     ${message ? `<div class="my-jobs-message">${esc(message)}</div>` : ''}${error ? `<div class="my-jobs-error">${esc(error)}</div>` : ''}
-    <section class="saved-jobs-section"><div class="my-jobs-section-head"><div><span class="eyebrow">SAVED</span><h2>Jobs to come back to</h2></div><strong>${saved.length}</strong></div>
-      <div class="my-jobs-grid">${saved.length ? saved.map(jobMini).join('') : '<div class="my-jobs-empty"><h3>No saved jobs yet</h3><p>Save jobs while browsing and they’ll appear here.</p><a class="button" href="/jobs">Find jobs</a></div>'}</div>
+    <section class="saved-jobs-section"><div class="my-jobs-section-head"><div><span class="eyebrow">SAVED</span><h2>Your shortlist</h2><p class="workspace-section-note">Bookmarked for later. Ready when you are.</p></div><strong>${saved.length}</strong></div>
+      <div class="my-jobs-grid">${saved.length ? saved.map(jobMini).join('') : '<div class="my-jobs-empty"><span class="workspace-empty-mark" aria-hidden="true">✧</span><h3>Start with a possibility.</h3><p>Spot a role you like? Save it and build your shortlist here.</p><a class="button" href="/jobs">Find jobs</a></div>'}</div>
     </section>
-    <section class="application-tracker"><div class="my-jobs-section-head"><div><span class="eyebrow">APPLICATION TRACKER</span><h2>Keep every application moving</h2></div><strong>${applications.length}</strong></div>
-      <div class="tracker-tabs" role="tablist" aria-label="Application status filters">${tabs.map(([key,label],idx) => `<button type="button" class="tracker-tab${idx===0?' active':''}" data-filter="${key}" aria-pressed="${idx===0?'true':'false'}">${label}<span>${counts[key]}</span></button>`).join('')}</div>
-      <div class="tracker-cards">${cards || '<div class="my-jobs-empty tracker-all-empty"><h3>No applications yet</h3><p>When you mark a job as applied, it will appear here.</p></div>'}<div class="my-jobs-empty tracker-filter-empty" hidden><h3>Nothing here yet</h3><p>No applications are in this stage.</p></div></div>
+    <section class="application-tracker"><div class="my-jobs-section-head"><div><span class="eyebrow">APPLICATION TRACKER</span><h2>Applications in motion</h2><p class="workspace-section-note">Your record of applications you’ve made.</p></div><strong>${applications.length}</strong></div>
+      <p class="workspace-tracking-note">Tracking here does not submit an application to the employer.</p><div class="tracker-tabs" role="group" aria-label="Application status filters">${tabs.map(([key,label],idx) => `<button type="button" class="tracker-tab${idx===0?' active':''}" data-filter="${key}" aria-pressed="${idx===0?'true':'false'}">${label}<span>${counts[key]}</span></button>`).join('')}</div>
+      <div class="tracker-cards">${cards || '<div class="my-jobs-empty tracker-all-empty"><span class="workspace-empty-mark" aria-hidden="true">✓</span><h3>Your next chapter starts with a role.</h3><p>Once you’ve applied to an employer, mark the job as applied to track it here.</p><a class="my-job-view" href="/jobs">Explore jobs →</a></div>'}<div class="my-jobs-empty tracker-filter-empty" hidden><span class="workspace-empty-mark" aria-hidden="true">○</span><h3>A little room for what’s next.</h3><p>No applications in this stage. Choose another status to see your progress.</p><a class="my-job-view" href="/jobs">Discover more roles →</a></div></div>
     </section>
   </section>
   <script>
