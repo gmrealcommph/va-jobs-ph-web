@@ -28,3 +28,18 @@ test('absent data is omitted and only an explicit true remote flag supplies fall
   assert.match(html, />Hybrid<\/dd>/);
   assert.doesNotMatch(html, />Remote<\/dd>/);
 });
+
+test('experience and optional facts share the grid without mutation or omitted values', () => {
+  const job = {location:'Philippines',workplace_type:'remote',employment_type:'full_time',experience_level:'senior'};
+  const before = structuredClone(job);
+  for (const [data,count] of [[job,4],[{...job,experience_level:null},3],[{...job,schedule_region:'us'},5],[{...job,schedule_region:'us',salary_min:1000,salary_currency:'USD',engagement_type:'Employee'},7]]) {
+    const html = renderAtAGlance(data);
+    assert.equal((html.match(/class="qr-glance-tile"/g) || []).length,count);
+    assert.equal((html.match(/class="qr-glance-icon"/g) || []).length,count);
+    assert.ok(html.includes(`--glance-count:${count}`));
+    assert.doesNotMatch(html,/qr-glance-extra/);
+  }
+  assert.match(renderAtAGlance(job),/>Senior<\/dd>/);
+  assert.match(renderAtAGlance({experience_level:'Custom <level>'}),/>Custom &lt;level&gt;<\/dd>/);
+  assert.deepEqual(job,before);
+});

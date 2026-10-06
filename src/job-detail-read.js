@@ -19,22 +19,23 @@ export function renderAtAGlance(job) {
     const mappings = field === 'schedule'
       ? {us:'US hours',uk:'UK/Europe hours',australia:'Australia hours',flexible:'Flexible/Any',any:'Flexible/Any','flexible/any':'Flexible/Any'}
       : field === 'setup' ? {remote:'Remote',hybrid:'Hybrid',onsite:'On-site','on site':'On-site'}
+      : field === 'experience' ? {senior:'Senior',junior:'Junior',mid:'Mid', 'mid level':'Mid-level'}
       : field === 'employment' ? {contract:'Contract',freelance:'Freelance',internship:'Internship'} : {};
     return mappings[key] || displayValue(value, field);
   };
   const icons = {
+    Experience:'<path d="m12 3 2.5 5 5.5.8-4 3.9.9 5.5-4.9-2.6-4.9 2.6.9-5.5-4-3.9 5.5-.8Z"/>',
+    Salary:'<rect x="2" y="5" width="20" height="14" rx="2"/><circle cx="12" cy="12" r="3"/><path d="M5 12h1M18 12h1"/>',
+    Engagement:'<path d="M8 4h8v17H8zM5 7H3v14h18V7h-2M10 8h4M10 12h4M10 16h4"/>',
     Schedule:'<circle cx="12" cy="12" r="8"/><path d="M12 7v5l3 2"/>',
     Location:'<path d="M19 10c0 5-7 11-7 11S5 15 5 10a7 7 0 0 1 14 0Z"/><circle cx="12" cy="10" r="2.5"/>',
     'Work setup':'<path d="m3 10 9-7 9 7M5 9v11h5M19 9v4M12 14h8v6h-8zM10 21h12"/>',
     'Employment type':'<rect x="3" y="7" width="18" height="14" rx="2"/><path d="M8 7V4h8v3M3 12c5 3 13 3 18 0M12 12v4"/>'
   };
-  const fields = [['Schedule',show(job.schedule_region, 'schedule')],['Location',show(job.location)],['Work setup',show(job.workplace_type, 'setup') || (job.remote === true ? 'Remote' : '')],['Employment type',show(job.employment_type, 'employment')]];
+  const fields = [['Location',show(job.location)],['Work setup',show(job.workplace_type, 'setup') || (job.remote === true ? 'Remote' : '')],['Employment type',show(job.employment_type, 'employment')],['Experience',show(job.experience_level, 'experience')],['Schedule',show(job.schedule_region, 'schedule')],['Salary',formatSalary(job)],['Engagement',displayValue(job.engagement_type)]];
   const present = fields.filter(([,v])=>typeof v === 'string' && v.trim());
-  // Retain existing authoritative supplementary facts without oversized tiles.
-  const extra = [['Salary',formatSalary(job)],['Engagement',displayValue(job.engagement_type)],['Experience',displayValue(job.experience_level)]].filter(([,v])=>typeof v === 'string' && v.trim());
-  if (!present.length && !extra.length) return '';
-  const fact = ([label,value]) => `<div><dt>${label}</dt><dd>${escape(value)}</dd></div>`;
-  return `<section class="qr-glance" aria-labelledby="at-a-glance"><header class="qr-glance-header"><h2 id="at-a-glance">At a glance<svg class="qr-glance-underline" viewBox="0 0 140 8" aria-hidden="true" focusable="false"><path d="M3 5Q58 1 137 4M103 7l22-1"/></svg></h2><svg class="qr-glance-flight" viewBox="0 0 180 42" aria-hidden="true" focusable="false"><path class="qr-glance-trail" d="M2 30c29-25 46 15 72-2s37-15 65-9"/><path class="qr-glance-plane" d="m144 8 30 9-27 14 4-12 23-2-23 2Z"/></svg></header>${present.length ? `<dl class="qr-glance-tiles">${present.map(([label,value])=>`<div class="qr-glance-tile"><svg class="qr-glance-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">${icons[label]}</svg><div><dt>${label}</dt><dd>${escape(value)}</dd></div></div>`).join('')}</dl>` : ''}${extra.length ? `<dl class="qr-glance-extra">${extra.map(fact).join('')}</dl>` : ''}</section>`;
+  if (!present.length) return '';
+  return `<section class="qr-glance" aria-labelledby="at-a-glance"><header class="qr-glance-header"><div class="qr-glance-heading"><p class="qr-glance-eyebrow">Opportunity snapshot</p><h2 id="at-a-glance">At a glance<svg class="qr-glance-underline" viewBox="0 0 140 8" aria-hidden="true" focusable="false"><path d="M3 5Q58 1 137 4M103 7l22-1"/></svg></h2></div><svg class="qr-glance-flight" viewBox="0 0 180 42" aria-hidden="true" focusable="false"><path class="qr-glance-trail" d="M2 30c29-25 46 15 72-2s37-15 65-9"/><path class="qr-glance-plane" d="m144 8 30 9-27 14 4-12 23-2-23 2Z"/></svg></header>${present.length ? `<dl class="qr-glance-tiles" style="--glance-count:${present.length}">${present.map(([label,value])=>`<div class="qr-glance-tile"><svg class="qr-glance-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">${icons[label]}</svg><div><dt>${label}</dt><dd>${escape(value)}</dd></div></div>`).join('')}</dl>` : ''}</section>`;
 }
 export function formatSalary(job) {
   const number=v=>(typeof v==='number' || typeof v==='string' && /^\d+(?:\.\d+)?$/.test(v)) && Number.isFinite(Number(v)) && Number(v)>=0 ? Number(v):null;
