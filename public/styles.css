@@ -5679,6 +5679,9 @@ body>header,body>footer{flex-shrink:0}
 .job-detail-page .qr-glance-tile:nth-child(4n+2) .qr-glance-icon {color:#276b58}
 .job-detail-page .qr-glance-tile:nth-child(4n+3) .qr-glance-icon {color:#346744}
 .job-detail-page .qr-glance-flight-sparks {stroke:#e37524;stroke-width:1.8}
+.job-detail-page .qr-glance-icon .qr-icon-paper {fill:#fffdf3;stroke:#234b35}
+.job-detail-page .qr-glance-icon .qr-icon-pin {fill:#f9bc68;stroke:#234b35}
+.job-detail-page .qr-glance-icon .qr-icon-orange {stroke:#e67b26;stroke-width:1.9}
 /* Two columns on smaller panels; an odd last tile fills its row. */
 @container glance (min-width:280px) and (max-width:539px) {
   .job-detail-page .qr-glance-tile {flex-basis:calc(50% - .7rem)}

@@ -24,13 +24,13 @@ export function renderAtAGlance(job) {
     return mappings[key] || displayValue(value, field);
   };
   const icons = {
-    Experience:'<path d="m12 3 2.5 5 5.5.8-4 3.9.9 5.5-4.9-2.6-4.9 2.6.9-5.5-4-3.9 5.5-.8Z"/>',
-    Salary:'<rect x="2" y="5" width="20" height="14" rx="2"/><circle cx="12" cy="12" r="3"/><path d="M5 12h1M18 12h1"/>',
-    Engagement:'<path d="M8 4h8v17H8zM5 7H3v14h18V7h-2M10 8h4M10 12h4M10 16h4"/>',
-    Schedule:'<circle cx="12" cy="12" r="8"/><path d="M12 7v5l3 2"/>',
-    Location:'<path d="M19 10c0 5-7 11-7 11S5 15 5 10a7 7 0 0 1 14 0Z"/><circle cx="12" cy="10" r="2.5"/>',
-    'Work setup':'<path d="m3 10 9-7 9 7M5 9v11h5M19 9v4M12 14h8v6h-8zM10 21h12"/>',
-    'Employment type':'<rect x="3" y="7" width="18" height="14" rx="2"/><path d="M8 7V4h8v3M3 12c5 3 13 3 18 0M12 12v4"/>'
+    Experience:'<path class="qr-icon-paper" d="m12 3 2.5 5 5.5.8-4 3.9.9 5.5-4.9-2.6-4.9 2.6.9-5.5-4-3.9 5.5-.8Z"/><path class="qr-icon-orange" d="m12 3 2.5 5 5.5.8M4 3l2 2M20 3l-2 2"/>',
+    Salary:'<rect class="qr-icon-paper" x="2" y="5" width="20" height="14" rx="2"/><circle cx="12" cy="12" r="3"/><path class="qr-icon-orange" d="M5 8h3M16 16h3M12 9v6"/>',
+    Engagement:'<rect class="qr-icon-paper" x="5" y="4" width="14" height="17" rx="2"/><path d="M9 10h6M9 14h6M9 18h4"/><path class="qr-icon-orange" d="M9 4V2h6v4H9zM2 7l2 1M21 6l1-2"/>',
+    Schedule:'<circle class="qr-icon-paper" cx="12" cy="12" r="8"/><path d="M12 7v5l3 2"/><path class="qr-icon-orange" d="M5 6a8 8 0 0 1 6-2M20 11v2M3 2l2 2"/>',
+    Location:'<path class="qr-icon-pin" d="M19 10c0 5-7 11-7 11S5 15 5 10a7 7 0 0 1 14 0Z"/><circle class="qr-icon-paper" cx="12" cy="10" r="2.5"/><path class="qr-icon-orange" d="M3 6 1 5M21 5l2-2M20 17l2 1"/>',
+    'Work setup':'<path class="qr-icon-paper" d="M5 10 12 4l7 6v11H5Z"/><path class="qr-icon-orange" d="m2 10 10-8 10 8M7 6V3h3"/><path d="M9 21v-7h6v7M16 10h1"/><path class="qr-icon-orange" d="M2 16H0M22 14l1-1"/>',
+    'Employment type':'<rect class="qr-icon-paper" x="3" y="7" width="18" height="14" rx="2"/><path d="M8 7V4h8v3M3 12c5 3 13 3 18 0"/><path class="qr-icon-orange" d="M11 12h2v4h-2zM5 7h5M18 3l2-2"/>'
   };
   const fields = [['Schedule',show(job.schedule_region, 'schedule')],['Location',show(job.location)],['Work setup',show(job.workplace_type, 'setup') || (job.remote === true ? 'Remote' : '')],['Employment type',show(job.employment_type, 'employment')],['Experience',show(job.experience_level, 'experience')],['Salary',formatSalary(job)],['Engagement',show(job.engagement_type, 'engagement')]];
   const present = fields.filter(([,v])=>typeof v === 'string' && v.trim());
