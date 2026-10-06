@@ -4424,46 +4424,6 @@ dd{margin:0;overflow-wrap:anywhere}
 }
 
 
-/* Snapshot information */
-
-.job-detail-snapshot dl{
-  margin:0 0 26px;
-}
-
-.job-detail-snapshot dl > div{
-  padding:11px 0;
-
-  border-top:1px solid rgba(18,62,48,.11);
-}
-
-.job-detail-snapshot dt{
-  margin-bottom:3px;
-
-  color:#6a7c74;
-
-  font-size:10px;
-}
-
-.job-detail-snapshot dd{
-  margin:0;
-
-  color:#123e30;
-
-  font-size:13px;
-  font-weight:700;
-  line-height:1.4;
-}
-
-.job-detail-snapshot dd a{
-  color:inherit;
-  text-decoration:none;
-}
-
-.job-detail-snapshot dd a:hover{
-  text-decoration:underline;
-}
-
-
 /* Apply button */
 
 .job-detail-apply{
@@ -5827,3 +5787,30 @@ a.jh-pill:hover{background:#dce8b7}a.jh-pill:focus-visible{outline:3px solid #72
   .jh-card .jh-artwork{display:block}
   .jh-card .jh-artwork>img,.jh-card .jh-workspace>svg{width:100%;height:100%;max-width:1678px;max-height:none;object-fit:contain;object-position:right bottom}
 }
+
+/* Application panel: scoped to the job sidebar, leaving approved job facts intact. */
+.job-detail-sidebar {min-width:0;}
+.job-detail-snapshot {padding:24px; border-radius:22px;}
+.job-detail-snapshot-kicker {margin-bottom:16px; font-size:10px;}
+.job-application-initials {display:grid;place-items:center;width:58px;height:58px;margin-bottom:18px;border:1px solid rgba(18,62,48,.16);border-radius:14px;background:#fffdf3;color:#123e30;font-family:Georgia,serif;font-size:23px;font-weight:700;}
+.job-detail-snapshot h2 {font-size:32px;line-height:1.06;margin:0 0 12px;letter-spacing:-1px;}
+.job-application-intro {margin:0 0 20px;color:#49685e;font-size:13px;line-height:1.6;}
+.job-application-identity {display:grid;gap:5px;margin-bottom:18px;padding:14px 0;border-top:1px solid rgba(18,62,48,.13);border-bottom:1px solid rgba(18,62,48,.13);overflow-wrap:anywhere;}
+.job-application-identity strong {color:#123e30;font-size:14px;line-height:1.4;}
+.job-application-identity span {color:#49685e;font-size:12px;line-height:1.4;}
+.job-detail-sidebar .job-detail-save,.job-detail-sidebar .job-detail-track {min-height:43px;border-radius:12px;font-size:13px;}
+.job-detail-sidebar .job-detail-apply {box-sizing:border-box;}
+.job-detail-sidebar a:focus-visible,.job-detail-sidebar button:focus-visible {outline:3px solid #123e30;outline-offset:3px;}
+.job-application-progress {margin-top:22px;padding-top:18px;border-top:1px dashed rgba(18,62,48,.25);}
+.job-application-progress h3 {margin:0 0 14px;color:#123e30;font-size:13px;}
+.job-application-progress ol {display:flex;list-style:none;padding:0;margin:0;gap:4px;}
+.job-application-progress li {position:relative;flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;gap:7px;color:#49685e;font-size:10px;}
+.job-application-progress li:not(:last-child)::after {content:'';position:absolute;top:11px;left:calc(50% + 14px);width:calc(100% - 24px);border-top:1px dashed #8a9d7e;}
+.job-progress-dot {display:grid;place-items:center;box-sizing:border-box;width:23px;height:23px;border:1px solid #8a9d7e;border-radius:50%;background:#eef6dc;font-size:12px;}
+.job-application-progress .is-complete .job-progress-dot {background:#a8ef6a;border-color:#6eb43a;color:#123e30;}
+.job-application-progress .is-current {font-weight:800;color:#123e30;}
+.job-application-progress .is-current .job-progress-dot {outline:2px solid #123e30;outline-offset:2px;}
+.job-application-progress p {margin:14px 0 0;color:#49685e;font-size:11px;line-height:1.6;overflow-wrap:anywhere;}
+.job-application-progress a {color:#123e30;text-underline-offset:3px;}
+@media(max-width:900px) {.job-detail-sidebar .job-detail-snapshot {position:relative;top:auto;max-width:600px;}}
+@media(max-width:480px) {.job-detail-sidebar .job-detail-snapshot {padding:22px 18px;}.job-detail-sidebar .job-detail-snapshot h2 {font-size:34px;}}

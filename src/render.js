@@ -1010,11 +1010,28 @@ function formatJobDescription(text = '') {
   return html;
 }
 
+function renderApplicationProgress({ user, saved, application }) {
+  if (!user) return '<section class="job-application-progress"><h3>Track your progress</h3><p>Create a free VeeAys account to save jobs and track your progress.</p></section>';
+  const status = application?.status;
+  const labels = { applied: 'Applied', interview: 'Interview', offer: 'Offer', hired: 'Hired', rejected: 'Rejected', withdrawn: 'Withdrawn' };
+  const rank = { applied: 1, interview: 2, offer: 3, hired: 4 }[status] || 0;
+  const closed = status === 'rejected' || status === 'withdrawn';
+  const steps = [['saved', 'Saved'], ['applied', 'Applied'], ['interview', 'Interview'], ['offer', 'Offer']];
+  if (status === 'hired') steps.push(['hired', 'Hired']);
+  return `<section class="job-application-progress" aria-label="Application progress">
+    <h3>Track your progress</h3>
+    <ol>${steps.map(([key, label], index) => {
+      // Saved is independent of application status; closed outcomes imply no later stage.
+      const done = index === 0 ? saved : (closed ? index === 1 : rank >= index);
+      const current = key === status || (!status && key === 'saved' && saved);
+      return `<li class="${done ? 'is-complete' : ''}${current ? ' is-current' : ''}"${current ? ' aria-current="step"' : ''}><span class="job-progress-dot" aria-hidden="true">${done ? '✓' : ''}</span><span>${label}</span><span class="ep-sr-only">${current ? ': current status' : (done ? ': reached' : ': not recorded')}</span></li>`;
+    }).join('')}</ol>
+    <p>${status ? `Current status: <strong>${esc(labels[status] || status)}</strong>. <a href="/my-jobs">Manage in My Jobs →</a>` : (saved ? 'Saved for later. Mark as applied when you have submitted your application.' : 'Save this job or mark it as applied to start tracking.')}</p>
+  </section>`;
+}
+
 export function detail(job, { user = null, saved = false, application = null, saveIntent = false } = {}) {
   const apply = safeUrl(job.job_url);
-
-  const logo =
-    safeUrl(job.company_logo_url);
 
   const company =
     job.company ||
@@ -1097,90 +1114,18 @@ export function detail(job, { user = null, saved = false, application = null, sa
 
             <div class="job-detail-snapshot-kicker">
               <span aria-hidden="true">✦</span>
-              OPPORTUNITY SNAPSHOT
+              YOUR APPLICATION
             </div>
 
 
-            ${
-  logo
-    ? `<div class="job-detail-logo-wrap${
-        company.toLowerCase() === 'assist world'
-          ? ' job-detail-logo-wrap--assist-world'
-          : ''
-      }">
-        <span class="qr-logo-initials" aria-hidden="true">${esc(company.trim().split(/\s+/).slice(0,2).map(word=>word[0]).join('').toUpperCase())}</span>
-        <img
-          class="job-detail-logo"
-          src="/company-logo/${encodeURIComponent(String(job.id))}"
-          alt=""
-          data-company-logo
-          loading="lazy"
-          referrerpolicy="no-referrer"
-        >
-      </div>`
-    : `<div class="job-detail-logo-wrap qr-logo-placeholder" aria-hidden="true">${esc(company.trim().split(/\s+/).slice(0,2).map(word=>word[0]).join('').toUpperCase())}</div>`
-}
-
-
-            <h2>
-              Sound like your<br>
-              kind of work?
-            </h2>
-
-
-            <dl>
-
-              <div>
-                <dt>Company</dt>
-                <dd>${esc(company)}</dd>
-              </div>
-
-
-              <div>
-                <dt>Location</dt>
-                <dd>${esc(location)}</dd>
-              </div>
-
-
-              ${
-                workplace
-                  ? `<div>
-                      <dt>Workplace</dt>
-                      <dd>${esc(workplace)}</dd>
-                    </div>`
-                  : ''
-              }
-
-
-              ${
-                job.category
-                  ? `<div>
-                      <dt>Category</dt>
-                      <dd>
-                        <a href="${categoryPath(job.category)}">
-                          ${esc(job.category)}
-                        </a>
-                      </dd>
-                    </div>`
-                  : ''
-              }
-
-
-              ${
-                posted
-                  ? `<div>
-                      <dt>Posted</dt>
-                      <dd>${posted}</dd>
-                    </div>`
-                  : ''
-              }
-
-            </dl>
-
+            <div class="job-application-initials" aria-hidden="true">${esc(company.trim().split(/\s+/).slice(0,2).map(word=>word[0]).join('').toUpperCase())}</div>
+            <h2>Ready to make<br>your move?</h2>
+            <p class="job-application-intro">Apply directly on the employer's site and keep track of your application right here on VeeAys.</p>
+            <div class="job-application-identity"><strong>${esc(title)}</strong><span>${esc(company)}</span></div>
 
             <div class="job-detail-user-actions">
               ${saveIntent && user && !saved ? '<p class="save-intent-note">You’re signed in. Save this job so you can come back to it anytime.</p>' : ''}
-              ${user ? `<form method="post" action="${saved ? '/unsave-job' : '/save-job'}"><input type="hidden" name="job_id" value="${esc(job.id)}"><input type="hidden" name="return_to" value="${jobPath(job)}"><button class="job-detail-save${saved ? ' is-saved' : ''}" type="submit">${saved ? '♥ Saved job' : '♡ Save job'}</button></form>` : `<a class="job-detail-save" href="/signup?return=${encodeURIComponent(jobPath(job) + '?save=1')}">♡ Save job</a>`}
+              ${user ? `<form method="post" action="${saved ? '/unsave-job' : '/save-job'}"><input type="hidden" name="job_id" value="${esc(job.id)}"><input type="hidden" name="return_to" value="${jobPath(job)}"><button class="job-detail-save${saved ? ' is-saved' : ''}" type="submit">${saved ? '♥ Unsave job' : '♡ Save for later'}</button></form>` : `<a class="job-detail-save" href="/signup?return=${encodeURIComponent(jobPath(job) + '?save=1')}">♡ Save for later</a>`}
               ${user && !application ? `<form method="post" action="/mark-applied"><input type="hidden" name="job_id" value="${esc(job.id)}"><input type="hidden" name="return_to" value="${jobPath(job)}"><button class="job-detail-track" type="submit">✓ Mark as applied</button></form>` : ''}
               ${user && application ? `<a class="job-detail-track is-tracked" href="/my-jobs">Tracked · ${esc(application.status.charAt(0).toUpperCase() + application.status.slice(1))}</a>` : ''}
             </div>
@@ -1198,8 +1143,7 @@ export function detail(job, { user = null, saved = false, application = null, sa
                   </a>
 
                   <p class="job-detail-external">
-  Opens the original listing
-  in a new tab.
+  Opens the employer's listing in a new tab.
 </p>
 
 ${
@@ -1220,13 +1164,7 @@ ${
             }
 
 
-            <div
-              class="job-detail-flight"
-              aria-hidden="true"
-            >
-              <span>· · · · · · ·</span>
-              <b>➤</b>
-            </div>
+            ${renderApplicationProgress({ user, saved, application })}
 
           </div>
 
@@ -1608,4 +1546,3 @@ export function myJobsPage({ saved = [], applications = [], message = '', error 
   })();
   </script>`;
 }
-
