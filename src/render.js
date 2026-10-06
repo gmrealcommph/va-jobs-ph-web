@@ -536,7 +536,7 @@ export function listing({ rows, total, page, search, category, names, categoryEn
           <span class="category-eyebrow">EXPLORE WORK</span>
           <h2>Explore categories</h2>
           <p>Browse by what you do best.</p>
-          ${categoryEntries.length ? '<span class="category-count-context">Counts show all public jobs.</span>' : ''}
+          
         </div>
         <nav class="category-links" aria-label="Job categories">
 
