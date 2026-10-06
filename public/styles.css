@@ -6071,3 +6071,68 @@ body:has(.employer-page)>.site-footer .footer-bottom{padding-top:15px;padding-bo
 /* Decorative employer collages; preserve the approved illustration slots. */
 .employer-page .ep-collage>.ep-workspace-art{display:block;position:absolute;inset:0;width:100%;height:100%;object-fit:contain}
 .employer-page .ep-letter>.ep-enquiry-art{display:block;width:100%;height:auto;aspect-ratio:190/135;margin:18px 0}
+/* About brand story. All additions are scoped to its page root. */
+.about-page{background:#fffdf3;color:#123e30}
+.about-page .company-hero-grid{grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);gap:32px}
+.about-page .ab-hero-art img{display:block;width:100%;height:auto}
+.about-page h2{font-size:clamp(34px,3.3vw,46px);line-height:1.16;letter-spacing:-1.5px;margin:18px 0 25px}
+.about-page h2 em{font-family:Georgia,serif;font-weight:400}
+.about-page p{font-size:18px;line-height:1.75}
+.about-page .ab-journey{padding-block:80px 66px}
+.about-page .ab-section-head{display:flex;justify-content:space-between;gap:30px;align-items:end;margin-bottom:38px}
+.about-page .ab-section-head>p{color:#52675c;margin-bottom:28px}
+.about-page .ab-steps{list-style:none;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:27px;padding:0 0 22px;margin:0;position:relative}
+.about-page .ab-steps:before{content:'';position:absolute;left:5%;right:5%;top:54%;height:80px;border-bottom:2px dashed #839873;border-radius:50%;transform:rotate(7deg)}
+.about-page .ab-steps li{background:#f5f0df;border:1px solid #dfdfc9;border-radius:4px 20px 7px 4px;padding:26px;position:relative;box-shadow:6px 7px 0 #e9ecd9;align-self:start}
+.about-page .ab-steps li:nth-child(2){margin-top:40px;background:#edf2df;box-shadow:6px 7px 0 #dce5c9}
+.about-page .ab-steps li:nth-child(3){margin-top:80px;background:#fcf2e8;box-shadow:6px 7px 0 #efe0cf}
+.about-page .ab-steps li:before{content:'';position:absolute;left:40%;top:-10px;width:58px;height:22px;background:#d8c39199;transform:rotate(-5deg)}
+.about-page .ab-step-top{display:flex;align-items:center;gap:14px}
+.about-page .ab-number{font:italic 30px Georgia,serif;color:#496242}
+.about-page .ab-step-top .company-eyebrow{font-size:11px;letter-spacing:1.3px}
+.about-page .ab-step-top svg{margin-left:auto;width:44px;height:44px;flex-shrink:0;fill:none;stroke:#123e30;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.about-page .ab-steps h3{font-size:23px;line-height:1.3;letter-spacing:-.5px;margin:22px 0 16px}
+.about-page .ab-steps p{font-size:16px;line-height:1.8;color:#435b4e;margin:0 0 24px}
+.about-page .ab-handnote{font:italic 18px Georgia,serif;border-top:1px solid #123e3026;display:block;padding-top:15px}
+.about-page .ab-pro-note{margin:28px 0 0;max-width:850px;font-size:14px;color:#52675c}
+.about-page a{color:inherit;text-underline-offset:4px}
+.about-page a:focus-visible{outline:3px solid #d7864e;outline-offset:5px;border-radius:4px}
+.about-page .ab-purpose{background:#f1f2e5;border-block:1px solid #dce1cb}
+.about-page .ab-purpose-grid{display:grid;grid-template-columns:1.1fr 1fr;gap:80px;align-items:center;padding-block:80px}
+.about-page .ab-purpose-copy p{color:#435b4e;max-width:600px}
+.about-page .ab-purpose-signoff{display:inline-block;font:italic 23px Georgia,serif;border-bottom:2px solid #d8935e;padding:7px 0;margin-top:12px}
+.about-page .ab-role-board{position:relative;background:#fffdf3;border:1px solid #d8deca;padding:35px;transform:rotate(2deg);box-shadow:-12px 12px 0 #dce6cc}
+.about-page .ab-role-board:before{content:'';position:absolute;left:36%;top:-14px;width:100px;height:28px;background:#d7bf88b3;transform:rotate(-6deg)}
+.about-page .ab-role-board>.company-eyebrow{display:block;line-height:1.6;font-size:10px}
+.about-page .ab-role-board h3{font:32px/1.15 Georgia,serif;letter-spacing:-.6px;margin:20px 0 25px}
+.about-page .ab-role-board h3 em{font-weight:400}
+.about-page .ab-role-board ul{list-style:none;padding:0;margin:0;display:grid;gap:0}
+.about-page .ab-role-board li{display:flex;gap:15px;align-items:center;padding:11px 0;border-top:1px solid #dfe3d5;font-size:16px;font-weight:600}
+.about-page .ab-role-board li>span{display:grid;place-items:center;width:28px;height:28px;flex-shrink:0;background:#e8efd8;border-radius:50%;font-size:19px;font-weight:400}
+.about-page .ab-role-board li:nth-child(3n)>span{background:#f5dfc9}
+.about-page .ab-role-board p{font:italic 18px Georgia,serif;margin:25px 0 0;color:#496242}
+.about-page .ab-finale-wrap{padding-block:80px}
+.about-page .ab-finale{display:grid;grid-template-columns:1.3fr 1fr;gap:45px;align-items:center;background:#123e30 radial-gradient(#ffffff12 .8px,transparent .8px);background-size:18px 18px;color:#fffdf3;border-radius:26px;padding:50px}
+.about-page .ab-finale .company-eyebrow{color:#d9ed89}
+.about-page .ab-finale h2{font-size:clamp(34px,3.5vw,48px)}
+.about-page .ab-finale h2 em{color:#d9ed89}
+.about-page .ab-finale p{color:#e1e8db;font-size:17px;max-width:560px}
+.about-page .ab-primary{display:inline-flex;align-items:center;gap:20px;background:#d9ed89;color:#123e30;border-radius:30px;padding:16px 24px;text-decoration:none;font-weight:700;margin:12px 0 24px;min-height:48px}
+.about-page .ab-primary:hover{background:#e8f5b8}
+.about-page .ab-secondary{display:flex;flex-wrap:wrap;gap:22px;font-size:14px;color:#e1e8db}
+.about-page .ab-search-collage{position:relative;min-height:330px;color:#123e30;padding:42px 20px 35px}
+.about-page .ab-search-fragment{position:absolute;left:0;top:10px;transform:rotate(-6deg);padding:14px 20px;border-radius:4px;background:#e9ecd7;font-size:15px;width:90%;box-shadow:0 6px 10px #06291e33}
+.about-page .ab-job-paper{position:relative;transform:rotate(5deg);padding:28px;background:#fffdf3;box-shadow:-10px 10px 0 #dedbc1;max-width:315px;margin:auto}
+.about-page .ab-job-paper:before{content:'';position:absolute;left:35%;top:-13px;width:80px;height:27px;background:#d7bf88b3;transform:rotate(-7deg)}
+.about-page .ab-job-paper .company-eyebrow{color:#496242;font-size:10px}
+.about-page .ab-job-paper strong{display:block;font:32px/1.2 Georgia,serif;margin:17px 0}
+.about-page .ab-job-category{font-size:12px;color:#496242}
+.about-page .ab-job-lines{width:80%;height:28px;margin:15px 0;background:repeating-linear-gradient(transparent 0 10px,#dae0cc 10px 12px)}
+.about-page .ab-saved{font-size:13px;display:inline-block;border:1px solid #d8deca;border-radius:25px;padding:7px 12px}
+.about-page .ab-fit-tag{position:absolute;right:-10px;bottom:70px;transform:rotate(-8deg);padding:13px 18px;background:#d9ed89;font:20px Georgia,serif;box-shadow:0 5px 12px #06291e33}
+.about-page .ab-fit-tag small{display:block;font:8px Arial,sans-serif;letter-spacing:1.5px;text-align:right;margin-top:6px}
+.about-page .ab-finale-note{display:block;color:#fffdf3;font:italic 17px Georgia,serif;margin:26px 0 0;transform:rotate(-4deg)}
+@media(max-width:1050px){.about-page .company-hero-grid{gap:15px}.about-page .ab-purpose-grid{gap:40px}.about-page .ab-steps{gap:20px}.about-page .ab-steps li{padding:22px}.about-page .ab-step-top{gap:10px;flex-wrap:wrap}.about-page .ab-finale{padding:35px;gap:20px}.about-page .ab-job-paper{padding:23px}.about-page .ab-fit-tag{right:-5px}}
+@media(max-width:800px){.about-page .company-hero-grid{grid-template-columns:1fr;gap:20px}.about-page .ab-hero-art{max-width:530px;width:100%;justify-self:center}.about-page .ab-journey{padding-block:50px}.about-page .ab-section-head{display:block;margin-bottom:30px}.about-page .ab-section-head>p{margin:0}.about-page .ab-steps{grid-template-columns:1fr;gap:30px;padding:0 8px 10px 0}.about-page .ab-steps:before{left:auto;right:30px;top:10%;bottom:10%;height:auto;width:25px;border-bottom:0;border-right:2px dashed #839873;transform:none}.about-page .ab-steps li:nth-child(n){margin-top:0;padding:26px}.about-page .ab-step-top{flex-wrap:nowrap}.about-page .ab-steps h3{max-width:430px}.about-page .ab-purpose-grid{grid-template-columns:1fr;padding-block:50px;gap:35px}.about-page .ab-role-board{margin:10px 10px 10px 12px;padding:28px;transform:rotate(1deg)}.about-page .ab-finale-wrap{padding-block:50px}.about-page .ab-finale{grid-template-columns:1fr;padding:30px 25px;gap:25px}.about-page .ab-search-collage{width:100%;max-width:380px;justify-self:center;padding-inline:20px;min-height:330px}.about-page .ab-fit-tag{right:0}.about-page h2{letter-spacing:-1px}.about-page .ab-pro-note{font-size:14px}}
+@media(max-width:360px){.about-page .ab-step-top{gap:8px}.about-page .ab-step-top svg{width:35px}.about-page .ab-role-board{padding:22px}.about-page .ab-finale{padding:27px 20px}.about-page .ab-primary{padding:15px 18px;font-size:14px;gap:12px}.about-page .ab-job-paper strong{font-size:28px}.about-page .ab-fit-tag{font-size:17px}}
+

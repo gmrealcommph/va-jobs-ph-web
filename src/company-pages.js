@@ -39,15 +39,7 @@ export function companyPage(path) {
   const page = Object.hasOwn(pages, path) ? pages[path] : null;
   if (!page) return null;
   if (path === '/employers') return employerPage(page);
-  return { title: page.title, description: page.description, body: `<div class="company-page">
-    <section class="company-hero"><div class="wrap company-hero-grid">
-      <div><span class="company-eyebrow">${page.eyebrow}</span><h1>${page.heading}</h1><p>${page.intro}</p></div>
-      <div class="company-note" aria-hidden="true"><span class="company-spark">✳</span><span class="company-note-label">${page.note}</span><strong>${page.aside}</strong><span class="company-note-line"></span></div>
-    </div></section>
-    <section class="wrap company-details" aria-label="${page.title}"><div class="company-cards">${page.cards.map(([number, title, copy]) => `<article><span class="company-number">${number}</span><h2>${title}</h2><p>${copy}</p></article>`).join('')}</div>
-      <div class="company-next"><div><span class="company-eyebrow">THE NEXT STEP</span><h2>${page.bottomTitle}</h2><p>${page.bottom}</p></div><div class="company-actions">${page.cta}</div></div>
-    </section>
-  </div>` };
+  return aboutPage(page);
 }
 
 // Decorative role notes are illustrative categories, never candidate records.
@@ -81,5 +73,40 @@ function employerPage(page) {
     </section>
     <section class="ep-roles" aria-labelledby="ep-roles-title"><div class="wrap ep-roles-inner"><div><span class="ep-eyebrow">ACROSS THE WORKING DAY</span><h2 id="ep-roles-title">Many roles.<br><em>More possibilities.</em></h2><p>From the everyday essentials to the creative spark, explore the kinds of remote work featured on VeeAys.</p></div><div class="ep-talent-board"><ul class="ep-role-tags">${categories.map(name => `<li><svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${roleDrawings[name]}</svg><span>${name.replaceAll('&', '&amp;')}</span></li>`).join('')}</ul><p class="ep-board-note">Different skills. One global workforce.</p></div></div></section>
     <section class="wrap ep-enquiry-wrap" id="employer-enquiry" aria-labelledby="ep-enquiry-title"><div class="ep-enquiry"><div><span class="ep-eyebrow">EMPLOYER ENQUIRIES ARE OPEN</span><h2 id="ep-enquiry-title">Interested in reaching<br><em>Filipino professionals?</em></h2><p>Employer listings are coming soon. For now, send us an enquiry and tell us about your company and opportunity.</p><div class="ep-actions">${page.cta}</div><p class="ep-availability">${page.bottom}</p></div><div class="ep-letter" aria-hidden="true"><span>TO: VEEAYS</span><img class="ep-enquiry-art" src="/images/employer-enquiry-desk.svg" alt="" width="190" height="135"><strong>A little hello.<br>A new possibility.</strong><span class="ep-letter-line"></span></div></div></section>
+  </div>` };
+}
+
+
+// About artwork shows generic product concepts, never live jobs or match results.
+function aboutPage(page) {
+  const icons = [
+    '<circle cx="26" cy="25" r="16"/><path d="m38 37 17 18M17 22h18m-18 7h12"/>',
+    '<rect x="13" y="12" width="37" height="44" rx="4"/><path d="M23 7h17v11H23zM21 30l4 4 7-8m5 5h6M21 45l4 4 7-8m5 5h6"/>',
+    '<path d="M17 42V27a15 15 0 0 1 30 0v15l5 6H12l5-6Zm10 13h10M32 4v6M7 16l5 4m40 0 5-4"/><path d="m24 30 6 6 11-13"/>'
+  ];
+  const steps = [
+    ['DISCOVER', 'Find opportunities open to Filipino talent.', 'Public job browsing remains free. Explore roles and categories, read the details, then apply through the employer’s original application process.', 'A world to explore'],
+    ['ORGANISE', 'Save jobs. Track applications. Keep your search together.', 'Your account gives you a place to save jobs and record your progress. Tracking an application in VeeAys does not submit it to an employer.', 'A little more clarity'],
+    ['GET MATCHED', 'Let VeeAys surface opportunities that fit you.', 'Personalized matching connects your preferences with available job information. Pro expands your feed with match filters, Strong Match Alerts and a Daily Job Digest.', 'A search that feels like you']
+  ];
+  const roles = ['Executive / Virtual Assistant', 'Customer Support', 'Marketing / Social Media', 'Bookkeeping & Finance', 'Design & Creative', 'Operations & Admin', 'Project Management'];
+  return { title: page.title, description: page.description, body: `<div class="company-page about-page">
+    <section class="company-hero"><div class="wrap company-hero-grid">
+      <div><span class="company-eyebrow">${page.eyebrow}</span><h1>${page.heading}</h1><p>${page.intro}</p></div>
+      <div class="ab-hero-art"><img src="/images/about-workspace.svg" width="560" height="520" alt="Editorial illustration of a Filipino remote professional at a laptop, surrounded by notes for remote opportunities, saved jobs, application tracking and personalized matching."></div>
+    </div></section>
+    <section class="wrap ab-journey" aria-labelledby="ab-journey-title">
+      <div class="ab-section-head"><div><span class="company-eyebrow">YOUR SEARCH, YOUR WAY</span><h2 id="ab-journey-title">From possibility<br>to <em>your next move.</em></h2></div><p>Discover what’s out there.<br>Keep what matters close.</p></div>
+      <ol class="ab-steps">${steps.map(([label,title,copy,caption],i)=>`<li><div class="ab-step-top"><span class="ab-number">0${i+1}</span><span class="company-eyebrow">${label}</span><svg viewBox="0 0 64 64" aria-hidden="true">${icons[i]}</svg></div><h3>${title}</h3><p>${copy}</p><span class="ab-handnote">${caption}</span></li>`).join('')}</ol>
+      <p class="ab-pro-note">Pro upgrades are coming soon. Alerts and digests require active Pro access and enabled email preferences. <a href="/pro">See current Pro features &amp; availability →</a></p>
+    </section>
+    <section class="ab-purpose" aria-labelledby="ab-purpose-title"><div class="wrap ab-purpose-grid">
+      <div class="ab-purpose-copy"><span class="company-eyebrow">BUILT FOR FILIPINO REMOTE WORKERS</span><h2 id="ab-purpose-title">The world of remote work is big.<br><em>Finding the right opportunity shouldn’t feel that way.</em></h2><p>VeeAys brings remote opportunities from different companies and sources into one place, with a focus on roles Filipino professionals can explore.</p><p>Our aim is simple: make discovering global work easier to navigate, more organised and more useful — whether you’re looking for your first remote role or your next one.</p><span class="ab-purpose-signoff">Local roots. Wider horizons.</span></div>
+      <div class="ab-role-board"><span class="company-eyebrow">THERE’S MORE THAN ONE WAY TO WORK REMOTELY</span><h3>Different skills.<br><em>Room to explore.</em></h3><ul>${roles.map((role,i)=>`<li><span aria-hidden="true">${['↗','◌','✳','＋','✎','✓','⌁'][i]}</span>${role.replaceAll('&','&amp;')}</li>`).join('')}</ul><p>Find your corner of a bigger world.</p></div>
+    </div></section>
+    <section class="wrap ab-finale-wrap" aria-labelledby="ab-next-title"><div class="ab-finale">
+      <div><span class="company-eyebrow">YOUR NEXT MOVE</span><h2 id="ab-next-title">Your next opportunity<br><em>could be here.</em></h2><p>Explore the roles that fit your skills, check the original listing and take your next step. Employers manage their own applications and hiring decisions.</p><a class="button ab-primary" href="/jobs">Explore opportunities <span aria-hidden="true">→</span></a><div class="ab-secondary"><a href="/pro">Explore VeeAys Pro</a><a href="/contact">Get in touch</a></div></div>
+      <div class="ab-search-collage" aria-hidden="true"><span class="ab-search-fragment">⌕ &nbsp; Your next remote role</span><div class="ab-job-paper"><span class="company-eyebrow">A LITTLE POSSIBILITY</span><strong>Work that fits<br><em>your skills.</em></strong><span class="ab-job-category">Remote · Explore roles</span><div class="ab-job-lines"></div><span class="ab-saved">♡ &nbsp; Saved for later</span></div><span class="ab-fit-tag">✓ &nbsp; Strong match<small>ILLUSTRATIVE</small></span><span class="ab-finale-note">Start with a little curiosity.</span></div>
+    </div></section>
   </div>` };
 }
