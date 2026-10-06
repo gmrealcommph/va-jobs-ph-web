@@ -1,0 +1,19 @@
+// Dedicated TEST Worker. Never deploy this configuration over the production Worker.
+// Replace the three placeholders and store secrets using --config with this file.
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "veeays-paymongo-test",
+  "main": "src/worker.js",
+  "compatibility_date": "2026-10-01",
+  "assets": { "directory": "./public", "binding": "ASSETS" },
+  "vars": {
+    "PAYMONGO_MODE": "test",
+    "PAYMONGO_TEST_USER_IDS": "REPLACE_WITH_COMMA_SEPARATED_TEST_AUTH_USER_UUIDS",
+    "SUPABASE_URL": "https://REPLACE_WITH_STAGING_PROJECT.supabase.co",
+    "SITE_URL": "https://REPLACE_WITH_TEST_WORKER_HOST",
+    "STRONG_MATCH_MODE": "disabled",
+    "DAILY_DIGEST_MODE": "disabled",
+    "QUICK_READ_MODE": "disabled",
+    "QUICK_READ_BATCH_ENABLED": "false"
+  }
+}

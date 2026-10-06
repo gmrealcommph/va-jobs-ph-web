@@ -1,3 +1,4 @@
+import { proCheckoutEndpoint, testUserAllowed } from './pro-checkout.js';
 import { recovery } from './recovery.js';
 import { categories, getJob, getJobsByIds, listJobs, query } from './data.js';
 import { quickReadEndpoint } from './quick-read-service.js';
@@ -24,7 +25,7 @@ function safeReturnPath(value) {
   if (/^\/apply\/[A-Za-z0-9%._~-]{1,240}$/.test(v)) return v;
   if (/^\/jobs\/[A-Za-z0-9%._~-]{1,240}(?:\?save=1)?$/.test(v)) return v;
   if (v === '/my-jobs' || v === '/matches' || v === '/jobs' || v === '/email-preferences') return v;
-  if (v === '/onboarding' || v === '/') return v;
+  if (v === '/pro' || v === '/onboarding' || v === '/') return v;
   return '';
 }
 async function defaultPostAuthPath(env, state) {
@@ -44,6 +45,7 @@ function hasCookie(request, name, expected = '1') {
 function xml(body) { return new Response(`<?xml version="1.0" encoding="UTF-8"?>${body}`, { headers: { 'content-type': 'application/xml; charset=utf-8', 'cache-control': 'public, max-age=300' } }); }
 export async function handle(request, env) {
   const url = new URL(request.url);
+  if (['/pro/checkout', '/pro/return', '/webhooks/paymongo'].includes(url.pathname)) return proCheckoutEndpoint(request, env);
   const quickReadMatch=url.pathname.match(/^\/internal\/quick-read\/([1-9]\d{0,18}|batch)$/);
   if(quickReadMatch) return quickReadEndpoint(request,env,quickReadMatch[1]==='batch'?null:quickReadMatch[1]);
 
@@ -612,7 +614,11 @@ if (
 
     if (url.pathname === '/pro') {
       const isPro = currentProfile?.plan === 'pro' && currentProfile?.plan_status === 'active';
-      return render('VeeAys Pro', proPage({ isPro, user: authState.user, profile: currentProfile }), { noindex: false });
+      const testCheckout = testUserAllowed(env, authState.user?.id);
+      const response = render('VeeAys Pro', proPage({ isPro, user: authState.user, profile: currentProfile, testCheckout }), { noindex: false });
+      // The form's 303 redirect must be allowed by the originating page's CSP.
+      if (testCheckout) response.headers.set('content-security-policy', headers['content-security-policy'].replace("form-action 'self'", "form-action 'self' https://checkout.paymongo.com"));
+      return response;
     }
 
     if (url.pathname === '/my-jobs') {
