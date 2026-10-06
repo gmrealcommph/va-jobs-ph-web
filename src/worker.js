@@ -954,8 +954,8 @@ if (
       return missing();
     }
 
-    const names =
-      await categories(env);
+    const { entries: categoryEntries, total: publicJobTotal } = await categories(env, { withCounts: true, withTotal: true });
+    const names = categoryEntries.map(entry => entry.name);
 
     if (
       category &&
@@ -1034,6 +1034,8 @@ if (
         search,
         category,
         names,
+        categoryEntries,
+        publicJobTotal,
         showPreferencesPrompt,
         onboardingComplete,
         user: authState.user,

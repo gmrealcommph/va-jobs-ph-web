@@ -5870,3 +5870,47 @@ a.jh-pill:hover{background:#dce8b7}a.jh-pill:focus-visible{outline:3px solid #72
 @media(max-width:600px){
   .home-hero .premium-collage.approved-hero-art{margin:16px auto 0}
 }
+/* Category discovery: shared by home, browse and category results only. */
+.listings:has(> .category-discovery){grid-template-columns:280px minmax(0,1fr);gap:30px;align-items:start;}
+.listings > .category-discovery{display:block;min-width:0;overflow:visible;position:sticky;top:var(--category-stick-top,22px);align-self:start;}
+.category-discovery .category-panel{position:static;padding:20px 12px 12px;}
+.category-panel-heading{padding:0 7px 17px;}
+.category-discovery .category-eyebrow{display:block;font:700 11px/1.4 Arial,sans-serif;letter-spacing:1.4px;color:#486349;}
+.category-panel-heading h2{position:relative;width:fit-content;margin:7px 0 16px;font:700 23px/1.15 Georgia,serif;letter-spacing:-.6px;color:#123e30;}
+.category-panel-heading h2::after{content:"";position:absolute;left:0;right:3px;bottom:-7px;height:4px;background:#e58b32;border-radius:50% 30% 60% 40%;transform:rotate(-1.7deg);}
+.category-panel-heading p{font-size:14px;line-height:1.4;margin:0 0 5px;color:#486349;}
+.category-count-context{font-size:12px;line-height:1.4;color:#586b5b;}
+.category-discovery .category-links{display:grid;gap:4px;}
+.listings .category-discovery .category-panel .filter{display:grid;grid-template-columns:32px minmax(0,1fr) auto 9px;align-items:center;gap:7px;min-height:48px;padding:7px 8px;margin:0;border:1px solid #e1e4d8;border-radius:9px;background:#fffef9;color:#173d32;font-size:14px;font-weight:500;line-height:1.25;white-space:normal;box-sizing:border-box;}
+.listings .category-discovery .category-panel .filter-icon{width:32px;height:32px;flex-basis:32px;border-radius:8px;font-size:17px;}
+.listings .category-discovery .category-panel .filter-name{min-width:0;overflow-wrap:anywhere;font-size:14px;line-height:1.25;font-weight:500;}
+.category-discovery .category-panel .all-filter .filter-name{font-weight:600;}
+.listings .category-discovery .category-panel .filter-chevron{display:block;font-size:21px;}
+.category-discovery .category-panel .all-count,.category-live-count{display:inline-block;min-width:22px;padding:3px 5px;border-radius:999px;background:#edf1e3;color:#486349;font-size:11px;font-weight:600;line-height:1.1;text-align:center;}
+.listings .category-discovery .category-panel .filter:hover{background:#f1f5e8;border-color:#a4b993;transform:none;text-decoration:none;}
+.listings .category-discovery .category-panel .filter.selected{background:#123e30;border-color:#123e30;color:#fffdf3;box-shadow:none;}
+.category-discovery .filter.selected .category-live-count,.category-discovery .filter.selected .all-count{background:#c4ec94;color:#123e30;}
+.category-discovery a:focus-visible{outline:3px solid #e58b32;outline-offset:3px;}
+.category-discovery .category-promo{display:block;position:relative;margin:14px 0 0;padding:20px;background:#eff6c8;border:1px solid #e0e9b9;border-radius:12px;transform:none;box-shadow:none;}
+.category-discovery .category-promo .category-eyebrow{font-size:11px;color:#486349;}
+.category-promo .category-eyebrow i{color:#bc601d;font-style:normal;}
+.category-discovery .category-promo h3{margin:12px 0 10px;font:italic 400 25px/1.05 Georgia,serif;color:#123e30;}
+.category-discovery .category-promo p{margin:0 0 10px;font-size:14px;line-height:1.45;color:#486349;}
+.category-promo a{display:inline-flex;align-items:center;gap:12px;min-height:44px;font-size:14px;font-weight:600;color:#123e30;}
+@media (min-width:901px) and (max-width:1100px){.listings:has(> .category-discovery){grid-template-columns:270px minmax(0,1fr);gap:24px;}.listings:has(> .category-discovery) .opportunity-grid{grid-template-columns:minmax(0,1fr);}}
+@media(max-width:900px){
+  .listings:has(> .category-discovery){display:block;}
+  .listings > .category-discovery{position:static;width:100%;margin-bottom:28px;padding:0;}
+  .category-discovery .category-panel{background:#fffdf6;border:1px solid #e1e2d7;border-radius:13px;padding:18px 12px 12px;display:block;overflow:visible;box-shadow:none;box-sizing:border-box;width:100%;}
+  .category-panel-heading{padding-bottom:14px;}
+  .category-discovery .category-links{display:flex;gap:8px;overflow-x:auto;padding:4px 4px 10px;scrollbar-width:thin;}
+  .listings .category-discovery .category-panel .filter{display:flex;flex:0 0 auto;gap:8px;max-width:320px;padding:7px 10px;border-radius:10px;white-space:nowrap;}
+  .listings .category-discovery .category-panel .filter-name{white-space:normal;}
+  .listings .category-discovery .category-panel .filter-chevron{display:none;}
+  .category-discovery .category-promo{display:none;}
+}
+/* Override legacy mobile span hiding inside this navigation only. */
+.listings .category-discovery .category-panel .filter-name{display:block;}
+.listings .category-discovery .category-panel .filter .all-count,
+.listings .category-discovery .category-panel .filter .category-live-count{display:inline-block;}
+.listings .category-discovery .category-panel .filter-icon{display:grid;place-items:center;}

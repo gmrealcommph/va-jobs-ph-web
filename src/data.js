@@ -109,7 +109,7 @@ export async function getJob(env, id) {
   } catch { /* Generation/enrichment availability must not break job navigation. */ }
   return job;
 }
-export async function categories(env, { withCounts = false } = {}) {
+export async function categories(env, { withCounts = false, withTotal = false } = {}) {
   const names = new Set();
   const counts = new Map();
   let offset = 0;
@@ -125,7 +125,8 @@ export async function categories(env, { withCounts = false } = {}) {
     if (!rows.length) throw new Error('Incomplete category response.');
   }
   const sorted = [...names].sort((a, b) => a.localeCompare(b));
-  return withCounts ? sorted.map(name => ({ name, count: counts.get(name) })) : sorted;
+  const entries = withCounts ? sorted.map(name => ({ name, count: counts.get(name) })) : sorted;
+  return withTotal ? { entries, total: offset } : entries;
 }
 
 

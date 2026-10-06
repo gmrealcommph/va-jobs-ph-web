@@ -46,7 +46,7 @@ export function layout({ title, description, canonical, body, noindex = false, u
     type="image/svg+xml"
   >
 
-  <link rel="stylesheet" href="/styles.css?v=20261006-job-header">
+  <link rel="stylesheet" href="/styles.css?v=20261006-category-sidebar">
 </head>
 
 <body>
@@ -373,7 +373,7 @@ export function searchForm(search = '', category = '', action = '/') {
   return `<form class="search" role="search" action="${esc(action)}" method="get"><label for="q">Job title, company, or keyword</label><div class="search-row"><span aria-hidden="true">⌕</span><input id="q" name="q" type="search" maxlength="120" placeholder="e.g. virtual assistant, customer support" value="${esc(search)}">${category && action === '/' ? `<input type="hidden" name="category" value="${esc(category)}">` : ''}<button type="submit">Search jobs <span aria-hidden="true">↗</span></button></div></form>`;
 }
 
-export function listing({ rows, total, page, search, category, names, showPreferencesPrompt = false, onboardingComplete = false, user = null, savedJobIds = [], browseOnly = false }) {
+export function listing({ rows, total, page, search, category, names, categoryEntries = [], publicJobTotal = total, showPreferencesPrompt = false, onboardingComplete = false, user = null, savedJobIds = [], browseOnly = false }) {
   const action = category ? categoryPath(category) : (browseOnly ? '/jobs' : '/');
   const pages = Math.ceil(total / 15);
 
@@ -501,6 +501,10 @@ export function listing({ rows, total, page, search, category, names, showPrefer
         </div>
       </div>`;
 
+  const categoryCounts = new Map(categoryEntries.map(({ name, count }) => [name, count]));
+  const countBadge = name => Number.isSafeInteger(categoryCounts.get(name))
+    ? `<span class="category-live-count" aria-label="${categoryCounts.get(name).toLocaleString('en-US')} public jobs">${categoryCounts.get(name).toLocaleString('en-US')}</span>` : '';
+  const allHref = `${browseOnly ? '/jobs' : '/'}${search ? '?' + new URLSearchParams({ q: search }) : ''}`;
   const filters = names.map(name => `
     <a
       class="filter ${category === name ? 'selected' : ''}"
@@ -509,6 +513,7 @@ export function listing({ rows, total, page, search, category, names, showPrefer
     >
       <span class="filter-icon" aria-hidden="true">${categoryIcon(name)}</span>
       <span class="filter-name">${esc(name)}</span>
+      ${countBadge(name)}
       <span class="filter-chevron" aria-hidden="true">›</span>
     </a>
   `).join('');
@@ -523,48 +528,42 @@ export function listing({ rows, total, page, search, category, names, showPrefer
 
   <section class="wrap listings" id="opportunities">
 
-    <aside class="opportunity-map">
-
-      <div class="category-doodle" aria-hidden="true">
-        Find a role<br>
-        that fits you
-        <b>↘</b>
-      </div>
+    <aside class="opportunity-map category-discovery" aria-label="Explore work categories">
 
       <div class="category-panel">
 
-        <h2>Explore categories</h2>
+        <div class="category-panel-heading">
+          <span class="category-eyebrow">EXPLORE WORK</span>
+          <h2>Explore categories</h2>
+          <p>Browse by what you do best.</p>
+          ${categoryEntries.length ? '<span class="category-count-context">Counts show all public jobs.</span>' : ''}
+        </div>
+        <nav class="category-links" aria-label="Job categories">
 
         <a
           class="filter all-filter ${category ? '' : 'selected'}"
-          href="${browseOnly ? '/jobs' : '/'}${search ? '?' + new URLSearchParams({ q: search }) : ''}"
+          ${category ? '' : 'aria-current="page"'}
+          href="${allHref}"
         >
           <span class="filter-icon" aria-hidden="true">⊞</span>
           <span class="filter-name">All opportunities</span>
-          <span class="all-count">${total.toLocaleString('en-US')}</span>
+          <span class="all-count" aria-label="${publicJobTotal.toLocaleString('en-US')} public jobs">${publicJobTotal.toLocaleString('en-US')}</span>
           <span class="filter-chevron" aria-hidden="true">›</span>
         </a>
 
         ${filters}
-
+        </nav>
       </div>
 
-      <div class="aside-note">
-        <span aria-hidden="true">✳</span>
-
-        <h3>
-          Your skills.<br>
-          New possibilities.
-        </h3>
-
-        <p>
-          Discover a role that fits where you want to go next.
-        </p>
-
-        <b aria-hidden="true">↗</b>
+      <div class="aside-note category-promo">
+        <span class="category-eyebrow">YOUR NEXT MOVE <i aria-hidden="true">✦</i></span>
+        <h3>Your skills.<br>New possibilities.</h3>
+        <p>See where your skills could take you next.</p>
+        <a href="${allHref}">Browse everything <span aria-hidden="true">→</span></a>
       </div>
 
     </aside>
+    <script src="/category-sidebar.js?v=20261006" defer></script>
 
     <div class="results">
 
