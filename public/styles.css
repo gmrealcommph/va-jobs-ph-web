@@ -5846,11 +5846,12 @@ a.jh-pill:hover{background:#dce8b7}a.jh-pill:focus-visible{outline:3px solid #72
 
 
 /* Original 1591 × 989 transparent PNG; crop only its empty left margin.
-   A 580px frame displays the 1160px artwork region at up to 2x density. */
+   Grow the desktop artwork 10%; the column still limits narrower layouts.
+   The asset's alpha feather embeds the desk/foliage without masking cards. */
 .home-hero .premium-collage.approved-hero-art,
 .home-hero .premium-collage.approved-hero-art:hover{
   width:100%;
-  max-width:580px;
+  max-width:638px;
   aspect-ratio:1160 / 989;
   margin:0 0 0 auto;
   overflow:hidden;
@@ -5869,4 +5870,3 @@ a.jh-pill:hover{background:#dce8b7}a.jh-pill:focus-visible{outline:3px solid #72
 @media(max-width:600px){
   .home-hero .premium-collage.approved-hero-art{margin:16px auto 0}
 }
-
