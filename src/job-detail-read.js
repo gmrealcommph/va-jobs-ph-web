@@ -54,16 +54,30 @@ export function formatSalary(job) {
 export function originalDescriptionDisplay(description) {
   const seen = new Set();
   const blocks = String(description).split(/(\r?\n[ \t]*\r?\n(?:[ \t]*\r?\n)*)/);
+  let previousProse = '';
   for (let index = 0; index < blocks.length; index += 2) {
-    const block = blocks[index];
+    let block = blocks[index];
+    // Only compare the leading sentence with the immediately preceding displayed
+    // prose. Match source spelling, case and punctuation; normalize whitespace only.
+    const leading = block.trimStart().match(/^([\s\S]*?[.!?]["'’”)]?)(?=\s|$)/);
+    const sentence = leading?.[1].replace(/\s+/g, ' ');
+    if (sentence && sentence.length >= 80 && /[a-z]/.test(sentence)
+      && !/^\s*(?:[-*•▪●]|\d+[.)]|#{1,6})\s/.test(block)
+      && (previousProse === sentence || previousProse.endsWith(' ' + sentence)
+        && /[.!?]["'’”)]?$/.test(previousProse.slice(0, -sentence.length).trimEnd()))) {
+      const start = block.length - block.trimStart().length;
+      block = block.slice(start + leading[1].length).trimStart();
+      blocks[index] = block;
+      if (!block && index > 0) blocks[index - 1] = '';
+    }
     const key = block.trim().replace(/\s+/g, ' ');
     const lines = block.trim().split(/\r?\n/);
     const prose = key.length >= 80 && /[.!?]["'’”)]?$/.test(key) && /[a-z]/.test(key)
       && !lines.some(line => /^(?:\s*(?:[-*•▪●]|\d+[.)])\s|\s*#{1,6}\s)|:\s*$/.test(line))
       && !lines.some(line => line.trim() && line.trim() === line.trim().toUpperCase());
-    if (!prose) continue;
+    if (!prose) { if (key) previousProse = ''; continue; }
     if (seen.has(key)) { blocks[index] = ''; if (index > 0) blocks[index - 1] = ''; }
-    else seen.add(key);
+    else { seen.add(key); previousProse = key; }
   }
   return blocks.join('');
 }

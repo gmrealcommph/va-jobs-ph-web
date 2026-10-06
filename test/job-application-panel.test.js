@@ -30,7 +30,7 @@ test('all application statuses render current state and leave later stages incom
  for(const status of ['applied','interview','offer','hired','rejected','withdrawn']) {
   const html=panel({user,saved:false,application:{status}});
   assert.doesNotMatch(html,/action="\/mark-applied"/);
-  assert.match(html,new RegExp(`Tracked · ${status[0].toUpperCase()+status.slice(1)}`));
+  assert.match(html,/>Update application</);
   assert.match(html,/href="\/my-jobs"/);
   const steps=[...html.matchAll(/<li class="([^"]*)"([^>]*)>.*?<span>(Saved|Applied|Interview|Offer|Hired)<\/span>/g)];
   assert.equal(steps[0][1],'');

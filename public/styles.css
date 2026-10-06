@@ -5827,3 +5827,19 @@ a.jh-pill:hover{background:#dce8b7}a.jh-pill:focus-visible{outline:3px solid #72
 .job-application-progress li:not(:last-child)::after{top:13px;left:calc(50% + 16px);width:calc(100% - 28px);}
 .job-detail-page .qr-original{line-height:calc(1.75em + 2px);}
 @media(min-width:1100px){.job-detail-layout{grid-template-columns:minmax(0,760px) 335px;gap:57px;}}
+
+/* Final targeted rhythm: desktop gap 38 + 20 = 58px, previously 92px. */
+@media(min-width:901px){
+  .job-detail-page .job-detail-layout{padding-top:20px;}
+  .job-detail-page .qr-glance{margin-bottom:calc(1.5rem + 24px);}
+  .job-detail-page .job-detail-sidebar{align-self:stretch;}
+  .job-detail-page .job-detail-snapshot{box-sizing:border-box;max-height:calc(100dvh - 129px);overflow:auto;}
+}
+@media(max-width:900px){
+  .job-detail-page .job-detail-layout{padding-top:28px;}
+  .job-detail-page .qr-glance{margin-bottom:2.5rem;}
+}
+@media(max-width:700px){
+  .job-detail-page .job-detail-layout{padding-top:20px;}
+  .job-detail-page .qr-glance{margin-bottom:2rem;}
+}

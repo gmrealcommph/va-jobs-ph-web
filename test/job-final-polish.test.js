@@ -10,8 +10,32 @@ test('exact normalized prose duplicates only; first wording and source are prese
  assert.ok(output.includes(p));assert.ok(output.includes('Different original prose.'));assert.equal(source,before);
 });
 test('similar, case-different paragraphs and reordered content remain',()=>{
- const source=[p,p+' Our mission is to support industries.',p.replace('ethical','Ethical')].join('\n\n');
+ const source=[p,p.replace('ethical','responsible')+' Our mission is to support industries.',p.replace('ethical','Ethical')].join('\n\n');
  assert.equal(originalDescriptionDisplay(source),source);
+});
+
+test('exact immediately repeated leading sentence is removed and remainder retained',()=>{
+ const rest='Our mission is to support industries in harnessing AI.';
+ for(const repeated of [p,p.replace('we deliver','we  deliver').replace('data collection','data\ncollection')]) {
+  const source=p+'\n\n'+repeated+' '+rest;
+  assert.equal(originalDescriptionDisplay(source),p+'\n\n'+rest);
+ }
+ assert.equal(originalDescriptionDisplay(p+'\n\n'+p+' '+rest+'\nThe Role\nSupport the team.'),p+'\n\n'+rest+'\nThe Role\nSupport the team.');
+});
+
+test('sentence comparisons preserve near matches, intervening headings and lists',()=>{
+ for(const repeated of [p.replace('ethical','Ethical'),p.replace('approaches.','approaches!'),p.replace('AI solutions','AI services')]) {
+  const source=p+'\n\n'+repeated+' New material.';
+  assert.equal(originalDescriptionDisplay(source),source);
+ }
+ for(const middle of ['The Role','Responsibilities:','- A list item']) {
+  const source=p+'\n\n'+middle+'\n\n'+p+' New material.';
+  assert.equal(originalDescriptionDisplay(source),source);
+ }
+ for(const prefix of ['- ','1. ','# ']) {
+  const source=p+'\n\n'+prefix+p+' New material.';
+  assert.equal(originalDescriptionDisplay(source),source);
+ }
 });
 test('repeated headings, list items and ambiguous short text are retained',()=>{
  for(const block of ['The Role','Responsibilities:',p.toUpperCase(),'- '+p,'1. '+p,'Short prose.','# '+p,p+'\nResponsibilities:']) {

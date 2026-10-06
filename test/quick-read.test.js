@@ -63,6 +63,6 @@ test('job detail keeps authenticated actions, tracked state, anonymous intent an
   for(const action of ['/save-job','/mark-applied','/apply/101']) assert.ok(html.includes(action));
   assert.match(html,/name="return_to" value="\/jobs\/101"/);
   assert.match(detail(job,{user:{id:'u'},saved:true,application:{status:'applied'}}),/\/unsave-job/);
-  assert.match(detail(job,{user:{id:'u'},saved:true,application:{status:'applied'}}),/Tracked · Applied/);
+  assert.match(detail(job,{user:{id:'u'},saved:true,application:{status:'applied'}}),/Update application/);
   assert.match(detail(job),/\/signup\?return=%2Fjobs%2F101%3Fsave%3D1/);
 });

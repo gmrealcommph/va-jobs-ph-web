@@ -1125,7 +1125,7 @@ export function detail(job, { user = null, saved = false, application = null, sa
               ${saveIntent && user && !saved ? '<p class="save-intent-note">You’re signed in. Save this job so you can come back to it anytime.</p>' : ''}
               ${user ? `<form method="post" action="${saved ? '/unsave-job' : '/save-job'}"><input type="hidden" name="job_id" value="${esc(job.id)}"><input type="hidden" name="return_to" value="${jobPath(job)}"><button class="job-detail-save${saved ? ' is-saved' : ''}" type="submit">${saved ? '♥ Unsave job' : '♡ Save for later'}</button></form>` : `<a class="job-detail-save" href="/signup?return=${encodeURIComponent(jobPath(job) + '?save=1')}">♡ Save for later</a>`}
               ${user && !application ? `<form method="post" action="/mark-applied"><input type="hidden" name="job_id" value="${esc(job.id)}"><input type="hidden" name="return_to" value="${jobPath(job)}"><button class="job-detail-track" type="submit">✓ Mark as applied</button></form>` : ''}
-              ${user && application ? `<a class="job-detail-track is-tracked" href="/my-jobs">Tracked · ${esc(application.status.charAt(0).toUpperCase() + application.status.slice(1))}</a>` : ''}
+              ${user && application ? `<a class="job-detail-track is-tracked" href="/my-jobs">Update application</a>` : ''}
             </div>
 
             ${
