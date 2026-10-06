@@ -57,7 +57,7 @@ test('41645: genuine duties, benefits, preferences, application and metadata can
   assert.throws(()=>validateSelection(invalid,source),/invalid_source_reference/);
   const corrupt=validateSelection(selection(),source);corrupt.requirements.push('Invented qualification');
   assert.equal(validateStored(corrupt,source),null);
-  assert.match(renderJobRead(source,corrupt,{}),/Quick Read is unavailable/);
+  assert.match(renderJobRead(source,corrupt,{}),/This listing is shown from the employer/);
 });
 test('41645: synthetic preference, mixed obligation and application probes stay fail closed',()=>{
   for(const [line,error] of [['Adobe certification preferred.','preference_upgraded'],['Adobe required; Canva preferred.','preference_upgraded'],['Incomplete application answers are auto-rejected.','application_condition_misplaced']]) {

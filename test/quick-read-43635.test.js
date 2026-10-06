@@ -55,7 +55,7 @@ test('43635: genuine material matches reproduce failure; allowed sections retain
   assert.throws(()=>validateSelection(q,source),/invalid_source_reference/);
   const corrupt=validateSelection(selection(),source);corrupt.requirements.push(sourceUnits(source)[29].text);
   assert.equal(validateStored(corrupt,source),null);
-  assert.match(renderJobRead(source,corrupt,{}),/Quick Read is unavailable/);
+  assert.match(renderJobRead(source,corrupt,{}),/This listing is shown from the employer/);
 });
 test('43635: guidance exposes exact guard matches and preference/application precedence (local mocks)',async()=>{
   const env={OPENAI_API_KEY:'test-only',QUICK_READ_MODEL:'mock'};

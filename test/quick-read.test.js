@@ -44,7 +44,7 @@ test('original is untouched text, safely escaped, with a native keyboard-accessi
 test('short, unstructured, malformed and HTML descriptions use original fallback',()=>{
   for(const s of ['', 'Short listing', 'This is a long unstructured listing. '.repeat(15), '<p>Responsibilities</p><ul><li>Required equipment</li></ul>']) {
     assert.equal(formatQuickRead(s),null);
-    assert.match(renderJobRead(s),/Quick Read is unavailable/);
+    assert.match(renderJobRead(s),/This listing is shown from the employer/);
     assert.doesNotMatch(renderJobRead(s),/<details/);
   }
 });

@@ -1,3 +1,4 @@
+import { sectionHeadingMarks } from './job-section-heading.js';
 import { renderJobHeader } from './job-detail-header.js';
 import { renderJobRead, renderAtAGlance } from './job-detail-read.js';
 export const esc = value => String(value ?? '').replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[char]));
@@ -1026,7 +1027,7 @@ function renderApplicationProgress({ user, saved, application }) {
       const current = key === status || (!status && key === 'saved' && saved);
       return `<li class="${done ? 'is-complete' : ''}${current ? ' is-current' : ''}"${current ? ' aria-current="step"' : ''}><span class="job-progress-dot" aria-hidden="true">${done ? '✓' : ''}</span><span>${label}</span><span class="ep-sr-only">${current ? ': current status' : (done ? ': reached' : ': not recorded')}</span></li>`;
     }).join('')}</ol>
-    <p>${status ? `Current status: <strong>${esc(labels[status] || status)}</strong>. <a href="/my-jobs">Manage in My Jobs →</a>` : (saved ? 'Saved for later. Mark as applied when you have submitted your application.' : 'Save this job or mark it as applied to start tracking.')}</p>
+    <p>${status ? `Current status: <strong>${esc(labels[status] || status)}</strong>. <a href="/my-jobs">Manage in My Jobs →</a>` : (saved ? 'Saved for later. Mark as applied when you have submitted your application.' : 'Save this role or mark it applied to start your journey.')}</p>
   </section>`;
 }
 
@@ -1112,10 +1113,7 @@ export function detail(job, { user = null, saved = false, application = null, sa
 
           <div class="job-detail-snapshot">
 
-            <div class="job-detail-snapshot-kicker">
-              <span aria-hidden="true">✦</span>
-              YOUR APPLICATION
-            </div>
+            <div class="job-detail-snapshot-kicker job-polish-heading">${sectionHeadingMarks('YOUR APPLICATION')}</div>
 
 
             <div class="job-application-initials" aria-hidden="true">${esc(company.trim().split(/\s+/).slice(0,2).map(word=>word[0]).join('').toUpperCase())}</div>

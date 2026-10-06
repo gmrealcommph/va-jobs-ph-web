@@ -5814,3 +5814,16 @@ a.jh-pill:hover{background:#dce8b7}a.jh-pill:focus-visible{outline:3px solid #72
 .job-application-progress a {color:#123e30;text-underline-offset:3px;}
 @media(max-width:900px) {.job-detail-sidebar .job-detail-snapshot {position:relative;top:auto;max-width:600px;}}
 @media(max-width:480px) {.job-detail-sidebar .job-detail-snapshot {padding:22px 18px;}.job-detail-sidebar .job-detail-snapshot h2 {font-size:34px;}}
+
+/* Final job-detail polish: approved hero, tiles and artwork stay intact. */
+.job-detail-page .job-polish-heading{position:relative;display:table;margin:0 0 16px .55rem;padding:0 0 5px;font-size:1.15rem;line-height:1.2;color:#183e2c;font-weight:700;letter-spacing:normal;}
+.job-detail-page .jh-eyebrow.job-polish-heading{margin-bottom:6px;}
+.job-detail-page .job-application-initials{width:46px;height:46px;border-radius:50%;background:#faf4e4;font-size:20px;}
+.job-detail-sidebar .job-detail-save,.job-detail-sidebar .job-detail-track{min-height:44px;font-weight:500;background:#fffdf3;border-color:rgba(18,62,48,.14);}
+.job-detail-sidebar .job-detail-save.is-saved,.job-detail-sidebar .job-detail-track.is-tracked{background:#f3f7e8;}
+.job-detail-sidebar .job-detail-save:hover,.job-detail-sidebar .job-detail-track:hover{background:#eef4e2;border-color:#77916b;}
+.job-application-progress li{font-size:11.5px;}
+.job-progress-dot{width:26px;height:26px;font-size:13.5px;}
+.job-application-progress li:not(:last-child)::after{top:13px;left:calc(50% + 16px);width:calc(100% - 28px);}
+.job-detail-page .qr-original{line-height:calc(1.75em + 2px);}
+@media(min-width:1100px){.job-detail-layout{grid-template-columns:minmax(0,760px) 335px;gap:57px;}}

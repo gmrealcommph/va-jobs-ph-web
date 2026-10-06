@@ -1,3 +1,4 @@
+import { sectionHeadingMarks } from './job-section-heading.js';
 // Static, local category artwork: no remote assets or request-time generation.
 import { displayValue } from './quick-read-presentation.js';
 const esc = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -199,8 +200,8 @@ export function renderJobHeader(job, {company, title, location, workplace, poste
   const pill = (name, value, href) => `<${href ? 'a' : 'span'} class="jh-pill"${href ? ` href="${href}"` : ''}>${icon(name)}<span>${esc(value)}</span></${href ? 'a' : 'span'}>`;
   return `<div class="job-detail-hero-card jh-card">
     ${artwork ? '' : '<svg class="jh-globe" viewBox="0 0 240 240" aria-hidden="true" focusable="false"><circle cx="120" cy="120" r="110"/><ellipse cx="120" cy="120" rx="55" ry="110"/><path d="M10 120h220M120 10v220M25 65h190M25 175h190"/></svg>'}
-    <div class="jh-top"><div class="jh-company"><div class="jh-eyebrow"><span aria-hidden="true">✳</span> THE COMPANY</div><div>${esc(company)}</div></div>${posted ? `<div class="jh-posted">${icon('calendar')}<span>Posted ${esc(posted)}</span></div>` : ''}</div>
-    <div class="jh-body"><div class="jh-copy"><h1><span>${esc(title)}</span><i aria-hidden="true">✦</i></h1><div class="jh-pills">${job.category ? pill('category', job.category, `/categories/${encodeURIComponent(job.category)}`) : ''}${pill('location', displayValue(location, 'location'))}${workplace ? pill('setup', displayValue(workplace, 'setup')) : ''}</div></div>${visual}</div>
+    <div class="jh-top"><div class="jh-company"><div class="jh-eyebrow job-polish-heading">${sectionHeadingMarks('THE COMPANY')}</div><div>${esc(company)}</div></div>${posted ? `<div class="jh-posted">${icon('calendar')}<span>Posted ${esc(posted)}</span></div>` : ''}</div>
+    <div class="jh-body"><div class="jh-copy"><h1><span>${esc(title)}</span><i aria-hidden="true">✦</i></h1><div class="jh-pills">${job.category ? pill('category', job.category, `/categories/${encodeURIComponent(job.category)}`) : ''}${pill('location', displayValue(location, 'location'))}${workplace ? pill('setup', ({remote:'Remote',hybrid:'Hybrid',onsite:'On-site','on-site':'On-site','on_site':'On-site'}[String(workplace).trim().toLowerCase()] || displayValue(workplace, 'setup'))) : ''}</div></div>${visual}</div>
     <div class="jh-footer">FILIPINO TALENT · GLOBAL OPPORTUNITIES</div><span class="job-detail-corner" aria-hidden="true"></span>
   </div>`;
 }

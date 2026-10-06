@@ -1,3 +1,4 @@
+import { sectionHeadingMarks } from './job-section-heading.js';
 import { formatQuickRead } from './quick-read.js';
 import { validateStored } from './quick-read-generation.js';
 import { presentQuickRead, displayValue } from './quick-read-presentation.js';
@@ -7,9 +8,9 @@ export function renderJobRead(description, stored = undefined, job = {}) {
   // Explicit null means persisted generation is unavailable/invalid: original only.
   const validated = stored === undefined ? formatQuickRead(description) : validateStored(stored, description);
   const quick = validated && presentQuickRead(validated, description, job);
-  const original = `<div class="qr-original">${escape(description)}</div>`;
-  if (!quick) return `<section class="qr"><h2>Original description</h2><p>Quick Read is unavailable for this listing. Read the employer's original description below.</p>${original}</section>`;
-  return `<section class="qr"><h2>✨ VeeAys Quick Read</h2><p class="qr-disclosure">We've organized this employer's listing to make it easier to scan. Important requirements and details come from the original job posting.</p><p class="qr-disclosure">Structured details above and employer wording below are shown separately; any differences are left visible.</p><div class="qr-content">${Object.entries(labels).filter(([key])=>quick[key].length).map(([key,label])=>`<section class="qr-section"><h3>${label}</h3><ul>${quick[key].map(text=>`<li>${escape(text)}</li>`).join('')}</ul></section>`).join('')}</div><details class="qr-source"><summary>Original description · View untouched source</summary>${original}</details></section>`;
+  const original = `<div class="qr-original">${escape(originalDescriptionDisplay(description))}</div>`;
+  if (!quick) return `<section class="qr"><h2>Original description</h2><p>This listing is shown from the employer's original description.</p>${original}</section>`;
+  return `<section class="qr"><h2>✨ VeeAys Quick Read</h2><p class="qr-disclosure">We've organized this employer's listing to make it easier to scan. Important requirements and details come from the original job posting.</p><p class="qr-disclosure">Structured details above and employer wording below are shown separately; any differences are left visible.</p><div class="qr-content">${Object.entries(labels).filter(([key])=>quick[key].length).map(([key,label])=>`<section class="qr-section"><h3>${label}</h3><ul>${quick[key].map(text=>`<li>${escape(text)}</li>`).join('')}</ul></section>`).join('')}</div><details class="qr-source"><summary>Original description · View source</summary>${original}</details></section>`;
 }
 export function renderAtAGlance(job) {
   // Local display projection only; keep shared Quick Read/matching semantics intact.
@@ -35,7 +36,7 @@ export function renderAtAGlance(job) {
   const fields = [['Schedule',show(job.schedule_region, 'schedule')],['Location',show(job.location)],['Work setup',show(job.workplace_type, 'setup') || (job.remote === true ? 'Remote' : '')],['Employment type',show(job.employment_type, 'employment')],['Experience',show(job.experience_level, 'experience')],['Salary',formatSalary(job)],['Engagement',show(job.engagement_type, 'engagement')]];
   const present = fields.filter(([,v])=>typeof v === 'string' && v.trim());
   if (!present.length) return '';
-  return `<section class="qr-glance" aria-labelledby="at-a-glance"><header class="qr-glance-header"><div class="qr-glance-heading"><h2 id="at-a-glance"><svg class="qr-glance-sparks" viewBox="0 0 18 26" aria-hidden="true" focusable="false"><path d="m9 3 3 5M3 11l6 2M3 22l6-4"/></svg>At a glance<svg class="qr-glance-underline" viewBox="0 0 140 8" aria-hidden="true" focusable="false"><path d="M3 5Q58 1 137 4M103 7l22-1"/></svg></h2></div><svg class="qr-glance-flight" viewBox="0 0 180 42" aria-hidden="true" focusable="false"><path class="qr-glance-trail" d="M2 30c20-30 54 20 74-5s-11-27-6-7 44 4 67-9"/><path class="qr-glance-plane" d="m144 8 30 9-27 14 4-12 23-2-23 2Z"/><path class="qr-glance-flight-sparks" d="m177 6 2-2m-1 8 3-1m-3 7 2 1"/></svg></header>${present.length ? `<dl class="qr-glance-tiles" style="--glance-count:${present.length}">${present.map(([label,value])=>`<div class="qr-glance-tile"><svg class="qr-glance-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">${icons[label]}</svg><div><dt>${label}</dt><dd>${escape(value)}</dd></div></div>`).join('')}</dl>` : ''}</section>`;
+  return `<section class="qr-glance" aria-labelledby="at-a-glance"><header class="qr-glance-header"><div class="qr-glance-heading"><h2 id="at-a-glance">${sectionHeadingMarks('At a glance')}</h2></div><svg class="qr-glance-flight" viewBox="0 0 180 42" aria-hidden="true" focusable="false"><path class="qr-glance-trail" d="M2 30c20-30 54 20 74-5s-11-27-6-7 44 4 67-9"/><path class="qr-glance-plane" d="m144 8 30 9-27 14 4-12 23-2-23 2Z"/><path class="qr-glance-flight-sparks" d="m177 6 2-2m-1 8 3-1m-3 7 2 1"/></svg></header>${present.length ? `<dl class="qr-glance-tiles" style="--glance-count:${present.length}">${present.map(([label,value])=>`<div class="qr-glance-tile"><svg class="qr-glance-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">${icons[label]}</svg><div><dt>${label}</dt><dd>${escape(value)}</dd></div></div>`).join('')}</dl>` : ''}</section>`;
 }
 export function formatSalary(job) {
   const number=v=>(typeof v==='number' || typeof v==='string' && /^\d+(?:\.\d+)?$/.test(v)) && Number.isFinite(Number(v)) && Number(v)>=0 ? Number(v):null;
@@ -46,4 +47,23 @@ export function formatSalary(job) {
   try {format=new Intl.NumberFormat('en-PH',{style:'currency',currency:job.salary_currency,maximumFractionDigits:2});} catch{return '';}
   const value=min!==null && max!==null?(min===max?format.format(min):`${format.format(min)}–${format.format(max)}`):min!==null?`From ${format.format(min)}`:`Up to ${format.format(max)}`;
   return value+(typeof job.salary_period==='string' && job.salary_period.trim()?` / ${job.salary_period}`:'');
+}
+
+// Display only. Blank lines establish paragraph boundaries; ambiguous headings and
+// lists are retained. Case and punctuation remain significant for exact equality.
+export function originalDescriptionDisplay(description) {
+  const seen = new Set();
+  const blocks = String(description).split(/(\r?\n[ \t]*\r?\n(?:[ \t]*\r?\n)*)/);
+  for (let index = 0; index < blocks.length; index += 2) {
+    const block = blocks[index];
+    const key = block.trim().replace(/\s+/g, ' ');
+    const lines = block.trim().split(/\r?\n/);
+    const prose = key.length >= 80 && /[.!?]["'’”)]?$/.test(key) && /[a-z]/.test(key)
+      && !lines.some(line => /^(?:\s*(?:[-*•▪●]|\d+[.)])\s|\s*#{1,6}\s)|:\s*$/.test(line))
+      && !lines.some(line => line.trim() && line.trim() === line.trim().toUpperCase());
+    if (!prose) continue;
+    if (seen.has(key)) { blocks[index] = ''; if (index > 0) blocks[index - 1] = ''; }
+    else seen.add(key);
+  }
+  return blocks.join('');
 }

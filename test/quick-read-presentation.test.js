@@ -53,7 +53,7 @@ test('missing and conflicting structured metadata remains; corruption and omissi
   for(const change of [v=>v.other_details.push('Invented salary'),v=>v.application_notes.pop(),v=>v.other_details.splice(v.other_details.indexOf('The opportunity'),1)]) {
     const bad=structuredClone(q);change(bad);
     assert.equal(validateStored(bad,source),null);
-    assert.match(renderJobRead(source,bad,job),/Quick Read is unavailable/);
+    assert.match(renderJobRead(source,bad,job),/This listing is shown from the employer/);
     assert.equal(content(renderJobRead(source,bad,job)),'');
   }
 });

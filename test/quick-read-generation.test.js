@@ -126,7 +126,7 @@ test('stored corruption or invented facts falls back without partially displayin
   const q=validateSelection(validSelection(),technologySource);q.benefits.push('Free car');
   assert.equal(validateStored(q,technologySource),null);
   const html=renderJobRead(technologySource,q);
-  assert.match(html,/Quick Read is unavailable/);assert.doesNotMatch(html,/Free car/);
+  assert.match(html,/This listing is shown from the employer/);assert.doesNotMatch(html,/Free car/);
 });
 test('original text remains byte-for-byte equivalent after HTML escaping',()=>{
   const source=technologySource+'\nA & B < 10; "quoted".\r\n';

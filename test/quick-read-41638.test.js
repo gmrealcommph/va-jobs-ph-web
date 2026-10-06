@@ -79,7 +79,7 @@ test('41638: unsupported duties/tail, omitted IDs and invented references still 
   assert.throws(()=>validateSelection(q,source),/invalid_source_reference/);
   const corrupt=validateSelection(selection(),source);corrupt.requirements.push('Invented qualification');
   assert.equal(validateStored(corrupt,source),null);
-  assert.match(renderJobRead(source,corrupt,job),/Quick Read is unavailable/);
+  assert.match(renderJobRead(source,corrupt,job),/This listing is shown from the employer/);
 });
 
 test('41638: preference safeguards remain under recognized heading (synthetic mutation)',()=>{
