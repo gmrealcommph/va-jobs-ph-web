@@ -24,16 +24,36 @@ async function rest(c, path, init = {}) {
   const response = await fetch(new URL(`/rest/v1/${path}`, c.db), { ...init,
     headers: { apikey: c.key, ...(!c.key.startsWith('sb_secret_') ? { Authorization: `Bearer ${c.key}` } : {}),
       'content-type': 'application/json', ...init.headers }, signal: AbortSignal.timeout(6000) });
-  if (!response.ok) fail('Payment storage unavailable.', 503);
-  return response.status === 204 ? null : response.json();
+  if (!response.ok) {
+    let errorCode = 'unknown';
+    try {
+      const payload = await response.json();
+      if (/^[A-Za-z0-9_]{1,40}$/.test(String(payload?.code || ''))) errorCode = payload.code;
+    } catch {}
+    console.error('TEST payment storage failed', JSON.stringify({status: response.status, code: errorCode}));
+    fail('Payment storage unavailable.', 503);
+  }
+  const responseText = await response.text();
+  return responseText.trim() ? JSON.parse(responseText) : null;
 }
 async function paymongo(c, path, attributes) {
+  console.info('TEST PayMongo request started', JSON.stringify({method: attributes ? 'POST' : 'GET'}));
   const response = await fetch(`https://api.paymongo.com/${path}`, {
-    method: attributes ? 'POST' : 'GET', redirect: 'error',
+    method: attributes ? 'POST' : 'GET', redirect: 'manual',
     headers: { Authorization: `Basic ${btoa(c.secret + ':')}`, 'content-type': 'application/json' },
     ...(attributes ? { body: JSON.stringify({ data: { attributes } }) } : {}), signal: AbortSignal.timeout(6000) });
-  if (!response.ok) fail('PayMongo test service unavailable.', 503);
+  console.info('TEST PayMongo response received', JSON.stringify({status: response.status}));
+  if (!response.ok) {
+    let codes = [];
+    try {
+      const payload = await response.json();
+      codes = (Array.isArray(payload?.errors) ? payload.errors : []).map(e => String(e.code || '')).filter(code => /^[A-Za-z0-9_]{1,60}$/.test(code));
+    } catch {}
+    console.error('TEST PayMongo request failed', JSON.stringify({status: response.status, codes}));
+    fail('PayMongo test service unavailable.', 503);
+  }
   const body = await response.json();
+  console.info('TEST PayMongo response shape', JSON.stringify({hasData: !!body?.data, hasAttributes: !!body?.data?.attributes, hasCheckoutUrl: typeof body?.data?.attributes?.checkout_url === 'string'}));
   return body.data;
 }
 async function row(c, id, userId) {
@@ -126,7 +146,8 @@ export async function proCheckoutEndpoint(request, env) {
           payment_method_types: ['qrph'], reference_number: id, pass_on_fees: false,
           success_url: `${c.site}/pro/return?payment=${id}`, cancel_url: `${c.site}/pro/return?payment=${id}&cancelled=1`
         });
-        const checkoutUrl = new URL(session?.attributes?.checkout_url);
+        if (typeof session?.attributes?.checkout_url !== 'string') fail('Invalid test checkout response.', 503);
+        const checkoutUrl = new URL(session.attributes.checkout_url);
         if (!resourceId(session?.id, 'cs') || session?.attributes?.livemode !== false || checkoutUrl.protocol !== 'https:' ||
             checkoutUrl.hostname !== 'checkout.paymongo.com' || checkoutUrl.username || checkoutUrl.password || checkoutUrl.port)
           fail('Invalid test checkout response.', 503);
@@ -160,7 +181,16 @@ export async function proCheckoutEndpoint(request, env) {
     return new Response(layout({ title: 'Pro test payment', canonical: c.site + '/pro/return', description: 'Check the status of your VeeAys Pro test payment.', user: state.user, noindex: true,
       body: `<section class="wrap"><div class="kicker">VEEAYS PRO · TEST MODE</div><h1>${confirmed ? 'Payment confirmed' : 'Checking your payment'}</h1><p role="status">${esc(text)}</p><p>No real money is charged. This is a one-time 30-day test purchase.</p><a class="button" href="/pro/return?payment=${id}">Refresh payment status</a> <a href="/pro">Back to Pro</a></section>` }), { headers: h });
   } catch (error) {
-    // Do not log raw provider payloads, keys, cookies, or customer billing information.
+    // Log only a safe error classification, never messages or raw payloads.
+    const errorName = /^[A-Za-z]{1,40}$/.test(String(error?.name || '')) ? error.name : 'UnknownError';
+    const errorText = String(error?.message || '').toLowerCase();
+    const category = errorText.includes('redirect') ? 'redirect' : errorText.includes('header') ? 'header' : errorText.includes('url') ? 'url' : errorText.includes('fetch') ? 'fetch' : errorText.includes('network') ? 'network' : errorText.includes('timeout') ? 'timeout' : 'unclassified';
+    console.error('TEST checkout failed', JSON.stringify({type: errorName, category, status: Number(error?.status) || 503}));
     return json({ error: error.status ? error.message : 'Test payment service unavailable. Please try again later.' }, error.status || 503);
   }
 }
+
+
+
+
+

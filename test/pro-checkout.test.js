@@ -149,3 +149,20 @@ test('Pro form redirect is allowed only for the test account; private response i
     assert.equal(res.headers.get('cache-control'),'no-store');assert.match(await res.text(),/action="\/pro\/checkout"/);
   });
 });
+
+test('checkout accepts empty 201 insert response and empty 204 update response', async () => {
+  let providerCalls = 0, pendingUpdates = 0;
+  await withFetch(async (url, init) => {
+    const u = new URL(url);
+    if (u.pathname === '/auth/v1/user') return Response.json({id: uid});
+    if (u.hostname === 'api.paymongo.com') { providerCalls++; return Response.json({data: session()}); }
+    if (init.method === 'POST') return new Response(null, {status: 201});
+    if (init.method === 'PATCH') { assert.equal(JSON.parse(init.body).status, 'pending'); pendingUpdates++; return new Response(null, {status: 204}); }
+    throw new Error('Unexpected request');
+  }, async () => {
+    const response = await proCheckoutEndpoint(request('/pro/checkout', {method: 'POST'}), env);
+    assert.equal(response.status, 303);
+    assert.equal(providerCalls, 1);
+    assert.equal(pendingUpdates, 1);
+  });
+});
