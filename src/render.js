@@ -46,7 +46,7 @@ export function layout({ title, description, canonical, body, noindex = false, u
     type="image/svg+xml"
   >
 
-  <link rel="stylesheet" href="/styles.css?v=20261006-company-pages">
+  <link rel="stylesheet" href="/styles.css?v=20261006-flip-counter-fix">
 </head>
 
 <body>
@@ -607,16 +607,17 @@ export function listing({ rows, total, page, search, category, names, categoryEn
         ${!search && !category ? `
           <div
             class="opportunity-count"
-            ${!browseOnly ? 'role="img"' : ''}
+            role="img"
             aria-label="${total.toLocaleString('en-US')} opportunities"
           >
-            <strong ${!browseOnly ? `data-live-opportunity-count="${total}" aria-hidden="true"` : ''}>${total.toLocaleString('en-US')}</strong>
+            <strong data-live-opportunity-count="${total}" aria-hidden="true">${total}</strong>
 
             <span>
               opportunities<br>
               and counting
             </span>
           </div>
+          <script src="/opportunity-count.js?v=20261006-flip" defer></script>
         ` : ''}
 
       </div>
