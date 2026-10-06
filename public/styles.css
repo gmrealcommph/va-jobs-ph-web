@@ -5788,6 +5788,11 @@ body>header,body>footer{flex-shrink:0}
 a.jh-pill:hover{background:#dce8b7}a.jh-pill:focus-visible{outline:3px solid #72952f;outline-offset:3px}
 .jh-workspace{min-width:0;opacity:.88;position:relative;transform:rotate(1deg)}
 .jh-workspace>svg{display:block;width:100%;height:auto;max-height:245px;filter:drop-shadow(0 9px 5px #423c2410)}
+.jh-artwork{min-width:0;display:flex;align-items:center;justify-content:center;pointer-events:none}
+.jh-artwork>img{display:block;width:100%;max-width:640px;height:auto;object-fit:contain;border:0;border-radius:0;background:none;box-shadow:none}
+.jh-posted{min-width:0;overflow-wrap:anywhere}
+@media(min-width:761px) and (max-width:1000px){.jh-body{grid-template-columns:minmax(0,1fr) minmax(0,.45fr);gap:24px}}
+@media(max-width:760px){.jh-artwork{display:none}.jh-body:has(.jh-artwork){grid-template-columns:minmax(0,1fr)}}
 .jh-footer{position:relative;z-index:1;display:table;font-size:9px;font-weight:700;letter-spacing:1.7px;line-height:1.7;color:#46604c;margin-top:18px;padding-bottom:7px;max-width:100%;overflow-wrap:anywhere}
 .jh-footer:after{content:"";position:absolute;bottom:0;left:0;width:78px;height:3px;border-radius:50%;background:#c77a46;transform:rotate(-2deg)}
 .jh-globe{position:absolute;width:280px;height:280px;right:45px;top:40px;opacity:.035;fill:none;stroke:#365f42;stroke-width:1.2;z-index:0;pointer-events:none}

@@ -8,6 +8,22 @@ const paths = {
   calendar:'<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M7 3v4M17 3v4M3 10h18M7 14h3M14 14h3"/>'
 };
 const icon = name => `<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">${paths[name]}</svg>`;
+// Explicit category aliases avoid assigning support art to unrelated IT support.
+// Add future artwork and its aliases here without changing the header renderer.
+const categoryArtworks = [
+  {
+    src: '/images/job-header-customer-support.png', width: 1678, height: 937,
+    aliases: ['customer support', 'customer service', 'customer support service',
+      'customer service support', 'customer support customer service',
+      'customer service customer support', 'customer care', 'customer success']
+  }
+];
+const categoryKey = value => String(value ?? '').toLowerCase()
+  .replace(/[^a-z0-9]+/g, ' ').trim().replace(/\s+/g, ' ');
+export function categoryArtwork(category) {
+  const key = categoryKey(category);
+  return categoryArtworks.find(art => art.aliases.includes(key)) ?? null;
+}
 // This chooses decorative artwork only; it never normalizes displayed/stored data.
 export function categoryVisual(category) {
   const key = String(category || '').toLowerCase();
@@ -40,11 +56,15 @@ function workspace(family, remote) {
   </svg></div>`;
 }
 export function renderJobHeader(job, {company, title, location, workplace, posted}) {
+  const artwork = categoryArtwork(job.category);
+  const visual = artwork
+    ? `<div class="jh-artwork" aria-hidden="true"><img src="${artwork.src}" width="${artwork.width}" height="${artwork.height}" alt="" decoding="async"></div>`
+    : workspace(categoryVisual(job.category), job.remote === true || /^remote$/i.test(String(workplace).trim()));
   const pill = (name, value, href) => `<${href ? 'a' : 'span'} class="jh-pill"${href ? ` href="${href}"` : ''}>${icon(name)}<span>${esc(value)}</span></${href ? 'a' : 'span'}>`;
   return `<div class="job-detail-hero-card jh-card">
-    <svg class="jh-globe" viewBox="0 0 240 240" aria-hidden="true" focusable="false"><circle cx="120" cy="120" r="110"/><ellipse cx="120" cy="120" rx="55" ry="110"/><path d="M10 120h220M120 10v220M25 65h190M25 175h190"/></svg>
+    ${artwork ? '' : '<svg class="jh-globe" viewBox="0 0 240 240" aria-hidden="true" focusable="false"><circle cx="120" cy="120" r="110"/><ellipse cx="120" cy="120" rx="55" ry="110"/><path d="M10 120h220M120 10v220M25 65h190M25 175h190"/></svg>'}
     <div class="jh-top"><div class="jh-company"><div class="jh-eyebrow"><span aria-hidden="true">✳</span> THE COMPANY</div><div>${esc(company)}</div></div>${posted ? `<div class="jh-posted">${icon('calendar')}<span>Posted ${esc(posted)}</span></div>` : ''}</div>
-    <div class="jh-body"><div class="jh-copy"><h1><span>${esc(title)}</span><i aria-hidden="true">✦</i></h1><div class="jh-pills">${job.category ? pill('category', job.category, `/categories/${encodeURIComponent(job.category)}`) : ''}${pill('location', displayValue(location, 'location'))}${workplace ? pill('setup', displayValue(workplace, 'setup')) : ''}</div></div>${workspace(categoryVisual(job.category), job.remote === true || /^remote$/i.test(String(workplace).trim()))}</div>
+    <div class="jh-body"><div class="jh-copy"><h1><span>${esc(title)}</span><i aria-hidden="true">✦</i></h1><div class="jh-pills">${job.category ? pill('category', job.category, `/categories/${encodeURIComponent(job.category)}`) : ''}${pill('location', displayValue(location, 'location'))}${workplace ? pill('setup', displayValue(workplace, 'setup')) : ''}</div></div>${visual}</div>
     <div class="jh-footer">FILIPINO TALENT · GLOBAL OPPORTUNITIES</div><span class="job-detail-corner" aria-hidden="true"></span>
   </div>`;
 }

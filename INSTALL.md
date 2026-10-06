@@ -1,33 +1,23 @@
-# VeeAys approved homepage artwork
+# Customer Support header artwork
 
-Prepared against va-jobs-ph-web commit 9575a10 (Add safe overnight Quick Read backfill mode).
+Changed code: src/job-detail-header.js, public/styles.css, test/job-detail-header.test.js.
+The ZIP also includes the exact, unchanged approved public/images/job-header-customer-support.png (1678 × 937 RGBA). The patch covers the three code files; the PNG is already present in your checkout.
 
-Changed files only:
-- public/veeays-hero-approved.png — original supplied transparent 1591 × 989 PNG, 1,540,514 bytes; byte-for-byte unchanged.
-- public/styles.css — scoped responsive artwork frame; crops empty left space without altering the source; caps visible artwork at 580 CSS pixels, preserves roughly 2x density; disables artwork transforms/animation.
-- src/render.js — uses new artwork, intrinsic dimensions and descriptive alt text; removes old overlaid decorative labels; updates stylesheet cache version.
+Customer Support, Customer Service, their punctuation/case/separator variants, Customer Care and Customer Success use the dedicated image. Other categories retain the existing illustration. Add future images and aliases to categoryArtworks. Displayed category and employer text remain untouched.
 
-Existing navigation, HTML headline, Explore opportunities anchor, search form and listing behavior are preserved. Quick Read, backfill, matching, auth, payments, database, collectors and deployment configuration are unchanged.
+Desktop uses the existing roughly 38% artwork column; tablet reduces it to roughly 31%; artwork hides at 760px and below. The image has no container background, border or crop and is capped at 640 CSS pixels. Its own globe replaces the duplicate globe behind the artwork. Existing title highlight, eyebrow, accents, chips, folded corner and tagline remain HTML/CSS.
 
-## Apply with GitHub Desktop
-1. Open your existing va-jobs-ph-web repository in GitHub Desktop. Review any pending changes, then create a branch named homepage-approved-hero from your current intended release branch.
-2. Choose Repository → Open in Terminal. Run these commands with the full path to the supplied patch (quotes are required):
+## GitHub Desktop
 
-   git apply --check "C:/Users/gmrea/Documents/Codex/2026-10-06/referenced-chatgpt-conversation-this-is-an-2/outputs/hero-install/veeays-hero.patch"
-   git apply "C:/Users/gmrea/Documents/Codex/2026-10-06/referenced-chatgpt-conversation-this-is-an-2/outputs/hero-install/veeays-hero.patch"
-
-   If the check fails, stop; your checkout differs from the prepared baseline. Do not overwrite whole files or force the patch. The changed-file copies are included for review, not to overwrite unrelated pending work.
-3. In GitHub Desktop, review the three changed files and commit with “Install approved VeeAys homepage artwork”. The patch includes the PNG.
-4. Publishing/pushing can trigger deployment depending on your repository setup. Wait until the current Quick Read backfill has finished before taking any action that deploys a new Worker. Publish the branch and open a PR when appropriate; merge only through your normal release process after reviewing the diff.
-5. After the backfill finishes, use the existing deployment process. If it is a manual deployment, run npm run build first, then npm run deploy only when ready. Do not change cron settings, reset the backfill, run migrations, or rerun collectors for this artwork change.
-6. Check the homepage on desktop/mobile: one HTML hero CTA, new collage with all benefit cards visible, working anchor/search/navigation, and no horizontal scrolling.
+1. Select va-jobs-ph-web. Changes are applied locally if checkout write approval was granted. Otherwise extract changed-files into C:\Users\gmrea\Documents\GitHub\va-jobs-ph-web, preserving folders.
+2. Review the three code files. The PNG should have no diff if already committed. Select only these files (plus the PNG if it is untracked); leave unrelated work out of the commit.
+3. Commit with summary: Use approved Customer Support header artwork.
+4. Click Push origin. Follow your existing hosting deployment process. GitHub Desktop pushes commits; it does not itself deploy the Worker. No production deployment was performed by this task. No database migration or backfill action is needed.
 
 ## Validation
-- Deployment dry run: passed; no upload/deployment performed.
-- JavaScript syntax and git diff whitespace checks: passed.
-- Full tests: 154 total; 143 passed, 4 skipped, 7 failed. The unmodified baseline returned identical totals and the same seven failures, in digest activation, existing Quick Read source boundaries (41645/43635), and worker search/detail expectations. Frozen functionality was not edited to address them.
-- Browser layout checks: 1440, 850, 601, 390 and 320 CSS pixels at 2x device density; correct intrinsic source size, frame ≤580px, no horizontal overflow, image animation disabled, and CTA href retained.
-- Desktop/mobile screenshots visually reviewed. Screenshots use a static homepage fragment with no live database requests or page scripts.
-- Source PNG SHA-256: 4013E3C5073BBF1767B88773A85D7413072BCE3343E6186BFF6B3345591360F0.
 
-No production endpoint or backfill control was called. This package is a local integration only.
+- 14 focused header, At a glance and Quick Read presentation tests passed.
+- Local browser geometry checks passed at 1440, 900, 760 and 390px for normal and very long title/company text. Desktop and mobile screenshots are supplied separately.
+- npm run build passed (Wrangler deploy --dry-run only).
+- Full suite: 162 tests, 153 passed, 5 failed, 4 skipped. Baseline: 160 tests, 151 passed, the same 5 failed, 4 skipped. Existing failures: daily-digest default-disabled assertion; worker search quoting; script application URL assertion; search page canonical; original application link assertion. These frozen areas were not edited.
+- Artwork bytes are unchanged. No production calls, live backfill, database changes or deployment.
