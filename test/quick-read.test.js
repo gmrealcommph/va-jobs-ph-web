@@ -50,8 +50,10 @@ test('short, unstructured, malformed and HTML descriptions use original fallback
 });
 test('responsive styles scoped to job details and source toggle has focus affordance',()=>{
   const css=readFileSync(new URL('../public/styles.css',import.meta.url),'utf8');
-  assert.match(css,/qr-glance-tiles \{display:grid;grid-template-columns:repeat\(2,minmax\(0,1fr\)\)/);
-  assert.match(css,/@container \(min-width:620px\).*grid-template-columns:repeat\(var\(--glance-count\),minmax\(0,1fr\)\)/);
+  assert.match(css,/qr-glance-tiles \{display:flex;flex-wrap:wrap/);
+  assert.match(css,/container:glance \/ inline-size/);
+  assert.match(css,/@container glance \(min-width:280px\) and \(max-width:539px\)/);
+  assert.match(css,/@container glance \(max-width:279px\)/);
   assert.match(css,/qr-source summary:focus-visible/);
   assert.match(css,/qr-original \{white-space:pre-wrap;overflow-wrap:anywhere/);
 });

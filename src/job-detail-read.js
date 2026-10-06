@@ -17,10 +17,10 @@ export function renderAtAGlance(job) {
     if (typeof value !== 'string') return '';
     const key = value.trim().toLowerCase().replace(/[_-]+/g, ' ').replace(/\s+/g, ' ');
     const mappings = field === 'schedule'
-      ? {us:'US hours',uk:'UK/Europe hours',australia:'Australia hours',flexible:'Flexible/Any',any:'Flexible/Any','flexible/any':'Flexible/Any'}
+      ? {us:'US hours',uk:'UK/Europe hours','uk europe':'UK / Europe',australia:'Australia hours',flexible:'Flexible/Any',any:'Flexible/Any','flexible/any':'Flexible/Any'}
       : field === 'setup' ? {remote:'Remote',hybrid:'Hybrid',onsite:'On-site','on site':'On-site'}
-      : field === 'experience' ? {senior:'Senior',junior:'Junior',mid:'Mid', 'mid level':'Mid-level'}
-      : field === 'employment' ? {contract:'Contract',freelance:'Freelance',internship:'Internship'} : {};
+      : field === 'experience' ? {senior:'Senior',junior:'Junior',mid:'Mid', 'mid level':'Mid-level',lead:'Lead',executive:'Executive','entry level':'Entry Level'}
+      : field === 'employment' || field === 'engagement' ? {contract:'Contract',freelance:'Freelance',internship:'Internship',employee:'Employee',temporary:'Temporary','full time':'Full-time','part time':'Part-time'} : {};
     return mappings[key] || displayValue(value, field);
   };
   const icons = {
@@ -32,10 +32,10 @@ export function renderAtAGlance(job) {
     'Work setup':'<path d="m3 10 9-7 9 7M5 9v11h5M19 9v4M12 14h8v6h-8zM10 21h12"/>',
     'Employment type':'<rect x="3" y="7" width="18" height="14" rx="2"/><path d="M8 7V4h8v3M3 12c5 3 13 3 18 0M12 12v4"/>'
   };
-  const fields = [['Location',show(job.location)],['Work setup',show(job.workplace_type, 'setup') || (job.remote === true ? 'Remote' : '')],['Employment type',show(job.employment_type, 'employment')],['Experience',show(job.experience_level, 'experience')],['Schedule',show(job.schedule_region, 'schedule')],['Salary',formatSalary(job)],['Engagement',displayValue(job.engagement_type)]];
+  const fields = [['Schedule',show(job.schedule_region, 'schedule')],['Location',show(job.location)],['Work setup',show(job.workplace_type, 'setup') || (job.remote === true ? 'Remote' : '')],['Employment type',show(job.employment_type, 'employment')],['Experience',show(job.experience_level, 'experience')],['Salary',formatSalary(job)],['Engagement',show(job.engagement_type, 'engagement')]];
   const present = fields.filter(([,v])=>typeof v === 'string' && v.trim());
   if (!present.length) return '';
-  return `<section class="qr-glance" aria-labelledby="at-a-glance"><header class="qr-glance-header"><div class="qr-glance-heading"><p class="qr-glance-eyebrow">Opportunity snapshot</p><h2 id="at-a-glance">At a glance<svg class="qr-glance-underline" viewBox="0 0 140 8" aria-hidden="true" focusable="false"><path d="M3 5Q58 1 137 4M103 7l22-1"/></svg></h2></div><svg class="qr-glance-flight" viewBox="0 0 180 42" aria-hidden="true" focusable="false"><path class="qr-glance-trail" d="M2 30c29-25 46 15 72-2s37-15 65-9"/><path class="qr-glance-plane" d="m144 8 30 9-27 14 4-12 23-2-23 2Z"/></svg></header>${present.length ? `<dl class="qr-glance-tiles" style="--glance-count:${present.length}">${present.map(([label,value])=>`<div class="qr-glance-tile"><svg class="qr-glance-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">${icons[label]}</svg><div><dt>${label}</dt><dd>${escape(value)}</dd></div></div>`).join('')}</dl>` : ''}</section>`;
+  return `<section class="qr-glance" aria-labelledby="at-a-glance"><header class="qr-glance-header"><div class="qr-glance-heading"><h2 id="at-a-glance"><svg class="qr-glance-sparks" viewBox="0 0 18 26" aria-hidden="true" focusable="false"><path d="m9 3 3 5M3 11l6 2M3 22l6-4"/></svg>At a glance<svg class="qr-glance-underline" viewBox="0 0 140 8" aria-hidden="true" focusable="false"><path d="M3 5Q58 1 137 4M103 7l22-1"/></svg></h2></div><svg class="qr-glance-flight" viewBox="0 0 180 42" aria-hidden="true" focusable="false"><path class="qr-glance-trail" d="M2 30c20-30 54 20 74-5s-11-27-6-7 44 4 67-9"/><path class="qr-glance-plane" d="m144 8 30 9-27 14 4-12 23-2-23 2Z"/></svg></header>${present.length ? `<dl class="qr-glance-tiles" style="--glance-count:${present.length}">${present.map(([label,value])=>`<div class="qr-glance-tile"><svg class="qr-glance-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">${icons[label]}</svg><div><dt>${label}</dt><dd>${escape(value)}</dd></div></div>`).join('')}</dl>` : ''}</section>`;
 }
 export function formatSalary(job) {
   const number=v=>(typeof v==='number' || typeof v==='string' && /^\d+(?:\.\d+)?$/.test(v)) && Number.isFinite(Number(v)) && Number(v)>=0 ? Number(v):null;

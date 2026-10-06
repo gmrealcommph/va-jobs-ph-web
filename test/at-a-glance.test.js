@@ -2,6 +2,18 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { renderAtAGlance } from '../src/job-detail-read.js';
 
+test('reference field order and leaked enums are normalized without changing data', () => {
+  const job = {schedule_region:'uk_europe',location:'Worldwide',workplace_type:'remote',employment_type:'full_time',experience_level:'senior',engagement_type:'freelance'};
+  const before = structuredClone(job);
+  const html = renderAtAGlance(job);
+  for (const value of ['UK / Europe','Remote','Full-time','Senior','Freelance']) assert.ok(html.includes(`>${value}</dd>`));
+  const labels = [...html.matchAll(/<dt>(.*?)<\/dt>/g)].map(match => match[1]);
+  assert.deepEqual(labels, ['Schedule','Location','Work setup','Employment type','Experience','Engagement']);
+  assert.doesNotMatch(html, /uk_europe|full_time|>freelance<|Opportunity snapshot/);
+  assert.deepEqual(job, before);
+  assert.match(renderAtAGlance({engagement_type:'Custom <contract>'}), />Custom &lt;contract&gt;<\/dd>/);
+});
+
 test('snapshot normalizes display only and keeps four authoritative tile values', () => {
   const job = {schedule_region:'us',location:'Philippines',workplace_type:'remote',employment_type:'full_time'};
   const before = structuredClone(job);
