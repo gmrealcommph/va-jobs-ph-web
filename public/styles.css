@@ -5800,6 +5800,8 @@ a.jh-pill:hover{background:#dce8b7}a.jh-pill:focus-visible{outline:3px solid #72
 @media(max-width:760px){.job-detail-page .jh-card{padding:24px}.jh-body{grid-template-columns:minmax(0,1fr) minmax(0,.6fr);gap:20px}.jh-top{gap:16px}.jh-posted{font-size:10px}.job-detail-page .jh-card h1{font-size:38px;letter-spacing:-1px}.jh-footer{letter-spacing:1px}}
 @media(max-width:540px){.job-detail-page .jh-card{padding:22px 20px}.jh-top{grid-template-columns:minmax(0,1fr);gap:10px;padding-right:12px}.jh-posted{max-width:none;padding:0}.jh-body{display:block;margin-top:22px}.job-detail-page .jh-card h1{font-size:clamp(30px,8vw,40px);margin-bottom:20px}.jh-workspace{display:none}.jh-globe{width:210px;height:210px;right:-45px;top:70px}.jh-company{font-size:15px}.jh-footer{font-size:8px;margin-top:25px}.jh-pill{font-size:11px}}
 /* Desktop header: one canvas, with decorative art outside the text flow. */
+.job-detail-page .jh-card h1{font-weight:700}
+.jh-card .jh-company>div:last-child{font-weight:700}
 @media(min-width:761px){
   .job-detail-page .jh-card{position:relative}
   .jh-card .jh-body{display:block;position:static;z-index:auto}
