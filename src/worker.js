@@ -1,4 +1,4 @@
-import { proCheckoutEndpoint, testUserAllowed } from './pro-checkout.js';
+import { proCheckoutEndpoint, testUserAllowed, checkoutUserAllowed } from './pro-checkout.js';
 import { recovery } from './recovery.js';
 import { categories, getJob, getJobsByIds, listJobs, query } from './data.js';
 import { quickReadEndpoint } from './quick-read-service.js';
@@ -615,9 +615,10 @@ if (
     if (url.pathname === '/pro') {
       const isPro = currentProfile?.plan === 'pro' && currentProfile?.plan_status === 'active';
       const testCheckout = testUserAllowed(env, authState.user?.id);
-      const response = render('VeeAys Pro', proPage({ isPro, user: authState.user, profile: currentProfile, testCheckout }), { noindex: false });
+      const liveCheckout = env.PAYMONGO_MODE === 'live' && checkoutUserAllowed(env, authState.user?.id);
+      const response = render('VeeAys Pro', proPage({ isPro, user: authState.user, profile: currentProfile, testCheckout, liveCheckout }), { noindex: false });
       // The form's 303 redirect must be allowed by the originating page's CSP.
-      if (testCheckout) response.headers.set('content-security-policy', headers['content-security-policy'].replace("form-action 'self'", "form-action 'self' https://checkout.paymongo.com"));
+      if (testCheckout || liveCheckout) response.headers.set('content-security-policy', headers['content-security-policy'].replace("form-action 'self'", "form-action 'self' https://checkout.paymongo.com"));
       return response;
     }
 

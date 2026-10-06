@@ -9,16 +9,31 @@ const json = (body, status = 200) => Response.json(body, { status, headers: { 'c
 export function testUserAllowed(env, userId) {
   return env.PAYMONGO_MODE === 'test' && String(env.PAYMONGO_TEST_USER_IDS || '').split(',').map(x => x.trim()).filter(x => UUID.test(x)).includes(userId);
 }
+export function checkoutUserAllowed(env, userId) {
+  return UUID.test(userId || '') && (testUserAllowed(env, userId) ||
+    (env.PAYMONGO_MODE === 'live' && env.PAYMONGO_LIVE_CHECKOUT_ENABLED === 'true'));
+}
 function configuration(env) {
-  const secret = env.PAYMONGO_TEST_SECRET_KEY;
+  const live = env.PAYMONGO_MODE === 'live';
+  const secret = live ? env.PAYMONGO_LIVE_SECRET_KEY : env.PAYMONGO_TEST_SECRET_KEY;
+  const webhookSecret = live ? env.PAYMONGO_LIVE_WEBHOOK_SECRET : env.PAYMONGO_TEST_WEBHOOK_SECRET;
   const key = env.SUPABASE_SERVICE_ROLE_KEY;
-  if (env.PAYMONGO_MODE !== 'test' || !/^sk_test_[A-Za-z0-9]+$/.test(secret || '') ||
-      !env.PAYMONGO_TEST_WEBHOOK_SECRET || !key || !(key.startsWith('sb_secret_') || key.startsWith('eyJ')))
+  if (!['test','live'].includes(env.PAYMONGO_MODE) || !(live ? /^sk_live_[A-Za-z0-9]+$/ : /^sk_test_[A-Za-z0-9]+$/).test(secret || '') ||
+      !webhookSecret || !key || !(key.startsWith('sb_secret_') || key.startsWith('eyJ')))
     fail('Test checkout is not configured.', 503);
   const db = new URL(env.SUPABASE_URL), site = new URL(env.SITE_URL);
   if (db.protocol !== 'https:' || site.protocol !== 'https:' || db.username || db.password || site.username || site.password)
     fail('Invalid test checkout configuration.', 503);
-  return { secret, key, db, site: site.origin };
+  if (live && (db.origin !== 'https://nwqmhqiymtqkdihjadrp.supabase.co' || site.origin !== 'https://veeays.com' ||
+      env.PAYMONGO_TEST_USER_IDS || env.PAYMONGO_TEST_SECRET_KEY || env.PAYMONGO_TEST_WEBHOOK_SECRET))
+    fail('Invalid live checkout configuration.', 503);
+  if (live && key.startsWith('eyJ')) {
+    let claims;
+    try { claims = JSON.parse(atob(key.split('.')[1].replace(/-/g,'+').replace(/_/g,'/'))); } catch { fail('Invalid server key.',503); }
+    if (claims.ref !== 'nwqmhqiymtqkdihjadrp' || claims.role !== 'service_role') fail('Wrong production server key.',503);
+  }
+  return { secret, webhookSecret, key, db, live, table: live ? 'pro_payments' : 'pro_test_payments',
+    rpc: live ? 'accept_pro_payment' : 'accept_pro_test_payment', site: site.origin };
 }
 async function rest(c, path, init = {}) {
   const response = await fetch(new URL(`/rest/v1/${path}`, c.db), { ...init,
@@ -57,25 +72,26 @@ async function paymongo(c, path, attributes) {
   return body.data;
 }
 async function row(c, id, userId) {
-  const rows = await rest(c, `pro_test_payments?id=eq.${id}${userId ? `&user_id=eq.${encodeURIComponent(userId)}` : ''}&select=*&limit=1`);
+  const rows = await rest(c, `${c.table}?id=eq.${id}${userId ? `&user_id=eq.${encodeURIComponent(userId)}` : ''}&select=*&limit=1`);
   return rows?.[0] || null;
 }
 
-export async function verifySignature(raw, header, secret, now = Date.now()) {
+export async function verifySignature(raw, header, secret, now = Date.now(), live = false) {
   const parts = (header || '').split(',').map(x => x.trim().split('='));
   if (parts.some(x => x.length !== 2) || new Set(parts.map(x => x[0])).size !== parts.length) return false;
   const values = Object.fromEntries(parts);
-  if (!/^\d{1,12}$/.test(values.t || '') || !/^[a-f0-9]{64}$/i.test(values.te || '') || values.li ||
+  const selected = live ? values.li : values.te;
+  if (!/^\d{1,12}$/.test(values.t || '') || !/^[a-f0-9]{64}$/i.test(selected || '') || (live ? values.te : values.li) ||
       Math.abs(now / 1000 - Number(values.t)) > 300) return false;
   const bytes = new TextEncoder();
   const key = await crypto.subtle.importKey('raw', bytes.encode(secret), { name: 'HMAC', hash: 'SHA-256' }, false, ['verify']);
-  const signature = Uint8Array.from(values.te.match(/../g), x => parseInt(x, 16));
+  const signature = Uint8Array.from(selected.match(/../g), x => parseInt(x, 16));
   return crypto.subtle.verify('HMAC', key, signature, bytes.encode(`${values.t}.${raw}`));
 }
 
-export function confirmedPayment(session, record, now = Date.now()) {
+export function confirmedPayment(session, record, now = Date.now(), live = false) {
   const a = session?.attributes;
-  if (!resourceId(session?.id, 'cs') || session.type !== 'checkout_session' || a?.livemode !== false ||
+  if (!resourceId(session?.id, 'cs') || session.type !== 'checkout_session' || a?.livemode !== live ||
       session.id !== record.checkout_id || a.reference_number !== record.id || record.amount !== 49900 || record.currency !== 'PHP')
     fail('Checkout ownership or mode mismatch.');
   const items = a.line_items;
@@ -84,7 +100,7 @@ export function confirmedPayment(session, record, now = Date.now()) {
   const paid = (a.payments || []).filter(p => p?.attributes?.status === 'paid');
   if (paid.length !== 1) fail('Checkout has no unique successful payment.');
   const p = paid[0], v = p.attributes;
-  if (!resourceId(p.id, 'pay') || v.livemode !== false || v.amount !== 49900 || v.currency !== 'PHP' ||
+  if (!resourceId(p.id, 'pay') || v.livemode !== live || v.amount !== 49900 || v.currency !== 'PHP' ||
       v.source?.type !== 'qrph' || v.disputed === true || (v.refunds || []).length ||
       !Number.isInteger(v.paid_at) || v.paid_at <= 0 || v.paid_at * 1000 > now + 300000 ||
       v.paid_at * 1000 < Date.parse(record.created_at) - 300000)
@@ -97,29 +113,29 @@ async function webhook(request, env, c) {
   if (Number(request.headers.get('content-length')) > 131072) return json({ error: 'Payload too large' }, 413);
   const raw = await request.text();
   if (new TextEncoder().encode(raw).length > 131072) return json({ error: 'Payload too large' }, 413);
-  if (!await verifySignature(raw, request.headers.get('paymongo-signature'), env.PAYMONGO_TEST_WEBHOOK_SECRET))
-    return json({ error: 'Invalid test signature' }, 400);
+  if (!await verifySignature(raw, request.headers.get('paymongo-signature'), c.webhookSecret, Date.now(), c.live))
+    return json({ error: 'Invalid payment signature' }, 400);
   let body;
   try { body = JSON.parse(raw); } catch { return json({ error: 'Invalid JSON' }, 400); }
   // PayMongo documents both the classic event resource and the newer send.webhook envelope.
   const envelope = body?.data;
   const event = envelope?.type === 'event' ? envelope.attributes : envelope;
-  if (event?.livemode !== false) fail('Only test events are accepted.');
+  if (event?.livemode !== c.live) fail('Payment event mode mismatch.');
   if (event.type !== 'checkout_session.payment.paid') return json({ ignored: true });
   const incoming = event.data;
   const id = incoming?.attributes?.reference_number;
   if (!UUID.test(id || '')) fail('Unknown payment reference.');
   const record = await row(c, id);
-  if (!record || !testUserAllowed(env, record.user_id)) fail('Unknown or unauthorized test checkout.');
+  if (!record || (c.live ? record.livemode !== true : !testUserAllowed(env, record.user_id))) fail('Unknown or unauthorized test checkout.');
   if (incoming.id !== record.checkout_id) fail('Checkout ownership mismatch.');
   // Fetch the merchant-owned resource with the test secret. Synthetic dashboard events
   // and browser returns cannot stand in for an actual successful test payment.
   const authoritative = await paymongo(c, `v1/checkout_sessions/${encodeURIComponent(record.checkout_id)}`);
-  const payment = confirmedPayment(authoritative, record);
-  const outcome = await rest(c, 'rpc/accept_pro_test_payment', { method: 'POST', body: JSON.stringify({
+  const payment = confirmedPayment(authoritative, record, Date.now(), c.live);
+  const outcome = await rest(c, `rpc/${c.rpc}`, { method: 'POST', body: JSON.stringify({
     p_id: record.id, p_checkout_id: record.checkout_id, p_payment_id: payment.id,
     p_event_id: resourceId(envelope.id, 'evt') ? envelope.id : null,
-    p_amount: 49900, p_currency: 'PHP', p_state: 'paid', p_livemode: false, p_paid_at: payment.paidAt
+    p_amount: 49900, p_currency: 'PHP', p_state: 'paid', p_livemode: c.live, p_paid_at: payment.paidAt
   }) });
   return json({ received: true, outcome });
 }
@@ -130,35 +146,37 @@ export async function proCheckoutEndpoint(request, env) {
     if (url.pathname === '/webhooks/paymongo') return await webhook(request, env, configuration(env));
     const state = await sessionForRequest(request, env);
     if (!state.user || !state.accessToken) return json({ error: 'Log in to continue.' }, 401);
-    if (!testUserAllowed(env, state.user.id)) return json({ error: 'Test checkout is unavailable for this account.' }, 403);
+    if (!(url.pathname === '/pro/checkout' ? checkoutUserAllowed(env, state.user.id) :
+        testUserAllowed(env, state.user.id) || (env.PAYMONGO_MODE === 'live' && UUID.test(state.user.id))))
+      return json({ error: 'Checkout is unavailable for this account.' }, 403);
     const c = configuration(env);
     if (url.pathname === '/pro/checkout') {
       if (request.method !== 'POST') return json({ error: 'Method not allowed' }, 405);
       if (request.headers.get('origin') !== c.site || url.origin !== c.site) return json({ error: 'Forbidden' }, 403);
       const id = crypto.randomUUID();
-      await rest(c, 'pro_test_payments', { method: 'POST', headers: { Prefer: 'return=minimal' },
-        body: JSON.stringify({ id, user_id: state.user.id, amount: 49900, currency: 'PHP', status: 'creating' }) });
+      await rest(c, c.table, { method: 'POST', headers: { Prefer: 'return=minimal' },
+        body: JSON.stringify({ id, user_id: state.user.id, amount: 49900, currency: 'PHP', status: 'creating', livemode: c.live }) });
       // Never accept amount, user, reference, plan or redirect URLs from the browser.
       let session;
       try {
         session = await paymongo(c, 'v2/checkout_sessions', {
-          line_items: [{ name: 'VeeAys Pro — 30 days (TEST)', amount: 49900, currency: 'PHP', quantity: 1 }],
+          line_items: [{ name: c.live ? 'VeeAys Pro — 30 days' : 'VeeAys Pro — 30 days (TEST)', amount: 49900, currency: 'PHP', quantity: 1 }],
           payment_method_types: ['qrph'], reference_number: id, pass_on_fees: false,
           success_url: `${c.site}/pro/return?payment=${id}`, cancel_url: `${c.site}/pro/return?payment=${id}&cancelled=1`
         });
         if (typeof session?.attributes?.checkout_url !== 'string') fail('Invalid test checkout response.', 503);
         const checkoutUrl = new URL(session.attributes.checkout_url);
-        if (!resourceId(session?.id, 'cs') || session?.attributes?.livemode !== false || checkoutUrl.protocol !== 'https:' ||
+        if (!resourceId(session?.id, 'cs') || session?.attributes?.livemode !== c.live || checkoutUrl.protocol !== 'https:' ||
             checkoutUrl.hostname !== 'checkout.paymongo.com' || checkoutUrl.username || checkoutUrl.password || checkoutUrl.port)
           fail('Invalid test checkout response.', 503);
-        await rest(c, `pro_test_payments?id=eq.${id}&status=eq.creating`, { method: 'PATCH', headers: { Prefer: 'return=minimal' },
+        await rest(c, `${c.table}?id=eq.${id}&status=eq.creating`, { method: 'PATCH', headers: { Prefer: 'return=minimal' },
           body: JSON.stringify({ checkout_id: session.id, checkout_url: checkoutUrl.href, status: 'pending', updated_at: new Date().toISOString() }) });
         const h = new Headers({ location: checkoutUrl.href, 'cache-control': 'no-store' });
         if (state.refreshed) setSessionCookies(h, state.refreshed);
         return new Response(null, { status: 303, headers: h });
       } catch (error) {
         // No automatic provider retry: a timeout may already have created a session.
-        await rest(c, `pro_test_payments?id=eq.${id}&status=eq.creating`, { method: 'PATCH', headers: { Prefer: 'return=minimal' },
+        await rest(c, `${c.table}?id=eq.${id}&status=eq.creating`, { method: 'PATCH', headers: { Prefer: 'return=minimal' },
           body: JSON.stringify({ status: 'creation_failed', updated_at: new Date().toISOString() }) });
         throw error;
       }
@@ -178,8 +196,8 @@ export async function proCheckoutEndpoint(request, env) {
       'x-content-type-options': 'nosniff', 'referrer-policy': 'no-referrer',
       'content-security-policy': "default-src 'none'; style-src 'self'; img-src 'self'; script-src 'self'; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-ancestors 'none'" });
     if (state.refreshed) setSessionCookies(h, state.refreshed);
-    return new Response(layout({ title: 'Pro test payment', canonical: c.site + '/pro/return', description: 'Check the status of your VeeAys Pro test payment.', user: state.user, noindex: true,
-      body: `<section class="wrap"><div class="kicker">VEEAYS PRO · TEST MODE</div><h1>${confirmed ? 'Payment confirmed' : 'Checking your payment'}</h1><p role="status">${esc(text)}</p><p>No real money is charged. This is a one-time 30-day test purchase.</p><a class="button" href="/pro/return?payment=${id}">Refresh payment status</a> <a href="/pro">Back to Pro</a></section>` }), { headers: h });
+    return new Response(layout({ title: c.live ? 'Pro payment' : 'Pro test payment', canonical: c.site + '/pro/return', description: 'Check the status of your VeeAys Pro test payment.', user: state.user, noindex: true,
+      body: `<section class="wrap"><div class="kicker">VEEAYS PRO${c.live ? '' : ' · TEST MODE'}</div><h1>${confirmed ? 'Payment confirmed' : 'Checking your payment'}</h1><p role="status">${esc(c.live ? text.replaceAll('Test payment', 'Payment').replaceAll('test checkout', 'checkout').replaceAll('test payment', 'payment') : text)}</p><p>${c.live ? 'One-time ₱499 purchase for 30 days. No automatic renewal.' : 'No real money is charged. This is a one-time 30-day test purchase.'}</p><a class="button" href="/pro/return?payment=${id}">Refresh payment status</a> <a href="/pro">Back to Pro</a></section>` }), { headers: h });
   } catch (error) {
     // Log only a safe error classification, never messages or raw payloads.
     const errorName = /^[A-Za-z]{1,40}$/.test(String(error?.name || '')) ? error.name : 'UnknownError';
@@ -189,8 +207,3 @@ export async function proCheckoutEndpoint(request, env) {
     return json({ error: error.status ? error.message : 'Test payment service unavailable. Please try again later.' }, error.status || 503);
   }
 }
-
-
-
-
-
