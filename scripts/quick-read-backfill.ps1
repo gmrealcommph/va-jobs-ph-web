@@ -151,7 +151,7 @@ function Invoke-QuickReadBackfill {
                     else {
                         $last = $id
                         if ($status -in @('invalid','claim_expired','source_changed') -or
-                            $code -match '^(generation_failed|provider_not_configured|provider_http_[0-9]{3})$') { $fatal = $true }
+                            $code -match '^(provider_not_configured|provider_http_[0-9]{3})$') { $fatal = $true }
                     }
                 }
                 if ($invalid -or [string]$data.next_after_id -cne $last -or

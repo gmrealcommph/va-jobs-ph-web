@@ -6039,3 +6039,31 @@ a.jh-pill:hover{background:#dce8b7}a.jh-pill:focus-visible{outline:3px solid #72
 @media(max-width:760px){.employer-page .ep-collage{height:520px}.employer-page .ep-talent{top:295px}.employer-page .ep-collage-note{font-size:13px}}
 @media(max-width:400px){.employer-page .ep-collage{height:505px}.employer-page .ep-talent{top:295px}.employer-page .ep-collage-note{width:16%;font-size:12px;bottom:8px}}
 @media(max-width:760px){.employer-page .ep-collage{height:565px}.employer-page .ep-collage-note{width:100%;bottom:0;font-size:14px;transform:rotate(-3deg)}}
+
+/* Final employer refinement; all rules are confined to this page. */
+.employer-page .ep-hero-link{background:#d9ec89;color:#123e30;border:0;border-radius:32px;padding:15px 25px;gap:22px;font-size:16px;text-decoration:none;min-height:48px}
+.employer-page .ep-hero-link span{color:inherit;font-size:22px}
+.employer-page .ep-hero-link:hover{background:#e7f6b2}
+.employer-page .ep-desk,.employer-page .ep-talent{box-shadow:3px 5px 0 #08291d33,8px 12px 20px #08291d26}
+.employer-page .ep-talent{top:276px;right:2%;z-index:1}
+.employer-page .ep-talent:before{left:20%;width:74px;background:#f3deadeb;border:1px solid #d5c08a66;box-shadow:0 2px 3px #123e3010}
+.employer-page .ep-world-stamp{z-index:2;background:#123e30;top:-10px;right:0}
+@media(min-width:761px) and (max-width:1000px){.employer-page .ep-collage-note{width:100%;bottom:-28px;font-size:14px;transform:rotate(-3deg)}}
+.employer-page .ep-steps li{padding:24px 26px 21px}
+.employer-page .ep-steps h3{margin:20px 0 12px}
+.employer-page .ep-steps p{line-height:1.6}
+.employer-page .ep-step-caption{margin-top:20px;padding-top:14px}
+.employer-page .ep-steps li:not(:last-child):after{content:'→';font-size:38px;right:-31px;top:75px;transform:rotate(14deg);color:#b36537}
+.employer-page .ep-role-tags{gap:15px 12px;padding:12px 4px 16px}
+.employer-page .ep-role-tags li{display:flex;align-items:center;gap:9px;padding:12px 15px;border-radius:5px 11px 5px 5px;background:#fffdf3;box-shadow:2px 4px 0 #123e300b;max-width:100%}
+.employer-page .ep-role-tags li:nth-child(3n+1){background:#e3ebca;transform:rotate(-2deg)}
+.employer-page .ep-role-tags li:nth-child(3n+2){background:#f5e8d5;transform:rotate(1deg)}
+.employer-page .ep-role-tags li:nth-child(4n){transform:rotate(2deg);background:#e4eee5}
+.employer-page .ep-role-tags svg{width:26px;height:26px;flex-shrink:0}
+.employer-page .ep-roles .ep-board-note{font:15px/1.6 'Segoe Print',Georgia,serif;color:#395743;margin:8px 4px 0;transform:rotate(-2deg);max-width:none}
+.employer-page .ep-actions{flex-direction:column;align-items:flex-start;gap:12px;padding-top:0}
+.employer-page .ep-actions .company-text-link{font-size:14px;min-height:32px;display:inline-flex;align-items:center}
+body:has(.employer-page)>.site-footer .footer-main{padding-top:43px;padding-bottom:28px}
+body:has(.employer-page)>.site-footer .footer-bottom{padding-top:15px;padding-bottom:17px}
+@media(max-width:1000px){.employer-page .ep-steps li{padding:21px 20px}.employer-page .ep-steps li:not(:last-child):after{right:-25px;font-size:31px}}
+@media(max-width:760px){.employer-page .ep-talent{top:276px}.employer-page .ep-steps li:nth-child(n){padding:23px}.employer-page .ep-steps li:not(:last-child):after{top:auto;right:35px;bottom:-29px;transform:rotate(90deg);font-size:32px}.employer-page .ep-role-tags{gap:13px 10px}.employer-page .ep-role-tags li{padding:10px 12px;font-size:14px}.employer-page .ep-actions{gap:10px}body:has(.employer-page)>.site-footer .footer-main{padding-top:37px;padding-bottom:26px}body:has(.employer-page)>.site-footer .footer-bottom{padding-top:15px;padding-bottom:18px}}
