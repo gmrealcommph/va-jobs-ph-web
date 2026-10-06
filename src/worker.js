@@ -1,3 +1,4 @@
+import { recovery } from './recovery.js';
 import { categories, getJob, getJobsByIds, listJobs, query } from './data.js';
 import { quickReadEndpoint } from './quick-read-service.js';
 import { manualNotification } from './notifications.js';
@@ -238,18 +239,7 @@ export async function handle(request, env) {
   const missing = () =>
     render(
       'Page not found',
-      `
-        <section class="wrap message">
-          <h1>This opportunity has moved on.</h1>
-          <p>
-            The page does not exist or the listing
-            is no longer available.
-          </p>
-          <a class="button" href="/">
-            Explore current jobs
-          </a>
-        </section>
-      `,
+      recovery({eyebrow: /^\/(jobs|apply)\//.test(url.pathname) ? 'LISTING UNAVAILABLE' : 'PAGE NOT FOUND', title: /^\/(jobs|apply)\//.test(url.pathname) ? 'This listing isn’t available.' : 'Let’s find your next step.', copy: /^\/(jobs|apply)\//.test(url.pathname) ? 'This job link may be outdated or the listing may have been removed. Explore current listings to keep your search moving.' : 'We couldn’t find the page at this address. Check the link, or explore the latest opportunities.', href:'/jobs', label:'Explore current jobs', secondaryHref:'/', secondaryLabel:'VeeAys home'}),
       {
         status: 404,
         noindex: true
@@ -627,7 +617,7 @@ if (
 
     if (url.pathname === '/my-jobs') {
       if (!authState.user || !authState.accessToken) return Response.redirect(url.origin + '/login?message=' + encodeURIComponent('Log in to see your saved jobs and applications.') + '&return=' + encodeURIComponent('/my-jobs'), 303);
-      let savedRows = [], applications = [], error = '';
+      let savedRows = [], applications = [], error = ''; let loadFailed = false;
       try {
         [savedRows, applications] = await Promise.all([
           getSavedJobs(env, authState.accessToken, authState.user.id),
@@ -638,9 +628,9 @@ if (
         const byId = new Map(jobs.map(j => [String(j.id), j]));
         savedRows = savedRows.map(r => byId.get(String(r.job_id))).filter(Boolean);
         applications = applications.map(a => ({ ...a, job: byId.get(String(a.job_id)) || null }));
-      } catch (e) { console.error('My jobs load failed:', e); error = 'We could not load your jobs right now. Please try again.'; }
+      } catch (e) { loadFailed = true; console.error('My jobs load failed:', e); error = 'We could not load your jobs right now. Please try again.'; }
       const message = url.searchParams.get('message') || '';
-      return render('My jobs', myJobsPage({ saved: savedRows, applications, message: message.slice(0,160), error: (url.searchParams.get('error') || error).slice(0,240) }), { noindex: true });
+      return render('My jobs', myJobsPage({ saved: savedRows, applications, loadFailed, message: message.slice(0,160), error: (url.searchParams.get('error') || error).slice(0,240) }), { noindex: true });
     }
 
     if (url.pathname === '/matches') {
@@ -1077,7 +1067,7 @@ if (
     const response =
       render(
         'Temporarily unavailable',
-        '<section class="wrap message"><div class="kicker">BACK SOON</div><h1>A little pause<br>in your job search.</h1><p>We couldn’t load opportunities right now. Please try again shortly.</p><a class="button" href="/">Try again</a></section>',
+        recovery({title:'A little pause in your job search.',copy:'We couldn’t load this page right now. Give it a moment, then try again.',href:request.method==='GET' && !url.pathname.startsWith('//') ? url.pathname+url.search : '/jobs',secondaryHref:'/contact',secondaryLabel:'Contact VeeAys'}),
         {
           status: 503,
           noindex: true

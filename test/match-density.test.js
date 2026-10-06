@@ -31,7 +31,7 @@ test('free, empty, error and unknown-factor states retain existing entitlement a
   const free=matchesPage({matches:[job],preferences,summary:{is_pro:false,total_matches:100,locked_matches:97}});
   assert.match(free,/97 more matches found/);assert.doesNotMatch(free,/id="match-sort"|match-filters\.js/);
   assert.match(matchesPage(),/No matches yet/);
-  const error=matchesPage({error:'<error>',summary:{is_pro:true}});assert.match(error,/&lt;error&gt;/);assert.doesNotMatch(error,/No matches yet|match-filters\.js/);
+  const error=matchesPage({error:'<error>',summary:{is_pro:true}});assert.match(error,/Your matches need a moment/);assert.doesNotMatch(error,/&lt;error&gt;|No matches yet|match-filters\.js/);
   const sparse=matchesPage({matches:[{job_id:9,match_score:50,available_dimensions:0}],summary:{is_pro:true}});
   assert.match(sparse,/Limited data/);assert.match(sparse,/Company not specified/);assert.doesNotMatch(sparse,/class="match-reasons"/);
   const escaped=matchesPage({matches:[{...job,title:'<script>bad</script>',company:'<img>'}]});assert.match(escaped,/&lt;script&gt;bad/);assert.match(escaped,/&lt;img&gt;/);

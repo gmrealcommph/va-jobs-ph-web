@@ -20,7 +20,6 @@ if (form) {
       if (!response.ok || (await response.json()).saved !== true) throw new Error('Save failed');
       success.hidden = false;
     } catch {
-      error.textContent = 'We could not save your preferences. Please try again. If your session expired, sign in again.';
       error.hidden = false;
     } finally {
       button.disabled = false;

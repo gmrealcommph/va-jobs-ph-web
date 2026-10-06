@@ -1,3 +1,4 @@
+import { recovery } from './recovery.js';
 import { sectionHeadingMarks } from './job-section-heading.js';
 import { renderJobHeader } from './job-detail-header.js';
 import { renderJobRead, renderAtAGlance } from './job-detail-read.js';
@@ -1318,9 +1319,9 @@ export function matchesPage({ matches = [], preferences = null, summary = null, 
     <section class="wrap matches-page">
       <div class="matches-heading-row"><div><div class="kicker">MY MATCHES</div><h1>Your best matches,<br><em>picked for you.</em></h1></div><svg class="matches-discovery" viewBox="0 0 210 160" aria-hidden="true"><circle class="matches-target-pulse" cx="74" cy="87" r="43" fill="#edf2d8" stroke="#b4c597" stroke-width="1.5"/><circle cx="74" cy="87" r="28" fill="none" stroke="currentColor" stroke-width="1.7"/><circle cx="74" cy="87" r="12" fill="#d8ed93" stroke="currentColor" stroke-width="1.7"/><path class="matches-flight-path" d="M12 142c32-10 2-48 49-47s52-30 75-40" fill="none" stroke="currentColor" stroke-width="1.5" stroke-dasharray="2 6" stroke-linecap="round"/><g class="matches-plane-float"><path d="m132 41 57-18-20 53-10-24-27-11Z" fill="#f2d36c" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="m159 52 30-29" stroke="currentColor" stroke-width="1.7"/></g><path d="M119 15v14m-7-7h14M185 103v9m-4.5-4.5h9" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>${!isPro ? '<a class="matches-edit-link" href="/onboarding">Edit preferences</a>' : ''}</div>
       <p class="matches-intro">${intro}</p>
-      ${error ? `<div class="match-error">${esc(error)}</div>` : ''}
+      ${error ? recovery({compact:true,title:"Your matches need a moment.",copy:"We couldn’t load your matches. Try again shortly, or browse current opportunities while you wait.",href:"/matches"}) : ''}
       ${proControls}
-      <div class="matches-list">${cards || (!error ? '<div class="match-empty"><h2>No matches yet</h2><p>Update your job preferences so VeeAys can find better-fit opportunities for you.</p><a class="button" href="/onboarding">Set my preferences</a></div>' : '')}</div>
+      <div class="matches-list">${cards || (!error ? recovery({compact:true,eyebrow:'ROOM FOR WHAT’S NEXT',title:'No matches yet.',copy:'Review your search profile to help VeeAys find opportunities that fit. You can browse all current jobs anytime.',href:'/onboarding',label:'Review search profile'}) : '')}</div>
       ${freeUpgrade}
     </section>${matches.length ? `<div class="match-tooltip" id="match-score-tooltip" role="tooltip" popover="manual" hidden><strong>How your match score works</strong><p>We compare this job with your saved preferences using the details the employer provides. Missing job information doesn’t lower your score, so 100% means it matched all the factors we could evaluate.</p></div><div class="match-tooltip" id="match-confidence-tooltip" role="tooltip" popover="manual" hidden><strong>What does confidence mean?</strong><p>Confidence reflects how much job information was available to calculate your match. More comparable details means greater confidence in the score.</p></div><script src="/match-interactions.js" defer></script>` : ''}${proScript}`;
 }
@@ -1433,7 +1434,8 @@ export function proPage({ isPro = false, user = null, profile = null } = {}) {
 }
 
 
-export function myJobsPage({ saved = [], applications = [], message = '', error = '' } = {}) {
+export function myJobsPage({ saved = [], applications = [], message = '', error = '', loadFailed = false } = {}) {
+  if (loadFailed) return recovery({title:'Your job search is still yours.',copy:'We couldn’t load your saved jobs and applications right now. Try again to see your latest shortlist and progress.',href:'/my-jobs',label:'Reload My Jobs'});
   const statusLabel = value => ({ applied: 'Applied', interview: 'Interview', offer: 'Offer', hired: 'Hired', rejected: 'Rejected', withdrawn: 'Withdrawn' }[value] || value);
   const formatAppliedDate = value => {
     if (!value) return '';
@@ -1471,7 +1473,7 @@ export function myJobsPage({ saved = [], applications = [], message = '', error 
   const cards = applications.map(applicationCard).join('');
   return `<section class="wrap my-jobs-page">
     <header class="workspace-intro"><div><div class="kicker">YOUR JOB SEARCH</div><h1>Keep your opportunities <em>moving.</em></h1><p class="my-jobs-intro">Save roles, track applications and keep your next steps in one place.</p><a class="workspace-discover" href="/jobs">Find your next opportunity <span aria-hidden="true">↗</span></a></div><div class="workspace-sketch" aria-hidden="true"><span class="sketch-label">Your next move</span><div class="sketch-paper"><span>THE SHORTLIST</span><i>✓ &nbsp; Find a role you love</i><i>✓ &nbsp; Make your application</i><i>○ &nbsp; Keep in touch</i><b>one step at a time</b></div></div></header>
-    ${message ? `<div class="my-jobs-message">${esc(message)}</div>` : ''}${error ? `<div class="my-jobs-error">${esc(error)}</div>` : ''}
+    ${message ? `<div class="my-jobs-message">${esc(message)}</div>` : ''}${error ? recovery({compact:true,title:"That update needs another try.",copy:"We couldn’t complete this change. Check your latest application details before trying again.",href:"/my-jobs",label:"Reload My Jobs"}) : ''}
     <section class="saved-jobs-section"><div class="my-jobs-section-head"><div><span class="eyebrow">SAVED</span><h2>Your shortlist</h2><p class="workspace-section-note">Bookmarked for later. Ready when you are.</p></div><strong>${saved.length}</strong></div>
       <div class="my-jobs-grid">${saved.length ? saved.map(jobMini).join('') : '<div class="my-jobs-empty"><span class="workspace-empty-mark" aria-hidden="true">✧</span><h3>Start with a possibility.</h3><p>Spot a role you like? Save it and build your shortlist here.</p><a class="button" href="/jobs">Find jobs</a></div>'}</div>
     </section>
