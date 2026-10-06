@@ -1,0 +1,42 @@
+/* Scoped to authentication pages; shared member and product styles stay intact. */
+.auth-polish{color:#123e30}
+body:has(.auth-polish) main{background:#f7f4e9}
+.auth-shell.auth-polish{max-width:1120px;gap:72px;padding-top:68px;padding-bottom:88px;align-items:start}
+.auth-polish .auth-intro{padding-top:18px}
+.auth-polish .kicker,.auth-card-label{font-size:11px;font-weight:800;letter-spacing:.14em;color:#934124}
+.auth-polish .auth-intro h1{font-family:Georgia,serif;font-weight:400;font-size:clamp(42px,5vw,66px);line-height:1.06;letter-spacing:-.04em}
+.auth-polish .auth-intro h1 em{font-weight:400;color:#476349}
+.auth-polish .auth-intro p{font-size:17px;line-height:1.7;max-width:450px;overflow-wrap:anywhere}
+.auth-polish .auth-card{position:relative;background:#fffdf4;border:1px solid #123e3038;border-radius:7px;padding:34px;box-shadow:6px 7px 0 #123e300a}
+.auth-polish .auth-card:before{content:"";display:block;width:52px;height:4px;background:#d8ed93;margin-bottom:24px}
+.auth-polish .auth-card h2{font:400 31px/1.2 Georgia,serif;letter-spacing:-.025em;margin-bottom:12px}
+.auth-polish .auth-card>p{font-size:15px;line-height:1.65;color:#496055}
+.auth-polish .auth-field label{font-size:14px}
+.auth-polish .auth-field input{font:inherit;font-size:16px;line-height:1.5;min-height:50px;border:1px solid #6e8174;border-radius:5px;background:#fffef9;padding:12px 14px;color:#123e30}
+.auth-polish .auth-field input:focus{border-color:#123e30;outline:3px solid #123e30;outline-offset:3px}
+.auth-polish .auth-field input:user-invalid{border-color:#934124;box-shadow:inset 3px 0 #934124}
+.auth-polish .auth-field small{font-size:12px;line-height:1.6;color:#496055}
+.auth-polish .auth-form{gap:20px}
+.auth-polish .auth-form button,.auth-polish .auth-card>.button{display:flex;justify-content:center;align-items:center;background:#d8ed93;color:#123e30;border:1px solid #123e30;border-radius:5px;min-height:50px;font-size:15px;font-weight:800;box-shadow:3px 3px 0 #123e30;text-decoration:none}
+.auth-polish .auth-form button:hover,.auth-polish .auth-card>.button:hover{background:#c6e379}
+.auth-polish a:focus-visible,.auth-polish button:focus-visible{outline:3px solid #123e30;outline-offset:5px}
+.auth-polish .auth-switch{margin:28px 0 0!important;font-size:14px}
+.auth-polish .auth-switch a,.auth-polish noscript a{color:#123e30;text-underline-offset:4px}
+.auth-polish .auth-alert{font-size:14px;line-height:1.6;border-radius:5px;overflow-wrap:anywhere}
+.auth-polish .auth-alert.error{background:#fff2e9;border:1px solid #934124;border-left-width:4px;color:#78311f}
+.auth-polish .auth-alert.success{background:#f1f5df;border:1px solid #627847;border-left-width:4px;color:#123e30}
+.auth-postcard{width:265px;max-width:100%;box-sizing:border-box;padding:18px 22px 20px;background:#f5f0dc;border:1px solid #123e3033;box-shadow:5px 6px 0 #123e3008;border-radius:3px;transform:rotate(-3deg);margin:36px 0 0 8px;background-image:radial-gradient(#123e3018 .8px,transparent .8px);background-size:9px 9px}
+.auth-postcard>span{font-size:8px;letter-spacing:.09em;font-weight:800}
+.auth-postcard svg{display:block;width:175px;height:84px;margin:8px auto}
+.auth-postcard strong{display:block;font:400 25px/1.2 Georgia,serif}
+.auth-postcard i{display:block;font-size:11px;font-style:normal;margin-top:8px;color:#496055}
+.auth-card-label{margin-bottom:14px}
+.auth-inbox-note{background:#f3f1df;border-left:3px solid #b65c35;padding:18px;margin:0 0 26px;font-size:14px;line-height:1.65}
+.auth-inbox-note p{margin:6px 0 0;color:#496055}
+.auth-callback.auth-polish{max-width:720px;margin:auto;padding:65px 24px 90px}
+.auth-callback.auth-polish .auth-postcard{margin:0 auto 38px}
+.auth-callback.auth-polish h1{font:400 clamp(32px,5vw,46px)/1.15 Georgia,serif;letter-spacing:-.03em}
+.auth-callback.auth-polish p{line-height:1.7;color:#496055}
+.auth-callback.auth-polish .kicker{justify-content:center}
+@media(max-width:800px){.auth-shell.auth-polish{gap:28px;padding:32px 20px 54px}.auth-polish .auth-intro{padding-top:0;text-align:left}.auth-polish .auth-intro h1{font-size:42px}.auth-polish .auth-intro p{margin:0;max-width:none;font-size:16px}.auth-shell .auth-postcard{display:none}.auth-polish .auth-card{padding:26px}.auth-polish .auth-card h2{font-size:29px}.auth-callback.auth-polish{padding:42px 24px 60px}}
+@media(max-width:360px){.auth-shell.auth-polish{padding-left:16px;padding-right:16px}.auth-polish .auth-card{padding:22px}.auth-polish .auth-intro h1{font-size:37px}}
