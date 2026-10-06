@@ -18,11 +18,147 @@ const categoryArtworks = [
       'customer service customer support', 'customer care', 'customer success']
   }
 ];
+categoryArtworks.push(...[
+  {
+    "src": "/images/job-header-account-management.png",
+    "width": 1672,
+    "height": 941,
+    "aliases": [
+      "account management"
+    ]
+  },
+  {
+    "src": "/images/job-header-bookkeeping-finance.png",
+    "width": 1678,
+    "height": 937,
+    "aliases": [
+      "bookkeeping finance",
+      "finance accounting",
+      "finance",
+      "accounting",
+      "bookkeeping"
+    ]
+  },
+  {
+    "src": "/images/job-header-data-entry.png",
+    "width": 1672,
+    "height": 941,
+    "aliases": [
+      "data entry"
+    ]
+  },
+  {
+    "src": "/images/job-header-design-creative.png",
+    "width": 1672,
+    "height": 941,
+    "aliases": [
+      "design creative",
+      "design video",
+      "graphic design",
+      "video editing"
+    ]
+  },
+  {
+    "src": "/images/job-header-e-commerce.png",
+    "width": 1678,
+    "height": 937,
+    "aliases": [
+      "e commerce"
+    ]
+  },
+  {
+    "src": "/images/job-header-executive-assistant.png",
+    "width": 1678,
+    "height": 937,
+    "aliases": [
+      "executive assistant"
+    ]
+  },
+  {
+    "src": "/images/job-header-marketing.png",
+    "width": 1672,
+    "height": 941,
+    "aliases": [
+      "marketing"
+    ]
+  },
+  {
+    "src": "/images/job-header-operations-admin.png",
+    "width": 1672,
+    "height": 941,
+    "aliases": [
+      "operations admin",
+      "operations",
+      "admin support",
+      "operations va pm"
+    ]
+  },
+  {
+    "src": "/images/job-header-other-remote.png",
+    "width": 1672,
+    "height": 941,
+    "aliases": [
+      "other remote",
+      "other"
+    ]
+  },
+  {
+    "src": "/images/job-header-project-management.png",
+    "width": 1672,
+    "height": 941,
+    "aliases": [
+      "project management"
+    ]
+  },
+  {
+    "src": "/images/job-header-recruitment-hr.png",
+    "width": 1672,
+    "height": 941,
+    "aliases": [
+      "recruitment hr"
+    ]
+  },
+  {
+    "src": "/images/job-header-sales.png",
+    "width": 1672,
+    "height": 940,
+    "aliases": [
+      "sales"
+    ]
+  },
+  {
+    "src": "/images/job-header-social-media.png",
+    "width": 1672,
+    "height": 941,
+    "aliases": [
+      "social media",
+      "social media management"
+    ]
+  },
+  {
+    "src": "/images/job-header-virtual-assistant.png",
+    "width": 1672,
+    "height": 941,
+    "aliases": [
+      "virtual assistant",
+      "general va"
+    ]
+  },
+  {
+    "src": "/images/job-header-writing-content.png",
+    "width": 1672,
+    "height": 940,
+    "aliases": [
+      "writing content"
+    ]
+  }
+]);
 const categoryKey = value => String(value ?? '').toLowerCase()
   .replace(/[^a-z0-9]+/g, ' ').trim().replace(/\s+/g, ' ');
 export function categoryArtwork(category) {
   const key = categoryKey(category);
-  return categoryArtworks.find(art => art.aliases.includes(key)) ?? null;
+  return categoryArtworks.find(art => art.aliases.includes(key))
+    ?? categoryArtworks.find(art => art.aliases.includes('other remote'));
 }
 // This chooses decorative artwork only; it never normalizes displayed/stored data.
 export function categoryVisual(category) {

@@ -12,7 +12,7 @@ test('header preserves employer text, escapes unsafe fields and does not mutate 
   assert.ok(html.includes(job.title.replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('& Reporting','&amp; Reporting')));
   assert.ok(!html.includes('<script>alert'));
   assert.match(html, /href="\/categories\/Finance%20%26%20Accounting"/);
-  assert.match(html, /data-visual="finance"/);
+  assert.match(html, /src="\/images\/job-header-bookkeeping-finance\.png"/);
   assert.match(html, /href="\/#opportunities"/);
   assert.match(html, /href="\/apply\/42"/);
   assert.match(html, /Original employer description\./);
@@ -27,7 +27,7 @@ test('category visuals are static with an unknown-category fallback', () => {
   const html = detail({id:1,title:'Role',workplace_type:'On-site'});
   assert.ok(!html.includes('>Remote</text>'));
   assert.ok(!html.includes('Posted </span>'));
-  assert.match(html,/data-visual="generic"/);
+  assert.match(html,/src="\/images\/job-header-other-remote\.png"/);
 });
 
 test('dedicated artwork accepts category variants without matching unrelated support', () => {
@@ -36,7 +36,7 @@ test('dedicated artwork accepts category variants without matching unrelated sup
     assert.equal(categoryArtwork(category)?.src, '/images/job-header-customer-support.png');
   }
   for (const category of [null, '', 'IT Support', 'Technical Support', 'Customer Research', 'Unknown', '<script>Customer Support</script>']) {
-    assert.equal(categoryArtwork(category), null);
+    assert.equal(categoryArtwork(category)?.src, '/images/job-header-other-remote.png');
   }
 });
 
@@ -59,4 +59,22 @@ test('support artwork is decorative and leaves all employer information in HTML'
   assert.equal(png.readUInt32BE(16), 1678);
   assert.equal(png.readUInt32BE(20), 937);
   assert.equal(png[25], 6, 'approved PNG retains RGBA transparency');
+});
+
+ test('each canonical category receives its own valid transparent artwork', () => {
+ const expected = [["Account Management","account-management"],["Bookkeeping & Finance","bookkeeping-finance"],["Data Entry","data-entry"],["Design & Creative","design-creative"],["E-commerce","e-commerce"],["Executive Assistant","executive-assistant"],["Marketing","marketing"],["Operations & Admin","operations-admin"],["Other Remote","other-remote"],["Project Management","project-management"],["Recruitment & HR","recruitment-hr"],["Sales","sales"],["Social Media","social-media"],["Virtual Assistant","virtual-assistant"],["Writing & Content","writing-content"]];
+ const sources = new Set();
+ for (const [category, slug] of expected) {
+   const art = categoryArtwork(category);
+   assert.equal(art.src, '/images/job-header-' + slug + '.png');
+   sources.add(art.src);
+   const png = readFileSync(new URL('../public'+art.src, import.meta.url));
+   assert.equal(png.readUInt32BE(16), art.width);
+   assert.equal(png.readUInt32BE(20), art.height);
+   assert.equal(png[25], 6);
+   const html = detail({id:12,title:'Employer title',category});
+   assert.ok(html.includes('src="'+art.src+'"'));
+   assert.doesNotMatch(html, /class="jh-workspace"|class="jh-globe"/);
+ }
+ assert.equal(sources.size, 15);
 });
