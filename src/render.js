@@ -52,7 +52,7 @@ export function layout({ title, description, canonical, body, noindex = false, u
     type="image/svg+xml"
   >
 
-  <link rel="stylesheet" href="/styles.css?v=20261006-my-jobs">
+  <link rel="stylesheet" href="/styles.css?v=20261006-my-jobs-final">
 </head>
 
 <body>
@@ -1434,12 +1434,12 @@ export function myJobsPage({ saved = [], applications = [], message = '', error 
     if (Number.isNaN(d.getTime())) return '';
     return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
   };
-  const jobMini = job => `<article class="my-job-card"><div><div class="my-job-company">${esc(job.company || 'Company')}</div><h3><a href="${jobPath(job)}">${esc(job.title || 'Job opportunity')}</a></h3><p>${esc(job.location || 'Remote')} ${job.category ? `· ${esc(job.category)}` : ''}</p></div><a class="my-job-view" href="${jobPath(job)}">View job →</a></article>`;
+  const jobMini = job => `<article class="my-job-card"><div><div class="my-job-company">${esc(job.company || 'Company')}</div><h3><a class="workspace-title-swipe" href="${jobPath(job)}">${esc(job.title || 'Job opportunity')}</a></h3><div class="shortlist-meta">${job.category ? `<span class="shortlist-category">${esc(job.category)}</span>` : ''}${job.location ? `<span class="shortlist-location">${esc(job.location)}</span>` : ''}</div></div><a class="my-job-view" href="${jobPath(job)}">View job →</a></article>`;
   const applicationCard = item => {
     const appliedDate = formatAppliedDate(item.applied_at);
     return `<article class="tracker-card" data-status="${esc(item.status)}">
       <div class="tracker-card-summary">
-        <div class="tracker-card-main"><div class="my-job-company">${esc(item.job?.company || 'Company')}</div><h3><a href="${item.job ? jobPath(item.job) : '#'}">${esc(item.job?.title || 'Job opportunity')}</a></h3><div class="tracker-meta"><span class="tracker-status tracker-status-${esc(item.status)}">${statusLabel(item.status)}</span>${appliedDate ? `<span>Applied ${esc(appliedDate)}</span>` : ''}${item.job?.location ? `<span>${esc(item.job.location)}</span>` : ''}</div></div>
+        <div class="tracker-card-main"><div class="my-job-company">${esc(item.job?.company || 'Company')}</div><h3><a class="workspace-title-swipe" href="${item.job ? jobPath(item.job) : '#'}">${esc(item.job?.title || 'Job opportunity')}</a></h3><div class="tracker-meta"><span class="tracker-status tracker-status-${esc(item.status)}">${statusLabel(item.status)}</span>${appliedDate ? `<span>Applied ${esc(appliedDate)}</span>` : ''}${item.job?.location ? `<span>${esc(item.job.location)}</span>` : ''}</div></div>
         <div class="tracker-card-links">${item.job ? `<a class="my-job-view" href="${jobPath(item.job)}">View job →</a>` : ''}<button class="tracker-edit-toggle" type="button" aria-expanded="false">Edit application</button></div>
       </div>
       <div class="tracker-edit-panel" hidden>
@@ -1468,7 +1468,8 @@ export function myJobsPage({ saved = [], applications = [], message = '', error 
     <section class="saved-jobs-section"><div class="my-jobs-section-head"><div><span class="eyebrow">SAVED</span><h2>Your shortlist</h2><p class="workspace-section-note">Bookmarked for later. Ready when you are.</p></div><strong>${saved.length}</strong></div>
       <div class="my-jobs-grid">${saved.length ? saved.map(jobMini).join('') : '<div class="my-jobs-empty"><span class="workspace-empty-mark" aria-hidden="true">✧</span><h3>Start with a possibility.</h3><p>Spot a role you like? Save it and build your shortlist here.</p><a class="button" href="/jobs">Find jobs</a></div>'}</div>
     </section>
-    <section class="application-tracker"><div class="my-jobs-section-head"><div><span class="eyebrow">APPLICATION TRACKER</span><h2>Applications in motion</h2><p class="workspace-section-note">Your record of applications you’ve made.</p></div><strong>${applications.length}</strong></div>
+    <p class="workspace-transition">Ready to apply? <span>Keep it moving <span aria-hidden="true">↓</span></span></p>
+    <section class="application-tracker"><div class="my-jobs-section-head"><div><span class="eyebrow">APPLICATION TRACKER</span><h2>Applications in motion</h2><p class="workspace-section-note">Keep track of every application and what happens next.</p></div><strong>${applications.length}</strong></div>
       <p class="workspace-tracking-note">Tracking here does not submit an application to the employer.</p><div class="tracker-tabs" role="group" aria-label="Application status filters">${tabs.map(([key,label],idx) => `<button type="button" class="tracker-tab${idx===0?' active':''}" data-filter="${key}" aria-pressed="${idx===0?'true':'false'}">${label}<span>${counts[key]}</span></button>`).join('')}</div>
       <div class="tracker-cards">${cards || '<div class="my-jobs-empty tracker-all-empty"><span class="workspace-empty-mark" aria-hidden="true">✓</span><h3>Your next chapter starts with a role.</h3><p>Once you’ve applied to an employer, mark the job as applied to track it here.</p><a class="my-job-view" href="/jobs">Explore jobs →</a></div>'}<div class="my-jobs-empty tracker-filter-empty" hidden><span class="workspace-empty-mark" aria-hidden="true">○</span><h3>A little room for what’s next.</h3><p>No applications in this stage. Choose another status to see your progress.</p><a class="my-job-view" href="/jobs">Discover more roles →</a></div></div>
     </section>

@@ -6229,3 +6229,25 @@ body:has(.employer-page)>.site-footer .footer-bottom{padding-top:15px;padding-bo
 @media(max-width:1000px){.my-jobs-page .my-jobs-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.workspace-intro{grid-template-columns:1fr 220px;gap:24px}.my-jobs-page .tracker-tab{padding:12px}}
 @media(max-width:700px){.my-jobs-page{padding-top:28px}.workspace-intro{grid-template-columns:1fr;padding-bottom:24px}.workspace-sketch{display:none}.workspace-intro h1{font-size:2.15rem;max-width:400px}.my-jobs-page .my-jobs-grid{grid-template-columns:1fr}.my-jobs-page .my-jobs-section-head h2{font-size:1.55rem}.my-jobs-page .tracker-tabs{display:flex;margin-right:0;padding:5px;gap:3px}.my-jobs-page .tracker-tab{min-width:92px;flex-shrink:0;padding:12px}.my-jobs-page .tracker-card{padding:20px}.my-jobs-page .tracker-card-links{gap:12px}.my-jobs-page .tracker-edit-panel{padding:16px}.my-jobs-page .tracker-edit-panel .tracker-form{grid-template-columns:1fr}.workspace-editor-heading{line-height:1.4}.my-jobs-page .tracker-actions{flex-wrap:wrap}.my-jobs-page .my-job-card{padding:20px}.my-jobs-page .tracker-meta{gap:8px;font-size:.8rem}}
 .my-jobs-page .workspace-intro{background:transparent}.my-jobs-page .tracker-edit-toggle{background:#fffdf5;color:#123e30}.my-jobs-page .tracker-edit-toggle:hover{background:#e5eccf;color:#123e30}
+
+/* Final approved My Jobs polish. Inline clone paints one soft marker swipe per title line. */
+.my-jobs-page .workspace-title-swipe{background-image:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20200%2020%22%20preserveAspectRatio%3D%22none%22%3E%3Cpath%20d%3D%22M3%206%20Q38%202%2074%205%20T143%204%20L196%203%20199%2013%20Q167%2016%20135%2014%20T66%2016%20L2%2017%200%2010Z%22%20fill%3D%22%23c6df96%22%20fill-opacity%3D%22.52%22%2F%3E%3Cpath%20d%3D%22M8%2013%20Q53%209%20101%2012%20T191%2010%22%20fill%3D%22none%22%20stroke%3D%22%23c6df96%22%20stroke-opacity%3D%22.22%22%20stroke-width%3D%225%22%2F%3E%3C%2Fsvg%3E");background-repeat:no-repeat;background-position:0 91%;background-size:100% .65em;box-decoration-break:clone;-webkit-box-decoration-break:clone;padding:0 .08em;margin:0 -.08em}
+.my-jobs-page .tracker-card .workspace-title-swipe{background-size:100% .43em;background-position:0 94%}
+.my-jobs-page .shortlist-meta{display:flex;align-items:center;flex-wrap:wrap;gap:8px 10px;font-size:.82rem;color:#5e6a61}
+.my-jobs-page .shortlist-category{border:1px solid #123e3022;border-radius:999px;background:#edf1e2;color:#365540;padding:4px 9px;line-height:1.4;max-width:100%;overflow-wrap:anywhere}
+.my-jobs-page .shortlist-location{line-height:1.5;overflow-wrap:anywhere}
+.my-jobs-page .tracker-status{padding:5px 10px;border:1px solid #123e302b;gap:6px}
+.my-jobs-page .tracker-status::before{content:"";width:5px;height:5px;border-radius:50%;background:currentColor;flex-shrink:0}
+.my-jobs-page .tracker-status-applied{background:#e1ead6;color:#244c35}
+.my-jobs-page .tracker-status-interview{background:#fae8cf;color:#734c25;border-color:#ac74302e}
+.my-jobs-page .tracker-status-offer{background:#e7edbd;color:#4a5a22}
+.my-jobs-page .tracker-status-hired{background:#d9ebc8;color:#254c32}
+.my-jobs-page .tracker-status-rejected,.my-jobs-page .tracker-status-withdrawn{background:#eeeadd;color:#62614c;border-color:#62614c30}
+.my-jobs-page .tracker-tabs{background-image:linear-gradient(#123e301c,#123e301c);background-repeat:no-repeat;background-size:calc(100% - 40px) 1px;background-position:center 44px}
+.my-jobs-page .tracker-tab span{background:#eceede;padding-right:5px}
+.my-jobs-page .tracker-tab.active span{background:#123e30}
+.my-jobs-page .workspace-transition{margin:24px 0 0;text-align:right;font-family:Georgia,serif;font-style:italic;font-size:1rem;color:#52654f;line-height:1.7}
+.my-jobs-page .workspace-transition>span{color:#365540;text-decoration:underline;text-decoration-color:#cfa76f;text-decoration-thickness:2px;text-underline-offset:5px}
+.my-jobs-page .application-tracker{margin-top:26px}
+@media(min-width:701px){.my-jobs-page .workspace-intro{padding-bottom:6px;align-items:start}.my-jobs-page .workspace-sketch{margin-top:-20px;margin-bottom:-20px}.my-jobs-page{padding-top:32px}.my-jobs-page .saved-jobs-section{margin-top:20px}}
+@media(max-width:700px){.my-jobs-page .workspace-transition{text-align:left;font-size:.94rem;margin-top:20px}.my-jobs-page .application-tracker{margin-top:24px}.my-jobs-page .tracker-tabs{background-size:580px 1px;background-position:20px 43px}.my-jobs-page .my-job-view{min-height:44px;box-sizing:border-box;display:inline-flex;align-items:center}.my-jobs-page .workspace-tracking-note{line-height:1.6}}
