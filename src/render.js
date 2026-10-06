@@ -448,31 +448,16 @@ export function listing({ rows, total, page, search, category, names, showPrefer
               </a>
             </div>
 
-            <div class="premium-collage" aria-hidden="true">
-
-              <div class="collage-glow"></div>
-
+            <div class="premium-collage approved-hero-art">
               <img
-                src="/veeays-hero-collage.png"
-                alt=""
-                width="1728"
-                height="864"
+                src="/veeays-hero-approved.png"
+                alt="Remote work possibilities: earn in USD, work with global companies, build skills and grow your career, skip the commute, work from anywhere, and enjoy better work-life balance."
+                width="1591"
+                height="989"
                 loading="eager"
                 fetchpriority="high"
+                decoding="async"
               >
-
-              <span class="float-note note-one">
-                Different time zones.<br>
-                <strong>Same drive.</strong>
-              </span>
-
-              <span class="float-badge">
-                PH <b>↗</b> WORLD
-              </span>
-
-              <span class="hero-spark spark-one">✳</span>
-              <span class="hero-spark spark-two">✦</span>
-
             </div>
 
           </div>
