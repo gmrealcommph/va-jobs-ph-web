@@ -6278,10 +6278,13 @@ body:has(.employer-page)>.site-footer .footer-bottom{padding-top:15px;padding-bo
 .category-jobs-page .opportunity-heading .eyebrow{display:none}
 .category-jobs-page .opportunity-heading h2{margin:0;font-size:25px;line-height:1.2}
 .category-results-count{font-size:12px;color:var(--muted);margin:7px 0 0}
-.category-order{margin-left:auto;flex:none;color:#486349;font-size:12px;border:1px solid var(--line);border-radius:999px;padding:8px 12px;background:#fffdf6}
 .category-jobs-page .opportunity-grid{gap:16px;grid-template-columns:repeat(2,minmax(0,1fr))}
 .category-jobs-page .results{min-width:0}
 .category-jobs-page .discovery-actions .job-save-button,.category-jobs-page .discovery-view-job{min-height:44px}
 @media(max-width:1100px){.category-jobs-hero-grid{grid-template-columns:minmax(0,1fr) 210px;gap:28px}.category-jobs-page .listings:has(>.category-discovery) .opportunity-grid{grid-template-columns:minmax(0,1fr)}}
 @media(max-width:900px){.category-jobs-page .listings:has(>.category-discovery){display:block}.category-jobs-page .listings>.category-discovery{margin-bottom:20px}.category-jobs-page .category-panel{padding:12px}.category-jobs-page .category-panel-heading h2{margin:0 0 8px}.category-jobs-page .category-panel-heading{padding-bottom:0}.category-jobs-page .listings .category-panel .filter{display:flex;min-height:44px}.category-jobs-page .listings:has(>.category-discovery) .opportunity-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
-@media(max-width:700px){.category-jobs-hero-grid{display:block;padding-block:26px 24px}.category-jobs-art{display:none}.category-jobs-hero h1{font-size:34px}.category-jobs-hero .search-row{flex-wrap:wrap}.category-jobs-hero .search-row input{width:0;min-width:0;flex:1}.category-jobs-hero .search-row button{font-size:12px;padding:12px;min-height:44px}.category-jobs-page .listings:has(>.category-discovery) .opportunity-grid{grid-template-columns:minmax(0,1fr)}.category-jobs-page .opportunity-heading{align-items:flex-start;flex-wrap:wrap}.category-jobs-page .opportunity-heading h2{font-size:22px}.category-order{padding:6px 9px}.category-jobs-page .opportunity-category{max-width:100%}}
+@media(max-width:700px){.category-jobs-hero-grid{display:block;padding-block:26px 24px}.category-jobs-art{display:none}.category-jobs-hero h1{font-size:34px}.category-jobs-hero .search-row{flex-wrap:wrap}.category-jobs-hero .search-row input{width:0;min-width:0;flex:1}.category-jobs-hero .search-row button{font-size:12px;padding:12px;min-height:44px}.category-jobs-page .listings:has(>.category-discovery) .opportunity-grid{grid-template-columns:minmax(0,1fr)}.category-jobs-page .opportunity-heading{align-items:flex-start;flex-wrap:wrap}.category-jobs-page .opportunity-heading h2{font-size:22px}.category-jobs-page .opportunity-category{max-width:100%}}
+
+.category-results-description{font-size:14px;line-height:1.5;color:var(--muted);margin:7px 0 0}
+.category-jobs-page .opportunity-arrow{width:44px;height:44px;flex-basis:44px}
+.category-jobs-page .opportunity-arrow:focus-visible{outline:3px solid #123e30;outline-offset:4px}

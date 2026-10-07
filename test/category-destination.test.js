@@ -11,13 +11,13 @@ test('category destination separates full category count from searched totals an
  assert.match(html,/<h1>Account Management<br><em>jobs for Filipino talent\.<\/em><\/h1>/);
  assert.equal((html.match(/<h1>/g)||[]).length,1);
  assert.doesNotMatch(html,/Account Management opportunities|salary|Sort by|<select/);
- assert.match(html,/33 opportunities/);assert.match(html,/17 jobs matching your search · Showing 16–16/);
+ assert.match(html,/33 opportunities/);assert.match(html,/17 Account Management jobs<\/h2>/);
  assert.match(html,/Client relationships, partnerships, customer success and account growth/);
  assert.match(html,/placeholder="Search Account Management jobs…"/);
  assert.match(html,/action="\/categories\/Account%20Management" method="get"/);
  assert.match(html,/href="\/categories\/Sales\?q=Excel\+%26\+client"/);
  assert.match(html,/href="\/categories\/Account%20Management\?q=Excel\+%26\+client&amp;page=1"/);
- assert.match(html,/Newest first/);assert.match(html,/Remote &amp; worldwide/);
+ assert.match(html,/Showing 16–16/);assert.doesNotMatch(html,/Newest first|Remote &amp; worldwide|category-order/);
 });
 test('category cards retain native authenticated save/unsave destinations and anonymous intent',()=>{
  for(const saved of [true,false]){
@@ -32,7 +32,7 @@ test('category cards retain native authenticated save/unsave destinations and an
 test('category editorial fallback is safe for new categories and escaped search/category text',()=>{
  const html=listing({...options,category:'<New & category>',search:'<script>',total:0,rows:[]});
  assert.match(html,/&lt;New &amp; category&gt;/);assert.match(html,/Explore opportunities that put your skills to work/);
- assert.match(html,/0 jobs matching your search/);assert.doesNotMatch(html,/<script>/);
+ assert.match(html,/0 &lt;New &amp; category&gt; jobs/);assert.doesNotMatch(html,/<script>/);
 });
 test('category route retains data query, canonical, index/noindex and page identity with no added queries',async()=>{
  const env={SUPABASE_URL:'https://test.supabase.co',SUPABASE_PUBLISHABLE_KEY:'sb_publishable_test',SITE_URL:'https://veeays.test'};
@@ -52,4 +52,19 @@ test('category route retains data query, canonical, index/noindex and page ident
   assert.match(html,new RegExp(`content="${search?'noindex':'index'},follow"`));
   assert.match(html,/<title>Account Management — Page 2 \| VeeAys<\/title>/);
  }
+});
+
+test('category polish uses dynamic counts, neutral copy, separate ranges and accessible native arrows',()=>{
+ for(const [category,total] of [['Sales',1],['Writing & Content',32],['New category',0]]){
+  const html=listing({...options,category,total,search:'',page:1,rows:total?[job]:[]});
+  assert.ok(html.includes(total+' '+category.replaceAll('&','&amp;')+' '+(total===1?'job':'jobs')+'</h2>'));
+  assert.match(html,/Browse current opportunities in this category/);
+  assert.doesNotMatch(html,/Explore available jobs|Newest first|Remote &amp; worldwide/);
+  if(total)assert.match(html,/class="category-results-count">Showing 1–1/);
+  else assert.doesNotMatch(html,/Showing/);
+ }
+ const card=discoveryCard(job,{categoryListing:true});
+ assert.match(card,/class="opportunity-arrow" href="\/jobs\/101" aria-label="View Account Manager"/);
+ assert.doesNotMatch(card,/discovery-view-job/);
+ assert.match(discoveryCard(job),/discovery-view-job/);
 });
