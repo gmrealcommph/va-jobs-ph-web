@@ -76,11 +76,11 @@ test('43635: guidance exposes exact guard matches and preference/application pre
     assert.deepEqual(validateStored(corrected,source),corrected);
   }
   let finish;
-  const result=await generateJob(env,'43635',{call:async(e,name,args)=>name==='claim_job_quick_read'
+  const result=await generateJob(env,'43635',{call:async(e,name,args)=>name==='claim_job_quick_read_recovery'
     ?{status:'claimed',description:source,source_hash:await sourceFingerprint(source)}
     :(finish=args,{status:'ready'}),generate:async()=>payload});
   assert.equal(result.status,'ready');assert.equal(finish.p_error,null);
-  const bad=await generateJob(env,'43635',{call:async(e,name,args)=>name==='claim_job_quick_read'
+  const bad=await generateJob(env,'43635',{call:async(e,name,args)=>name==='claim_job_quick_read_recovery'
     ?{status:'claimed',description:source,source_hash:await sourceFingerprint(source)}
     :(finish=args,{status:'failed'}),generate:async()=>validateSelection(move(selection(),29,'requirements'),source)});
   assert.equal(bad.error,'material_condition_misplaced');assert.equal(finish.p_payload,null);

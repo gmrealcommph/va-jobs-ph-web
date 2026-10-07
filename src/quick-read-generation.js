@@ -1,6 +1,10 @@
 // Extractive LLM organizer: the model selects source IDs, never writes public facts.
+import {providerFailureDiagnostics} from './quick-read-provider-diagnostics.js';
 export const FORMATTER_VERSION = 'source-organizer-v2';
 export const SCHEMA_VERSION = 2;
+// Bump only when deterministic source limits/normalization change. Ready caches
+// remain compatible; an unchanged blocked source can then be reconsidered.
+export const SOURCE_RULES_VERSION = 'source-limits-v1';
 export const SECTIONS = ['about_role','responsibilities','requirements','nice_to_have','important_requirements','benefits','company_overview','application_notes','other_details'];
 export const preference = /\b(prefer(?:red|ably)|highly preferred|nice[- ]to[- ]have|(?:a|an) (?:big )?(?:plus|advantage|bonus)|desirable|optional)\b/i;
 const mandatory = /\b(required|must|mandatory|need to)\b/i;
@@ -68,7 +72,7 @@ function isPreferred(u) {
 function supportsRequirement(u) {
   return u.is_heading || u.section_hint==='requirements' || mandatory.test(u.text);
 }
-export function validateSelection(selection, description) {
+function validateSelectionUnchecked(selection, description) {
   const units=sourceUnits(description);
   if (!selection || typeof selection !== 'object' || Array.isArray(selection) || Object.keys(selection).length!==SECTIONS.length || Object.keys(selection).some(k=>!SECTIONS.includes(k))) throw new Error('invalid_schema');
   const used=new Set();
@@ -97,6 +101,10 @@ export function validateSelection(selection, description) {
   if (used.size!==units.length) throw new Error('source_omitted');
   return result;
 }
+export function validateSelection(selection, description) {
+  try { return validateSelectionUnchecked(selection,description); }
+  catch (error) { error.quickReadSelection=selection; throw error; }
+}
 export function validateStored(payload, description) {
   try {
     if (payload?.version!==SCHEMA_VERSION || payload?.formatter!==FORMATTER_VERSION || Object.keys(payload).length!==SECTIONS.length+2) return null;
@@ -122,18 +130,23 @@ export async function generateWithProvider(env, description, fetcher=fetch) {
   const response=await fetcher('https://api.openai.com/v1/responses',{
     method:'POST',headers:{Authorization:`Bearer ${env.OPENAI_API_KEY}`,'content-type':'application/json'},
     signal:AbortSignal.timeout(90000),body:JSON.stringify({model:env.QUICK_READ_MODEL,store:false,
-      instructions:instructions+' mixed_obligation_ids flag every unit matching both the preference and mandatory keyword guards, including negated wording such as preferred but not required. Keep each complete unit in other_details (or application_notes for an explicit application condition); never put it in nice_to_have or split/rewrite it. Do not interpret not required as a requirement. Also preserve combined minimum/preferred thresholds, such as at least 2 years; 4 years preferred, together in other_details.'+' preference_ids flag every preference guard match, including preferred platforms in company prose and all entries under optional-skills headings. Assign these only to nice_to_have, other_details or application_notes; use other_details for company prose rather than presenting it as a candidate preference. Never put optional-section text in requirements, even when it lacks an explicit preference word. requirement_supported_ids are the only IDs eligible for requirements; this is eligibility, not an instruction to make every eligible ID a requirement. Duties mentioning experience remain duties; unknown qualifications stay in other_details. Preference, application and material restrictions still take precedence.'+' material_condition_ids flag the validator\'s conservative material keyword matches, even within duties, benefits, qualifications, headings or concatenated text. For non-preferred entries, only important_requirements, application_notes or other_details are permitted; section_hint does not override this restriction. Use other_details for keyword matches that describe ordinary duties (such as scheduling appointments) or aggregator metadata, rather than turning them into candidate conditions. Preserve entire mixed/concatenated units. Existing preference and application routing rules take precedence; these IDs do not establish mandatory qualifications.',input:JSON.stringify({source_units:units,mixed_obligation_ids:mixedObligationIds,preference_ids:preferenceIds,requirement_supported_ids:requirementSupportedIds,application_note_ids:units.filter(u=>application.test(u.text)).map(u=>u.id),material_condition_ids:materialConditionIds}),max_output_tokens:8000,
+      instructions:instructions+' mixed_obligation_ids flag every unit matching both the preference and mandatory keyword guards, including negated wording such as preferred but not required. Keep each complete unit in other_details (or application_notes for an explicit application condition); never put it in nice_to_have or split/rewrite it. Do not interpret not required as a requirement. Also preserve combined minimum/preferred thresholds, such as at least 2 years; 4 years preferred, together in other_details.'+' preference_ids flag every preference guard match, including preferred platforms in company prose and all entries under optional-skills headings. Assign these only to nice_to_have, other_details or application_notes; use other_details for company prose rather than presenting it as a candidate preference. Never put optional-section text in requirements, even when it lacks an explicit preference word. requirement_supported_ids are the only IDs eligible for requirements; this is eligibility, not an instruction to make every eligible ID a requirement. Duties mentioning experience remain duties; unknown qualifications stay in other_details. Preference, application and material restrictions still take precedence.'+' material_condition_ids flag the validator\'s conservative material keyword matches, even within duties, benefits, qualifications, headings or concatenated text. For non-preferred entries, only important_requirements, application_notes or other_details are permitted; section_hint does not override this restriction. Use other_details for keyword matches that describe ordinary duties (such as scheduling appointments) or aggregator metadata, rather than turning them into candidate conditions. Preserve entire mixed/concatenated units. Existing preference and application routing rules take precedence; these IDs do not establish mandatory qualifications.',input:JSON.stringify({source_units:units,mixed_obligation_ids:mixedObligationIds,preference_ids:preferenceIds,requirement_supported_ids:requirementSupportedIds,application_note_ids:units.filter(u=>application.test(u.text)).map(u=>u.id),material_condition_ids:materialConditionIds}),max_output_tokens:16000,
       text:{format:{type:'json_schema',name:'veeays_quick_read',strict:true,schema:outputSchema}}})
   });
   if(!response.ok) throw new Error(`provider_http_${response.status}`);
   const data=await response.json();
-  if(data.status!=='completed' || !Array.isArray(data.output)) throw new Error('provider_incomplete');
+  if(data.status!=='completed' || !Array.isArray(data.output)) {
+    const error=new Error('provider_incomplete');
+    error.quickReadProviderDiagnostics=providerFailureDiagnostics(data,response.status);
+    throw error;
+  }
   const content=data.output.flatMap(o=>o.content || []);
   if(content.some(c=>c.type==='refusal')) throw new Error('provider_refusal');
   const texts=content.filter(c=>c.type==='output_text');
   if(texts.length!==1) throw new Error('provider_invalid_output');
   let selection;
   try { selection=JSON.parse(texts[0].text); } catch { throw new Error('provider_invalid_json'); }
+  const originalSelection=structuredClone(selection);
   // Correct only a material placement rejected by the unchanged validator.
   // Keep the whole source unit in the existing conservative fallback section.
   // Every pass rechecks schema, references, preferences and full coverage; no
@@ -141,16 +154,24 @@ export async function generateWithProvider(env, description, fetcher=fetch) {
   for(let corrections=0; corrections<=units.length; corrections++) {
     try { return validateSelection(selection,description); }
     catch(error) {
-      if(error.message!=='material_condition_misplaced' || corrections===units.length) throw error;
+      if(error.message!=='material_condition_misplaced' || corrections===units.length) {
+        error.quickReadSelection=originalSelection; throw error;
+      }
       const seen=new Set();
       for(const key of SECTIONS) {
-        if(!Array.isArray(selection[key])) throw new Error('invalid_schema');
+        if(!Array.isArray(selection[key])) {
+          const invalid=new Error('invalid_schema'); invalid.quickReadSelection=originalSelection; throw invalid;
+        }
         for(const id of selection[key]) {
-          if(!Number.isInteger(id) || !units[id] || seen.has(id)) throw new Error('invalid_source_reference');
+          if(!Number.isInteger(id) || !units[id] || seen.has(id)) {
+            const invalid=new Error('invalid_source_reference'); invalid.quickReadSelection=originalSelection; throw invalid;
+          }
           seen.add(id);
         }
       }
-      if(seen.size!==units.length) throw new Error('source_omitted');
+      if(seen.size!==units.length) {
+        const omitted=new Error('source_omitted'); omitted.quickReadSelection=originalSelection; throw omitted;
+      }
       selection[error.section]=selection[error.section].filter(id=>id!==error.sourceId);
       selection.other_details.push(error.sourceId);
     }

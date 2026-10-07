@@ -86,7 +86,7 @@ test('37688 provider routing cues identify real application conditions, not ordi
   let finish;
   const hash=await sourceFingerprint(liveTechnologySource);
   const persisted=await generateJob(env,'37688',{
-    call:async(e,name,args)=>name==='claim_job_quick_read'
+    call:async(e,name,args)=>name==='claim_job_quick_read_recovery'
       ?{status:'claimed',description:liveTechnologySource,source_hash:hash}
       :(finish=args,{status:'ready'}),
     generate:async()=>result
@@ -155,6 +155,9 @@ test('Responses adapter uses server key, strict schema, no remote storage and va
     return Response.json({status:'completed',output:[{type:'message',content:[{type:'output_text',text:JSON.stringify(validSelection())}]}]});
   });
   assert.equal(sent.url,'https://api.openai.com/v1/responses');assert.equal(sent.body.store,false);
+  assert.equal(sent.body.max_output_tokens,16000);
+  assert.equal(sent.body.model,'gpt-5-mini');
+  assert.equal(Object.hasOwn(sent.body,'reasoning'),false);
   assert.equal(sent.body.text.format.strict,true);assert.equal(sent.init.headers.Authorization,'Bearer test-only');
   assert.equal(q.version,2);
   for(const response of [{status:'incomplete',output:[]},{status:'completed',output:[{content:[{type:'refusal'}]}]},{status:'completed',output:[{content:[{type:'output_text',text:'bad'}]}]}]) await assert.rejects(generateWithProvider(env,technologySource,async()=>Response.json(response)));
@@ -167,7 +170,7 @@ test('fingerprint unchanged skips provider, changed source fingerprint differs',
 });
 test('generation persists validated payload; malformed provider writes only failure metadata',async()=>{
   const hash=await sourceFingerprint(technologySource);let finish;
-  const call=async(env,name,args)=>name==='claim_job_quick_read'?{status:'claimed',description:technologySource,source_hash:hash}:(finish=args,{status:args.p_error?'failed':'ready'});
+  const call=async(env,name,args)=>name==='claim_job_quick_read_recovery'?{status:'claimed',description:technologySource,source_hash:hash}:(finish=args,{status:args.p_error?'failed':'ready'});
   const deps={call,generate:async()=>validateSelection(validSelection(),technologySource)};
   assert.equal((await generateJob({QUICK_READ_MODEL:'test-model'},42,deps)).status,'ready');
   assert.equal(finish.p_payload.version,2);
@@ -190,7 +193,7 @@ test('bounded batch stops at rate gate without advancing cursor past unprocessed
   const called=[];
   const call=async(e,name,args)=>{
     called.push({name,args});
-    if(name==='quick_read_candidates') return [{id:'37688'},{id:'39665'},{id:'99999'}];
+    if(name==='quick_read_candidates_recovery') return [{id:'37688'},{id:'39665'},{id:'99999'}];
     return {status:args.p_job_id==='37688'?'unchanged':'rate_limited'};
   };
   const req=new Request('https://x',{method:'POST',headers:{authorization:'Bearer '+env.QUICK_READ_ADMIN_TOKEN},body:'{"limit":3,"after_id":"0"}'});

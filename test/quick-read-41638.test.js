@@ -56,7 +56,7 @@ test('41638: corrected hints reach mocked provider and validated persistence',as
   });
   let finish;
   const result=await generateJob({QUICK_READ_MODEL:'mock'},'41638',{
-    call:async(e,name,args)=>name==='claim_job_quick_read'
+    call:async(e,name,args)=>name==='claim_job_quick_read_recovery'
       ?{status:'claimed',description:source,source_hash:await sourceFingerprint(source)}
       :(finish=args,{status:'ready'}),generate:async()=>payload
   });
