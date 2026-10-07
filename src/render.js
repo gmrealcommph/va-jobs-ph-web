@@ -66,7 +66,7 @@ export function layout({ title, description, canonical, body, noindex = false, u
     type="image/svg+xml"
   >
 
-  <link rel="stylesheet" href="/styles.css?v=20261007-category-final">
+  <link rel="stylesheet" href="/styles.css?v=20261007-category-cream">
 </head>
 
 <body>
@@ -390,7 +390,7 @@ export function listing({ rows, total, page, search, category, names, categoryEn
   const hero = browseOnly
     ? `<section class="jobs-browse-hero"><div class="wrap"><div class="kicker"><span></span> REMOTE JOBS FOR FILIPINO TALENT</div><h1>Find your next<br><em>opportunity.</em></h1><p>Search and explore roles open to talent in the Philippines.</p>${searchForm(search, '', '/jobs')}</div></section>`
     : category
-    ? `<section class="category-jobs-hero"><div class="wrap category-jobs-hero-grid"><div><div class="kicker"><span></span> BUILT FOR FILIPINO TALENT</div><h1>${esc(category)}<br><em>jobs for Filipino talent.</em></h1><p class="category-jobs-descriptor">${esc(categoryDescriptor(category))}</p><p class="category-jobs-context"><strong>${(categoryEntries.find(entry => entry.name === category)?.count ?? total).toLocaleString('en-US')} opportunities</strong></p>${searchForm(search, category, action, sort)}</div><div class="category-jobs-art"><img src="/images/category-workspace.webp" width="768" height="432" decoding="async" alt="" aria-hidden="true"><p class="category-sticky-note">${esc(categoryNote(category))}</p><div class="category-benefits" aria-label="Explore with VeeAys"><span>Work remotely</span><span>Join global teams</span><span>Grow your career</span></div></div></div></section>`
+    ? `<section class="category-jobs-hero"><div class="wrap category-jobs-hero-grid"><div><div class="kicker"><span></span> BUILT FOR FILIPINO TALENT</div><h1>${esc(category)}<br><em>jobs for Filipino talent.</em></h1><p class="category-jobs-descriptor">${esc(categoryDescriptor(category))}</p><p class="category-jobs-context"><strong>${(categoryEntries.find(entry => entry.name === category)?.count ?? total).toLocaleString('en-US')} opportunities</strong></p>${searchForm(search, category, action, sort)}</div><div class="category-jobs-art"><img src="/images/category-workspace.webp" width="768" height="432" decoding="async" alt="" aria-hidden="true"><p class="category-sticky-note">${esc(categoryNote(category))}</p></div></div></section>`
     : `<section class="home-hero">
         <div class="wrap">
 
