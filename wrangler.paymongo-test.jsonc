@@ -3,17 +3,23 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "veeays-paymongo-test",
+  "account_id": "e3383856f0658ad90cee219395f6e91e",
+  "workers_dev": true,
+  "preview_urls": false,
+  "routes": [],
+  "triggers": { "crons": [] },
   "main": "src/worker.js",
   "compatibility_date": "2026-10-01",
   "assets": { "directory": "./public", "binding": "ASSETS" },
   "vars": {
     "PAYMONGO_MODE": "test",
-    "PAYMONGO_TEST_USER_IDS": "REPLACE_WITH_COMMA_SEPARATED_TEST_AUTH_USER_UUIDS",
-    "SUPABASE_URL": "https://REPLACE_WITH_STAGING_PROJECT.supabase.co",
-    "SITE_URL": "https://REPLACE_WITH_TEST_WORKER_HOST",
+    "PAYMONGO_TEST_USER_IDS": "6952a024-fd83-48b0-be24-585700463135",
+    "SUPABASE_URL": "https://megedmsfdwtjxjejrxaq.supabase.co",
+    "SITE_URL": "https://veeays-paymongo-test.gm-realcommph.workers.dev",
     "STRONG_MATCH_MODE": "disabled",
     "DAILY_DIGEST_MODE": "disabled",
     "QUICK_READ_MODE": "disabled",
     "QUICK_READ_BATCH_ENABLED": "false"
   }
 }
+

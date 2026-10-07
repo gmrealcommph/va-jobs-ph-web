@@ -1,7 +1,7 @@
 #requires -Version 5.1
 <#
 .SYNOPSIS
-Bounded operator-only Quick Read backfill. Never retries completed failed jobs.
+Bounded operator-only Quick Read backfill with global recovery checks. Each unchanged failure is attempted at most once per run.
 .EXAMPLE
 .\scripts\quick-read-backfill.ps1 -AfterId 444 -MaxJobs 50
 Uses QUICK_READ_ADMIN_TOKEN from this process environment. Reports go to TEMP.
@@ -14,16 +14,21 @@ param(
     [ValidateRange(5,500)][int]$MaxJobs = 50,
     [switch]$UntilExhausted,
     [ValidateRange(5,100000)][int]$EmergencyMaxJobs = 10000,
+    [ValidateRange(1,720)][int]$MaxRunMinutes = 180,
+    [ValidateRange(2,100)][int]$MaxSweeps = 5,
     [ValidateRange(10,300)][int]$WaitSeconds = 15,
     [ValidateRange(1,10)][int]$MaxRetries = 3,
     [string]$ReportDirectory = (Join-Path ([IO.Path]::GetTempPath()) 'VeeAys-QuickRead')
 )
 
 function Invoke-QuickReadHttp {
-    param([string]$Cursor, [int]$Limit)
+    param([string]$Cursor, [int]$Limit, [string]$RunStartedAt, [string]$Mode)
     # Fixed origin, no redirects and no raw HTTP/exception output (may contain secrets).
     $headers = @{ Authorization = 'Bearer ' + $env:QUICK_READ_ADMIN_TOKEN }
-    $body = @{ limit = $Limit; after_id = $Cursor } | ConvertTo-Json -Compress
+    $bodyArgs = @{ limit = $Limit; after_id = $Cursor }
+    if ($Mode -eq 'recovery') { $bodyArgs = @{ mode = 'recovery' } }
+    if ($RunStartedAt) { $bodyArgs.run_started_at = $RunStartedAt }
+    $body = $bodyArgs | ConvertTo-Json -Compress
     $oldProtocol = [Net.ServicePointManager]::SecurityProtocol
     try {
         [Net.ServicePointManager]::SecurityProtocol = $oldProtocol -bor [Net.SecurityProtocolType]::Tls12
@@ -57,12 +62,15 @@ function Invoke-QuickReadBackfill {
         [ValidateRange(5,500)][int]$MaxJobs = 50,
         [switch]$UntilExhausted,
         [ValidateRange(5,100000)][int]$EmergencyMaxJobs = 10000,
+        [ValidateRange(1,720)][int]$MaxRunMinutes = 180,
+        [ValidateRange(2,100)][int]$MaxSweeps = 5,
         [ValidateRange(10,300)][int]$WaitSeconds = 15,
         [ValidateRange(1,10)][int]$MaxRetries = 3,
         [string]$ReportDirectory = (Join-Path ([IO.Path]::GetTempPath()) 'VeeAys-QuickRead'),
         # Injection seams for offline tests; the command-line entry point never exposes these.
-        [scriptblock]$Request = { param($cursor,$limit) Invoke-QuickReadHttp $cursor $limit },
-        [scriptblock]$Sleep = { param($seconds) Start-Sleep -Seconds $seconds }
+        [scriptblock]$Request = { param($cursor,$limit,$started,$mode) Invoke-QuickReadHttp $cursor $limit $started $mode },
+        [scriptblock]$Sleep = { param($seconds) Start-Sleep -Seconds $seconds },
+        [scriptblock]$Now = { [DateTimeOffset]::UtcNow }
     )
     $ErrorActionPreference = 'Stop'
     if ($AfterId -cnotmatch '^(0|[1-9][0-9]{0,18})$') { throw 'Supply an explicit numeric -AfterId (for example 444).' }
@@ -72,15 +80,18 @@ function Invoke-QuickReadBackfill {
     $jobCeiling = $MaxJobs
     if ($UntilExhausted) { $jobCeiling = $EmergencyMaxJobs }
     # Even a server returning one result per response cannot exceed this request bound.
-    $requestCeiling = ($jobCeiling + 1) * ($MaxRetries + 1)
+    $requestCeiling = ($jobCeiling + $MaxSweeps + $MaxRunMinutes * 6 + 1) * ($MaxRetries + 1)
+    $started = & $Now
+    $runStartedAt = $started.UtcDateTime.ToString("yyyy-MM-ddTHH:mm:ss.fffffffZ")
     if ([string]::IsNullOrWhiteSpace($env:QUICK_READ_ADMIN_TOKEN) -or
         $env:QUICK_READ_ADMIN_TOKEN.Length -lt 32 -or $env:QUICK_READ_ADMIN_TOKEN.Length -gt 512 -or
         $env:QUICK_READ_ADMIN_TOKEN -match '[\r\n]') { throw 'Set a valid QUICK_READ_ADMIN_TOKEN in the process environment.' }
     $report = [ordered]@{
-        started_at = [DateTime]::UtcNow.ToString('o'); finished_at = $null
+        started_at = $runStartedAt; finished_at = $null
         starting_cursor = $AfterId; final_cursor = $AfterId; max_jobs = $MaxJobs
         until_exhausted = [bool]$UntilExhausted; emergency_max_jobs = $EmergencyMaxJobs
-        request_ceiling = $requestCeiling
+        request_ceiling = $requestCeiling; max_run_minutes = $MaxRunMinutes; max_sweeps = $MaxSweeps
+        sweeps = 1; recovery_state = $null; highest_cursor = $AfterId
         attempted = 0; ready = 0; failed = 0; other = 0; failed_by_error = @{}
         completed_normally = $false; reason = 'interrupted'; batches = @()
     }
@@ -89,6 +100,7 @@ function Invoke-QuickReadBackfill {
     $retryCount = 0
     $batchNumber = 0
     $remainingLimit = 5
+    $checkingRecovery = $false
     try {
         # Verify the report destination before making any request.
         New-Item -ItemType Directory -Path $ReportDirectory -Force | Out-Null
@@ -96,11 +108,17 @@ function Invoke-QuickReadBackfill {
         $report | ConvertTo-Json -Depth 10 | Set-Content -LiteralPath $path -Encoding UTF8
         Write-Host ('Progress report: ' + $path)
         while ($report.attempted -lt $jobCeiling) {
+            if ((& $Now) -ge $started.AddMinutes($MaxRunMinutes)) { $report.reason = 'recovery_time_limit_reached'; break }
             if ($batchNumber -ge $requestCeiling) { $report.reason = 'emergency_request_ceiling_reached'; break }
             $batchNumber++
             $start = $cursor
             Write-Host ('Batch {0}: cursor {1}, limit {2}' -f $batchNumber,$start,$remainingLimit)
-            try { $envelope = & $Request $cursor $remainingLimit }
+            try {
+                $mode = ''; $cutoff = ''
+                if ($UntilExhausted) { $cutoff = $runStartedAt }
+                if ($checkingRecovery) { $mode = 'recovery' }
+                $envelope = & $Request $cursor $remainingLimit $cutoff $mode
+            }
             catch { $report.reason = 'request_failed_unknown_outcome'; break }
             $delay = $WaitSeconds
             $blocked = $false
@@ -126,6 +144,42 @@ function Invoke-QuickReadBackfill {
                 break
             } else {
                 $data = $envelope.Data
+                if ($checkingRecovery) {
+                    $state = $data.recovery
+                    $invalidState = $null -eq $state -or $null -ne $data.error -or $state.protocol_version -ne 1
+                    foreach ($field in @('eligible','ready','missing','candidates','terminal','attempted_failed','deferred')) {
+                        if ([string]$state.$field -cnotmatch '^(0|[1-9][0-9]{0,8})$') { $invalidState=$true }
+                    }
+                    if ($invalidState -or [long]$state.eligible -ne ([long]$state.ready+[long]$state.missing) -or
+                        [long]$state.missing -ne ([long]$state.candidates+[long]$state.terminal+[long]$state.attempted_failed+[long]$state.deferred)) {
+                        $report.reason='invalid_recovery_state'; break
+                    }
+                    $next=[DateTimeOffset]::MinValue
+                    if ([long]$state.deferred -gt 0 -and (-not [DateTimeOffset]::TryParse([string]$state.next_check_at,[ref]$next) -or $next -le (& $Now))) {
+                        $report.reason='invalid_recovery_state'; break
+                    }
+                    # Retain only numeric counters and validated timestamps.
+                    $report.recovery_state=[ordered]@{}
+                    foreach ($field in @('eligible','ready','missing','candidates','terminal','attempted_failed','deferred')) { $report.recovery_state[$field]=[long]$state.$field }
+                    $report.recovery_state.next_check_at=$null
+                    if ([long]$state.deferred -gt 0) { $report.recovery_state.next_check_at=$next.UtcDateTime.ToString('o') }
+                    if ([long]$state.missing -eq 0) { $report.completed_normally=$true; $report.reason='coverage_complete_at_check'; break }
+                    if ([long]$state.candidates -gt 0) {
+                        if ($report.sweeps -ge $MaxSweeps) { $report.reason='recovery_sweep_limit_reached'; break }
+                        $report.sweeps++; $cursor='0'; $report.final_cursor=$cursor; $checkingRecovery=$false
+                        Write-Host ('  Recovery sweep {0}: lower-ID/new candidates remain; restarting at 0.' -f $report.sweeps)
+                    } elseif ([long]$state.deferred -gt 0) {
+                        # Poll without generation while leases/cooldowns mature. Do
+                        # not spend the sweep budget on waiting; the clock/request
+                        # bounds still apply. Never retry this run's failures.
+                        $delay=[Math]::Min(60,[Math]::Max(1,[Math]::Ceiling(($next-(& $Now)).TotalSeconds)))
+                    } else { $report.reason='coverage_incomplete_requires_action'; break }
+                    $retryCount=0
+                    $report | ConvertTo-Json -Depth 10 | Set-Content -LiteralPath ($path + '.tmp') -Encoding UTF8
+                    [IO.File]::Replace(($path + '.tmp'),$path,($path + '.previous'))
+                    & $Sleep $delay
+                    continue
+                }
                 # Validate the entire response before trusting any cursor or printing fields.
                 if ($null -eq $data -or $null -ne $data.error -or
                     $data.results -isnot [System.Array] -or
@@ -141,7 +195,7 @@ function Invoke-QuickReadBackfill {
                     $code = [string]$job.error
                     if ($blocked -or $id -cnotmatch '^[1-9][0-9]{0,18}$' -or
                         [decimal]$id -le [decimal]$last -or
-                        $status -cnotin @('ready','failed','unchanged','retry_later','ineligible','invalid','claim_expired','source_changed','busy','rate_limited') -or
+                        $status -cnotin @('ready','failed','unchanged','retry_later','ineligible','invalid','claim_expired','source_changed','unsupported','busy','rate_limited') -or
                         ($status -ne 'failed' -and $code.Length -gt 0)) { $invalid = $true; break }
                     if ($status -eq 'failed' -and $code -cnotmatch '^(unsupported_source|unsafe_source|source_hash_mismatch|invalid_generated_output|invalid_schema|invalid_source_reference|unsupported_requirement|preference_upgraded|mixed_obligation|application_condition_misplaced|material_condition_misplaced|source_omitted|generation_failed|provider_(not_configured|http_[0-9]{3}|incomplete|refusal|invalid_output|invalid_json))$') {
                         $invalid = $true; break
@@ -151,7 +205,7 @@ function Invoke-QuickReadBackfill {
                     else {
                         $last = $id
                         if ($status -in @('invalid','claim_expired','source_changed') -or
-                            $code -match '^(provider_not_configured|provider_http_[0-9]{3})$') { $fatal = $true }
+                            $code -match '^(generation_failed|provider_not_configured|provider_http_[0-9]{3})$') { $fatal = $true }
                     }
                 }
                 if ($invalid -or [string]$data.next_after_id -cne $last -or
@@ -159,7 +213,8 @@ function Invoke-QuickReadBackfill {
                     $report.reason = 'invalid_or_stalled_cursor_response'; break
                 }
                 if ($data.results.Count -eq 0) {
-                    $report.completed_normally = $true; $report.reason = 'no_more_candidates'; break
+                    if ($UntilExhausted) { $checkingRecovery=$true; continue }
+                    $report.completed_normally = $true; $report.reason = 'cursor_sweep_complete'; break
                 }
                 foreach ($job in $validated) {
                     Write-Host ('  Job {0}: {1} {2}' -f $job.job_id,$job.status,$job.error)
@@ -173,6 +228,7 @@ function Invoke-QuickReadBackfill {
                 }
                 $cursor = [string]$data.next_after_id
                 $report.final_cursor = $cursor
+                if ([decimal]$cursor -gt [decimal]$report.highest_cursor) { $report.highest_cursor=$cursor }
                 $report.batches += [ordered]@{ number=$batchNumber; starting_cursor=$start; ending_cursor=$cursor; http_status=200; results=$validated }
                 # Persist every confirmed batch, including fatal results and the ceiling batch.
                 $report | ConvertTo-Json -Depth 10 | Set-Content -LiteralPath ($path + '.tmp') -Encoding UTF8
@@ -202,7 +258,7 @@ function Invoke-QuickReadBackfill {
         $report.reason = 'local_error_or_report_write_failed'
         $report.completed_normally = $false
     } finally {
-        $report.finished_at = [DateTime]::UtcNow.ToString('o')
+        $report.finished_at = (& $Now).UtcDateTime.ToString('o')
         if ($null -ne $path) {
             try {
                 $report | ConvertTo-Json -Depth 10 | Set-Content -LiteralPath ($path + '.tmp') -Encoding UTF8
@@ -220,7 +276,7 @@ function Invoke-QuickReadBackfill {
 
 if ($MyInvocation.InvocationName -ne '.') {
     if ([string]::IsNullOrWhiteSpace($AfterId)) { throw 'Required: -AfterId. Overnight production run: -AfterId 5438 -UntilExhausted.' }
-    $arguments = @{ AfterId=$AfterId; UntilExhausted=$UntilExhausted; EmergencyMaxJobs=$EmergencyMaxJobs; WaitSeconds=$WaitSeconds; MaxRetries=$MaxRetries; ReportDirectory=$ReportDirectory }
+    $arguments = @{ AfterId=$AfterId; UntilExhausted=$UntilExhausted; EmergencyMaxJobs=$EmergencyMaxJobs; WaitSeconds=$WaitSeconds; MaxRetries=$MaxRetries; MaxRunMinutes=$MaxRunMinutes; MaxSweeps=$MaxSweeps; ReportDirectory=$ReportDirectory }
     if ($PSBoundParameters.ContainsKey('MaxJobs') -or -not $UntilExhausted) { $arguments.MaxJobs=$MaxJobs }
     $result = Invoke-QuickReadBackfill @arguments
     if (-not $result.completed_normally) { exit 1 }
