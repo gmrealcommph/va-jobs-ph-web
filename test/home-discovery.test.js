@@ -11,7 +11,10 @@ test('homepage discovery remains server-rendered, search/category links compose 
   assert.match(home,/id="discovery-q" name="q"/);assert.match(home,/action="\/#opportunities" method="get"/);assert.match(home,/class="discovery-card"|opportunity-card discovery-card/);
   assert.match(home,/>42<\/strong>/);assert.match(home,/home-discovery\.js/);assert.doesNotMatch(home,/class="discovery-salary"|opportunity-remote/);
   const searched=listing({...options,search:'Excel & VA'});assert.match(searched,/value="Excel &amp; VA"/);assert.match(searched,/\/categories\/Marketing\?q=Excel\+%26\+VA/);
-  for(const other of [listing({...options,category:'Executive Assistant'}),listing({...options,browseOnly:true})])assert.doesNotMatch(other,/discovery-card|home-discovery\.js|id="discovery-q"/);
+  assert.doesNotMatch(listing({...options,browseOnly:true}),/discovery-card|home-discovery\.js|id="discovery-q"/);
+  const category=listing({...options,category:'Executive Assistant'});
+  assert.match(category,/category-jobs-page/);assert.match(category,/opportunity-card discovery-card/);
+  assert.doesNotMatch(category,/home-discovery\.js|id="discovery-q"/);
 });
 test('cards preserve native job/category destinations, saved form fields and anonymous save intent; escape all content',()=>{
   const saved=discoveryCard(job,{user:{id:'user'},saved:true});assert.match(saved,/action="\/unsave-job"/);assert.match(saved,/name="job_id" value="101"/);assert.match(saved,/name="return_to" value="\/#opportunities"/);assert.match(saved,/href="\/jobs\/101"/);assert.match(saved,/href="\/categories\/Executive%20Assistant"/);assert.match(saved,/discovery-heart/);
