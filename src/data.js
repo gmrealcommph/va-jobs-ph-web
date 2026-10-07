@@ -33,12 +33,13 @@ export function listJobs(
   {
     page = 1,
     search = '',
-    category = ''
+    category = '',
+    sort = 'newest'
   } = {}
 ) {
   const params = {
     select: COLUMNS,
-    order: 'posted_at.desc.nullslast,id.asc'
+    order: sort === 'oldest' ? 'posted_at.asc.nullslast,id.asc' : 'posted_at.desc.nullslast,id.asc'
   };
 
   if (category) {

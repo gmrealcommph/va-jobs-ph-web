@@ -993,6 +993,7 @@ if (
           120
         );
 
+    const sort = category && url.searchParams.get('sort') === 'oldest' ? 'oldest' : 'newest';
     const {
       rows,
       total
@@ -1001,7 +1002,8 @@ if (
       {
         category,
         search,
-        page
+        page,
+        sort
       }
     );
 
@@ -1037,6 +1039,7 @@ if (
         names,
         categoryEntries,
         publicJobTotal,
+        sort,
         showPreferencesPrompt,
         onboardingComplete,
         user: authState.user,

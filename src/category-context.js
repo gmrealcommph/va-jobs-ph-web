@@ -18,3 +18,14 @@ const descriptors = {
   'Writing & Content': 'Turn ideas into clear writing and engaging content.'
 };
 export const categoryDescriptor = name => descriptors[name] || 'Explore opportunities that put your skills to work.';
+
+export const categoryNote = name => ({
+ 'Account Management': 'Build stronger client relationships',
+ 'Bookkeeping & Finance': 'Make every detail count',
+ 'Customer Support': 'Turn questions into great experiences',
+ 'Design & Creative': 'Bring your next big idea to life',
+ 'Marketing': 'Connect ideas with the right people',
+ 'Project Management': 'Move great work forward',
+ 'Sales': 'Build connections that grow',
+ 'Writing & Content': 'Give your ideas a voice'
+}[name] || 'Find your fit. Make your move.');

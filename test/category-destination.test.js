@@ -10,14 +10,14 @@ test('category destination separates full category count from searched totals an
  const html=listing(options);
  assert.match(html,/<h1>Account Management<br><em>jobs for Filipino talent\.<\/em><\/h1>/);
  assert.equal((html.match(/<h1>/g)||[]).length,1);
- assert.doesNotMatch(html,/Account Management opportunities|salary|Sort by|<select/);
+ assert.doesNotMatch(html,/Account Management opportunities|salary|Sort by/);
  assert.match(html,/33 opportunities/);assert.match(html,/17 Account Management jobs<\/h2>/);
  assert.match(html,/Client relationships, partnerships, customer success and account growth/);
  assert.match(html,/placeholder="Search Account Management jobs…"/);
  assert.match(html,/action="\/categories\/Account%20Management" method="get"/);
  assert.match(html,/href="\/categories\/Sales\?q=Excel\+%26\+client"/);
  assert.match(html,/href="\/categories\/Account%20Management\?q=Excel\+%26\+client&amp;page=1"/);
- assert.match(html,/Showing 16–16/);assert.doesNotMatch(html,/Newest first|Remote &amp; worldwide|category-order/);
+ assert.match(html,/Showing 16–16/);assert.doesNotMatch(html,/Remote &amp; worldwide|category-order/);
 });
 test('category cards retain native authenticated save/unsave destinations and anonymous intent',()=>{
  for(const saved of [true,false]){
@@ -58,8 +58,8 @@ test('category polish uses dynamic counts, neutral copy, separate ranges and acc
  for(const [category,total] of [['Sales',1],['Writing & Content',32],['New category',0]]){
   const html=listing({...options,category,total,search:'',page:1,rows:total?[job]:[]});
   assert.ok(html.includes(total+' '+category.replaceAll('&','&amp;')+' '+(total===1?'job':'jobs')+'</h2>'));
-  assert.match(html,/Browse current opportunities in this category/);
-  assert.doesNotMatch(html,/Explore available jobs|Newest first|Remote &amp; worldwide/);
+  assert.match(html,/Sort jobs/);
+  assert.doesNotMatch(html,/Explore available jobs|Remote &amp; worldwide/);
   if(total)assert.match(html,/class="category-results-count">Showing 1–1/);
   else assert.doesNotMatch(html,/Showing/);
  }
