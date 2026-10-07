@@ -1,15 +1,12 @@
 import {test,afterEach} from 'node:test';
 import assert from 'node:assert/strict';
-import {descriptionPreview,discoveryCard,listing} from '../src/render.js';
+import {discoveryCard,listing} from '../src/render.js';
 import {handle} from '../src/worker.js';
 const original=globalThis.fetch;afterEach(()=>globalThis.fetch=original);
-test('previews are plain escaped source text, bounded, and omit missing descriptions',()=>{
- const raw='<script>alert(1)</script><p>Real &amp; useful description <img src=x onerror=alert(2)></p>';
- assert.equal(descriptionPreview(raw),'Real & useful description');
- const html=discoveryCard({id:1,title:'Role',description:raw},{categoryListing:true});
- assert.match(html,/Real &amp; useful description/);assert.doesNotMatch(html,/alert|onerror|<img/);
- assert.ok(Array.from(descriptionPreview('word '.repeat(100))).length<=280);
- assert.doesNotMatch(discoveryCard({id:1,title:'Role'},{categoryListing:true}),/category-job-preview/);
+test('category cards omit descriptions while retaining metadata and native actions',()=>{
+ const html=discoveryCard({id:1,title:'Role',company:'Company',category:'Sales',location:'Manila',remote:true,posted_at:'2026-10-01',description:'SECRET DESCRIPTION'},{categoryListing:true});
+ assert.doesNotMatch(html,/SECRET DESCRIPTION|category-job-preview/);
+ for(const value of ['Company','Role','Manila','Remote','Sales','Posted','Save','opportunity-arrow']) assert.ok(html.includes(value));
 });
 test('oldest sort reaches database, preserves search/page links and leaves default canonical',async()=>{
  const calls=[];globalThis.fetch=async input=>{const u=new URL(input);calls.push(u);return new Response(JSON.stringify(u.searchParams.get('select')==='category'?Array.from({length:31},()=>({category:'Sales'})):[{id:1,title:'Sales role',category:'Sales'}]),{headers:{'content-range':'0-0/31'}})};
@@ -20,6 +17,12 @@ test('oldest sort reaches database, preserves search/page links and leaves defau
 });
 test('multiple categories retain real headings, notes, and omit unsupported filters',()=>{
  for(const category of ['Account Management','Customer Support','Writing & Content']){
- const html=listing({category,rows:[],total:0,page:1,search:'',names:[category]});assert.match(html,/0 .* jobs<\/h2>/);assert.match(html,/category-workspace.svg/);assert.doesNotMatch(html,/name="(remote|employment_type|location)"/);
+ const html=listing({category,rows:[],total:0,page:1,search:'',names:[category]});assert.match(html,/0 .* jobs<\/h2>/);assert.match(html,/category-workspace.webp/);assert.doesNotMatch(html,/name="(remote|employment_type|location)"/);
  }
+});
+
+test('sort uses immediate native submission and no Apply button',()=>{
+ const html=listing({category:'Sales',rows:[],total:0,page:1,search:'client',names:['Sales']});
+ assert.doesNotMatch(html,/>Apply<|name="page"/);
+ assert.match(html,/name="q" value="client"/);
 });

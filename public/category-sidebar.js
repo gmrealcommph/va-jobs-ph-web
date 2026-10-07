@@ -11,3 +11,8 @@
   window.addEventListener('resize', update, { passive: true });
   update();
 })();
+
+// Native GET submission preserves search and resets pagination on sort changes.
+document.querySelector('.category-sort select')?.addEventListener('change', event => {
+  event.currentTarget.form.requestSubmit();
+});

@@ -6296,7 +6296,6 @@ body:has(.employer-page)>.site-footer .footer-bottom{padding-top:15px;padding-bo
 .category-sticky-note{position:absolute;right:5px;top:3px;max-width:130px;margin:0;padding:15px 12px;background:#d9ec89;box-shadow:2px 4px 0 #123e3012;transform:rotate(5deg);font:italic 17px/1.3 Georgia,serif;color:var(--ink)}
 .category-benefits{display:flex;justify-content:center;flex-wrap:wrap;gap:5px}
 .category-benefits span{border:1px solid #123e3020;border-radius:999px;padding:5px 8px;font-size:10px;color:#486349;background:#fffdf3}
-.category-job-preview{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:3;overflow:hidden;font-size:14px;line-height:1.55;color:var(--muted);margin:12px 0 18px;overflow-wrap:anywhere}
 .category-sort{display:flex;align-items:center;flex-wrap:wrap;gap:7px;margin-left:auto;font-size:12px}
 .category-sort select,.category-sort button{min-height:44px;border:1px solid #d4ddc6;border-radius:8px;padding:7px 10px;background:#fffdf3;color:var(--ink);font:inherit}
 .category-sort button{background:#d9ec89;cursor:pointer}
@@ -6304,3 +6303,13 @@ body:has(.employer-page)>.site-footer .footer-bottom{padding-top:15px;padding-bo
 .category-results-description:empty{display:none}
 @media(max-width:1100px) and (min-width:701px){.category-jobs-hero-grid{grid-template-columns:minmax(0,1fr) 270px;gap:24px}.category-sticky-note{font-size:15px;max-width:110px}}
 @media(max-width:700px){.category-sort{margin-left:0;width:100%}.category-sort label{margin-right:auto}.category-jobs-art{display:none}}
+
+/* Final category polish: shared editorial cutout, compact cards. */
+.category-jobs-art{background:transparent;border:0;border-radius:0;padding:12px 0 0;isolation:isolate}
+.category-jobs-art img{width:100%;height:auto;aspect-ratio:16/9;object-fit:contain}
+.category-sticky-note{top:4px;right:0;z-index:1}
+.category-benefits{position:relative;margin-top:10px;gap:6px}
+.category-jobs-page .job-card.opportunity-card.discovery-card{padding:21px 20px 18px}
+.category-jobs-page .discovery-card .opportunity-meta{margin-bottom:14px}
+.category-sort select{cursor:pointer}
+.category-sticky-note{left:0;right:auto;top:-24px;max-width:110px;font-size:16px}

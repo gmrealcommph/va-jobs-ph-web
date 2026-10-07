@@ -66,7 +66,7 @@ export function layout({ title, description, canonical, body, noindex = false, u
     type="image/svg+xml"
   >
 
-  <link rel="stylesheet" href="/styles.css?v=20261007-category-hybrid">
+  <link rel="stylesheet" href="/styles.css?v=20261007-category-final">
 </head>
 
 <body>
@@ -334,13 +334,6 @@ export function card(job, { user = null, saved = false } = {}) {
   `;
 }
 
-export function descriptionPreview(value) {
-  if (typeof value !== 'string') return '';
-  const plain = value.replace(/<(script|style)\b[^>]*>[\s\S]*?<\/\1\s*>/gi, ' ').replace(/<[^>]*>/g, ' ').replace(/&nbsp;|&#160;/gi, ' ').replace(/&amp;/gi, '&').replace(/\s+/g, ' ').trim();
-  const chars = Array.from(plain);
-  return chars.length > 280 ? chars.slice(0, 277).join('').replace(/\s+\S*$/, '') + '…' : plain;
-}
-
 export function discoveryCard(job, { user = null, saved = false, categoryListing = false } = {}) {
   const human = value => String(value || '').replaceAll('_', ' ');
   const metadata = categoryListing
@@ -360,7 +353,7 @@ export function discoveryCard(job, { user = null, saved = false, categoryListing
   const posted = job.posted_at && Number.isFinite(Date.parse(job.posted_at)) ? date(job.posted_at) : '';
   const heart = `<span class="discovery-heart" aria-hidden="true">${saved ? '♥' : '♡'}</span>`;
   const save = user ? `<form data-home-save method="post" action="${saved ? '/unsave-job' : '/save-job'}"><input type="hidden" name="job_id" value="${esc(job.id)}"><input type="hidden" name="return_to" value="${categoryListing ? jobPath(job) : '/#opportunities'}"><button class="job-save-button${saved ? ' is-saved' : ''}" type="submit" aria-pressed="${saved}" aria-label="${saved ? 'Unsave' : 'Save'} ${esc(job.title || 'job opportunity')}">${heart} ${saved ? 'Saved' : 'Save'}</button><span class="ep-sr-only" role="status" aria-live="polite" data-save-status></span></form>` : `<a class="job-save-button" href="/signup?return=${encodeURIComponent(jobPath(job) + '?save=1')}">${heart} Save</a>`;
-  return `<article class="job-card opportunity-card discovery-card"><div class="opportunity-card-top"><span class="opportunity-company">${esc(job.company || 'Company not specified')}</span>${posted ? `<span class="opportunity-date">Posted ${esc(posted)}</span>` : ''}</div><h2 class="opportunity-title"><a href="${jobPath(job)}">${esc(job.title || 'Job opportunity')}</a></h2>${metadata.length ? `<div class="opportunity-meta">${metadata.map(value=>`<span>${esc(value)}</span>`).join('')}</div>` : ''}${salary ? `<p class="discovery-salary">${esc(salary)}</p>` : ''}${categoryListing && descriptionPreview(job.description) ? `<p class="category-job-preview">${esc(descriptionPreview(job.description))}</p>` : ''}<div class="opportunity-card-bottom">${job.category ? `<a class="opportunity-category" href="${categoryPath(job.category)}">${esc(job.category)}</a>` : ''}<div class="discovery-actions">${save}${categoryListing ? `<a class="opportunity-arrow" href="${jobPath(job)}" aria-label="View ${esc(job.title || 'job opportunity')}"><span aria-hidden="true">↗</span></a>` : `<a class="discovery-view-job" href="${jobPath(job)}">View job <span aria-hidden="true">→</span></a>`}</div></div></article>`;
+  return `<article class="job-card opportunity-card discovery-card"><div class="opportunity-card-top"><span class="opportunity-company">${esc(job.company || 'Company not specified')}</span>${posted ? `<span class="opportunity-date">Posted ${esc(posted)}</span>` : ''}</div><h2 class="opportunity-title"><a href="${jobPath(job)}">${esc(job.title || 'Job opportunity')}</a></h2>${metadata.length ? `<div class="opportunity-meta">${metadata.map(value=>`<span>${esc(value)}</span>`).join('')}</div>` : ''}${salary ? `<p class="discovery-salary">${esc(salary)}</p>` : ''}<div class="opportunity-card-bottom">${job.category ? `<a class="opportunity-category" href="${categoryPath(job.category)}">${esc(job.category)}</a>` : ''}<div class="discovery-actions">${save}${categoryListing ? `<a class="opportunity-arrow" href="${jobPath(job)}" aria-label="View ${esc(job.title || 'job opportunity')}"><span aria-hidden="true">↗</span></a>` : `<a class="discovery-view-job" href="${jobPath(job)}">View job <span aria-hidden="true">→</span></a>`}</div></div></article>`;
 }
 
 export function searchForm(search = '', category = '', action = '/', sort = 'newest') {
@@ -397,7 +390,7 @@ export function listing({ rows, total, page, search, category, names, categoryEn
   const hero = browseOnly
     ? `<section class="jobs-browse-hero"><div class="wrap"><div class="kicker"><span></span> REMOTE JOBS FOR FILIPINO TALENT</div><h1>Find your next<br><em>opportunity.</em></h1><p>Search and explore roles open to talent in the Philippines.</p>${searchForm(search, '', '/jobs')}</div></section>`
     : category
-    ? `<section class="category-jobs-hero"><div class="wrap category-jobs-hero-grid"><div><div class="kicker"><span></span> BUILT FOR FILIPINO TALENT</div><h1>${esc(category)}<br><em>jobs for Filipino talent.</em></h1><p class="category-jobs-descriptor">${esc(categoryDescriptor(category))}</p><p class="category-jobs-context"><strong>${(categoryEntries.find(entry => entry.name === category)?.count ?? total).toLocaleString('en-US')} opportunities</strong></p>${searchForm(search, category, action, sort)}</div><div class="category-jobs-art"><img src="/images/category-workspace.svg" width="360" height="240" alt="" aria-hidden="true"><p class="category-sticky-note">${esc(categoryNote(category))}</p><div class="category-benefits" aria-label="Explore with VeeAys"><span>Work remotely</span><span>Join global teams</span><span>Grow your career</span></div></div></div></section>`
+    ? `<section class="category-jobs-hero"><div class="wrap category-jobs-hero-grid"><div><div class="kicker"><span></span> BUILT FOR FILIPINO TALENT</div><h1>${esc(category)}<br><em>jobs for Filipino talent.</em></h1><p class="category-jobs-descriptor">${esc(categoryDescriptor(category))}</p><p class="category-jobs-context"><strong>${(categoryEntries.find(entry => entry.name === category)?.count ?? total).toLocaleString('en-US')} opportunities</strong></p>${searchForm(search, category, action, sort)}</div><div class="category-jobs-art"><img src="/images/category-workspace.webp" width="768" height="432" decoding="async" alt="" aria-hidden="true"><p class="category-sticky-note">${esc(categoryNote(category))}</p><div class="category-benefits" aria-label="Explore with VeeAys"><span>Work remotely</span><span>Join global teams</span><span>Grow your career</span></div></div></div></section>`
     : `<section class="home-hero">
         <div class="wrap">
 
@@ -560,7 +553,7 @@ export function listing({ rows, total, page, search, category, names, categoryEn
       </div>
 
     </aside>
-    <script src="/category-sidebar.js?v=20261006" defer></script>
+    <script src="/category-sidebar.js?v=20261007-instant-sort" defer></script>
 
     <div class="results">
 
@@ -603,7 +596,7 @@ export function listing({ rows, total, page, search, category, names, categoryEn
         </div>
 
         
-        ${category ? `<form class="category-sort" action="${esc(action)}" method="get">${search ? `<input type="hidden" name="q" value="${esc(search)}">` : ''}<label for="category-sort">Sort jobs</label><select id="category-sort" name="sort"><option value="newest"${sort === 'newest' ? ' selected' : ''}>Newest first</option><option value="oldest"${sort === 'oldest' ? ' selected' : ''}>Oldest first</option></select><button type="submit">Apply</button></form>` : ''}
+        ${category ? `<form class="category-sort" action="${esc(action)}" method="get">${search ? `<input type="hidden" name="q" value="${esc(search)}">` : ''}<label for="category-sort">Sort jobs</label><select id="category-sort" name="sort"><option value="newest"${sort === 'newest' ? ' selected' : ''}>Newest first</option><option value="oldest"${sort === 'oldest' ? ' selected' : ''}>Oldest first</option></select><noscript><p>JavaScript is required to change sorting automatically.</p></noscript></form>` : ''}
         ${!search && !category ? `
           <div
             class="opportunity-count"
