@@ -51,7 +51,7 @@ export function sourceUnits(description) {
     // qualification context. Do not match generic "have what it takes" prose.
     const heading=({'have what it takes to be our graphic designer / video editor?':'requirements','day in the life of a graphic designer / video editor':'responsibilities','job overview':'about_role','your role':'responsibilities','our ideal candidate':'requirements','ideal candidate':'requirements','what we are offering':'benefits','why join wizementoring':'benefits','about wizementoring':'company_overview'})[label] || hints[label];
     // Exact section labels captured across public listings; optional skills end qualifications.
-    const boundary=({'what we are looking for in you':'requirements','additional skills that you might also bring':'nice_to_have','what your day will look like':'responsibilities','the role entails':'responsibilities','what we offer colleagues':'benefits'})[label];
+    const boundary=({'what we are looking for in you':'requirements','nice to have':'nice_to_have','nice-to-have':'nice_to_have','optional requirements':'nice_to_have','optional skills':'nice_to_have','preferred qualifications':'nice_to_have','additional skills that you might also bring':'nice_to_have','what your day will look like':'responsibilities','the role entails':'responsibilities','what we offer colleagues':'benefits'})[label];
     if(heading || boundary) hint=heading || boundary;
     u.section_hint=hint;
     u.is_heading=!!heading || !!boundary || /^skills & experience:?$/i.test(u.text);
