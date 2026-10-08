@@ -1,3 +1,5 @@
+import { adminEndpoint } from './admin.js';
+import {scheduledQuickReads, QUICK_READ_CRON} from './quick-read-scheduled.js';
 import { proCheckoutEndpoint, testUserAllowed, checkoutUserAllowed } from './pro-checkout.js';
 import { recovery } from './recovery.js';
 import { categories, getJob, getJobsByIds, listJobs, query } from './data.js';
@@ -24,7 +26,7 @@ function safeReturnPath(value) {
   const v = String(value || '');
   if (/^\/apply\/[A-Za-z0-9%._~-]{1,240}$/.test(v)) return v;
   if (/^\/jobs\/[A-Za-z0-9%._~-]{1,240}(?:\?save=1)?$/.test(v)) return v;
-  if (v === '/my-jobs' || v === '/matches' || v === '/jobs' || v === '/email-preferences') return v;
+  if (v === '/admin' || v === '/my-jobs' || v === '/matches' || v === '/jobs' || v === '/email-preferences') return v;
   if (v === '/pro' || v === '/onboarding' || v === '/') return v;
   return '';
 }
@@ -45,6 +47,7 @@ function hasCookie(request, name, expected = '1') {
 function xml(body) { return new Response(`<?xml version="1.0" encoding="UTF-8"?>${body}`, { headers: { 'content-type': 'application/xml; charset=utf-8', 'cache-control': 'public, max-age=300' } }); }
 export async function handle(request, env) {
   const url = new URL(request.url);
+  if (url.pathname === '/admin' || url.pathname.startsWith('/admin/')) return adminEndpoint(request, env);
   if (['/pro/checkout', '/pro/return', '/webhooks/paymongo'].includes(url.pathname)) return proCheckoutEndpoint(request, env);
   const quickReadMatch=url.pathname.match(/^\/internal\/quick-read\/([1-9]\d{0,18}|batch)$/);
   if(quickReadMatch) return quickReadEndpoint(request,env,quickReadMatch[1]==='batch'?null:quickReadMatch[1]);
@@ -1093,6 +1096,7 @@ if (
   }
 }
 export default { fetch: handle, scheduled(controller,env) {
+  if(controller.cron===QUICK_READ_CRON) return scheduledQuickReads(controller,env);
   // Separate cron invocations preserve Strong Match behavior and its subrequest budget.
   return controller.cron===DIGEST_CRON ? scheduledDailyDigest(controller,env) : scheduledStrongMatches(controller,env);
 } };

@@ -8,12 +8,15 @@
     "binding": "ASSETS"
   },
   "keep_vars": true,
-  "triggers": { "crons": ["*/15 * * * *", "* * * * *"] },
+  "triggers": { "crons": ["*/15 * * * *", "* * * * *", "2-59/5 * * * *"] },
   "vars": {
     "STRONG_MATCH_MODE": "enabled",
     "STRONG_MATCH_START_AT": "2026-10-03T04:15:00Z",
     "DAILY_DIGEST_MODE": "enabled",
 "DAILY_DIGEST_START_AT": "2026-10-04T00:00:00Z",
-    "SUPABASE_URL": "https://nwqmhqiymtqkdihjadrp.supabase.co"
+    "SUPABASE_URL": "https://nwqmhqiymtqkdihjadrp.supabase.co",
+    "QUICK_READ_AUTO_ENABLED": "true",
+    "QUICK_READ_MODEL": "gpt-5-mini",
+    "QUICK_READ_PROVIDER": "openai"
   }
 }
