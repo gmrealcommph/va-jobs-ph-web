@@ -33,6 +33,8 @@ rows leave the database; member names, emails and payment identifiers do not.
 - Live jobs: the existing `public_jobs` eligibility/deduplication view.
 - New jobs: source rows created in the selected period; the currently live
   subset is shown separately.
+  The daily new-jobs chart and its data table exclude the initial bulk import
+  on October 2, 2026 (1,855 rows). Summary totals still include that day.
 - Quick Read completions: current ready records with generation dates in the
   period. Errors are current failures updated in the period. Current queue
   and cache status counts are snapshots independent of period filters.

@@ -10,13 +10,15 @@ function table(headers,rows,empty='No records in this period.'){
   if(!rows.length) return '<p>'+esc(empty)+'</p>';
   return '<table><thead><tr>'+headers.map(h=>'<th scope="col">'+esc(h)+'</th>').join('')+'</tr></thead><tbody>'+rows.map(r=>'<tr>'+r.map(c=>'<td>'+esc(c)+'</td>').join('')+'</tr>').join('')+'</tbody></table>';
 }
-function chart(title,data,key,currency=false){
+function chart(title,data,key,currency=false,note=''){
+  const heading='<h3>'+esc(title)+'</h3>'+(note?'<p class="note">'+esc(note)+'</p>':'');
+  if(!data.length) return '<article class="chart">'+heading+'<p>No daily values to plot in this period.</p></article>';
   const values=data.map(d=>Number(d[key])),max=Math.max(1,...values),w=540,h=160;
   const x=i=>44+(values.length===1?.5:i/(values.length-1))*(w-60);
   const y=v=>h-22-(v/max)*(h-42);
   const points=values.map((v,i)=>x(i)+','+y(v)).join(' ');
   const fmt=v=>currency?money(v,'PHP'):num(v);
-  return '<article class="chart"><h3>'+esc(title)+'</h3><svg viewBox="0 0 '+w+' '+h+'" role="img" aria-label="'+esc(title+'; daily values available in the table below.')+'"><line x1="44" y1="'+y(0)+'" x2="524" y2="'+y(0)+'"/><line x1="44" y1="'+y(max)+'" x2="524" y2="'+y(max)+'"/><text x="0" y="'+(y(max)+4)+'">'+esc(num(max))+'</text><text x="25" y="'+(y(0)+4)+'">0</text><polyline points="'+points+'"/>'+values.map((v,i)=>'<circle cx="'+x(i)+'" cy="'+y(v)+'" r="3" fill="#22B07D"><title>'+esc(data[i].day+': '+fmt(v))+'</title></circle>').join('')+'<text x="44" y="158">'+esc(data[0]?.day||'')+'</text><text text-anchor="end" x="524" y="158">'+esc(data.at(-1)?.day||'')+'</text></svg><details><summary>View daily values</summary><div class="table-wrap">'+table(['Manila date',title],data.map(d=>[d.day,fmt(d[key])]))+'</div></details></article>';
+  return '<article class="chart">'+heading+'<svg viewBox="0 0 '+w+' '+h+'" role="img" aria-label="'+esc(title+'; daily values available in the table below.')+'"><line x1="44" y1="'+y(0)+'" x2="524" y2="'+y(0)+'"/><line x1="44" y1="'+y(max)+'" x2="524" y2="'+y(max)+'"/><text x="0" y="'+(y(max)+4)+'">'+esc(num(max))+'</text><text x="25" y="'+(y(0)+4)+'">0</text><polyline points="'+points+'"/>'+values.map((v,i)=>'<circle cx="'+x(i)+'" cy="'+y(v)+'" r="3" fill="#22B07D"><title>'+esc(data[i].day+': '+fmt(v))+'</title></circle>').join('')+'<text x="44" y="158">'+esc(data[0]?.day||'')+'</text><text text-anchor="end" x="524" y="158">'+esc(data.at(-1)?.day||'')+'</text></svg><details><summary>View daily values</summary><div class="table-wrap">'+table(['Manila date',title],data.map(d=>[d.day,fmt(d[key])]))+'</div></details></article>';
 }
 function render(d){
   const rev=d.revenue.length?d.revenue.map(r=>money(r.amount,r.currency)).join(' · '):money(0,'PHP');
@@ -30,7 +32,9 @@ function render(d){
     card('Quick Read errors',num(d.quick_period.errors),'Current failures updated in period'),
     card('Site visitors','Unavailable','Visitor tracking is not connected')
   ].join('');
-  $('charts').innerHTML=chart('New members',d.daily,'members')+chart('New jobs',d.daily,'jobs')+chart('Quick Reads completed',d.daily,'quick_reads')+chart('Confirmed live revenue · PHP',d.daily,'revenue_php',true);
+  // The initial bulk-import spike is excluded only from this trend, not totals.
+  const jobTrend=d.daily.filter(day=>day.day!=='2026-10-02');
+  $('charts').innerHTML=chart('New members',d.daily,'members')+chart('New jobs',jobTrend,'jobs',false,'Initial bulk import on Oct 2, 2026 excluded from this graph. Job totals include it.')+chart('Quick Reads completed',d.daily,'quick_reads')+chart('Confirmed live revenue · PHP',d.daily,'revenue_php',true);
   const pilot=d.pilot;
   $('quick').innerHTML='<article><h3>Queue & completion state · now</h3>'+d.queue.map(q=>row('Queue / '+q.state,num(q.count))).join('')+d.quick_reads.map(q=>row('Quick Reads / '+q.status,num(q.count))).join('')+row('Worker automation',d.runtime.quick_read_enabled?'Enabled':'Disabled')+row('Database automation',d.automation?.enabled?'Enabled':'Disabled')+'<p class="note">Queue states are current snapshots, independent of the period filter.</p></article><article><h3>Cost reservations · current pilot</h3>'+(pilot?row('Pilot gate',pilot.enabled?'Enabled':'Disabled')+row('Claims',num(pilot.claims))+row('Budget',money(pilot.budget_usd))+row('Reserved',money(pilot.reserved_usd))+row('Remaining',money(Math.max(0,Number(pilot.budget_usd)-Number(pilot.reserved_usd))))+row('Worst-case request reservation',money(pilot.worst_request_usd)):'<p>Pilot reservation record unavailable.</p>')+'<p class="note">USD reservations are conservative budget holds. Actual provider spend is not connected. This dashboard cannot change caps or run jobs.</p></article>';
   $('errors').innerHTML=table(['Job ID','Error code','Last update'],d.errors.map(e=>[e.job_id,e.error_code||'Unspecified',date(e.updated_at)]),'No current failures updated in this period.');
