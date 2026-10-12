@@ -52,7 +52,7 @@ function hasCookie(request, name, expected = '1') {
 function xml(body) { return new Response(`<?xml version="1.0" encoding="UTF-8"?>${body}`, { headers: { 'content-type': 'application/xml; charset=utf-8', 'cache-control': 'public, max-age=300' } }); }
 export async function handle(request, env) {
   const url = new URL(request.url);
-  if(/^\/jobs\/[1-9]\d{0,18}\/report$/.test(url.pathname)||['/admin/job-health','/admin/api/job-health'].includes(url.pathname))return jobHealthEndpoint(request,env);
+  if(/^\/jobs\/[1-9]\d{0,18}\/report$/.test(url.pathname)||['/admin/job-health','/admin/api/job-health'].includes(url.pathname)||(url.pathname==='/admin'&&url.searchParams.get('view')==='job-health'))return jobHealthEndpoint(request,env);
   if(url.pathname === '/privacy') refreshDeletionDisclosure(env);
   if(['/account/delete','/account/deleted','/account/deletion.css','/account/deletion.js'].includes(url.pathname)) return accountDeletionEndpoint(request,env);
   if(url.pathname==='/traffic/event')return trafficEndpoint(request,env);

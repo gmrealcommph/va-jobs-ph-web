@@ -42,4 +42,8 @@ The second command is also a dry run by default. Its `--write` mode requires an 
 
 ## Validation
 
+The Windows admin app 0.1.1 restricts top-level navigation to `/admin`. The dashboard links to `/admin?view=job-health`, an authenticated alias for `/admin/job-health`, so the existing app can open Job Health without expanding its origin or route allowlist. Both paths use the same authorization and review API. Native app visual acceptance is separate from HTTP route validation.
+
+The review-only rollout was approved on October 12. Staging uses its own Worker and Supabase project, synthetic accounts/listings, no cron schedules, and disabled payment/email automation. Production explicitly enables member reports and disables scheduled verification. Automatic hiding remains absent. Roll back application code with the saved Cloudflare version; disable member reports first if necessary. Leave additive database objects and retained reports intact on application rollback. Do not revert the importer to hard deletes once referenced records exist.
+
 Local tests cover anonymous/member/admin authorization; confirmed-account checks; duplicate/minute/day reporting limits; honeypot/body bounds/CSRF; stale review conflicts; evergreen expiry; evidence identity changes; account-deletion anonymization; leases; opt-in scheduler isolation; source matching, HTTP false positives, redirects, outages, rate-limit circuits, date boundaries and unchanged job visibility. The companion importer has offline persistence tests for soft retirement, source isolation and reopen identity. Production acceptance tests remain pending deployment approval.

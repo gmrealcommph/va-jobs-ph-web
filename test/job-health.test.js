@@ -21,6 +21,8 @@ test('invalid, oversized and honeypot reports never call database',async()=>{
  assert.equal((await jobHealthEndpoint(req('/jobs/1/report',{details:'x'.repeat(17000)}),env,{session,job,call:()=>assert.fail()})).status,413);
 });
 test('admin routes authorize every action and reject hide operations',async()=>{
+ assert.equal((await jobHealthEndpoint(req('/admin?view=job-health'),env,{session,call:async()=>true})).status,200);
+ assert.equal((await jobHealthEndpoint(req('/admin?view=job-health'),env,{session,call:async()=>false})).status,403);
  assert.equal((await jobHealthEndpoint(req('/admin/api/job-health'),env,{session,call:async()=>false})).status,403);
  const calls=[];const call=async(e,t,n,p)=>{calls.push(n);return n==='veeays_admin_access'?true:{metrics:{},queue:[]};};
  assert.equal((await jobHealthEndpoint(req('/admin/api/job-health?filter=missing'),env,{session,call})).status,200);assert.deepEqual(calls,['veeays_admin_access','veeays_job_health']);

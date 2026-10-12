@@ -16,6 +16,8 @@
     ]
   },
   "vars": {
+    "JOB_REPORTS_ENABLED": "true",
+    "JOB_HEALTH_VERIFY_ENABLED": "false",
     "DAILY_DIGEST_MODE": "enabled",
     "DAILY_DIGEST_START_AT": "2026-10-04T00:00:00Z",
     "PAYMONGO_LIVE_CHECKOUT_ENABLED": "true",

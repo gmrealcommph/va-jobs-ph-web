@@ -17,7 +17,8 @@ export async function jobHealthEndpoint(request,env,{session=sessionForRequest,c
  const url=new URL(request.url),report=url.pathname.match(/^\/jobs\/([1-9]\d{0,18})\/report$/),api=url.pathname==='/admin/api/job-health';
  const h=new Headers(headers);const reply=(body,status=200,type='text/html; charset=utf-8')=>{h.set('content-type',type);return new Response(body,{status,headers:h});};
  const json=(data,status=200)=>reply(JSON.stringify(data),status,'application/json');
- if(!report&&!api&&url.pathname!=='/admin/job-health')return reply('Not found',404);
+ const desktopPage=url.pathname==='/admin'&&url.searchParams.get('view')==='job-health';
+ if(!report&&!api&&url.pathname!=='/admin/job-health'&&!desktopPage)return reply('Not found',404);
  if(!['GET','POST'].includes(request.method)||(!api&&!report&&request.method!=='GET')){h.set('allow',api||report?'GET, POST':'GET');return reply('Method not allowed',405);}
  // All cookie-authenticated mutations require a browser's exact same-origin header.
  if(request.method==='POST'&&request.headers.get('origin')!==url.origin)return reply('Forbidden',403);
