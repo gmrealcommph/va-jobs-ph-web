@@ -1,4 +1,6 @@
 import { adminEndpoint } from './admin.js';
+import { jobHealthEndpoint } from './job-health.js';
+import { scheduledJobHealth, JOB_HEALTH_CRON } from './job-health-scheduled.js';
 import {trafficEndpoint,linkTrafficRegistration} from './traffic.js';
 import {scheduledQuickReads, QUICK_READ_CRON} from './quick-read-scheduled.js';
 import { proCheckoutEndpoint, testUserAllowed, checkoutUserAllowed } from './pro-checkout.js';
@@ -50,6 +52,7 @@ function hasCookie(request, name, expected = '1') {
 function xml(body) { return new Response(`<?xml version="1.0" encoding="UTF-8"?>${body}`, { headers: { 'content-type': 'application/xml; charset=utf-8', 'cache-control': 'public, max-age=300' } }); }
 export async function handle(request, env) {
   const url = new URL(request.url);
+  if(/^\/jobs\/[1-9]\d{0,18}\/report$/.test(url.pathname)||['/admin/job-health','/admin/api/job-health'].includes(url.pathname))return jobHealthEndpoint(request,env);
   if(url.pathname === '/privacy') refreshDeletionDisclosure(env);
   if(['/account/delete','/account/deleted','/account/deletion.css','/account/deletion.js'].includes(url.pathname)) return accountDeletionEndpoint(request,env);
   if(url.pathname==='/traffic/event')return trafficEndpoint(request,env);
@@ -897,7 +900,7 @@ if (
           id
         );
 
-      let detailState = { user: authState.user, saved: false, application: null, saveIntent: url.searchParams.get('save') === '1' };
+      let detailState = { user: authState.user, saved: false, application: null, saveIntent: url.searchParams.get('save') === '1', reportsEnabled: env.JOB_REPORTS_ENABLED === 'true', reported: url.searchParams.get('reported') === '1' };
       if (job && authState.user && authState.accessToken) {
         try {
           const [savedRows, applications] = await Promise.all([
@@ -1113,6 +1116,7 @@ if (
   }
 }
 export default { fetch: handle, scheduled(controller,env,ctx) {
+  if(controller.cron===JOB_HEALTH_CRON)return scheduledJobHealth(controller,env);
   // Independent observer cannot delay or replace operational schedules.
   if(env.ADMIN_HEALTH_MONITOR_ENABLED==='true'&&controller.cron==='*/15 * * * *')ctx.waitUntil(scheduledAdminHealth(controller,env));
   if(controller.cron===QUICK_READ_CRON) return scheduledQuickReads(controller,env);
