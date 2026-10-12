@@ -1,3 +1,4 @@
+import {attachQuickReadAvailability} from './quick-read-availability.js';
 export const COLUMNS = 'id,title,company,description,category,location,remote,workplace_type,source,job_url,posted_at,collected_at,company_logo_url';
 export const PAGE_SIZE = 15;
 
@@ -28,7 +29,7 @@ export async function query(env, params, { offset = 0, limit = PAGE_SIZE, count 
   if (count && (!total || total === '*' || !/^\d+$/.test(total))) throw new Error('Missing job count.');
   return { rows, total: count ? Number(total) : null };
 }
-export function listJobs(
+export async function listJobs(
   env,
   {
     page = 1,
@@ -60,7 +61,7 @@ export function listJobs(
       `(title.ilike.${term},company.ilike.${term},description.ilike.${term})`;
   }
 
-  return query(
+  const result = await query(
     env,
     params,
     {
@@ -69,6 +70,8 @@ export function listJobs(
       count: true
     }
   );
+  await attachQuickReadAvailability(env, result.rows);
+  return result;
 }
 export async function getJob(env, id) {
   const numericId = String(id).trim();
@@ -135,5 +138,6 @@ export async function getJobsByIds(env, ids) {
   const clean = [...new Set((ids || []).map(v => String(v)).filter(v => /^\d+$/.test(v)))];
   if (!clean.length) return [];
   const { rows } = await query(env, { select: COLUMNS, id: `in.(${clean.join(',')})` }, { limit: Math.min(clean.length, 500) });
+  await attachQuickReadAvailability(env, rows);
   return rows;
 }

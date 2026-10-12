@@ -1,3 +1,4 @@
+import {quickReadMarker} from './quick-read-availability.js';
 import { categoryDescriptor, categoryNote } from './category-context.js';
 import { recovery } from './recovery.js';
 import { sectionHeadingMarks } from './job-section-heading.js';
@@ -273,7 +274,7 @@ export function card(job, { user = null, saved = false } = {}) {
 
       <h2 class="opportunity-title">
         <a href="${jobPath(job)}">
-          ${esc(job.title || 'Job opportunity')}
+          ${esc(job.title || 'Job opportunity')}${quickReadMarker(job)}
         </a>
       </h2>
 
@@ -355,7 +356,7 @@ export function discoveryCard(job, { user = null, saved = false, categoryListing
   const posted = job.posted_at && Number.isFinite(Date.parse(job.posted_at)) ? date(job.posted_at) : '';
   const heart = `<span class="discovery-heart" aria-hidden="true">${saved ? '♥' : '♡'}</span>`;
   const save = user ? `<form data-home-save method="post" action="${saved ? '/unsave-job' : '/save-job'}"><input type="hidden" name="job_id" value="${esc(job.id)}"><input type="hidden" name="return_to" value="${categoryListing ? jobPath(job) : '/#opportunities'}"><button class="job-save-button${saved ? ' is-saved' : ''}" type="submit" aria-pressed="${saved}" aria-label="${saved ? 'Unsave' : 'Save'} ${esc(job.title || 'job opportunity')}">${heart} ${saved ? 'Saved' : 'Save'}</button><span class="ep-sr-only" role="status" aria-live="polite" data-save-status></span></form>` : `<a class="job-save-button" href="/signup?return=${encodeURIComponent(jobPath(job) + '?save=1')}">${heart} Save</a>`;
-  return `<article class="job-card opportunity-card discovery-card"><div class="opportunity-card-top"><span class="opportunity-company">${esc(job.company || 'Company not specified')}</span>${posted ? `<span class="opportunity-date">Posted ${esc(posted)}</span>` : ''}</div><h2 class="opportunity-title"><a href="${jobPath(job)}">${esc(job.title || 'Job opportunity')}</a></h2>${metadata.length ? `<div class="opportunity-meta">${metadata.map(value=>`<span>${esc(value)}</span>`).join('')}</div>` : ''}${salary ? `<p class="discovery-salary">${esc(salary)}</p>` : ''}<div class="opportunity-card-bottom">${job.category ? `<a class="opportunity-category" href="${categoryPath(job.category)}">${esc(job.category)}</a>` : ''}<div class="discovery-actions">${save}${categoryListing ? `<a class="opportunity-arrow" href="${jobPath(job)}" aria-label="View ${esc(job.title || 'job opportunity')}"><span aria-hidden="true">↗</span></a>` : `<a class="discovery-view-job" href="${jobPath(job)}">View job <span aria-hidden="true">→</span></a>`}</div></div></article>`;
+  return `<article class="job-card opportunity-card discovery-card"><div class="opportunity-card-top"><span class="opportunity-company">${esc(job.company || 'Company not specified')}</span>${posted ? `<span class="opportunity-date">Posted ${esc(posted)}</span>` : ''}</div><h2 class="opportunity-title"><a href="${jobPath(job)}">${esc(job.title || 'Job opportunity')}${quickReadMarker(job)}</a></h2>${metadata.length ? `<div class="opportunity-meta">${metadata.map(value=>`<span>${esc(value)}</span>`).join('')}</div>` : ''}${salary ? `<p class="discovery-salary">${esc(salary)}</p>` : ''}<div class="opportunity-card-bottom">${job.category ? `<a class="opportunity-category" href="${categoryPath(job.category)}">${esc(job.category)}</a>` : ''}<div class="discovery-actions">${save}${categoryListing ? `<a class="opportunity-arrow" href="${jobPath(job)}" aria-label="View ${esc(job.title || 'job opportunity')}"><span aria-hidden="true">↗</span></a>` : `<a class="discovery-view-job" href="${jobPath(job)}">View job <span aria-hidden="true">→</span></a>`}</div></div></article>`;
 }
 
 export function searchForm(search = '', category = '', action = '/', sort = 'newest') {
@@ -1291,7 +1292,7 @@ export function matchesPage({ matches = [], preferences = null, summary = null, 
       <article class="match-card" data-match-card data-original-order="${index}" data-score="${esc(job.match_score)}" data-salary="${esc(salaryValue)}" data-salary-period="${esc(job.salary_period || '')}" data-schedule="${esc(job.schedule_region || '')}" data-work-type="${esc(job.employment_type || '')}">
         <div class="match-card-main">
           <div class="match-card-top"><span class="match-score"><strong>${esc(job.match_score)}%</strong> MATCH${infoButton('score')}</span><span class="match-company">${esc(job.company || 'Company not specified')}</span><span class="match-confidence">${esc(confidence)}${infoButton('confidence')}</span></div>
-          <h2><a title="${esc(job.title || 'Job opportunity')}" href="${jobPath({ id: job.job_id })}">${esc(job.title || 'Job opportunity')}</a><span class="match-full-title" aria-hidden="true">${esc(job.title || 'Job opportunity')}</span></h2>
+          <h2><a title="${esc(job.title || 'Job opportunity')}" href="${jobPath({ id: job.job_id })}">${esc(job.title || 'Job opportunity')}${quickReadMarker(job)}</a><span class="match-full-title" aria-hidden="true">${esc(job.title || 'Job opportunity')}</span></h2>
           <div class="match-meta">${job.location ? `<span>${esc(job.location)}</span>` : ''}${job.employment_type ? `<span>${esc(job.employment_type.replaceAll('_', ' '))}</span>` : ''}${job.engagement_type ? `<span>${esc(job.engagement_type)}</span>` : ''}</div>
           <div class="match-card-footer">
             ${reasons ? `<div class="match-reasons">${reasons}</div>` : ''}
@@ -1473,7 +1474,7 @@ export function myJobsPage({ saved = [], applications = [], message = '', error 
     if (Number.isNaN(d.getTime())) return '';
     return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
   };
-  const jobMini = job => `<article class="my-job-card"><div><div class="my-job-company">${esc(job.company || 'Company')}</div><h3><a class="workspace-title-swipe" href="${jobPath(job)}">${esc(job.title || 'Job opportunity')}</a></h3><div class="shortlist-meta">${job.category ? `<span class="shortlist-category">${esc(job.category)}</span>` : ''}${job.location ? `<span class="shortlist-location">${esc(job.location)}</span>` : ''}</div></div><a class="my-job-view" href="${jobPath(job)}">View job →</a></article>`;
+  const jobMini = job => `<article class="my-job-card"><div><div class="my-job-company">${esc(job.company || 'Company')}</div><h3><a class="workspace-title-swipe" href="${jobPath(job)}">${esc(job.title || 'Job opportunity')}${quickReadMarker(job)}</a></h3><div class="shortlist-meta">${job.category ? `<span class="shortlist-category">${esc(job.category)}</span>` : ''}${job.location ? `<span class="shortlist-location">${esc(job.location)}</span>` : ''}</div></div><a class="my-job-view" href="${jobPath(job)}">View job →</a></article>`;
   const applicationCard = item => {
     const appliedDate = formatAppliedDate(item.applied_at);
     return `<article class="tracker-card" data-status="${esc(item.status)}">

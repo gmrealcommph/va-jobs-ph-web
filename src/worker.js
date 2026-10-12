@@ -683,6 +683,12 @@ if (
         console.error('Matches load failed:', error);
         matchError = 'We could not load your matches right now. Please try again.';
       }
+      // Availability is optional; an enrichment outage must not hide matches.
+      try {
+        const publicJobs = await getJobsByIds(env, matches.map(job => job.job_id));
+        const available = new Set(publicJobs.filter(job => job.quick_read_ready).map(job => String(job.id)));
+        for (const job of matches) job.quick_read_ready = available.has(String(job.job_id));
+      } catch { /* Render the match feed without availability markers. */ }
       return render('My matches', matchesPage({ matches, preferences, summary: matchSummary, error: matchError, savedJobIds: savedRows.map(r => String(r.job_id)) }), { noindex: true });
     }
 
