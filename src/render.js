@@ -1011,7 +1011,7 @@ function renderApplicationProgress({ user, saved, application }) {
   </section>`;
 }
 
-export function detail(job, { user = null, saved = false, application = null, saveIntent = false } = {}) {
+export function detail(job, { user = null, saved = false, application = null, saveIntent = false, reportsEnabled = false, reported = false } = {}) {
   const apply = safeUrl(job.job_url);
 
   const company =
@@ -1102,6 +1102,7 @@ export function detail(job, { user = null, saved = false, application = null, sa
             <div class="job-application-identity"><strong>${esc(title)}</strong><span>${esc(company)}</span></div>
 
             <div class="job-detail-user-actions">
+              ${reportsEnabled ? `<a href="/jobs/${esc(job.id)}/report">Report this job</a>${reported ? '<p role="status">Thank you. Your report has been sent for review.</p>' : ''}` : ''}
               ${saveIntent && user && !saved ? '<p class="save-intent-note">You’re signed in. Save this job so you can come back to it anytime.</p>' : ''}
               ${user ? `<form method="post" action="${saved ? '/unsave-job' : '/save-job'}"><input type="hidden" name="job_id" value="${esc(job.id)}"><input type="hidden" name="return_to" value="${jobPath(job)}"><button class="job-detail-save${saved ? ' is-saved' : ''}" type="submit">${saved ? '♥ Unsave job' : '♡ Save for later'}</button></form>` : `<a class="job-detail-save" href="/signup?return=${encodeURIComponent(jobPath(job) + '?save=1')}">♡ Save for later</a>`}
               ${user && !application ? `<form method="post" action="/mark-applied"><input type="hidden" name="job_id" value="${esc(job.id)}"><input type="hidden" name="return_to" value="${jobPath(job)}"><button class="job-detail-track" type="submit">✓ Mark as applied</button></form>` : ''}
