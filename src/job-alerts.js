@@ -16,6 +16,16 @@ export function alertMessage(config,person,day,address) {
  message.html=message.html.replace('<p>Hello,</p>','<p style="font-size:16px;margin:26px 0 12px">Hi there,</p><h1 style="font-family:Georgia,serif;font-size:28px;line-height:1.3;margin:0 0 16px;color:#163f2c">'+opening+'</h1>');
  message.html=message.html.replace(explanation,'We’ve gathered '+person.items.length+' recently imported roles that match your settings. Have a look and see what feels right for your next move.<br><span style="font-size:13px;color:#647469">Check the original employer listing for current availability and application details.</span>');
  message.html=message.html.replaceAll('background:#f1f6f0;border:1px solid #d6e2d4','background:#ffffff;border:1px solid #d6e2d4').replaceAll('font-size:22px;margin:16px 0 8px','font-size:21px;line-height:1.3;margin:16px 0 8px');
+ // Initial tiles identify the actual employer without implying an official logo.
+ const tileColors=[['#e8efd9','#355234'],['#f9e8d5','#7d4c2c'],['#e1eaf1','#33566b']];
+ let graphicIndex=0;
+ message.html=message.html.replace(/<tr><td><span style="background:#d6ebcc/g,()=>{
+  const item=person.items[graphicIndex],colors=tileColors[graphicIndex++%tileColors.length];
+  const words=String(item?.company||'').trim().split(/\s+/).filter(Boolean);
+  const initials=words.length>1?words.slice(0,2).map(w=>Array.from(w)[0]).join(''):Array.from(words[0]||'').slice(0,2).join('');
+  const graphic='<table role="presentation" cellpadding="0" cellspacing="0" style="margin:0 0 18px"><tr><td width="52" height="52" align="center" valign="middle" aria-hidden="true" style="width:52px;height:52px;background:'+colors[0]+';color:'+colors[1]+';border-radius:12px;font-family:Arial,sans-serif;font-size:20px;font-weight:bold;letter-spacing:1px">'+escape(initials.toUpperCase()||'•')+'</td><td style="padding-left:12px;font-size:13px;line-height:1.6;color:#506354">'+escape(item?.company||'Job opportunity')+'</td></tr></table>';
+  return '<tr><td>'+graphic+'<span style="background:#d6ebcc';
+ });
  // Replace the empty legacy match-score pill with each job's real category.
  let cardIndex=0;
  message.html=message.html.replace(/<span style="background:#d6ebcc;color:#20452d;border-radius:20px;padding:6px 12px;font-size:13px;font-weight:bold">[^<]*<\/span>/g,()=>{
