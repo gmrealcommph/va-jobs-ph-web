@@ -10,11 +10,12 @@ export function alertMessage(config,person,day,address) {
  const explanation=`You opted in to personalized ${frequency} job digests. These jobs were recently imported and matched your settings; check the employer source before applying.`;
  message.text=message.text.replace('Your best new matches from the previous 24 hours.',explanation).replace(/You received this because[^\n]+/,'').replaceAll('/email-preferences','/job-alerts')+`\n\nUnsubscribe: ${unsubscribe}\nVeeAys · ${address}`;
  const escape=v=>String(v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
- message.html=message.html.replace('<html>','<html lang="en">').replace('<head>','<head><title>VeeAys job digest</title>').replace('DAILY JOB DIGEST',frequency.toUpperCase()+' JOB DIGEST').replace('Here are your best new matches from the previous 24 hours.',explanation).replace('You received this because Daily Job Digest is enabled for your VeeAys Pro account.','').replaceAll('/email-preferences','/job-alerts').replace('</body>',`<p style="text-align:center;font:14px Arial;line-height:1.7"><a href="${escape(unsubscribe)}">Unsubscribe from job alerts</a><br>VeeAys · ${escape(address)}</p></body>`);
- // Essential copy stays readable even when the decorative illustration is blocked.
- const hero='<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:18px 0 24px;background:#fff3d6;border-radius:16px;overflow:hidden"><tr><td><img src="'+escape(config.site)+'/email/job-alerts-morning-v1.jpg" alt="" width="484" style="display:block;width:100%;max-width:484px;height:auto;border:0;border-radius:16px 16px 0 0"></td></tr><tr><td style="padding:24px"><p style="margin:0 0 10px;font-size:11px;font-weight:bold;letter-spacing:2px;color:#7a5123">A LITTLE MOMENTUM FOR YOUR NEXT MOVE</p><h1 style="margin:0;font-family:Georgia,serif;font-size:34px;line-height:1.15;color:#163f2c">Your next chapter<br>could start here.</h1><p style="margin:14px 0 0;font-size:15px;line-height:1.7;color:#385342">'+person.items.length+' opportunities to explore in your '+frequency+' digest. Take a look, find your fit, and make your next move.</p></td></tr></table>';
- message.html=message.html.replace('<p>Hello,</p>',hero+'<p style="font-size:17px;font-weight:bold;margin:28px 0 10px">Let’s find your next opportunity.</p>');
- message.html=message.html.replaceAll('background:#f1f6f0;border:1px solid #d6e2d4','background:#ffffff;border:1px solid #d6e2d4;border-left:5px solid #d9a441').replaceAll('font-size:22px;margin:16px 0 8px','font-family:Georgia,serif;font-size:24px;line-height:1.25;margin:16px 0 8px');
+ message.html=message.html.replace('<html>','<html lang="en">').replace('<head>','<head><title>VeeAys job digest</title>').replace('DAILY JOB DIGEST',frequency.toUpperCase()+' JOB DIGEST').replace('Here are your best new matches from the previous 24 hours.',explanation).replace('You received this because Daily Job Digest is enabled for your VeeAys Pro account.','You receive this because you opted in to VeeAys job alerts.').replaceAll('/email-preferences','/job-alerts').replace('</body>',`<p style="text-align:center;font:14px Arial;line-height:1.7"><a href="${escape(unsubscribe)}">Unsubscribe from job alerts</a><br>VeeAys · ${escape(address)}</p></body>`);
+ const opening=frequency==='daily'?'Here are today’s opportunities based on your preferences.':'Here are this week’s opportunities based on your preferences.';
+ message.text=message.text.replace(explanation,opening+'\n\n'+explanation);
+ message.html=message.html.replace('<p>Hello,</p>','<p style="font-size:16px;margin:26px 0 12px">Hi there,</p><h1 style="font-family:Georgia,serif;font-size:28px;line-height:1.3;margin:0 0 16px;color:#163f2c">'+opening+'</h1>');
+ message.html=message.html.replace(explanation,'We’ve gathered '+person.items.length+' recently imported roles that match your settings. Have a look and see what feels right for your next move.<br><span style="font-size:13px;color:#647469">Check the original employer listing for current availability and application details.</span>');
+ message.html=message.html.replaceAll('background:#f1f6f0;border:1px solid #d6e2d4','background:#ffffff;border:1px solid #d6e2d4').replaceAll('font-size:22px;margin:16px 0 8px','font-size:21px;line-height:1.3;margin:16px 0 8px');
  // Replace the empty legacy match-score pill with each job's real category.
  let cardIndex=0;
  message.html=message.html.replace(/<span style="background:#d6ebcc;color:#20452d;border-radius:20px;padding:6px 12px;font-size:13px;font-weight:bold">[^<]*<\/span>/g,()=>{
@@ -26,9 +27,14 @@ export function alertMessage(config,person,day,address) {
   'Show your work: include one relevant portfolio sample or a brief result you achieved; remove confidential client details.',
   'Follow the instructions: check the original listing for requirements, deadlines and requested documents before submitting.'
  ];
- const tipsText='Before you apply\n'+tips.map(t=>'• '+t).join('\n');
- message.text=message.text.replace('My Matches:',tipsText+'\n\nMy Matches:');
- const tipsHtml='<section aria-labelledby="apply-tips-title" style="margin:28px 0;padding:22px;background:#fff3d6;border-top:4px solid #d9a441;border-radius:12px"><h2 id="apply-tips-title" style="font-size:20px;margin:0 0 12px">Before you apply</h2><ul style="margin:0;padding-left:20px;font-size:14px;line-height:1.7">'+tips.map(t=>'<li style="margin:8px 0">'+escape(t)+'</li>').join('')+'</ul></section>';
+ // A stable weekly rotation keeps retries and daily digests consistent for the same week.
+ const stamp=Date.parse(day+'T00:00:00Z');
+ const week=Number.isFinite(stamp)?Math.floor((stamp+3*86400000)/(7*86400000)):0;
+ const tip=tips[((week%tips.length)+tips.length)%tips.length];
+ const tipHeading='Application tip of the week';
+ const signoff='Rooting for your next move,\nThe VeeAys team';
+ message.text=message.text.replace('My Matches:',tipHeading+'\n'+tip+'\n\n'+signoff+'\n\nMy Matches:');
+ const tipsHtml='<section aria-labelledby="apply-tips-title" style="margin:28px 0;padding:20px;background:#f5f7f1;border-left:3px solid #80996c"><p style="margin:0 0 8px;font-size:11px;letter-spacing:1.5px;font-weight:bold;color:#46613e">A SMALL STEP FOR YOUR NEXT APPLICATION</p><h2 id="apply-tips-title" style="font-size:18px;margin:0 0 10px">'+tipHeading+'</h2><p style="margin:0;font-size:14px;line-height:1.7">'+escape(tip)+'</p></section><p style="font-size:15px;line-height:1.7;margin:24px 0">Rooting for your next move,<br><strong>The VeeAys team</strong></p>';
  message.html=message.html.replace('<p><a href="'+escape(config.site)+'/matches"',tipsHtml+'<p><a href="'+escape(config.site)+'/matches"');
  message.headers={'List-Unsubscribe':`<${unsubscribe}>`,'List-Unsubscribe-Post':'List-Unsubscribe=One-Click'};
  return message;
