@@ -59,8 +59,8 @@ test('counts and structural scan are bounded; known reason and missing HTTP rema
   assert.equal(d.output_count,1000);assert.equal(d.text_count,256);assert.equal(d.scan_truncated,true);
   assert.equal(d.reason,'content_filter');assert.equal(d.http_status,null);
 });
-test('HTTP failure behavior remains unchanged and does not capture response body',async()=>{
-  await assert.rejects(generateWithProvider(env,source,async()=>({ok:false,status:429,json:()=>assert.fail('Do not read error body')})),/provider_http_429/);
+test('ordinary rate limit retains a safe classification without retaining provider messages',async()=>{
+  await assert.rejects(generateWithProvider(env,source,async()=>({ok:false,status:429,json:async()=>({error:{code:'rate_limit_exceeded',message:'PRIVATE_PROVIDER_MESSAGE'}})})),error=>error.message==='provider_http_429'&&!String(error).includes('PRIVATE_PROVIDER_MESSAGE'));
 });
 test('service forwards only structural incomplete metadata; null payload and error stay unchanged',async()=>{
   let finished;
