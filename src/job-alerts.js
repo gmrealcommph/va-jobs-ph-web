@@ -13,25 +13,23 @@ export function alertMessage(config,person,day,address) {
  message.html=message.html.replace('<html>','<html lang="en">').replace('<head>','<head><title>VeeAys job digest</title>').replace('DAILY JOB DIGEST',frequency.toUpperCase()+' JOB DIGEST').replace('Here are your best new matches from the previous 24 hours.',explanation).replace('You received this because Daily Job Digest is enabled for your VeeAys Pro account.','You receive this because you opted in to VeeAys job alerts.').replaceAll('/email-preferences','/job-alerts').replace('</body>',`<p style="text-align:center;font:14px Arial;line-height:1.7"><a href="${escape(unsubscribe)}">Unsubscribe from job alerts</a><br>VeeAys · ${escape(address)}</p></body>`);
  const opening=frequency==='daily'?'Here are today’s opportunities based on your preferences.':'Here are this week’s opportunities based on your preferences.';
  message.text=message.text.replace(explanation,opening+'\n\n'+explanation);
- message.html=message.html.replace('<p>Hello,</p>','<p style="font-size:16px;margin:26px 0 12px">Hi there,</p><h1 style="font-family:Georgia,serif;font-size:28px;line-height:1.3;margin:0 0 16px;color:#163f2c">'+opening+'</h1>');
+ message.html=message.html.replace('<p>Hello,</p>','<p style="font-size:16px;margin:26px 0 12px">Hi there,</p><h1 style="font-family:Arial,sans-serif;font-size:27px;line-height:1.25;letter-spacing:-0.5px;margin:0 0 16px;color:#163f2c">'+opening+'</h1>');
  message.html=message.html.replace(explanation,'We’ve gathered '+person.items.length+' recently imported roles that match your settings. Have a look and see what feels right for your next move.<br><span style="font-size:13px;color:#647469">Check the original employer listing for current availability and application details.</span>');
  message.html=message.html.replaceAll('background:#f1f6f0;border:1px solid #d6e2d4','background:#ffffff;border:1px solid #d6e2d4').replaceAll('font-size:22px;margin:16px 0 8px','font-size:21px;line-height:1.3;margin:16px 0 8px');
- // Initial tiles identify the actual employer without implying an official logo.
- const tileColors=[['#e8efd9','#355234'],['#f9e8d5','#7d4c2c'],['#e1eaf1','#33566b']];
- let graphicIndex=0;
- message.html=message.html.replace(/<tr><td><span style="background:#d6ebcc/g,()=>{
-  const item=person.items[graphicIndex],colors=tileColors[graphicIndex++%tileColors.length];
-  const words=String(item?.company||'').trim().split(/\s+/).filter(Boolean);
-  const initials=words.length>1?words.slice(0,2).map(w=>Array.from(w)[0]).join(''):Array.from(words[0]||'').slice(0,2).join('');
-  const graphic='<table role="presentation" cellpadding="0" cellspacing="0" style="margin:0 0 18px"><tr><td width="52" height="52" align="center" valign="middle" aria-hidden="true" style="width:52px;height:52px;background:'+colors[0]+';color:'+colors[1]+';border-radius:12px;font-family:Arial,sans-serif;font-size:20px;font-weight:bold;letter-spacing:1px">'+escape(initials.toUpperCase()||'•')+'</td><td style="padding-left:12px;font-size:13px;line-height:1.6;color:#506354">'+escape(item?.company||'Job opportunity')+'</td></tr></table>';
-  return '<tr><td>'+graphic+'<span style="background:#d6ebcc';
- });
- // Replace the empty legacy match-score pill with each job's real category.
- let cardIndex=0;
- message.html=message.html.replace(/<span style="background:#d6ebcc;color:#20452d;border-radius:20px;padding:6px 12px;font-size:13px;font-weight:bold">[^<]*<\/span>/g,()=>{
-  const item=person.items[cardIndex++];
-  return item?.category?'<span style="background:#d6ebcc;color:#20452d;border-radius:20px;padding:6px 12px;font-size:13px;font-weight:bold">'+escape(item.category)+'</span>':'';
- });
+ // Category illustrations are decorative; all job facts remain live text.
+ const jobCards=person.items.map((item,index)=>{
+  const category=String(item.category||'');
+  const icon=/Sales|Marketing|Account Management/.test(category)?'sales':/Finance|Bookkeeping/.test(category)?'finance':/Admin|Operations|Project|Assistant/.test(category)?'operations':'general';
+  const types={full_time:'Full-time',part_time:'Part-time',contract:'Contract',freelance:'Freelance',internship:'Internship'};
+  const amount=v=>Number.isFinite(v)&&v>=0?v.toLocaleString('en-US'):'';
+  const min=amount(item.salary_min_usd),max=amount(item.salary_max_usd);
+  const period={monthly:'month',yearly:'year',annually:'year',hourly:'hour',weekly:'week'}[item.salary_period];
+  const salary=period&&(min||max)?(min?'$'+min:'Up to $'+max)+(min&&max&&min!==max?'–$'+max:'')+'/'+period:'';
+  const meta=[item.location,types[item.employment_type]||item.employment_type?.replaceAll('_',' '),salary,item.schedule_region].filter(Boolean).map(escape).join(' &nbsp;·&nbsp; ');
+  const link=escape(config.site+'/jobs/'+encodeURIComponent(item.job_id));
+  return '<tr><td style="padding:0 0 20px"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border:1px solid #dae3d5;border-radius:12px;background:#ffffff"><tr><td style="padding:20px 20px 0"><table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr><td style="font-size:11px;font-weight:bold;letter-spacing:1.5px;line-height:1.6;color:#456344">'+escape(category||'JOB OPPORTUNITY')+'</td><td width="80" rowspan="2" align="right"><img src="'+escape(config.site)+'/email/card-icons/'+icon+'.png" width="80" height="64" alt="" style="display:block;width:80px;height:64px;border:0;border-radius:8px"></td></tr><tr><td style="font-size:13px;line-height:1.6;color:#62705f;padding:5px 12px 0 0">'+escape(item.company||'')+'</td></tr></table><h2 style="font-family:Arial,sans-serif;font-size:22px;line-height:1.3;letter-spacing:-0.3px;color:#163f2c;margin:18px 0 12px">'+escape(String(item.title||'Job opportunity').replace(/[\r\n]/g,' ').slice(0,200))+'</h2><p style="font-size:13px;line-height:1.8;color:#566550;margin:0 0 20px">'+meta+'</p></td></tr><tr><td style="padding:16px 20px;background:#f5f7f2;border-top:1px solid #e5ebdf;border-radius:0 0 12px 12px"><a href="'+link+'" style="font-size:14px;line-height:1.5;font-weight:bold;color:#163f2c;text-decoration:none">Explore this role &nbsp; &#8594;</a></td></tr></table></td></tr>';
+ }).join('');
+ message.html=message.html.replace(/<table role="presentation" width="100%" cellpadding="0"><tr><td style="padding:18px 0">[\s\S]*?<\/table><p><a href="/, '<table role="presentation" width="100%" cellpadding="0" cellspacing="0">'+jobCards+'</table><p><a href="');
  const tips=[
   'Tailor your application: highlight the experience and tools that match the role, using truthful examples.',
   'Show your work: include one relevant portfolio sample or a brief result you achieved; remove confidential client details.',
