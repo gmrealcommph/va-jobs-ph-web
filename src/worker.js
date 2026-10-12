@@ -71,7 +71,7 @@ export async function handle(request, env) {
     return manualNotification(request, env, manualMatch[1]);
   }
   if (url.pathname === '/job-alerts' || url.pathname === '/job-alerts/unsubscribe') return jobAlertsEndpoint(request,env);
-  if (url.pathname === '/email-preferences') { if(env.JOB_ALERTS_MODE!==undefined)return Response.redirect(url.origin+'/job-alerts',303); return emailPreferences(request, env); }
+  if (url.pathname === '/email-preferences') { if(env.JOB_ALERTS_MODE==='enabled')return Response.redirect(url.origin+'/job-alerts',303); return emailPreferences(request, env); }
 
   const siteOrigin = origin(env, url);
 
@@ -1132,6 +1132,6 @@ export default { fetch: handle, scheduled(controller,env,ctx) {
   if(env.ADMIN_HEALTH_MONITOR_ENABLED==='true'&&controller.cron==='*/15 * * * *')ctx.waitUntil(scheduledAdminHealth(controller,env));
   if(controller.cron===QUICK_READ_CRON) return scheduledQuickReads(controller,env);
   // Separate cron invocations preserve Strong Match behavior and its subrequest budget.
-  if(env.JOB_ALERTS_MODE!==undefined) return controller.cron===DIGEST_CRON ? scheduledJobAlerts(controller,env) : undefined;
+  if(env.JOB_ALERTS_MODE==='enabled') return controller.cron===DIGEST_CRON ? scheduledJobAlerts(controller,env) : undefined;
   return controller.cron===DIGEST_CRON ? scheduledDailyDigest(controller,env) : scheduledStrongMatches(controller,env);
 } };
