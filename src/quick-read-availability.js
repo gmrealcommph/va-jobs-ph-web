@@ -4,7 +4,11 @@ import {sourceFingerprint, validateStored} from './quick-read-generation.js';
 export async function attachQuickReadAvailability(env, jobs) {
   for (const job of jobs) job.quick_read_ready = false;
   const key = env.SUPABASE_SERVICE_ROLE_KEY;
-  if (!key || !/^(sb_secret_|eyJ)/.test(key)) return jobs;
+  if (!key || !/^(sb_secret_|eyJ)/.test(key)) {
+    console.info(JSON.stringify({event:'quick_read_availability',status:'server_key_unavailable'}));
+    return jobs;
+  }
+  let stage='configuration';
   try {
     const base = new URL(env.SUPABASE_URL);
     if (base.protocol !== 'https:' || base.username || base.password) return jobs;
@@ -15,11 +19,16 @@ export async function attachQuickReadAvailability(env, jobs) {
       url.searchParams.set('select', 'job_id,source_hash,payload');
       url.searchParams.set('status', 'eq.ready');
       url.searchParams.set('job_id', `in.(${batch.map(job => String(job.id)).join(',')})`);
+      stage='cache_request';
       const response = await fetch(url, {
         headers: {apikey: key, ...(key.startsWith('sb_secret_') ? {} : {Authorization: 'Bearer ' + key})},
-        redirect: 'error', signal: AbortSignal.timeout(3000)
+        redirect: 'manual', signal: AbortSignal.timeout(3000)
       });
-      if (!response.ok) continue;
+      if (!response.ok) {
+        console.info(JSON.stringify({event:'quick_read_availability',status:'cache_unavailable',http_status:response.status}));
+        continue;
+      }
+      stage='cache_validation';
       const rows = await response.json();
       if (!Array.isArray(rows)) continue;
       const cached = new Map(rows.map(row => [String(row.job_id), row]));
@@ -30,7 +39,10 @@ export async function attachQuickReadAvailability(env, jobs) {
         } catch { /* Invalid or outdated output never earns a marker. */ }
       }));
     }
-  } catch { /* Optional lookup must never prevent browsing or saving jobs. */ }
+  } catch {
+    console.info(JSON.stringify({event:'quick_read_availability',status:'unavailable',stage}));
+  }
+  console.info(JSON.stringify({event:'quick_read_availability',status:'checked',jobs:jobs.length,ready:jobs.filter(job=>job.quick_read_ready).length}));
   return jobs;
 }
 

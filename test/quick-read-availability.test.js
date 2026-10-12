@@ -20,7 +20,7 @@ test('one bounded server lookup marks only current valid ready payloads, never c
     assert.equal(url.searchParams.get('status'),'eq.ready');
     assert.equal(url.searchParams.get('job_id'),'in.(1,2,3,4)');
     assert.equal(init.headers.apikey,env.SUPABASE_SERVICE_ROLE_KEY);
-    assert.equal(init.redirect,'error');
+    assert.equal(init.redirect,'manual');
     return Response.json([
       {job_id:'1',source_hash:hash,payload,internal_notes:'private'},
       {job_id:'2',source_hash:await sourceFingerprint(description+'changed'),payload},
