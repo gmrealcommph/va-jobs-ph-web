@@ -11,6 +11,9 @@ const person={email:'member@example.com',frequency:'weekly',token:uid,items:[ite
 const config={site:'https://veeays.test',url:new URL('https://test.supabase.co'),key:'sb_secret_test',modernKey:true};
 test('settings require sign in, same origin, valid form and preserve explicit consent',async()=>{
  const url='https://veeays.test/job-alerts';
+ const page=await jobAlertsEndpoint(new Request(url),{JOB_ALERTS_MODE:'disabled'},{session,call:async()=>({})});
+ assert.equal(page.headers.get('referrer-policy'),'same-origin');
+ assert.ok((await page.text()).includes('Personalized digest delivery is not active yet')); 
  assert.equal((await jobAlertsEndpoint(new Request(url),{}, {session:async()=>({})})).status,303);
  assert.equal((await jobAlertsEndpoint(new Request(url,{method:'POST',headers:{origin:'https://evil.test'}}),{}, {session})).status,403);
  let captured;
@@ -21,7 +24,7 @@ test('settings require sign in, same origin, valid form and preserve explicit co
 test('unsubscribe GET never mutates; POST works without login and handles an in-flight barrier',async()=>{
  let calls=0;globalThis.fetch=async()=>{calls++;return Response.json(false);};
  const url='https://veeays.test/job-alerts/unsubscribe?token='+uid,env={SUPABASE_URL:'https://test.supabase.co',SUPABASE_PUBLISHABLE_KEY:'sb_publishable_test'};
- assert.equal((await jobAlertsEndpoint(new Request(url),env)).status,200);assert.equal(calls,0);
+ const page=await jobAlertsEndpoint(new Request(url),env);assert.equal(page.status,200);assert.equal(page.headers.get('referrer-policy'),'no-referrer');assert.equal(calls,0);
  assert.equal((await jobAlertsEndpoint(new Request(url,{method:'POST'}),env)).status,409);
  globalThis.fetch=async()=>Response.json(true);
  assert.equal((await jobAlertsEndpoint(new Request(url,{method:'POST'}),env)).status,200);
