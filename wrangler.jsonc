@@ -16,6 +16,7 @@
     ]
   },
   "vars": {
+    "JOB_ALERTS_MODE": "disabled",
     "JOB_REPORTS_ENABLED": "true",
     "JOB_HEALTH_VERIFY_ENABLED": "false",
     "DAILY_DIGEST_MODE": "enabled",

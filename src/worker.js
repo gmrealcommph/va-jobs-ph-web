@@ -1,3 +1,6 @@
+import {jobAlertsWebhook} from './job-alerts-webhook.js';
+import {jobAlertsEndpoint} from './job-alerts-page.js';
+import {scheduledJobAlerts} from './job-alerts.js';
 import { adminEndpoint } from './admin.js';
 import { jobHealthEndpoint } from './job-health.js';
 import { scheduledJobHealth, JOB_HEALTH_CRON } from './job-health-scheduled.js';
@@ -31,7 +34,7 @@ function safeReturnPath(value) {
   const v = String(value || '');
   if (/^\/apply\/[A-Za-z0-9%._~-]{1,240}$/.test(v)) return v;
   if (/^\/jobs\/[A-Za-z0-9%._~-]{1,240}(?:\?save=1)?$/.test(v)) return v;
-  if (v === '/admin' || v === '/my-jobs' || v === '/matches' || v === '/jobs' || v === '/email-preferences') return v;
+  if (v === '/admin' || v === '/my-jobs' || v === '/matches' || v === '/jobs' || v === '/email-preferences' || v === '/job-alerts') return v;
   if (v === '/pro' || v === '/onboarding' || v === '/') return v;
   return '';
 }
@@ -52,6 +55,7 @@ function hasCookie(request, name, expected = '1') {
 function xml(body) { return new Response(`<?xml version="1.0" encoding="UTF-8"?>${body}`, { headers: { 'content-type': 'application/xml; charset=utf-8', 'cache-control': 'public, max-age=300' } }); }
 export async function handle(request, env) {
   const url = new URL(request.url);
+  if(url.pathname==='/webhooks/job-alerts')return jobAlertsWebhook(request,env);
   if(/^\/jobs\/[1-9]\d{0,18}\/report$/.test(url.pathname)||['/admin/job-health','/admin/api/job-health'].includes(url.pathname)||(url.pathname==='/admin'&&url.searchParams.get('view')==='job-health'))return jobHealthEndpoint(request,env);
   if(url.pathname === '/privacy') refreshDeletionDisclosure(env);
   if(['/account/delete','/account/deleted','/account/deletion.css','/account/deletion.js'].includes(url.pathname)) return accountDeletionEndpoint(request,env);
@@ -66,7 +70,8 @@ export async function handle(request, env) {
     if (env.STRONG_MATCH_MODE !== undefined) return new Response('Manual sender retired',{status:410});
     return manualNotification(request, env, manualMatch[1]);
   }
-  if (url.pathname === '/email-preferences') return emailPreferences(request, env);
+  if (url.pathname === '/job-alerts' || url.pathname === '/job-alerts/unsubscribe') return jobAlertsEndpoint(request,env);
+  if (url.pathname === '/email-preferences') { if(env.JOB_ALERTS_MODE!==undefined)return Response.redirect(url.origin+'/job-alerts',303); return emailPreferences(request, env); }
 
   const siteOrigin = origin(env, url);
 
@@ -1127,5 +1132,6 @@ export default { fetch: handle, scheduled(controller,env,ctx) {
   if(env.ADMIN_HEALTH_MONITOR_ENABLED==='true'&&controller.cron==='*/15 * * * *')ctx.waitUntil(scheduledAdminHealth(controller,env));
   if(controller.cron===QUICK_READ_CRON) return scheduledQuickReads(controller,env);
   // Separate cron invocations preserve Strong Match behavior and its subrequest budget.
+  if(env.JOB_ALERTS_MODE!==undefined) return controller.cron===DIGEST_CRON ? scheduledJobAlerts(controller,env) : undefined;
   return controller.cron===DIGEST_CRON ? scheduledDailyDigest(controller,env) : scheduledStrongMatches(controller,env);
 } };
