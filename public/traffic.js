@@ -32,10 +32,11 @@ if(allowed.test(location.pathname)||privacy){
  const decline=document.createElement('button');decline.type='button';decline.textContent='Decline / withdraw';
  const status=document.createElement('p');status.setAttribute('role','status');
  button.onclick=()=>{panel.hidden=!panel.hidden;};
- accept.onclick=()=>{if(blocked()){status.textContent='Your browser privacy preference blocks optional analytics.';return;}set('yes');status.textContent='Optional analytics allowed.';panel.hidden=true;track();};
- decline.onclick=()=>{set('no');clear();send({consent:false}).catch(()=>{});status.textContent='Optional analytics declined. Future collection stopped.';panel.hidden=true;};
+ accept.onclick=()=>{if(blocked()){status.textContent='Your browser privacy preference blocks optional analytics.';return;}set('yes');status.textContent='Optional analytics allowed.';panel.hidden=true;box.hidden=!privacy;track();};
+ decline.onclick=()=>{set('no');clear();send({consent:false}).catch(()=>{});status.textContent='Optional analytics declined. Future collection stopped.';panel.hidden=true;box.hidden=!privacy;};
  panel.append(accept,decline);box.append(button,panel,status);document.body.append(box);
  if(!get('veeays_analytics_choice')&&!blocked())panel.hidden=false;
+ box.hidden=!privacy&&(!!get('veeays_analytics_choice')||blocked());
  if(blocked()){clear();if(get('veeays_analytics_choice')==='yes')send({consent:false}).catch(()=>{});}else track();
- window.addEventListener('storage',e=>{if(e.key==='veeays_analytics_choice'&&e.newValue!=='yes')clear();});
+ window.addEventListener('storage',e=>{if(e.key!=='veeays_analytics_choice')return;if(e.newValue!=='yes')clear();box.hidden=!privacy&&(!!e.newValue||blocked());panel.hidden=privacy||!!e.newValue||blocked();});
 }
