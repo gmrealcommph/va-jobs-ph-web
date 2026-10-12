@@ -3,12 +3,20 @@
   "version": "1.0.0",
   "private": true,
   "type": "module",
-  "engines": { "node": ">=22" },
+  "engines": {
+    "node": ">=22"
+  },
   "scripts": {
     "dev": "wrangler dev",
     "build": "wrangler deploy --dry-run --outdir dist",
     "deploy": "wrangler deploy",
-    "test": "node --test"
+    "test": "node --test",
+    "verify:production": "npm run build && node scripts/verify-production-parity.mjs"
   },
-  "devDependencies": { "wrangler": "4.144.0", "@electric-sql/pglite": "0.5.8" }
+  "devDependencies": {
+    "@electric-sql/pglite": "0.5.8",
+    "acorn": "8.15.0",
+    "wrangler": "4.144.0"
+  },
+  "packageManager": "pnpm@11.25.0"
 }

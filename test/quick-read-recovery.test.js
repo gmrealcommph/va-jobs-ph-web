@@ -151,9 +151,9 @@ for(const code of ['unsupported_requirement','invalid_source_reference','prefere
   if(code==='preference_upgraded') {bad.requirements=[3];bad.other_details=[0,1,2];}
   if(code==='source_omitted') bad.other_details.pop();
   let finishArgs;
-  const result=await generateJob({OPENAI_API_KEY:'test-only',QUICK_READ_MODEL:'mock'},'1',{
-   call:async(e,name,args)=>name==='claim_job_quick_read_recovery'?{status:'claimed',description:source,source_hash:await sourceFingerprint(source)}:(finishArgs=args,{status:'failed'}),
-   generate:async()=>generateWithProvider({OPENAI_API_KEY:'secret-test',QUICK_READ_MODEL:'mock'},source,async()=>Response.json({status:'completed',id:'private-response-id',reasoning:'private-reasoning',output:[{content:[{type:'output_text',text:JSON.stringify(bad)}]}]}))
+  const result=await generateJob({OPENAI_API_KEY:'test-only',QUICK_READ_MODEL:'gpt-5-mini'},'1',{
+   call:async(e,name,args)=>name==='claim_job_quick_read_auto'?{status:'claimed',description:source,source_hash:await sourceFingerprint(source)}:(finishArgs=args,{status:'failed'}),
+   generate:async()=>generateWithProvider({OPENAI_API_KEY:'secret-test',QUICK_READ_MODEL:'gpt-5-mini'},source,async()=>Response.json({status:'completed',id:'private-response-id',reasoning:'private-reasoning',output:[{content:[{type:'output_text',text:JSON.stringify(bad)}]}]}))
   });
   assert.equal(result.error,code);assert.deepEqual(finishArgs.p_diagnostics.selection,bad);
   for(const forbidden of ['secret-test','private-response-id','private-reasoning',source]) assert.ok(!JSON.stringify(finishArgs.p_diagnostics).includes(forbidden));
@@ -168,7 +168,7 @@ test('diagnostics retain original provider IDs even when material routing was co
  const description=source+'\nReliable laptop and internet connection.\nAn additional ordinary sentence about the team.';
  const original={...selection(),responsibilities:[4],requirements:[5]};
  let failure;
- try {await generateWithProvider({OPENAI_API_KEY:'test',QUICK_READ_MODEL:'mock'},description,async()=>Response.json({status:'completed',output:[{content:[{type:'output_text',text:JSON.stringify(original)}]}]}));}
+ try {await generateWithProvider({OPENAI_API_KEY:'test',QUICK_READ_MODEL:'gpt-5-mini'},description,async()=>Response.json({status:'completed',output:[{content:[{type:'output_text',text:JSON.stringify(original)}]}]}));}
  catch(error){failure=error;}
  assert.equal(failure.message,'unsupported_requirement');assert.deepEqual(failure.quickReadSelection,original);
  assert.deepEqual(failureDiagnostics(failure.quickReadSelection,description,failure.message).selection,original);
@@ -176,13 +176,13 @@ test('diagnostics retain original provider IDs even when material routing was co
 test('unsupported sources never call provider; uncommitted failures return actual finish state',async()=>{
  const long=Array.from({length:275},(_,i)=>`Source line ${i} describing ordinary work responsibilities.`).join('\n');
  let args;
- const result=await generateJob({},'15959',{call:async(e,name,a)=>name==='claim_job_quick_read_recovery'?{status:'claimed',description:long,source_hash:await sourceFingerprint(long)}:(args=a,{status:'failed'}),generate:()=>assert.fail('must not generate')});
+ const result=await generateJob({QUICK_READ_MODEL:'gpt-5-mini'},'15959',{call:async(e,name,a)=>name==='claim_job_quick_read_auto'?{status:'claimed',description:long,source_hash:await sourceFingerprint(long)}:(args=a,{status:'failed'}),generate:()=>assert.fail('must not generate')});
  assert.equal(result.error,'unsupported_source');assert.equal(args.p_diagnostics,null);
- const claimExpired=await generateJob({},'1',{call:async(e,name)=>name==='claim_job_quick_read_recovery'?{status:'claimed',description:source,source_hash:await sourceFingerprint(source)}:{status:'claim_expired'},generate:async()=>{throw new Error('provider_incomplete');}});
+ const claimExpired=await generateJob({QUICK_READ_MODEL:'gpt-5-mini'},'1',{call:async(e,name)=>name==='claim_job_quick_read_auto'?{status:'claimed',description:source,source_hash:await sourceFingerprint(source)}:{status:'claim_expired'},generate:async()=>{throw new Error('provider_incomplete');}});
  assert.equal(claimExpired.status,'claim_expired');assert.equal(claimExpired.error,undefined);
 });
 test('recovery endpoint checks auth/protocol, only queries state and passes the run cutoff to candidates',async()=>{
- const env={QUICK_READ_MODE:'manual',QUICK_READ_BATCH_ENABLED:'true',QUICK_READ_ADMIN_TOKEN:'x'.repeat(32),OPENAI_API_KEY:'test',QUICK_READ_MODEL:'mock'};
+ const env={QUICK_READ_MODE:'manual',QUICK_READ_BATCH_ENABLED:'true',QUICK_READ_ADMIN_TOKEN:'x'.repeat(32),OPENAI_API_KEY:'test',QUICK_READ_MODEL:'gpt-5-mini'};
  const started=new Date().toISOString();const calls=[];
  const deps={call:async(e,name,args)=>{calls.push({name,args});return name==='quick_read_recovery_state'?{protocol_version:1,candidates:0}:[];}};
  const request=body=>new Request('https://test',{method:'POST',headers:{authorization:'Bearer '+env.QUICK_READ_ADMIN_TOKEN},body:JSON.stringify(body)});

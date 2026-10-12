@@ -86,7 +86,7 @@ test('37688 provider routing cues identify real application conditions, not ordi
   let finish;
   const hash=await sourceFingerprint(liveTechnologySource);
   const persisted=await generateJob(env,'37688',{
-    call:async(e,name,args)=>name==='claim_job_quick_read_recovery'
+    call:async(e,name,args)=>name==='claim_job_quick_read_auto'
       ?{status:'claimed',description:liveTechnologySource,source_hash:hash}
       :(finish=args,{status:'ready'}),
     generate:async()=>result
@@ -165,17 +165,17 @@ test('Responses adapter uses server key, strict schema, no remote storage and va
 test('fingerprint unchanged skips provider, changed source fingerprint differs',async()=>{
   assert.equal(await sourceFingerprint(technologySource),await sourceFingerprint(technologySource));
   assert.notEqual(await sourceFingerprint(technologySource),await sourceFingerprint(technologySource+' changed'));
-  const result=await generateJob({},'42',{call:async()=>({status:'unchanged'}),generate:()=>assert.fail('Provider must not run')});
+  const result=await generateJob({QUICK_READ_MODEL:'gpt-5-mini'},'42',{call:async()=>({status:'unchanged'}),generate:()=>assert.fail('Provider must not run')});
   assert.equal(result.status,'unchanged');
 });
 test('generation persists validated payload; malformed provider writes only failure metadata',async()=>{
   const hash=await sourceFingerprint(technologySource);let finish;
-  const call=async(env,name,args)=>name==='claim_job_quick_read_recovery'?{status:'claimed',description:technologySource,source_hash:hash}:(finish=args,{status:args.p_error?'failed':'ready'});
+  const call=async(env,name,args)=>name==='claim_job_quick_read_auto'?{status:'claimed',description:technologySource,source_hash:hash}:(finish=args,{status:args.p_error?'failed':'ready'});
   const deps={call,generate:async()=>validateSelection(validSelection(),technologySource)};
-  assert.equal((await generateJob({QUICK_READ_MODEL:'test-model'},42,deps)).status,'ready');
+  assert.equal((await generateJob({QUICK_READ_MODEL:'gpt-5-mini'},42,deps)).status,'ready');
   assert.equal(finish.p_payload.version,2);
   deps.generate=async()=>({summary:'Invented'});
-  assert.equal((await generateJob({},42,deps)).status,'failed');assert.equal(finish.p_payload,null);
+  assert.equal((await generateJob({QUICK_READ_MODEL:'gpt-5-mini'},42,deps)).status,'failed');assert.equal(finish.p_payload,null);
 });
 test('manual endpoint disabled, unauthorized, GET and batch gate never generate',async()=>{
   let calls=0;const deps={call:async()=>{calls++;}};

@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1100" preserveAspectRatio="xMidYMid slice">
+<defs>
+ <linearGradient id="night" x2="1" y2="1"><stop stop-color="#131d50"/><stop offset=".48" stop-color="#031126"/><stop offset="1" stop-color="#063c43"/></linearGradient>
+ <linearGradient id="blue" x1="0" y1="1" x2=".85" y2="0"><stop stop-color="#043578"/><stop offset=".35" stop-color="#087cdb"/><stop offset=".65" stop-color="#7dbdff"/><stop offset=".73" stop-color="#b4ddff"/><stop offset=".8" stop-color="#1a75d1"/><stop offset="1" stop-color="#04172f"/></linearGradient>
+ <linearGradient id="teal" x1="0" x2="1"><stop stop-color="#023e56"/><stop offset=".35" stop-color="#07848f"/><stop offset=".65" stop-color="#24dac2"/><stop offset=".75" stop-color="#9fffea"/><stop offset=".82" stop-color="#14ad98"/><stop offset="1" stop-color="#052535"/></linearGradient>
+ <linearGradient id="amber" x1="0" y1="0" x2=".7" y2="1"><stop stop-color="#fff1c5"/><stop offset=".15" stop-color="#ffb546"/><stop offset=".4" stop-color="#9b5124"/><stop offset=".7" stop-color="#382448"/><stop offset="1" stop-color="#051833"/></linearGradient>
+ <linearGradient id="violet" x1="0" x2="1"><stop stop-color="#c5bdf9"/><stop offset=".28" stop-color="#535d9e"/><stop offset=".7" stop-color="#233b70"/><stop offset="1" stop-color="#0d203d"/></linearGradient>
+ <filter id="glow"><feGaussianBlur stdDeviation="18"/></filter>
+</defs>
+<path fill="url(#night)" d="M0 0h1600v1100H0z"/>
+<path fill="url(#violet)" d="M-120-80H350C490 80 180 250 400 440S860 550 900 860L360 1120C170 840 190 520-50 380Z"/>
+<path fill="url(#blue)" d="M170-110C370 120 430 170 710 110S1220 25 1350 340C1480 650 1060 625 850 830S560 1160 250 1160L-70 1020C300 1000 500 850 570 650S430 510 330 390 360 180 170-110Z"/>
+<path fill="none" stroke="#d0eeff" stroke-opacity=".7" stroke-width="2" d="M170-110C370 120 430 170 710 110S1220 25 1350 340C1480 650 1060 625 850 830"/>
+<path fill="url(#amber)" d="M-130 440C170 510 270 450 400 580S580 940 780 1100H100C180 970 130 820 60 710S-40 640-130 600Z"/>
+<path fill="none" stroke="#ffe0a2" stroke-opacity=".65" stroke-width="2" d="M-130 440C170 510 270 450 400 580S580 940 780 1100"/>
+<path fill="url(#teal)" d="M1430-180C1150 130 1380 310 1130 540S1120 970 1540 1160H1770C1530 900 1290 750 1510 480S1490 130 1700-180Z"/>
+<path fill="none" stroke="#b2fff1" stroke-opacity=".75" stroke-width="3" d="M1430-180C1150 130 1380 310 1130 540S1120 970 1540 1160"/>
+<path fill="none" stroke="#2d9cff" stroke-opacity=".22" stroke-width="40" filter="url(#glow)" d="M170-110C370 120 430 170 710 110S1220 25 1350 340"/>
+</svg>

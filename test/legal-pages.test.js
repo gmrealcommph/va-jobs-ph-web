@@ -22,7 +22,8 @@ for (const path of routes) {
     assert.match(html, /sole proprietor/);
     assert.match(html, /href="mailto:support@veeays.com"/);
     assert.match(html, /href="tel:\+639758104597"/);
-    assert.match(html, /not live(?: yet)?/);
+    assert.match(html, /one-time ₱499 payment granting 30 days of access/);
+    assert.match(html, /does not renew automatically/);
     for (const route of routes) assert.ok(html.includes(`href="${route}"`));
     const head = await handle(new Request(env.SITE_URL + path, { method: 'HEAD' }), env);
     assert.equal(head.status, 200);
@@ -44,7 +45,7 @@ test('copy distinguishes job tracking from applying and protects statutory right
   assert.match(terms, /does not submit an application/);
   assert.match(terms, /do not guarantee employment/);
   const refunds = await (await handle(new Request(env.SITE_URL + '/refund-policy'), env)).text();
-  assert.match(refunds, /₱499\/month, cancel anytime/);
-  assert.match(refunds, /does not currently process VeeAys transactions/);
+  assert.match(refunds, /one-time ₱499 payment granting 30 days of access/);
+  assert.match(refunds, /Paddle is not the active checkout provider/);
   assert.match(refunds, /Nothing in this policy limits mandatory consumer rights/);
 });

@@ -13,7 +13,7 @@ export async function rpc(env, name, args) {
 }
 export async function generateJob(env, id, {call=rpc,generate=generateWithProvider}={}) {
   const token=crypto.randomUUID();
-  const claim=await call(env,'claim_job_quick_read_recovery',{p_job_id:String(id),p_formatter:FORMATTER_VERSION,p_token:token,p_source_rules:SOURCE_RULES_VERSION});
+  const claim=await call(env,'claim_job_quick_read_auto',{p_job_id:String(id),p_formatter:FORMATTER_VERSION,p_token:token,p_source_rules:SOURCE_RULES_VERSION});
   if(claim.status!=='claimed') return {job_id:String(id),status:claim.status};
   let generated;
   try {
@@ -23,17 +23,17 @@ export async function generateJob(env, id, {call=rpc,generate=generateWithProvid
     generated=await generate(env,claim.description);
     const payload=validateStored(generated,claim.description);
     if(!payload) throw new Error('invalid_generated_output');
-    const result=await call(env,'finish_job_quick_read_with_diagnostics',{p_job_id:String(id),p_token:token,p_payload:payload,p_model:env.QUICK_READ_MODEL,p_schema:SCHEMA_VERSION,p_error:null,p_diagnostics:null,p_source_rules:SOURCE_RULES_VERSION});
+    const result=await call(env,'finish_job_quick_read_auto',{p_job_id:String(id),p_token:token,p_payload:payload,p_model:env.QUICK_READ_MODEL,p_schema:SCHEMA_VERSION,p_error:null,p_diagnostics:null,p_source_rules:SOURCE_RULES_VERSION});
     return {job_id:String(id),status:result.status};
   } catch(error) {
     // Only known error codes enter storage; never API responses, credentials or source text.
-    const allowed=/^(unsupported_source|unsafe_source|source_hash_mismatch|invalid_generated_output|invalid_schema|invalid_source_reference|unsupported_requirement|preference_upgraded|mixed_obligation|application_condition_misplaced|material_condition_misplaced|source_omitted|provider_(not_configured|http_\d{3}|incomplete|refusal|invalid_output|invalid_json))$/;
+    const allowed=/^(unsupported_source|unsafe_source|source_hash_mismatch|invalid_generated_output|invalid_schema|invalid_source_reference|unsupported_requirement|preference_upgraded|mixed_obligation|application_condition_misplaced|material_condition_misplaced|source_omitted|input_limit_exceeded|provider_(model_not_allowed|not_configured|http_\d{3}|incomplete|refusal|invalid_output|invalid_json))$/;
     const code=allowed.test(error.message)?error.message:'generation_failed';
     const selection=error.quickReadSelection ?? (generated ? storedSelection(generated,claim.description) : null);
     const diagnosticCodes=/^(invalid_schema|invalid_generated_output|invalid_source_reference|unsupported_requirement|preference_upgraded|mixed_obligation|application_condition_misplaced|material_condition_misplaced|source_omitted)$/;
     const diagnostics=code==='provider_incomplete'?(error.quickReadProviderDiagnostics ?? null):
       diagnosticCodes.test(code)?failureDiagnostics(selection,claim.description,code):null;
-    const result=await call(env,'finish_job_quick_read_with_diagnostics',{p_job_id:String(id),p_token:token,p_payload:null,p_model:env.QUICK_READ_MODEL,p_schema:SCHEMA_VERSION,p_error:code,p_diagnostics:diagnostics,p_source_rules:SOURCE_RULES_VERSION});
+    const result=await call(env,'finish_job_quick_read_auto',{p_job_id:String(id),p_token:token,p_payload:null,p_model:env.QUICK_READ_MODEL,p_schema:SCHEMA_VERSION,p_error:code,p_diagnostics:diagnostics,p_source_rules:SOURCE_RULES_VERSION});
     return result.status==='failed' ? {job_id:String(id),status:'failed',error:code} : {job_id:String(id),status:result.status};
   }
 }

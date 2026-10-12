@@ -7,7 +7,7 @@ import {generateWithProvider,sourceFingerprint,sourceUnits,SECTIONS,validateSele
 import {generateJob} from '../src/quick-read-service.js';
 import {providerFailureDiagnostics} from '../src/quick-read-provider-diagnostics.js';
 const source='About the role\nCoordinate customer relationships across a distributed team.\nClear communication and accurate reporting are part of the role.';
-const env={QUICK_READ_PROVIDER:'openai',QUICK_READ_MODEL:'test-model',OPENAI_API_KEY:'SECRET_SENTINEL'};
+const env={QUICK_READ_PROVIDER:'openai',QUICK_READ_MODEL:'gpt-5-mini',OPENAI_API_KEY:'SECRET_SENTINEL'};
 const token='aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa';
 const response=data=>async()=>({ok:true,status:200,json:async()=>data});
 async function failure(data) {
@@ -64,12 +64,12 @@ test('HTTP failure behavior remains unchanged and does not capture response body
 });
 test('service forwards only structural incomplete metadata; null payload and error stay unchanged',async()=>{
   let finished;
-  const result=await generateJob(env,'1',{call:async(e,name,args)=>name==='claim_job_quick_read_recovery'?
+  const result=await generateJob(env,'1',{call:async(e,name,args)=>name==='claim_job_quick_read_auto'?
     {status:'claimed',description:source,source_hash:await sourceFingerprint(source)}:(finished=args,{status:'failed'}),
     generate:()=>generateWithProvider(env,source,response({status:'incomplete',output:[]}))});
   assert.deepEqual(result,{job_id:'1',status:'failed',error:'provider_incomplete'});
   assert.equal(finished.p_payload,null);assert.equal(finished.p_error,'provider_incomplete');
-  assert.equal(finished.p_model,'test-model');assert.equal(finished.p_diagnostics.version,2);
+  assert.equal(finished.p_model,'gpt-5-mini');assert.equal(finished.p_diagnostics.version,2);
 });
 async function database() {
   const db=new PGlite({extensions:{pgcrypto}});

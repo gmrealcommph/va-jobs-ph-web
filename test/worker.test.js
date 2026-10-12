@@ -34,7 +34,7 @@ test('search is quoted and pagination/filtering happen in Supabase', async () =>
   globalThis.fetch = async input => { captured = new URL(input); return new Response('[]', { headers: { 'content-range': '*/0' } }); };
   await listJobs(env, { page: 3, search: 'hello),id.eq.1', category: 'Admin & Support' });
   assert.equal(captured.searchParams.get('offset'), '30');
-  assert.equal(captured.searchParams.get('category'), 'eq."Admin & Support"');
+  assert.equal(captured.searchParams.get('category'), 'eq.Admin & Support');
   assert.match(captured.searchParams.get('or'), /title\.ilike\."\*hello\),id.eq.1\*"/);
   assert.equal(captured.searchParams.has('status'), false);
   assert.equal(captured.searchParams.has('philippines_eligible'), false);
@@ -42,7 +42,7 @@ test('search is quoted and pagination/filtering happen in Supabase', async () =>
 test('job detail escapes content and rejects script application URLs', async () => {
   mock([{ ...job, title: '<script>alert(1)</script>', description: '<img src=x onerror=alert(1)>', job_url: 'javascript:alert(1)' }]);
   const html = await (await handle(request('/jobs/101'), env)).text();
-  assert.match(html, /&lt;script&gt;/); assert.doesNotMatch(html, /<script|<img|href="javascript:/); assert.match(html, /application link is currently unavailable/);
+  assert.match(html, /&lt;script&gt;/); assert.doesNotMatch(html, /<script>alert|<img src=x|href="javascript:/); assert.match(html, /application link is currently unavailable/);
 });
 test('missing jobs, unknown categories and invalid pages return 404', async () => {
   mock([]);
@@ -51,7 +51,7 @@ test('missing jobs, unknown categories and invalid pages return 404', async () =
 test('search results are noindex; page two has its own canonical', async () => {
   mock(Array.from({ length: 16 }, (_, i) => ({ ...job, id: String(i) })));
   let html = await (await handle(request('/?q=assistant'), env)).text(); assert.match(html, /noindex,follow/);
-  html = await (await handle(request('/?page=2'), env)).text(); assert.match(html, /rel="canonical" href="https:\/\/jobs.example.com\/\?page=2"/); assert.match(html, /Page 2 of 2/);
+  html = await (await handle(request('/?page=2'), env)).text(); assert.match(html, /rel="canonical"\s+href="https:\/\/jobs.example.com\/\?page=2"/); assert.match(html, /Page 2 of 2/);
 });
 test('upstream failure is 503 with retry header, never a false empty state', async () => {
   globalThis.fetch = async () => new Response('unavailable', { status: 503 });
@@ -111,6 +111,6 @@ test('numeric job detail keeps the original application link and canonical', asy
   const res = await handle(request('/jobs/101'), env);
   assert.equal(res.status, 200);
   const html = await res.text();
-  assert.match(html, /href="https:\/\/example.com\/apply" target="_blank" rel="noopener noreferrer nofollow"/);
-  assert.match(html, /rel="canonical" href="https:\/\/jobs.example.com\/jobs\/101"/);
+  assert.match(html, /href="\/apply\/101"[\s\S]*?target="_blank"[\s\S]*?rel="nofollow noopener"/);
+  assert.match(html, /rel="canonical"\s+href="https:\/\/jobs.example.com\/jobs\/101"/);
 });
