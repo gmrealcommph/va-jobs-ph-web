@@ -1,4 +1,8 @@
+import { adminEndpoint } from './admin.js';
+import {trafficEndpoint,linkTrafficRegistration} from './traffic.js';
+import {scheduledQuickReads, QUICK_READ_CRON} from './quick-read-scheduled.js';
 import { proCheckoutEndpoint, testUserAllowed, checkoutUserAllowed } from './pro-checkout.js';
+import {scheduledAdminHealth} from './admin-monitor.js';
 import { recovery } from './recovery.js';
 import { categories, getJob, getJobsByIds, listJobs, query } from './data.js';
 import { quickReadEndpoint } from './quick-read-service.js';
@@ -11,6 +15,7 @@ import { legalPage } from './legal-pages.js';
 import { companyPage } from './company-pages.js';
 import { layout, listing, detail, esc, jobPath, categoryPath, authPage, checkEmailPage, authCallbackPage, onboardingPage, matchesPage, proPage, myJobsPage } from './render.js';
 import { signUp, signIn, getUser, sessionForRequest, setSessionCookies, clearSessionCookies, authError, getJobPreferences, saveJobPreferences, completeOnboarding, getMyProfile, getMyJobMatches, getMyMatchSummary, getSavedJobs, saveJobForUser, unsaveJobForUser, getJobApplications, markJobApplied, updateJobApplication, deleteJobApplication } from './auth.js';
+import {accountDeletionEndpoint,deletionDanger,refreshDeletionDisclosure} from './account-deletion.js';
 
 const headers = { 'content-type': 'text/html; charset=utf-8', 'x-content-type-options': 'nosniff', 'referrer-policy': 'strict-origin-when-cross-origin', 'content-security-policy': "default-src 'none'; style-src 'self'; img-src 'self'; script-src 'self'; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-ancestors 'none'", 'permissions-policy': 'camera=(), microphone=(), geolocation=()' };
 function origin(env, url) {
@@ -24,7 +29,7 @@ function safeReturnPath(value) {
   const v = String(value || '');
   if (/^\/apply\/[A-Za-z0-9%._~-]{1,240}$/.test(v)) return v;
   if (/^\/jobs\/[A-Za-z0-9%._~-]{1,240}(?:\?save=1)?$/.test(v)) return v;
-  if (v === '/my-jobs' || v === '/matches' || v === '/jobs' || v === '/email-preferences') return v;
+  if (v === '/admin' || v === '/my-jobs' || v === '/matches' || v === '/jobs' || v === '/email-preferences') return v;
   if (v === '/pro' || v === '/onboarding' || v === '/') return v;
   return '';
 }
@@ -45,6 +50,10 @@ function hasCookie(request, name, expected = '1') {
 function xml(body) { return new Response(`<?xml version="1.0" encoding="UTF-8"?>${body}`, { headers: { 'content-type': 'application/xml; charset=utf-8', 'cache-control': 'public, max-age=300' } }); }
 export async function handle(request, env) {
   const url = new URL(request.url);
+  if(url.pathname === '/privacy') refreshDeletionDisclosure(env);
+  if(['/account/delete','/account/deleted','/account/deletion.css','/account/deletion.js'].includes(url.pathname)) return accountDeletionEndpoint(request,env);
+  if(url.pathname==='/traffic/event')return trafficEndpoint(request,env);
+  if (url.pathname === '/admin' || url.pathname.startsWith('/admin/')) return adminEndpoint(request, env);
   if (['/pro/checkout', '/pro/return', '/webhooks/paymongo'].includes(url.pathname)) return proCheckoutEndpoint(request, env);
   const quickReadMatch=url.pathname.match(/^\/internal\/quick-read\/([1-9]\d{0,18}|batch)$/);
   if(quickReadMatch) return quickReadEndpoint(request,env,quickReadMatch[1]==='batch'?null:quickReadMatch[1]);
@@ -161,6 +170,7 @@ export async function handle(request, env) {
       if (!fullName) return Response.redirect(`${url.origin}/signup?error=${encodeURIComponent('Enter your full name.')}&email=${encodeURIComponent(email)}${returnTo ? `&return=${encodeURIComponent(returnTo)}` : ''}`, 303);
       const { response, data } = await signUp(env, { email, password, fullName, redirectTo: `${siteOrigin}/auth/callback${returnTo ? `?return=${encodeURIComponent(returnTo)}` : ''}` });
       if (!response.ok) return Response.redirect(`${url.origin}/signup?error=${encodeURIComponent(authError(data, 'We could not create your account.'))}&email=${encodeURIComponent(email)}${returnTo ? `&return=${encodeURIComponent(returnTo)}` : ''}`, 303);
+      await linkTrafficRegistration(request,env,data?.user);
       if (data?.access_token && data?.refresh_token) {
         const target = returnTo || '/';
         const h = new Headers({ location: target, 'cache-control': 'no-store' });
@@ -571,7 +581,9 @@ if (
     if (url.pathname === '/signup' || url.pathname === '/login') {
       if (authState.user) {
         const target = safeReturnPath(url.searchParams.get('return')) || await defaultPostAuthPath(env, authState);
-        return Response.redirect(url.origin + target, 303);
+        const h=new Headers({location:url.origin+target,'cache-control':'no-store'});
+        if(authState.refreshed&&typeof authState.refreshed==='object')setSessionCookies(h,authState.refreshed);
+        return new Response(null,{status:303,headers:h});
       }
       const mode = url.pathname === '/signup' ? 'signup' : 'login';
       return render(mode === 'signup' ? 'Create your account' : 'Log in', authPage({
@@ -584,12 +596,20 @@ if (
     }
 
     if (url.pathname === '/check-email') {
-      if (authState.user) return Response.redirect(url.origin + (safeReturnPath(url.searchParams.get('return')) || await defaultPostAuthPath(env, authState)), 303);
+      if(authState.user){
+        const h=new Headers({location:url.origin+(safeReturnPath(url.searchParams.get('return'))||await defaultPostAuthPath(env,authState)),'cache-control':'no-store'});
+        if(authState.refreshed&&typeof authState.refreshed==='object')setSessionCookies(h,authState.refreshed);
+        return new Response(null,{status:303,headers:h});
+      }
       return render('Check your email', checkEmailPage((url.searchParams.get('email') || '').slice(0, 254), safeReturnPath(url.searchParams.get('return'))), { noindex: true });
     }
 
     if (url.pathname === '/auth/callback') {
-      if (authState.user) return Response.redirect(url.origin + (safeReturnPath(url.searchParams.get('return')) || await defaultPostAuthPath(env, authState)), 303);
+      if(authState.user){
+        const h=new Headers({location:url.origin+(safeReturnPath(url.searchParams.get('return'))||await defaultPostAuthPath(env,authState)),'cache-control':'no-store'});
+        if(authState.refreshed&&typeof authState.refreshed==='object')setSessionCookies(h,authState.refreshed);
+        return new Response(null,{status:303,headers:h});
+      }
       return render('Verifying your email', authCallbackPage(), { noindex: true });
     }
 
@@ -598,7 +618,7 @@ if (
       let preferences = null;
       try { preferences = await getJobPreferences(env, authState.accessToken, authState.user.id); }
       catch (error) { console.error('Preferences load failed:', error); }
-      return render('Set up your account', onboardingPage({ user: authState.user, preferences, error: (url.searchParams.get('error') || '').slice(0, 240) }), { noindex: true });
+      return render('Set up your account', onboardingPage({ user: authState.user, preferences, error: (url.searchParams.get('error') || '').slice(0, 240) }) + '<link rel="stylesheet" href="/account/deletion.css?v=20261012-fun">' + deletionDanger, { noindex: true });
     }
 
     const company = companyPage(url.pathname);
@@ -1092,7 +1112,10 @@ if (
     return response;
   }
 }
-export default { fetch: handle, scheduled(controller,env) {
+export default { fetch: handle, scheduled(controller,env,ctx) {
+  // Independent observer cannot delay or replace operational schedules.
+  if(env.ADMIN_HEALTH_MONITOR_ENABLED==='true'&&controller.cron==='*/15 * * * *')ctx.waitUntil(scheduledAdminHealth(controller,env));
+  if(controller.cron===QUICK_READ_CRON) return scheduledQuickReads(controller,env);
   // Separate cron invocations preserve Strong Match behavior and its subrequest budget.
   return controller.cron===DIGEST_CRON ? scheduledDailyDigest(controller,env) : scheduledStrongMatches(controller,env);
 } };

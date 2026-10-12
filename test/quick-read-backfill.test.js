@@ -5,7 +5,7 @@ import {sourceUnits,SECTIONS,validateSelection,validateStored,generateWithProvid
 import {renderJobRead} from '../src/job-detail-read.js';
 // Public HTML-decoded Original description GETs, 2026-10-05 Asia/Manila.
 // Not historical database bytes or failed provider responses. All provider calls are mocks.
-const env={OPENAI_API_KEY:'test-only',QUICK_READ_MODEL:'mock'};
+const env={OPENAI_API_KEY:'test-only',QUICK_READ_MODEL:'gpt-5-mini'};
 const response=q=>Response.json({status:'completed',output:[{content:[{type:'output_text',text:JSON.stringify(q)}]}]});
 const empty=()=>Object.fromEntries(SECTIONS.map(k=>[k,[]]));
 function move(q,id,key) { for(const k of SECTIONS) q[k]=q[k].filter(n=>n!==id);q[key].push(id);return q; }

@@ -68,7 +68,7 @@ test('default disabled, wrong cron, and before activation never access network',
   assert.equal((await runDailyDigest({...env,DAILY_DIGEST_START_AT:'2099-01-01T00:00:00Z'},Date.now())).status,'before_activation');
   await assert.rejects(runDailyDigest({...env,DAILY_DIGEST_START_AT:''},Date.now()),/start/);
   const cfg=JSON.parse(await readFile(new URL('../wrangler.jsonc',import.meta.url),'utf8'));
-  assert.equal(cfg.vars.DAILY_DIGEST_MODE,'disabled');assert.equal(cfg.keep_vars,true);
+  assert.equal(cfg.vars.DAILY_DIGEST_MODE,'enabled');assert.equal(cfg.keep_vars,true);
   assert.equal(cfg.vars.STRONG_MATCH_MODE,'enabled');assert.equal(cfg.vars.STRONG_MATCH_START_AT,'2026-10-03T04:15:00Z');
   assert.ok(cfg.triggers.crons.includes('*/15 * * * *'));assert.ok(cfg.triggers.crons.includes(DIGEST_CRON));
 });

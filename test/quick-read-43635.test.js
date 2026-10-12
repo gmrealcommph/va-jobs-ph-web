@@ -58,7 +58,7 @@ test('43635: genuine material matches reproduce failure; allowed sections retain
   assert.match(renderJobRead(source,corrupt,{}),/This listing is shown from the employer/);
 });
 test('43635: guidance exposes exact guard matches and preference/application precedence (local mocks)',async()=>{
-  const env={OPENAI_API_KEY:'test-only',QUICK_READ_MODEL:'mock'};
+  const env={OPENAI_API_KEY:'test-only',QUICK_READ_MODEL:'gpt-5-mini'};
   const payload=await generateWithProvider(env,source,async(url,init)=>{
     const sent=JSON.parse(init.body),input=JSON.parse(sent.input);
     assert.equal(sent.store,false);assert.equal(sent.text.format.strict,true);
@@ -76,17 +76,17 @@ test('43635: guidance exposes exact guard matches and preference/application pre
     assert.deepEqual(validateStored(corrected,source),corrected);
   }
   let finish;
-  const result=await generateJob(env,'43635',{call:async(e,name,args)=>name==='claim_job_quick_read_recovery'
+  const result=await generateJob(env,'43635',{call:async(e,name,args)=>name==='claim_job_quick_read_auto'
     ?{status:'claimed',description:source,source_hash:await sourceFingerprint(source)}
     :(finish=args,{status:'ready'}),generate:async()=>payload});
   assert.equal(result.status,'ready');assert.equal(finish.p_error,null);
-  const bad=await generateJob(env,'43635',{call:async(e,name,args)=>name==='claim_job_quick_read_recovery'
+  const bad=await generateJob(env,'43635',{call:async(e,name,args)=>name==='claim_job_quick_read_auto'
     ?{status:'claimed',description:source,source_hash:await sourceFingerprint(source)}
     :(finish=args,{status:'failed'}),generate:async()=>validateSelection(move(selection(),29,'requirements'),source)});
   assert.equal(bad.error,'material_condition_misplaced');assert.equal(finish.p_payload,null);
 });
 test('43635: provider correction preserves all units and rejects unrelated corruption',async()=>{
-  const env={OPENAI_API_KEY:'test-only',QUICK_READ_MODEL:'mock'};
+  const env={OPENAI_API_KEY:'test-only',QUICK_READ_MODEL:'gpt-5-mini'};
   const q=selection();
   for(const [id,key] of [[0,'about_role'],[3,'about_role'],[9,'responsibilities'],[29,'requirements'],[35,'about_role']]) move(q,id,key);
   const result=await generateWithProvider(env,source,async()=>response(q));

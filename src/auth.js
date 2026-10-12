@@ -28,7 +28,7 @@ export function setSessionCookies(headers, session) {
   headers.append('Set-Cookie', cookie(REFRESH_COOKIE, session.refresh_token, 60 * 60 * 24 * 30));
 }
 
-async function authFetch(env, path, init = {}) {
+export async function authFetch(env, path, init = {}) {
   const { key, url } = config(env);
   const endpoint = new URL(path, url);
   const response = await fetch(endpoint, {
@@ -73,6 +73,7 @@ export async function getUser(env, accessToken) {
     method: 'GET',
     headers: { Authorization: `Bearer ${accessToken}` }
   });
+  if (response.status === 429 || response.status >= 500) throw new Error('Authentication temporarily unavailable.');
   return response.ok && data?.id ? data : null;
 }
 
@@ -82,6 +83,7 @@ export async function sessionForRequest(request, env) {
   if (user) return { user, refreshed: null, accessToken: cookies[ACCESS_COOKIE] };
   if (!cookies[REFRESH_COOKIE]) return { user: null, refreshed: null, accessToken: null };
   const { response, data } = await exchangeRefreshToken(env, cookies[REFRESH_COOKIE]);
+  if (response.status === 429 || response.status >= 500) throw new Error('Authentication temporarily unavailable.');
   if (!response.ok || !data?.access_token) return { user: null, refreshed: false, accessToken: null };
   user = data.user || await getUser(env, data.access_token);
   return { user, refreshed: user ? data : false, accessToken: user ? data.access_token : null };

@@ -8,12 +8,28 @@
     "binding": "ASSETS"
   },
   "keep_vars": true,
-  "triggers": { "crons": ["*/15 * * * *", "* * * * *"] },
+  "triggers": {
+    "crons": [
+      "* * * * *",
+      "0-59 * * * *",
+      "*/15 * * * *"
+    ]
+  },
   "vars": {
+    "DAILY_DIGEST_MODE": "enabled",
+    "DAILY_DIGEST_START_AT": "2026-10-04T00:00:00Z",
+    "PAYMONGO_LIVE_CHECKOUT_ENABLED": "true",
+    "PAYMONGO_MODE": "live",
+    "QUICK_READ_AUTO_ENABLED": "true",
+    "QUICK_READ_BATCH_ENABLED": "true",
+    "QUICK_READ_MODE": "manual",
+    "QUICK_READ_MODEL": "gpt-5-mini",
+    "QUICK_READ_PROVIDER": "openai",
+    "SITE_URL": "https://veeays.com",
     "STRONG_MATCH_MODE": "enabled",
     "STRONG_MATCH_START_AT": "2026-10-03T04:15:00Z",
-    "DAILY_DIGEST_MODE": "enabled",
-"DAILY_DIGEST_START_AT": "2026-10-04T00:00:00Z",
+    "SUPABASE_PUBLISHABLE_KEY": "sb_publishable_ZRWxrn1CiYzfRSsJgFGUNg_m5iFhPi_",
     "SUPABASE_URL": "https://nwqmhqiymtqkdihjadrp.supabase.co"
-  }
+  },
+  "compatibility_flags": []
 }

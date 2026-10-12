@@ -1,0 +1,10 @@
+* text=auto
+*.js text eol=lf
+*.mjs text eol=lf
+*.json text eol=lf
+*.jsonc text eol=lf
+*.sql text eol=lf
+*.txt text eol=lf
+evidence/production-20261012/worker.reference.mjs -whitespace
+public/admin-quick-reads.css -whitespace
+public/admin.js -whitespace

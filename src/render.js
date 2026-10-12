@@ -67,6 +67,8 @@ export function layout({ title, description, canonical, body, noindex = false, u
   >
 
   <link rel="stylesheet" href="/styles.css?v=20261007-category-cream">
+<link rel="stylesheet" href="/traffic.css">
+<script src="/traffic.js" type="module"></script>
 </head>
 
 <body>

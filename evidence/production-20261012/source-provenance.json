@@ -1,0 +1,161 @@
+{
+  "original_source_map": "October 10 waiting-build/worker.js.map (local original sourcesContent)",
+  "entries": [
+    {
+      "file": "src/quick-read-provider-diagnostics.js",
+      "sha256": "84a38c8f53034002e09f987ed517f46515be9152a7c242a9dfe85f6b1b127e0f",
+      "origin": "October 10 original sourcesContent"
+    },
+    {
+      "file": "src/quick-read-input-bound.js",
+      "sha256": "8f9dd4005a6f1f495ccfa6a587909e7b54b653e241bb851e3d7fb9143f4b98ec",
+      "origin": "October 10 original sourcesContent"
+    },
+    {
+      "file": "src/quick-read-generation.js",
+      "sha256": "1aac50218b5a642f4d737a1fe0484f7e52f5bde2e8a0fabef7fdc84d8460c6db",
+      "origin": "October 10 original sourcesContent"
+    },
+    {
+      "file": "src/data.js",
+      "sha256": "c56c72a306343a42ce225661900a06093c2bd1702239ce47cac19dce67d3433d",
+      "origin": "October 10 original sourcesContent"
+    },
+    {
+      "file": "src/auth.js",
+      "sha256": "e983dae40e27137a3e5dbbed3fdf4f8a7ed6a07537fdc841c4bee07b08601e4e",
+      "origin": "October 10 original sourcesContent"
+    },
+    {
+      "file": "src/admin-visitors.js",
+      "sha256": "a956a12ccc429b2c8512c8229a429c73bbd26e21cdf5d4dadacefe0f691328f9",
+      "origin": "October 10 original sourcesContent"
+    },
+    {
+      "file": "src/admin-health.js",
+      "sha256": "cce2e44d927277313bffd3ae72290e3337fa6ce57480a31d906cf80077d91d62",
+      "origin": "October 10 original sourcesContent"
+    },
+    {
+      "file": "src/admin-balances.js",
+      "sha256": "49d3a62d5221d6ac3fe4f8be26d81810ee4234a09113050fef7d1170471fa73f",
+      "origin": "October 10 original sourcesContent"
+    },
+    {
+      "file": "src/notifications.js",
+      "sha256": "ab52c4d6fad5937fa9713421cdca5f1428090d7532b7ec9e8c8d06314d81ca58",
+      "origin": "October 10 original sourcesContent"
+    },
+    {
+      "file": "src/quick-read-service.js",
+      "sha256": "1171cc836c3d2edc5f4ea4e612a991ef0018a7b0f443afa512bc415cb2bf6987",
+      "origin": "October 10 original sourcesContent"
+    },
+    {
+      "file": "src/quick-read-diagnostics.js",
+      "sha256": "8773d814e82ca6f66e17424860a95b8bca8863789045348e84919ad803e6f298",
+      "origin": "October 10 original sourcesContent"
+    },
+    {
+      "file": "src/quick-read-scheduled.js",
+      "sha256": "aeeab92c32ec626b643e5e9744315beea2cd82c12764781f0245d94b1142c550",
+      "origin": "October 10 original sourcesContent"
+    },
+    {
+      "file": "src/admin.js",
+      "sha256": "1b7f9c7b3894c938554d71076a6ec95fc8d61a72ab0d0471cffa401d6a87bedc",
+      "origin": "October 10 original sourcesContent"
+    },
+    {
+      "file": "src/traffic.js",
+      "sha256": "5803ae0344c432e5e48ac319c546c9cf51c59ec1254818e6d3bb16a49e51b307",
+      "origin": "October 10 original sourcesContent"
+    },
+    {
+      "file": "src/category-context.js",
+      "sha256": "c3c034d014dd1f2b97681d8fc95676a4a5569b994fee197393f2c437b2f74043",
+      "origin": "October 10 original sourcesContent"
+    },
+    {
+      "file": "src/recovery.js",
+      "sha256": "409f2b1a04263851f243f6655baf172cd57d68f2575e71a68866146660056f77",
+      "origin": "October 10 original sourcesContent"
+    },
+    {
+      "file": "src/job-section-heading.js",
+      "sha256": "4763440dd4200b330da8a5c01c961883e8a3c11c09e4402a3589f4b34c20bb8f",
+      "origin": "October 10 original sourcesContent"
+    },
+    {
+      "file": "src/quick-read-presentation.js",
+      "sha256": "7cb288788fbba44fbd2e8360aaf9e0c091662121a75d8f4a08a9ba4bb61744e8",
+      "origin": "October 10 original sourcesContent"
+    },
+    {
+      "file": "src/job-detail-header.js",
+      "sha256": "41ddac7f0c6ef197fb96d7b95c85d1b13d58918439eaabc743510ac4e98cd0c1",
+      "origin": "October 10 original sourcesContent"
+    },
+    {
+      "file": "src/quick-read.js",
+      "sha256": "ccf2843eaf4ed558ce46125a8634b8c48702f00f6ca3e901f14be67c9c61b111",
+      "origin": "October 10 original sourcesContent"
+    },
+    {
+      "file": "src/job-detail-read.js",
+      "sha256": "478a144efb14f22700348803890890ddaa5dd0bd26c83b4954ad90a3f1ea1fde",
+      "origin": "October 10 original sourcesContent"
+    },
+    {
+      "file": "src/render.js",
+      "sha256": "47ea2baf30254b84f52eed65b2cdf5d31d26ee6f21a8b240667d5bc72f3b39a9",
+      "origin": "October 10 original sourcesContent"
+    },
+    {
+      "file": "src/pro-checkout.js",
+      "sha256": "a09fc4042f970c4e52b1df537710aa5e7b9f3498e90b3c69f9887661242a0ddd",
+      "origin": "October 10 original sourcesContent"
+    },
+    {
+      "file": "src/admin-monitor.js",
+      "sha256": "9883a7f65e8367d25b558714f0ac62e79e07dd98103198fd60252558c52634dc",
+      "origin": "October 10 original sourcesContent"
+    },
+    {
+      "file": "src/strong-matches.js",
+      "sha256": "252af96c0c98f286402d5bf5406f68192fac6373101b20887b4c422a895df6fb",
+      "origin": "October 10 original sourcesContent"
+    },
+    {
+      "file": "src/daily-digest.js",
+      "sha256": "f4086f025adf967d69fcaae65137066d994b64bca0641a564475173b70966512",
+      "origin": "October 10 original sourcesContent"
+    },
+    {
+      "file": "src/email-preferences.js",
+      "sha256": "a2fc6530b60e5870060e37865b1e4ccea720638d7e202e3b25ffa10c23481849",
+      "origin": "October 10 original sourcesContent"
+    },
+    {
+      "file": "src/category-page.js",
+      "sha256": "4e2134b1f6e65afbce880e8d2eade973fbaac9f167b4e6f489d53d3027d47a27",
+      "origin": "October 10 original sourcesContent"
+    },
+    {
+      "file": "src/legal-pages.js",
+      "sha256": "4fbc36c21493d9381f55edc90935fda56be065251d71690704696ec2be3a1fb9",
+      "origin": "October 10 original sourcesContent"
+    },
+    {
+      "file": "src/company-pages.js",
+      "sha256": "cdaef3bfea9e774b75fec636c91e739689fbcca9a5252068945c0ad6958e8b7b",
+      "origin": "October 10 original sourcesContent"
+    },
+    {
+      "file": "src/worker.js",
+      "sha256": "467eb112dd7df0618e318e0d92005c0541b22712d87b7dcc587f395d34da3354",
+      "origin": "October 10 original sourcesContent"
+    }
+  ],
+  "notes": "31 original modules recovered; authored October 10 admin and October 12 deletion modules restored; production-only authentication and scheduler patches ported to modules. Full structural comparison passes."
+}
