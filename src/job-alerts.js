@@ -11,6 +11,15 @@ export function alertMessage(config,person,day,address) {
  message.text=message.text.replace('Your best new matches from the previous 24 hours.',explanation).replace(/You received this because[^\n]+/,'').replaceAll('/email-preferences','/job-alerts')+`\n\nUnsubscribe: ${unsubscribe}\nVeeAys · ${address}`;
  const escape=v=>String(v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
  message.html=message.html.replace('<html>','<html lang="en">').replace('<head>','<head><title>VeeAys job digest</title>').replace('DAILY JOB DIGEST',frequency.toUpperCase()+' JOB DIGEST').replace('Here are your best new matches from the previous 24 hours.',explanation).replace('You received this because Daily Job Digest is enabled for your VeeAys Pro account.','').replaceAll('/email-preferences','/job-alerts').replace('</body>',`<p style="text-align:center;font:14px Arial;line-height:1.7"><a href="${escape(unsubscribe)}">Unsubscribe from job alerts</a><br>VeeAys · ${escape(address)}</p></body>`);
+ const tips=[
+  'Tailor your application: highlight the experience and tools that match the role, using truthful examples.',
+  'Show your work: include one relevant portfolio sample or a brief result you achieved; remove confidential client details.',
+  'Follow the instructions: check the original listing for requirements, deadlines and requested documents before submitting.'
+ ];
+ const tipsText='Before you apply\n'+tips.map(t=>'• '+t).join('\n');
+ message.text=message.text.replace('My Matches:',tipsText+'\n\nMy Matches:');
+ const tipsHtml='<section aria-labelledby="apply-tips-title" style="margin:24px 0;padding:18px;background:#fff9e9;border:1px solid #e4d9b8;border-radius:10px"><h2 id="apply-tips-title" style="font-size:20px;margin:0 0 12px">Before you apply</h2><ul style="margin:0;padding-left:20px;font-size:14px;line-height:1.7">'+tips.map(t=>'<li style="margin:8px 0">'+escape(t)+'</li>').join('')+'</ul></section>';
+ message.html=message.html.replace('<p><a href="'+escape(config.site)+'/matches"',tipsHtml+'<p><a href="'+escape(config.site)+'/matches"');
  message.headers={'List-Unsubscribe':`<${unsubscribe}>`,'List-Unsubscribe-Post':'List-Unsubscribe=One-Click'};
  return message;
 }
