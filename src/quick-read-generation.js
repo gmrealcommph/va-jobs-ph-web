@@ -5,7 +5,7 @@ export const FORMATTER_VERSION = 'source-organizer-v2';
 export const SCHEMA_VERSION = 2;
 // Bump only when deterministic source limits/normalization change. Ready caches
 // remain compatible; an unchanged blocked source can then be reconsidered.
-export const SOURCE_RULES_VERSION = 'source-limits-v1';
+export const SOURCE_RULES_VERSION = 'source-limits-timezones-v2';
 export const SECTIONS = ['about_role','responsibilities','requirements','nice_to_have','important_requirements','benefits','company_overview','application_notes','other_details'];
 export const preference = /\b(prefer(?:red|ably)|highly preferred|nice[- ]to[- ]have|(?:a|an) (?:big )?(?:plus|advantage|bonus)|desirable|optional)\b/i;
 const mandatory = /\b(required|must|mandatory|need to)\b/i;
@@ -14,6 +14,17 @@ const mandatory = /\b(required|must|mandatory|need to)\b/i;
 const application = /\b(application|apply|auto[- ]reject(?:ed|ion)?|screening|pre[- ]employment)\b|\b(?:AI[- ]generated|incomplete)\b[^\n]*\banswers?\b/i;
 const material = /\b(authori[sz]|sponsorship|visa|permit|laptop|PC|computer|equipment|internet|backup|shift|schedule|PHT|timezone)\w*/i;
 const entities = {amp:'&',lt:'<',gt:'>',quot:'"',apos:"'",nbsp:' '};
+// Only the captured all-timezone aggregator list is redundant. Narrow lists,
+// prose, and employer schedules remain source facts and must be covered.
+const allTimezoneOffsets = '-11,-10,-9.5,-9,-8,-7,-6,-5,-4,-3.5,-3,-2,-1,0,1,2,3,3.5,4,4.5,5,5.5,5.75,6,6.5,7,8,8.75,9,9.5,10,10.5,11,12,12.75,13,14'.split(',').map(Number);
+export function isRedundantTimezoneList(text) {
+  const match = /^Timezone restrictions:\s*([+\-\d.,\s]+)$/i.exec(String(text).trim());
+  if (!match) return false;
+  const parts = match[1].split(',').map(x=>x.trim());
+  if (parts.some(x=>!/^[-+]?\d+(?:\.\d+)?$/.test(x))) return false;
+  const offsets = new Set(parts.map(Number));
+  return offsets.size===allTimezoneOffsets.length && allTimezoneOffsets.every(x=>offsets.has(x));
+}
 export function sourceUnits(description) {
   if (typeof description !== 'string' || description.trim().length < 100 || description.length > 40000) throw new Error('unsupported_source');
   // Keep the original untouched; only the formatter input is normalized.
@@ -28,7 +39,7 @@ export function sourceUnits(description) {
   const units = [];
   for (const raw of text.replace(/\r\n?/g,'\n').split('\n')) {
     const line = raw.trim().replace(/^(?:[-*•●▪◦]\s*|\d+[.)]\s+)/,'');
-    if (!line || seen.has(line)) continue;
+    if (!line || seen.has(line) || isRedundantTimezoneList(line)) continue;
     seen.add(line); units.push({id:units.length, text:line});
   }
   // Remove duplicated company-intro prefixes only when the exact prose (apart from
@@ -43,6 +54,8 @@ export function sourceUnits(description) {
   let hint='unknown';
   const hints={'the opportunity':'about_role','about the role':'about_role',"what you'll do":'responsibilities','responsibilities':'responsibilities','who you are':'requirements','requirements':'requirements','qualifications':'requirements','what we offer you':'benefits','benefits':'benefits','about us':'company_overview','about the company':'company_overview','work authorization':'important_requirements','application notes':'application_notes','how to apply':'application_notes','salary range':'other_details','monthly pay range':'other_details','eoe statement':'other_details'};
   for(const u of compact) {
+    // Imported metadata must not inherit an employer's preferred-skills block.
+    if (/^Timezone restrictions:/i.test(u.text)) hint='unknown';
     // Exact employer qualification heading from job 41638; no keyword/prose match.
     if (/^skills & experience:?$/i.test(u.text)) hint='requirements';
     // The captured listing's aggregator tail is outside employer qualifications.
@@ -111,7 +124,8 @@ export function validateStored(payload, description) {
     if (payload?.version!==SCHEMA_VERSION || payload?.formatter!==FORMATTER_VERSION || Object.keys(payload).length!==SECTIONS.length+2) return null;
     const units=sourceUnits(description);
     const byText=new Map(units.map(u=>[u.text,u.id]));
-    const selection=Object.fromEntries(SECTIONS.map(k=>[k,Array.isArray(payload[k])?payload[k].map(t=>byText.get(t)):null]));
+    // Existing valid caches remain usable; omit only the same redundant metadata.
+    const selection=Object.fromEntries(SECTIONS.map(k=>[k,Array.isArray(payload[k])?payload[k].filter(t=>!isRedundantTimezoneList(t)).map(t=>byText.get(t)):null]));
     return validateSelection(selection,description);
   } catch { return null; }
 }
