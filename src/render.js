@@ -1,3 +1,4 @@
+import {jobLocation} from './job-location.js';
 import {quickReadMarker} from './quick-read-availability.js';
 import { categoryDescriptor, categoryNote } from './category-context.js';
 import { recovery } from './recovery.js';
@@ -238,13 +239,7 @@ export function layout({ title, description, canonical, body, noindex = false, u
 }
 
 export function card(job, { user = null, saved = false } = {}) {
-  const location =
-    job.location ||
-    (job.remote ? 'Remote' : 'Location not specified');
-
-  const remoteLabel =
-    job.workplace_type ||
-    (job.remote ? 'Remote' : '');
+  const {summary: location} = jobLocation(job);
 
   const posted = date(job.posted_at);
 
@@ -286,14 +281,7 @@ export function card(job, { user = null, saved = false } = {}) {
           ${esc(location)}
         </span>
 
-        ${
-          remoteLabel
-            ? `<span class="opportunity-remote">
-                <i aria-hidden="true">⌁</i>
-                ${esc(remoteLabel)}
-              </span>`
-            : ''
-        }
+
 
       </div>
 
@@ -340,8 +328,8 @@ export function card(job, { user = null, saved = false } = {}) {
 export function discoveryCard(job, { user = null, saved = false, categoryListing = false } = {}) {
   const human = value => String(value || '').replaceAll('_', ' ');
   const metadata = categoryListing
-    ? [job.location, human(job.workplace_type) || (job.remote === true ? 'Remote' : '')].filter(Boolean)
-    : [job.location, human(job.employment_type), human(job.engagement_type)].filter(Boolean);
+    ? [jobLocation(job).summary]
+    : [jobLocation(job).summary, human(job.employment_type), human(job.engagement_type)].filter(Boolean);
   if (!metadata.length && job.workplace_type && !/^remote$/i.test(job.workplace_type)) metadata.push(job.workplace_type);
   const periods = {monthly:'mo',annual:'yr',yearly:'yr',hourly:'hr',weekly:'wk'};
   const min = job.salary_min_usd, max = job.salary_max_usd;
@@ -1293,7 +1281,7 @@ export function matchesPage({ matches = [], preferences = null, summary = null, 
         <div class="match-card-main">
           <div class="match-card-top"><span class="match-score"><strong>${esc(job.match_score)}%</strong> MATCH${infoButton('score')}</span><span class="match-company">${esc(job.company || 'Company not specified')}</span><span class="match-confidence">${esc(confidence)}${infoButton('confidence')}</span></div>
           <h2><a title="${esc(job.title || 'Job opportunity')}" href="${jobPath({ id: job.job_id })}">${esc(job.title || 'Job opportunity')}${quickReadMarker(job)}</a><span class="match-full-title" aria-hidden="true">${esc(job.title || 'Job opportunity')}</span></h2>
-          <div class="match-meta">${job.location ? `<span>${esc(job.location)}</span>` : ''}${job.employment_type ? `<span>${esc(job.employment_type.replaceAll('_', ' '))}</span>` : ''}${job.engagement_type ? `<span>${esc(job.engagement_type)}</span>` : ''}</div>
+          <div class="match-meta">${job.location ? `<span>${esc(jobLocation(job).summary)}</span>` : ''}${job.employment_type ? `<span>${esc(job.employment_type.replaceAll('_', ' '))}</span>` : ''}${job.engagement_type ? `<span>${esc(job.engagement_type)}</span>` : ''}</div>
           <div class="match-card-footer">
             ${reasons ? `<div class="match-reasons">${reasons}</div>` : ''}
             <span class="match-card-actions"><form method="post" action="${savedJobIds.includes(String(job.job_id)) ? '/unsave-job' : '/save-job'}"><input type="hidden" name="job_id" value="${esc(job.job_id)}"><input type="hidden" name="return_to" value="/matches"><button class="match-save-button${savedJobIds.includes(String(job.job_id)) ? ' is-saved' : ''}" type="submit"><span class="match-heart" aria-hidden="true">${savedJobIds.includes(String(job.job_id)) ? '♥' : '♡'}</span> ${savedJobIds.includes(String(job.job_id)) ? 'Saved' : 'Save'}</button></form><a class="match-view-job" href="${jobPath({ id: job.job_id })}">View job <span aria-hidden="true">→</span></a></span>
@@ -1474,12 +1462,12 @@ export function myJobsPage({ saved = [], applications = [], message = '', error 
     if (Number.isNaN(d.getTime())) return '';
     return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
   };
-  const jobMini = job => `<article class="my-job-card"><div><div class="my-job-company">${esc(job.company || 'Company')}</div><h3><a class="workspace-title-swipe" href="${jobPath(job)}">${esc(job.title || 'Job opportunity')}${quickReadMarker(job)}</a></h3><div class="shortlist-meta">${job.category ? `<span class="shortlist-category">${esc(job.category)}</span>` : ''}${job.location ? `<span class="shortlist-location">${esc(job.location)}</span>` : ''}</div></div><a class="my-job-view" href="${jobPath(job)}">View job →</a></article>`;
+  const jobMini = job => `<article class="my-job-card"><div><div class="my-job-company">${esc(job.company || 'Company')}</div><h3><a class="workspace-title-swipe" href="${jobPath(job)}">${esc(job.title || 'Job opportunity')}${quickReadMarker(job)}</a></h3><div class="shortlist-meta">${job.category ? `<span class="shortlist-category">${esc(job.category)}</span>` : ''}${job.location ? `<span class="shortlist-location">${esc(jobLocation(job).summary)}</span>` : ''}</div></div><a class="my-job-view" href="${jobPath(job)}">View job →</a></article>`;
   const applicationCard = item => {
     const appliedDate = formatAppliedDate(item.applied_at);
     return `<article class="tracker-card" data-status="${esc(item.status)}">
       <div class="tracker-card-summary">
-        <div class="tracker-card-main"><div class="my-job-company">${esc(item.job?.company || 'Company')}</div><h3><a class="workspace-title-swipe" href="${item.job ? jobPath(item.job) : '#'}">${esc(item.job?.title || 'Job opportunity')}</a></h3><div class="tracker-meta"><span class="tracker-status tracker-status-${esc(item.status)}">${statusLabel(item.status)}</span>${appliedDate ? `<span>Applied ${esc(appliedDate)}</span>` : ''}${item.job?.location ? `<span>${esc(item.job.location)}</span>` : ''}</div></div>
+        <div class="tracker-card-main"><div class="my-job-company">${esc(item.job?.company || 'Company')}</div><h3><a class="workspace-title-swipe" href="${item.job ? jobPath(item.job) : '#'}">${esc(item.job?.title || 'Job opportunity')}</a></h3><div class="tracker-meta"><span class="tracker-status tracker-status-${esc(item.status)}">${statusLabel(item.status)}</span>${appliedDate ? `<span>Applied ${esc(appliedDate)}</span>` : ''}${item.job?.location ? `<span>${esc(jobLocation(item.job).summary)}</span>` : ''}</div></div>
         <div class="tracker-card-links">${item.job ? `<a class="my-job-view" href="${jobPath(item.job)}">View job →</a>` : ''}<button class="tracker-edit-toggle" type="button" aria-expanded="false">Edit application</button></div>
       </div>
       <div class="tracker-edit-panel" hidden>

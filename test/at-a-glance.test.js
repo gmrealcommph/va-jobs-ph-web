@@ -18,7 +18,7 @@ test('snapshot normalizes display only and keeps four authoritative tile values'
   const job = {schedule_region:'us',location:'Philippines',workplace_type:'remote',employment_type:'full_time'};
   const before = structuredClone(job);
   const html = renderAtAGlance(job);
-  for (const value of ['US hours','Philippines','Remote','Full-time']) assert.ok(html.includes(`>${value}</dd>`));
+  for (const value of ['US hours','Listed location: Philippines','Remote','Full-time']) assert.ok(html.includes(`>${value}</dd>`));
   assert.equal((html.match(/class="qr-glance-tile"/g) || []).length, 4);
   assert.equal((html.match(/class="qr-glance-icon"/g) || []).length, 4);
   assert.match(html, /aria-labelledby="at-a-glance"/);
