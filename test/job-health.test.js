@@ -4,6 +4,8 @@ import {sourceEvidence,reviewDecision,readSource,allowedURL,boardURL} from '../s
 import {detail} from '../src/render.js';
 import {scheduledJobHealth,JOB_HEALTH_CRON} from '../src/job-health-scheduled.js';
 import {sourceReader} from '../src/job-verification.js';
+import {readFile} from 'node:fs/promises';
+import worker from '../src/worker.js';
 const env={JOB_REPORTS_ENABLED:'true'},state={user:{id:'member'},accessToken:'verified-token'},session=async()=>state,job=async()=>({id:1,title:'Support <script>',company:'Employer'});
 const req=(path,form,origin='https://veeays.com')=>new Request('https://veeays.com'+path,form?{method:'POST',headers:{origin,'content-type':'application/x-www-form-urlencoded'},body:new URLSearchParams(form)}:{});
 test('reports require authentication, explicit enablement and strict same origin',async()=>{
@@ -67,4 +69,31 @@ test('scheduled verification is opt-in, isolated from other crons and records ev
 test('rate limits stop further requests to the same host, without calling jobs closed',async()=>{
  let requests=0;const read=sourceReader(async()=>{requests++;return new Response('',{status:429});});
  assert.equal((await read('https://api.lever.co/one')).status,429);assert.equal((await read('https://api.lever.co/two')).reason,'source_rate_limited');assert.equal(requests,1);
+});
+
+test('six-hour pilot is registered, disabled by default and routed by the worker',async(t)=>{
+ const config=JSON.parse(await readFile(new URL('../wrangler.jsonc',import.meta.url),'utf8'));
+ assert.equal(JOB_HEALTH_CRON,'17 */6 * * *');
+ assert.deepEqual(config.triggers.crons,['* * * * *','0-59 * * * *','*/15 * * * *',JOB_HEALTH_CRON]);
+ assert.equal(config.vars.JOB_HEALTH_VERIFY_ENABLED,'false');
+ const calls=[];
+ t.mock.method(globalThis,'fetch',async(url,options)=>{
+  calls.push({url:String(url),body:options.body});
+  return new Response('[]',{headers:{'content-type':'application/json'}});
+ });
+ const enabled={SUPABASE_URL:'https://database.example',SUPABASE_SERVICE_ROLE_KEY:'sb_secret_test-only',JOB_HEALTH_VERIFY_ENABLED:'true'};
+ await worker.scheduled({cron:JOB_HEALTH_CRON},{...enabled,...config.vars},{waitUntil:()=>assert.fail()});
+ assert.equal(calls.length,0);
+ await worker.scheduled({cron:JOB_HEALTH_CRON},enabled,{waitUntil:()=>assert.fail()});
+ assert.deepEqual(calls,[{url:'https://database.example/rest/v1/rpc/veeays_job_health_candidates',body:'{}'}]);
+});
+
+test('scheduled verification rejects batches over eight before reading or recording',async()=>{
+ const calls=[],logs=[];
+ await scheduledJobHealth({cron:JOB_HEALTH_CRON},{JOB_HEALTH_VERIFY_ENABLED:'true'},{
+  call:async(e,n)=>{calls.push(n);return Array.from({length:9},(_,id)=>({id}));},
+  read:()=>assert.fail('oversized batches must not fetch sources'),log:s=>logs.push(JSON.parse(s))
+ });
+ assert.deepEqual(calls,['veeays_job_health_candidates']);
+ assert.deepEqual(logs,[{event:'job_health_verification',status:'unavailable',visibility_changes:0}]);
 });

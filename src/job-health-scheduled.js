@@ -1,7 +1,7 @@
 import {rpc} from './quick-read-service.js';
 import {sourceReader,verifyListing} from './job-verification.js';
-export const JOB_HEALTH_CRON='12,42 * * * *';
-// Not registered in wrangler config. Opt-in evidence collection, never hiding.
+export const JOB_HEALTH_CRON='17 */6 * * *';
+// Six-hour pilot. Opt-in evidence collection, never hiding.
 export async function scheduledJobHealth(controller,env,{call=rpc,read=sourceReader(),log=console.log}={}) {
  if(controller.cron!==JOB_HEALTH_CRON||env.JOB_HEALTH_VERIFY_ENABLED!=='true')return;
  try {
