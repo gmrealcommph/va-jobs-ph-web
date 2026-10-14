@@ -111,6 +111,6 @@ test('independent analytics integrations start together and provider failure pre
  const response=adminEndpoint(req('/admin/api/analytics'),{}, {session,
  call:async(e,t,n)=>n==='veeays_admin_access'?true:n==='veeays_admin_analytics'?{members:23}:optional(n),
  visitors:()=>optional('visitors'),usage:()=>optional('usage'),balances:()=>optional('balances')});
- await new Promise(resolve=>setImmediate(resolve));assert.equal(started.size,4);release();
+ await new Promise(resolve=>setImmediate(resolve));assert.equal(started.size,5);release();
  const result=await response;assert.equal(result.status,200);const data=await result.json();assert.equal(data.members,23);assert.equal(data.visitors.available,false);
 });

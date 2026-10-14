@@ -6,6 +6,7 @@ import {RegistrationTracker,PaymentTracker,refreshDelay,playRegistrationChime,pl
 import {renderEmailUsage} from '../public/admin-email-health.js';
 import {renderProviderBalances} from '../public/admin-balances.js';
 import {renderTraffic} from '../public/admin-traffic.js';
+import {renderVerification} from '../public/admin-verification.js';
 const script=(await readFile(new URL('../public/admin.js',import.meta.url),'utf8')).replace(/^import[^\n]+\n/gm,'');
 function element(){
  return {value:'',innerHTML:'',textContent:'',children:[],listeners:{},attributes:{},
@@ -30,7 +31,7 @@ async function page(){
   addEventListener(name,fn){this.listeners[name]=fn;}};
  document.getElementById('period').value='7';document.getElementById('signup-notifications');
  const state={calls:[],responses};
- const context=vm.createContext({RegistrationTracker,PaymentTracker,refreshDelay,playRegistrationChime,playPaymentCelebration,renderEmailUsage,renderProviderBalances,renderTraffic,document,Intl,Date,Number,String,URLSearchParams,AbortSignal:{},AbortController,
+ const context=vm.createContext({RegistrationTracker,PaymentTracker,refreshDelay,playRegistrationChime,playPaymentCelebration,renderEmailUsage,renderProviderBalances,renderTraffic,renderVerification,document,Intl,Date,Number,String,URLSearchParams,AbortSignal:{},AbortController,
   setTimeout(fn,delay){timers.set(++nextTimer,{fn,delay});return nextTimer;},clearTimeout(id){timers.delete(id);},
   async fetch(url){state.calls.push(url);const r=responses.shift();if(r instanceof Error)throw r;if(!r)throw new Error('Unexpected request');return {status:r.status,ok:r.status===200,json:async()=>r.body};}});
  vm.runInContext("'use strict';\n"+script,context);await new Promise(setImmediate);

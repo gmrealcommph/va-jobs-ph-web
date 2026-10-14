@@ -8,7 +8,7 @@ test('saved refresh cookie restores login after access cookie expires; redirects
  const before=globalThis.fetch;
  globalThis.fetch=async input=>{
   const url=new URL(input);
-  if(url.pathname==='/auth/v1/token')return Response.json({access_token:'renewed-access',refresh_token:'renewed-refresh',expires_in:3600,user:{id:'fixture-user'}});
+  if(url.pathname==='/auth/v1/token')return Response.json({access_token:'renewed-access',refresh_token:'renewed-refresh',expires_in:3600,user:{id:'fixture-user',email_confirmed_at:'2026-10-01T00:00:00Z'}});
   if(url.pathname==='/rest/v1/profiles')return Response.json([]);
   throw new Error('Unexpected request '+url.pathname);
  };

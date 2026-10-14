@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {detail} from '../src/render.js';
 import {handle} from '../src/worker.js';
 const job={id:101,title:'Freelancer Support Specialist <Senior>',company:'Your Personal AI',job_url:'https://employer.example/role',source:'himalayas'};
-const user={id:'u'};
+const user={id:'u',email_confirmed_at:'2026-10-01T00:00:00Z'};
 const panel=options=>detail(job,options).split('<aside class="job-detail-sidebar">')[1].split('</aside>')[0];
 test('application panel uses exact escaped identity and safe apply route, retaining attribution',()=>{
  const html=panel({user});
