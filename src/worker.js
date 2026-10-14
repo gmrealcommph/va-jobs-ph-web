@@ -1,4 +1,5 @@
 import {jobAlertsWebhook} from './job-alerts-webhook.js';
+import {verificationResend, verifiedEmail, scheduledVerification, VERIFICATION_CRON} from './email-verification.js';
 import {jobAlertsEndpoint} from './job-alerts-page.js';
 import {scheduledJobAlerts} from './job-alerts.js';
 import { adminEndpoint } from './admin.js';
@@ -55,6 +56,7 @@ function hasCookie(request, name, expected = '1') {
 function xml(body) { return new Response(`<?xml version="1.0" encoding="UTF-8"?>${body}`, { headers: { 'content-type': 'application/xml; charset=utf-8', 'cache-control': 'public, max-age=300' } }); }
 export async function handle(request, env) {
   const url = new URL(request.url);
+  if(url.pathname==='/auth/resend')return verificationResend(request,env);
   if(url.pathname==='/webhooks/job-alerts')return jobAlertsWebhook(request,env);
   if(/^\/jobs\/[1-9]\d{0,18}\/report$/.test(url.pathname)||['/admin/job-health','/admin/api/job-health'].includes(url.pathname)||(url.pathname==='/admin'&&url.searchParams.get('view')==='job-health'))return jobHealthEndpoint(request,env);
   if(url.pathname === '/privacy') refreshDeletionDisclosure(env);
@@ -189,7 +191,10 @@ export async function handle(request, env) {
     }
 
     const { response, data } = await signIn(env, { email, password });
-    if (!response.ok || !data?.access_token) return Response.redirect(`${url.origin}/login?error=${encodeURIComponent(authError(data, 'Email or password is incorrect.'))}&email=${encodeURIComponent(email)}${returnTo ? `&return=${encodeURIComponent(returnTo)}` : ''}`, 303);
+    if (!response.ok || !data?.access_token) {
+      if(data?.error_code==='email_not_confirmed' || data?.code==='email_not_confirmed')return Response.redirect(`${url.origin}/check-email?email=${encodeURIComponent(email)}${returnTo ? `&return=${encodeURIComponent(returnTo)}` : ''}`,303);
+      return Response.redirect(`${url.origin}/login?error=${encodeURIComponent(authError(data, 'Email or password is incorrect.'))}&email=${encodeURIComponent(email)}${returnTo ? `&return=${encodeURIComponent(returnTo)}` : ''}`, 303);
+    }
     const state = { user: data.user || await getUser(env, data.access_token), accessToken: data.access_token };
     const target = returnTo || await defaultPostAuthPath(env, state);
     const h = new Headers({ location: target, 'cache-control': 'no-store' });
@@ -248,7 +253,7 @@ export async function handle(request, env) {
         status,
         headers: (() => {
           const h = new Headers(headers);
-          h.set('cache-control', status === 200 && !authState.user ? 'public, max-age=60' : 'no-store');
+          h.set('cache-control', status === 200 && !authState.user && !noindex ? 'public, max-age=60' : 'no-store');
           if (authState.refreshed && typeof authState.refreshed === 'object') setSessionCookies(h, authState.refreshed);
           else if (authState.refreshed === false) clearSessionCookies(h);
           return h;
@@ -604,20 +609,15 @@ if (
     }
 
     if (url.pathname === '/check-email') {
-      if(authState.user){
+      if(verifiedEmail(authState.user)){
         const h=new Headers({location:url.origin+(safeReturnPath(url.searchParams.get('return'))||await defaultPostAuthPath(env,authState)),'cache-control':'no-store'});
         if(authState.refreshed&&typeof authState.refreshed==='object')setSessionCookies(h,authState.refreshed);
         return new Response(null,{status:303,headers:h});
       }
-      return render('Check your email', checkEmailPage((url.searchParams.get('email') || '').slice(0, 254), safeReturnPath(url.searchParams.get('return'))), { noindex: true });
+      return render('Check your email', checkEmailPage(authState.user?.email || (url.searchParams.get('email') || '').slice(0, 254), safeReturnPath(url.searchParams.get('return')), url.searchParams.get('requested')==='1'), { noindex: true });
     }
 
     if (url.pathname === '/auth/callback') {
-      if(authState.user){
-        const h=new Headers({location:url.origin+(safeReturnPath(url.searchParams.get('return'))||await defaultPostAuthPath(env,authState)),'cache-control':'no-store'});
-        if(authState.refreshed&&typeof authState.refreshed==='object')setSessionCookies(h,authState.refreshed);
-        return new Response(null,{status:303,headers:h});
-      }
       return render('Verifying your email', authCallbackPage(), { noindex: true });
     }
 
@@ -709,10 +709,17 @@ if (
         return Response.redirect(url.origin + `/signup?return=${encodeURIComponent(returnTo)}`, 303);
       }
       const destination = String(job.job_url || '');
+      if(!verifiedEmail(authState.user)) {
+        const h=new Headers({location:'/check-email?return='+encodeURIComponent(`/apply/${encodeURIComponent(id)}`),'cache-control':'private, no-store'});
+        if(authState.refreshed&&typeof authState.refreshed==='object')setSessionCookies(h,authState.refreshed);
+        return new Response(null,{status:303,headers:h});
+      }
       let external;
       try { external = new URL(destination); } catch { return missing(); }
       if (!['https:', 'http:'].includes(external.protocol)) return missing();
-      return Response.redirect(external.href, 302);
+      const h=new Headers({location:external.href,'cache-control':'private, no-store'});
+      if(authState.refreshed&&typeof authState.refreshed==='object')setSessionCookies(h,authState.refreshed);
+      return new Response(null,{status:302,headers:h});
     }
 
     if (
@@ -1127,6 +1134,7 @@ if (
   }
 }
 export default { fetch: handle, scheduled(controller,env,ctx) {
+  if(env.EMAIL_VERIFICATION_REMINDERS_ENABLED==='true'&&controller.cron===VERIFICATION_CRON)ctx.waitUntil(scheduledVerification(controller,env));
   if(controller.cron===JOB_HEALTH_CRON)return scheduledJobHealth(controller,env);
   // Independent observer cannot delay or replace operational schedules.
   if(env.ADMIN_HEALTH_MONITOR_ENABLED==='true'&&controller.cron==='*/15 * * * *')ctx.waitUntil(scheduledAdminHealth(controller,env));

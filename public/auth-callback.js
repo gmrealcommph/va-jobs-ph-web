@@ -6,6 +6,8 @@
   const expiresIn = hash.get('expires_in');
   const returnTo = query.get('return') || '';
   const error = hash.get('error_description') || hash.get('error');
+  // Remove bearer credentials from the visible URL and browser history immediately.
+  history.replaceState(null, '', location.pathname + location.search);
 
   const authUrl = (path) => path + (returnTo ? '?return=' + encodeURIComponent(returnTo) : '');
 

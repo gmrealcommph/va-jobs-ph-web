@@ -1,4 +1,5 @@
 import {renderTraffic} from './admin-traffic.js';
+import {renderVerification} from './admin-verification.js';
 import {RegistrationTracker,PaymentTracker,refreshDelay,playRegistrationChime,playPaymentCelebration} from './admin-live.js';
 import {renderEmailUsage} from './admin-email-health.js';
 import {renderProviderBalances} from './admin-balances.js';
@@ -175,6 +176,7 @@ function render(d){
   $('email').innerHTML=renderEmailUsage(usage,{row,num,date,esc,compact:true})+(x?'<h3>Application batches · selected period</h3>'+row('Email batches awaiting retry',num(x.email.retrying))+row('Held email batches',num(x.email.held))+row('Accepted app batches in period',num(x.email.accepted_in_period)):'')+'<details><summary>Delivery coverage and operational protections</summary><p class="note">App batch counts do not measure account-wide emails or SMTP sends. 70% warning · 90% high · 100% critical. Provider acceptance does not prove delivery. Delivery failures, bounces and Supabase Auth email errors need provider events/logs. Supabase Auth cap of 100/hour is user-reported, separate from Resend account quota, and does not increase the Free plan allowance of 100/day and 3,000/month. Background alerts remain disabled pending independent destination approval.</p></details>';
   const m=x?.members;
   $('member-detail').innerHTML=renderMemberAnalytics(m);
+  if($('verification-detail'))$('verification-detail').innerHTML=renderVerification(d.verification);
   $('marketing-detail').innerHTML=renderTraffic(d);
   $('system').innerHTML=(x?row('Database analytics query succeeded',date(x.system.database_query_succeeded_at)):'<p>Database analytics status unavailable.</p>')+'<p>Worker errors, API latency history, DB failure history and independent uptime: unavailable. A successful query is a point-in-time check, not uptime. Deployment history was audited separately; no live deployment monitor is connected.</p>';
   if(x){$('import-table').innerHTML+= '<h3>Job quality · raw records now</h3>'+row('Active records with posted date over 30 days old',num(x.job_quality.active_posted_over_30d))+row('Active records missing posted date',num(x.job_quality.active_missing_posted_at))+row('Duplicate URL groups',num(x.job_quality.duplicate_url_groups))+row('Duplicate source-ID groups',num(x.job_quality.duplicate_source_groups))+row('Inactive records',num(x.job_quality.inactive_rows))+'<p class="note">Old posting dates indicate age, not confirmed expiration. Duplicate groups are raw candidates; public listings already deduplicate. Import failures and confirmed expired jobs require authoritative importer/source events.</p>';}
@@ -245,6 +247,7 @@ async function load({automatic=false}={}){
     failures++;
     if([401,403].includes(error.status)){
       accessExpired=true;lastSuccess=null;signupQueue.length=0;
+      if($('verification-detail'))$('verification-detail').replaceChildren();
       clearTimeout(toastTimer);activeToast?.remove();activeToast=null;
       for(const id of ['overview','quick-stats','collection-health','charts','quick','errors','import-table','payment-table','actions','email','provider-balances','member-detail','marketing-detail','system'])$(id).replaceChildren();
       $('platform-status').textContent='Admin access expired';

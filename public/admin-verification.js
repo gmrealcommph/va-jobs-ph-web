@@ -1,0 +1,6 @@
+export function renderVerification(data) {
+ const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+ if(!data?.available)return '<h3>Email verification</h3><p>Verification tracking is unavailable.</p>';
+ const count=v=>Number.isSafeInteger(v)&&v>=0?v:'—';
+ return '<h3>Email verification</h3><p>'+count(data.verified)+' verified · '+count(data.unverified)+' unverified · '+count(data.total)+' members</p><p>Reminder receipts: '+count(data.reminders?.sent||0)+' accepted by provider · '+count(data.reminders?.pending||0)+' pending · '+count(data.reminders?.review||0)+' need review. Acceptance does not confirm inbox delivery.</p><p>Latest 100 members · current Auth status · all-time counts</p><div class="table-wrap"><table><thead><tr><th>Member</th><th>Status</th><th>Verified at</th><th>24h reminder accepted</th><th>72h reminder accepted</th></tr></thead><tbody>'+(data.members||[]).map(m=>'<tr><td>'+esc(m.email)+'</td><td>'+(m.email_confirmed_at?'Verified':'Unverified')+'</td><td>'+esc(m.email_confirmed_at||'—')+'</td><td>'+esc(m.reminder_24h_at||'—')+'</td><td>'+esc(m.reminder_72h_at||'—')+'</td></tr>').join('')+'</tbody></table></div>';
+}

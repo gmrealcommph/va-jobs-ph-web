@@ -92,7 +92,8 @@ export async function adminEndpoint(request, env, {session=sessionForRequest, ca
         Promise.resolve().then(()=>call(env,state.accessToken,'veeays_admin_traffic',dates)),
         Promise.resolve().then(()=>call===rpc&&cached?.extended&&cached.expires>Date.now()?structuredClone(cached.extended):call(env,state.accessToken,'veeays_admin_extended',dates)),
         Promise.resolve().then(()=>call(env,state.accessToken,'veeays_admin_registration_snapshot',{})),
-        Promise.resolve().then(()=>call(env,state.accessToken,'veeays_admin_payment_snapshot',{}))
+        Promise.resolve().then(()=>call(env,state.accessToken,'veeays_admin_payment_snapshot',{})),
+        Promise.resolve().then(()=>call(env,state.accessToken,'veeays_admin_verification_snapshot',{}))
       ]);
       for(const result of secured)if(result.status==='rejected'&&[401,403].includes(result.reason?.status))throw result.reason;
       const providers=await Promise.allSettled([
@@ -109,6 +110,7 @@ export async function adminEndpoint(request, env, {session=sessionForRequest, ca
       data.provider_balances=value(4,{available:false});
       data.registrations=value(5,{available:false});
       data.confirmed_payments=value(6,{available:false});
+      data.verification=secured[4].status==='fulfilled'?secured[4].value:{available:false};
       data.actions=actionCenter(data);
       data.runtime={quick_read_enabled:env.QUICK_READ_AUTO_ENABLED==='true',payment_mode:env.PAYMONGO_MODE || 'not configured'};
       return reply(JSON.stringify(data),200,'application/json');
@@ -136,7 +138,7 @@ export function adminPage() {
 <section id="action-center"><div class="section-heading"><h2>Action Center</h2><p>Read-only issues · follow links to inspect</p></div><article id="actions"></article></section>
 <div class="growth-row"><section id="collection-panel" class="growth-panel"><div class="section-heading"><h2>Collection Health</h2><p>Job boards · latest arrivals</p></div><div id="collection-health"></div></section><section class="quick-stats-panel"><div class="section-heading"><h2>Operational snapshot</h2><p>Queue, access and delivery</p></div><div id="quick-stats" class="cards"></div></section><div id="overview-insights" class="overview-insights" aria-label="Member, traffic and email summaries"></div></div>
 </div>
-<section id="members"><div class="section-heading"><h2>Member Analytics</h2><p>Current access and registration cohorts</p></div><article id="member-detail"></article></section>
+<section id="members"><div class="section-heading"><h2>Member Analytics</h2><p>Current access and registration cohorts</p></div><article id="member-detail"></article><article id="verification-detail"></article></section>
 <section id="marketing"><link rel="stylesheet" href="/admin-traffic.css"><div class="section-heading"><h2>Site Visitors &amp; Traffic Sources</h2><p>Measured traffic · attribution coverage</p></div><article id="marketing-detail"></article></section>
 <section id="payments"><div class="section-heading"><h2>Payment events</h2><p>Checkout records created in the selected period</p></div><article><p>Live confirmed payments contribute to revenue on their paid date. Test payments are excluded. Pro access includes grants and purchases; it is not a recurring subscriber count.</p><div id="payment-table" class="table-wrap"></div></article></section>
 <section id="operations"><div class="section-heading"><h2>Quick Read operations</h2><p>Current state and selected-period results</p></div><div id="quick-live"></div><div id="quick" class="panels"></div><article><h3>Recent errors in period</h3><div id="errors" class="table-wrap"></div></article></section>
