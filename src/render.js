@@ -1145,7 +1145,7 @@ ${
 }
 
 
-export function authPage({ mode = 'login', error = '', message = '', email = '', returnTo = '' } = {}) {
+export function authPage({ mode = 'login', error = '', message = '', email = '', returnTo = '', turnstileSiteKey = '', authCaptcha = false, fullName = '' } = {}) {
   const signup = mode === 'signup';
   const applyIntent = returnTo.startsWith('/apply/');
   return `
@@ -1164,12 +1164,13 @@ export function authPage({ mode = 'login', error = '', message = '', email = '',
         ${message ? `<div class="auth-alert success" role="status">${esc(message)}</div>` : ''}
         <form class="auth-form" method="post" action="${signup ? '/signup' : '/login'}">
           ${returnTo ? `<input type="hidden" name="return" value="${esc(returnTo)}">` : ''}
-          ${signup ? `<div class="auth-field"><label for="full_name">Full name</label><input id="full_name" name="full_name" type="text" autocomplete="name" maxlength="100" required></div>` : ''}
+          ${signup ? `<div class="auth-field"><label for="full_name">Full name</label><input id="full_name" name="full_name" type="text" autocomplete="name" maxlength="100" value="${esc(fullName)}" required></div>` : ''}
           <div class="auth-field"><label for="email">Email address</label><input id="email" name="email" type="email" autocomplete="email" maxlength="254" value="${esc(email)}" required></div>
-          <div class="auth-field"><label for="password">Password</label><input id="password" name="password" type="password" autocomplete="${signup ? 'new-password' : 'current-password'}" minlength="8" maxlength="128" ${signup ? 'aria-describedby="auth-password-help" ' : ''}required>${signup ? '<small id="auth-password-help">Use 8–128 characters for your password.</small>' : ''}</div>
+          <div class="auth-field"><label for="password">Password</label><input id="password" name="password" type="password" autocomplete="${signup ? 'new-password' : 'current-password'}" minlength="8" maxlength="128" ${signup ? 'aria-describedby="auth-password-help" ' : ''}required>${signup ? '<small id="auth-password-help">Use 8–128 characters for your password.</small>' : ''}</div>${turnstileSiteKey ? `
+          <div class="cf-turnstile" data-sitekey="${esc(turnstileSiteKey)}" data-action="${signup ? 'signup' : 'login'}"></div><script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>` : ''}
           <button type="submit">${signup ? 'Create account' : 'Log in'}</button>
         </form>
-        <p class="auth-switch">${signup ? `Already have an account? <a href="/login${returnTo ? `?return=${encodeURIComponent(returnTo)}` : ''}">Log in</a>` : `New to VeeAys? <a href="/signup${returnTo ? `?return=${encodeURIComponent(returnTo)}` : ''}">Create an account</a>`}</p>
+        <p><a href="/forgot-password">Forgot password?</a> · <a href="/auth/resend">Resend verification email</a></p><p class="auth-switch">${signup ? `Already have an account? <a href="/login${returnTo ? `?return=${encodeURIComponent(returnTo)}` : ''}">Log in</a>` : `New to VeeAys? <a href="/signup${returnTo ? `?return=${encodeURIComponent(returnTo)}` : ''}">Create an account</a>`}</p>
       </div>
     </section>`;
 }
@@ -1180,14 +1181,14 @@ function authPostcard(label) {
 
 export function checkEmailPage(email = '', returnTo = '') {
   const loginHref = '/login' + (returnTo ? `?return=${encodeURIComponent(returnTo)}` : '');
-  return `<link rel="stylesheet" href="/auth.css?v=20261006"><section class="auth-shell auth-polish"><div class="auth-intro"><div class="kicker">ONE MORE STEP</div><h1>Check your<br><em>inbox.</em></h1><p>We sent a confirmation link${email ? ` to <strong>${esc(email)}</strong>` : ''}. Click it to verify your email and continue setting up your VeeAys account.</p>${authPostcard('A little inbox delivery')}</div><div class="auth-card"><div class="auth-card-label">YOUR EMAIL CONFIRMATION</div><h2>Verify your email</h2><p>Open the email from VeeAys and follow the confirmation link. It will take you back here.</p><div class="auth-inbox-note"><strong>Still looking for it?</strong><p>Check your spam or junk folder, and make sure you’re checking the email address you signed up with.</p></div><a class="button" href="${esc(loginHref)}">Back to log in</a></div></section>`;
+  return `<link rel="stylesheet" href="/auth.css?v=20261006"><section class="auth-shell auth-polish"><div class="auth-intro"><div class="kicker">ONE MORE STEP</div><h1>Check your<br><em>inbox.</em></h1><p>We sent a confirmation link${email ? ` to <strong>${esc(email)}</strong>` : ''}. Click it to verify your email and continue setting up your VeeAys account.</p>${authPostcard('A little inbox delivery')}</div><div class="auth-card"><div class="auth-card-label">YOUR EMAIL CONFIRMATION</div><h2>Verify your email</h2><p>Open the email from VeeAys and follow the confirmation link. It will take you back here.</p><div class="auth-inbox-note"><strong>Still looking for it?</strong><p>Check your spam or junk folder, and make sure you’re checking the email address you signed up with.</p></div><p><a href="/auth/resend?email=${encodeURIComponent(email)}&amp;return=${encodeURIComponent(returnTo)}">Resend verification email</a></p><a class="button" href="${esc(loginHref)}">Back to log in</a></div></section>`;
 }
 
 export function authCallbackPage() {
   return `<link rel="stylesheet" href="/auth.css?v=20261006"><section class="auth-callback auth-polish">${authPostcard('Almost there')}<div role="status" aria-live="polite"><div class="kicker">VERIFYING</div><h1>Finishing your sign in…</h1><p>Please keep this page open for a moment.</p></div><noscript><p>JavaScript is needed to finish email verification. Enable it, then reopen the confirmation link from your email.</p><a href="/login">Back to log in</a></noscript></section><script src="/auth-callback.js" defer></script>`;
 }
 
-export function onboardingPage({ user, preferences = null, error = '' } = {}) {
+export function onboardingPage({ user, preferences = null, error = '', memberEmailChoices = null } = {}) {
   const roles = ['Executive Assistant','General VA','Customer Support','Social Media','Marketing','Sales','E-commerce','Bookkeeping','Graphic Design','Video Editing','Operations','Web/Development','Other'];
   const employment = ['Full-time','Part-time','Contract/Freelance'];
   const schedules = ['Philippines daytime','UK/Europe hours','Australia hours','US hours','Flexible/Any'];
@@ -1232,6 +1233,7 @@ export function onboardingPage({ user, preferences = null, error = '' } = {}) {
       <section class="onboard-step" data-step="5">
         <div class="onboard-step-label">YOUR SEARCH PROFILE</div><h2 tabindex="-1">Your search profile, ready to go.</h2><p>Here’s what matters to you. Go back to adjust anything, then save your profile and explore jobs.</p>
         <h3 class="onboard-recap-title">Your search profile</h3><div class="onboard-review" id="onboard-review"></div>
+        ${memberEmailChoices===null?'':`<fieldset><legend>A little inbox boost? Totally your call.</legend><input type="hidden" name="member_email_choices" value="v1"><p><label><input type="checkbox" name="member_tips" value="yes" ${memberEmailChoices.tips===true?'checked':''}> Send me getting-started emails and practical career tips during my first two weeks.</label></p><p><label><input type="checkbox" name="member_pro" value="yes" ${memberEmailChoices.pro===true?'checked':''}> Send me the optional introduction to VeeAys Pro.</label></p><p>These are separate from job digests. Unsubscribe anytime. <a href="/privacy">Privacy policy</a>.</p></fieldset>`}
         <div class="onboard-ready"><strong>${esc(user?.email || 'Your account')}</strong><span>✓ Your preferences will be saved to this account. You can update them later.</span></div>
       </section>
       <div class="onboard-actions"><button class="button secondary" type="button" id="onboard-back" hidden>Back</button><button type="button" id="onboard-next">Continue</button><button type="submit" id="onboard-finish" hidden>Save profile &amp; explore jobs</button></div>
@@ -1528,4 +1530,17 @@ export function myJobsPage({ saved = [], applications = [], message = '', error 
     }));
   })();
   </script>`;
+}
+
+// Share the established login/signup design with account recovery and email states.
+export function authSupportPage(title, body, pathname) {
+  const resend = pathname === '/auth/resend';
+  const copy = title === 'Check your inbox'
+    ? ['ONE MORE STEP', 'A little inbox<br><em>delivery.</em>', 'Your next step is on its way. Check your inbox and spam folder for an email from VeeAys.', 'A little inbox delivery']
+    : title === 'Password updated'
+    ? ['READY TO GO', 'A fresh start,<br><em>all yours.</em>', 'Your password is updated. Head back to your saved jobs and your next possibilities.', 'Welcome back']
+    : resend
+    ? ['ONE MORE STEP', 'Your next chapter,<br><em>one click away.</em>', 'Verify your email to keep exploring opportunities open to Filipino talent.', 'Your next chapter']
+    : ['WELCOME BACK', 'A fresh start,<br><em>without the fuss.</em>', 'Let’s get you back to your saved jobs, preferences, and next possibilities.', 'Back to possibilities'];
+  return `<link rel="stylesheet" href="/auth.css?v=20261006"><section class="auth-shell auth-polish"><div class="auth-intro"><div class="kicker">${copy[0]}</div><h1>${copy[1]}</h1><p>${copy[2]}</p>${authPostcard(copy[3])}</div><div class="auth-card"><div class="auth-card-label">${resend ? 'YOUR EMAIL CONFIRMATION' : 'YOUR VEEAYS ACCOUNT'}</div><h2>${esc(title)}</h2>${body}</div></section>`;
 }

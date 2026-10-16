@@ -1,3 +1,4 @@
+import {memberEmailUIEnabled} from './lifecycle-config.js';
 import {sessionForRequest,setSessionCookies} from './auth.js';
 import {healthRPC} from './job-health.js';
 import {layout,esc} from './render.js';
@@ -32,6 +33,6 @@ export async function jobAlertsEndpoint(request,env,{session=sessionForRequest,c
  h.set('location','/job-alerts?saved=1');return reply('',303);
  }
  const data=await call(env,state.accessToken,'my_job_alerts',{});
- return reply(layout({title:'My Job Alerts',noindex:true,user:state.user,body:'<link rel="stylesheet" href="/job-alerts.css">'+(url.searchParams.get('saved')==='1'?'<p role="status">Job alert preferences saved.</p>':'')+alertForm({...data,deliveryPaused:env.JOB_ALERTS_MODE!=='enabled'})}));
+ return reply(layout({title:'My Job Alerts',noindex:true,user:state.user,body:'<link rel="stylesheet" href="/job-alerts.css">'+(url.searchParams.get('saved')==='1'?'<p role="status">Job alert preferences saved.</p>':'')+alertForm({...data,deliveryPaused:env.JOB_ALERTS_MODE!=='enabled'})+(memberEmailUIEnabled(env)?'<p class="wrap"><a href="/member-emails">Choose onboarding, career tips and Pro introduction emails</a></p>':'')}));
  }catch(error){return reply(`<h1>Job alerts need another try</h1><p>${error.status===409?'A delivery is finishing. Please retry in 30 seconds.':'We could not confirm your settings. Please reopen this page and try again.'}</p><a href="/job-alerts">Reopen My Job Alerts</a>`,error.status===409?409:503);}
 }

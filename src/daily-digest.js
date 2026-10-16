@@ -1,4 +1,5 @@
 import { configuration, rest, one } from './notifications.js';
+import {reserveMemberEmailGap} from './lifecycle-coordination.js';
 
 export const DIGEST_CRON='* * * * *';
 const DAY=86400000, RETRY_WINDOW=23*3600000;
@@ -111,6 +112,7 @@ export async function processDigest(env,config,delivery,token) {
     delivery.payload=payload;
     person=await checked(config,delivery,args);
     if (payload.to?.length!==1 || payload.to[0]!==person.email) throw new Review('recipient_changed');
+    await reserveMemberEmailGap(env,delivery.user_id,'daily_digest',delivery.id);
     const started=await rpc(config,'start_daily_digest_attempt',args);
     if (!Number.isFinite(Date.parse(started)) || Date.now()-Date.parse(started)>=RETRY_WINDOW)
       throw new Review('idempotency_window_expired');
