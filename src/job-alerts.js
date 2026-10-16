@@ -1,4 +1,5 @@
 import {configuration,rest} from './notifications.js';
+import {reserveMemberEmailGap} from './lifecycle-coordination.js';
 import {digestMessage} from './daily-digest.js';
 import {categoryArtwork} from './job-detail-header.js';
 const rpc=(c,n,b)=>rest(c,'rpc/'+n,{}, {method:'POST',body:JSON.stringify(b)});
@@ -63,6 +64,7 @@ export async function processJobAlert(env,c,d,token,{call=rpc,request=fetch}={})
  const visible=await rest({...c,key:env.SUPABASE_PUBLISHABLE_KEY,modernKey:true},'public_jobs',{select:'id',id:`in.(${ids.join(',')})`,limit:'10'});
  if(visible.length!==ids.length)throw Object.assign(Error(),{safe:'visibility_changed'});
  person=await call(c,'check_job_alert',args);if(person?.error||payload.to?.[0]!==person.email)throw Object.assign(Error(),{safe:'recipient_or_jobs_changed'});
+ await reserveMemberEmailGap(env,d.user_id,'job_alert',d.id);
  if(await call(c,'start_job_alert',args)!==true)throw Object.assign(Error(),{safe:'send_refused'});
 
  const r=await request('https://api.resend.com/emails',{method:'POST',headers:{Authorization:'Bearer '+env.RESEND_API_KEY,'content-type':'application/json','Idempotency-Key':'veeays-job-alert-'+d.id},body:JSON.stringify(payload),signal:AbortSignal.timeout(15000)});

@@ -45,18 +45,18 @@ export async function authFetch(env, path, init = {}) {
   return { response, data };
 }
 
-export async function signUp(env, { email, password, fullName, redirectTo }) {
+export async function signUp(env, { email, password, fullName, redirectTo, captchaToken }) {
   const path = `/auth/v1/signup?redirect_to=${encodeURIComponent(redirectTo)}`;
   return authFetch(env, path, {
     method: 'POST',
-    body: JSON.stringify({ email, password, data: { full_name: fullName } })
+    body: JSON.stringify({ email, password, data: { full_name: fullName }, ...(captchaToken ? {gotrue_meta_security:{captcha_token:captchaToken}} : {}) })
   });
 }
 
-export async function signIn(env, { email, password }) {
+export async function signIn(env, { email, password, captchaToken }) {
   return authFetch(env, '/auth/v1/token?grant_type=password', {
     method: 'POST',
-    body: JSON.stringify({ email, password })
+    body: JSON.stringify({ email, password, ...(captchaToken ? {gotrue_meta_security:{captcha_token:captchaToken}} : {}) })
   });
 }
 
