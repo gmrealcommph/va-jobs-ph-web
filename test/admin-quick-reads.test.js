@@ -101,7 +101,7 @@ test('polling supports older browsers and skewed tablet clocks, rejects stale se
  const ctx=vm.createContext({document:doc,window:{addEventListener(){},matchMedia:()=>({matches:false,addEventListener(){},removeEventListener(){}}),requestAnimationFrame:()=>1,cancelAnimationFrame(){}},performance:{now:()=>mono},Date:class extends Date{static now(){return Date.parse(time)+mono+8*3600000;}},Intl,AbortSignal:{},AbortController,
  setTimeout:(fn,delay)=>{timeouts.set(++id,{fn,delay});return id;},clearTimeout:i=>timeouts.delete(i),setInterval:()=>1,clearInterval(){},
  fetch:async(url,options)=>{requests++;assert.equal(url,'/admin/api/quick-reads');assert.equal(options.method,undefined);assert.equal(options.cache,'no-store');return {status,ok:status===200,headers:{get:()=>new Date(Date.parse(time)+mono).toUTCString()},json:async()=>({...fixture(),checked_at:new Date(Date.parse(time)+mono+snapshotOffset).toISOString()})};}});
- const source=(await readFile(new URL('../public/admin-quick-reads.js',import.meta.url),'utf8')).replaceAll('export ','');
+ const source=(await readFile(new URL('../public/admin-quick-reads.js',import.meta.url),'utf8')).replace(/^import [^\n]+\n/,'const updateProcessingCard=()=>{};\n').replaceAll('export ','');
  vm.runInContext(source,ctx);ctx.root=root;vm.runInContext('startProcessingMonitor(root)',ctx);
  const flush=()=>new Promise(resolve=>setImmediate(resolve));await flush();
  assert.equal(requests,1);assert.match(root.innerHTML,/79/);assert.equal([...timeouts.values()][0].delay,15000);
