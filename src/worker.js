@@ -8,6 +8,7 @@ import {scheduledLifecycle} from './lifecycle-email.js';
 import {jobAlertsEndpoint} from './job-alerts-page.js';
 import {scheduledJobAlerts} from './job-alerts.js';
 import { adminEndpoint } from './admin.js';
+import {adminMembersEndpoint} from './admin-members.js';
 import { jobHealthEndpoint } from './job-health.js';
 import { scheduledJobHealth, JOB_HEALTH_CRON } from './job-health-scheduled.js';
 import {trafficEndpoint,linkTrafficRegistration} from './traffic.js';
@@ -68,6 +69,7 @@ export async function handle(request, env) {
   if(url.pathname === '/privacy') refreshDeletionDisclosure(env);
   if(['/account/delete','/account/deleted','/account/deletion.css','/account/deletion.js'].includes(url.pathname)) return accountDeletionEndpoint(request,env);
   if(url.pathname==='/traffic/event')return trafficEndpoint(request,env);
+  if (url.pathname === '/admin/api/members') return adminMembersEndpoint(request,env);
   if (url.pathname === '/admin' || url.pathname.startsWith('/admin/')) return adminEndpoint(request, env);
   if (['/pro/checkout', '/pro/return', '/webhooks/paymongo'].includes(url.pathname)) return proCheckoutEndpoint(request, env);
   const quickReadMatch=url.pathname.match(/^\/internal\/quick-read\/([1-9]\d{0,18}|batch)$/);

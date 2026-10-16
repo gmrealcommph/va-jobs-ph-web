@@ -17,6 +17,7 @@
     ]
   },
   "vars": {
+    "ADMIN_MEMBER_ACTIONS_ENABLED": "false",
     "JOB_ALERTS_MODE": "disabled",
     "JOB_REPORTS_ENABLED": "true",
     "JOB_HEALTH_VERIFY_ENABLED": "false",
