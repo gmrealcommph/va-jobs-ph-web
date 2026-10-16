@@ -1,7 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {adminMembersEndpoint} from '../src/admin-members.js';
-import {processingCard} from '../public/admin-processing-card.js';
 const actor='10000000-0000-4000-8000-000000000001',target='10000000-0000-4000-8000-000000000002';
 const env={SITE_URL:'https://veeays.com',ADMIN_MEMBER_ACTIONS_ENABLED:'true'};
 let sequence=0;
@@ -26,4 +25,3 @@ test('password mismatch and MFA fail closed; temporary password sessions are cle
 test('deletion closes checkouts before receipt-preserving finalization; provider failure stops finalization',async()=>{
  for(const fail of [false,true]){const {deps,req,calls}=setup();if(fail)deps.close=async()=>{throw Error('Provider unavailable');};const response=await adminMembersEndpoint(req(),env,deps);assert.equal(response.status,fail?503:200);const actions=calls.filter(c=>c.service);assert.equal(actions[0].b.p_action,'delete');assert.equal(actions.length,fail?1:2);if(!fail){assert.equal(actions[1].b.p_action,'finish_delete');assert.ok(calls.findIndex(c=>c.n==='close')<calls.findIndex(c=>c.b?.p_action==='finish_delete'));}assert.ok(calls.some(c=>c.n==='logout'));}
 });
-test('processing summary uses current queue counts and handles outages without false zeros',()=>{assert.match(processingCard({counts:{completed:42,queued:10,processing:1,failed:2}}),/>42</);assert.match(processingCard(null),/unavailable/);assert.doesNotMatch(processingCard(null),/>0</);assert.match(processingCard({counts:{completed:0}}),/unavailable/);assert.match(processingCard({counts:{completed:0,queued:0,processing:0,failed:0}}),/not historical queue trends/);});

@@ -14,7 +14,7 @@ Suspension removes refresh sessions, sets the Auth ban, rejects existing JWTs in
 
 The root scrolling bug reproduced at 390px: body `overflow:clip` propagated to the viewport while root overflow was visible. A touch swipe moved 0px. Giving the root an explicit vertical scroll container and allowing visible body overflow on mobile restores scrolling; desktop retains its layout and rounded container. Native dialogs scroll independently and clean up their password field on close.
 
-The former Email allowance overview tile now shows processed, queued, processing and failed automatic Quick Reads counts as labelled bars. It shares the existing 15-second monitor without adding network polling. Counts are current queue state, not historical queue depth; stale/incomplete data is labelled unavailable. Detailed Email Health remains available.
+The Email allowance overview tile and existing Quick Reads monitoring are retained unchanged.
 
 ## Validation
 

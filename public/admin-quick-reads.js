@@ -1,4 +1,3 @@
-import {updateProcessingCard} from './admin-processing-card.js';
 const stamp=value=>value?Date.parse(value):NaN;
 const freshWindow=45000;
 export function processingState(data,age=0){
@@ -71,7 +70,6 @@ export function startProcessingMonitor(root){
   const age=data?performance.now()-received:0;
   lastState=processingState(data,age).state;
   root.innerHTML=renderProcessing(data,age,issue);
-  updateProcessingCard(age>freshWindow?null:data);
   if(open&&root.querySelector('details'))root.querySelector('details').open=true;
  };
  const poll=async()=>{

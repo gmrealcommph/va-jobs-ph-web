@@ -227,7 +227,7 @@ html{scroll-behavior:smooth;scrollbar-width:thin;scrollbar-color:var(--line) tra
 @keyframes jobs-bar-enter{from{transform:scaleY(0);opacity:.2}to{transform:scaleY(1);opacity:1}}@keyframes jobs-bar-breathe{0%,100%{opacity:1}50%{opacity:.6}}
 @media(prefers-reduced-motion:reduce){.primary-card .jobs-bar-chart .jobs-bar{animation:none;transform:none}}
 /* Keep dialogs independent of the page scroll container. */
-.member-dialog{width:min(640px,calc(100vw - 24px));max-height:calc(100dvh - 24px);overflow:auto;overflow-wrap:anywhere;background:var(--surface);color:var(--ink);border:1px solid var(--line);border-radius:16px;padding:24px}.member-dialog::backdrop{background:#10251dcc}.member-dialog form{display:grid;gap:12px}.member-dialog input,.member-dialog textarea{width:100%;font-size:16px}.member-dialog label{display:grid;gap:6px}#member-management form{display:flex;flex-wrap:wrap;gap:8px;margin:16px 0}#member-management>button{margin:8px 8px 0 0}.processing-bars{width:100%;height:auto;display:block}.processing-bars text{fill:var(--ink);font:12px sans-serif}
+.member-dialog{width:min(640px,calc(100vw - 24px));max-height:calc(100dvh - 24px);overflow:auto;overflow-wrap:anywhere;background:var(--surface);color:var(--ink);border:1px solid var(--line);border-radius:16px;padding:24px}.member-dialog::backdrop{background:#10251dcc}.member-dialog form{display:grid;gap:12px}.member-dialog input,.member-dialog textarea{width:100%;font-size:16px}.member-dialog label{display:grid;gap:6px}#member-management form{display:flex;flex-wrap:wrap;gap:8px;margin:16px 0}#member-management>button{margin:8px 8px 0 0}
 html{overflow-y:auto}
 @media(max-width:700px){body{overflow:visible}main{min-width:0}.member-dialog{padding:16px}}
 /* HTML axis labels retain natural letter proportions at every card size. */
@@ -265,7 +265,3 @@ html{overflow-y:auto}
 /* Edge-to-edge, enlarged geography with recognizable coastlines and borders. */
 .reference-board .traffic-mix-tile:before{inset:0;background-size:160% auto;background-position:54% 43%;opacity:.28;border-radius:inherit}
 :root[data-theme=dark] .reference-board .traffic-mix-tile:before{opacity:.22}
-
-/* Queue summaries need enough room for accessible labels and scope notes. */
-.reference-board .email-allowance-tile{height:auto!important;min-height:260px!important}
-@media(max-width:700px){.reference-board .email-allowance-tile{grid-column:1/-1!important}.processing-bars text{font-size:14px}}
