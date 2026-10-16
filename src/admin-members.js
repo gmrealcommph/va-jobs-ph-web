@@ -1,6 +1,7 @@
 import {sessionForRequest,setSessionCookies,clearSessionCookies,signIn,authFetch} from './auth.js';
 import {config} from './data.js';
 import {closeDeletionCheckout} from './account-deletion.js';
+import {authCaptchaToken} from './signup-protection.js';
 
 async function rpc(env,token,name,body,service=false){
  const {url,key}=config(env),secret=service?env.SUPABASE_SERVICE_ROLE_KEY:token;
@@ -29,6 +30,7 @@ export async function adminMembersEndpoint(request,env,{session=sessionForReques
    const result=await call(env,state.accessToken,'veeays_admin_members',{p_query:(url.searchParams.get('q')||'').slice(0,100),p_filter:url.searchParams.get('filter')||'all',p_offset:Math.floor(Math.max(0,Math.min(100000,Number(url.searchParams.get('offset'))||0))),p_id:id||null});
    if(id){const token=crypto.randomUUID();headers.append('set-cookie',`__Host-veeays_member=${state.user.id}.${id}.${token}; Path=/; Secure; HttpOnly; SameSite=Strict; Max-Age=300`);result.token=token;}
    result.actions_enabled=env.ADMIN_MEMBER_ACTIONS_ENABLED==='true';
+   result.captcha={required:env.AUTH_CAPTCHA_ENABLED==='true',site_key:env.TURNSTILE_SITE_KEY||''};
    return reply(result);
   }
   // Disabled by default; deployment approval must explicitly enable actions.
@@ -38,6 +40,10 @@ export async function adminMembersEndpoint(request,env,{session=sessionForReques
   const raw=await request.text();if(raw.length>4096)return reply({error:'Request too large'},413);
   let body;try{body=JSON.parse(raw);}catch{return reply({error:'Invalid request'},400);}
   const {id,action,token,password,confirm,reason}=body;
+  if(env.AUTH_CAPTCHA_ENABLED==='true'&&!env.TURNSTILE_SITE_KEY)return reply({error:'Security check temporarily unavailable.'},503);
+  const captchaForm=new FormData();
+  if(body.captchaToken!==undefined){if(typeof body.captchaToken!=='string')return reply({error:'Complete the security check.'},400);captchaForm.append('cf-turnstile-response',body.captchaToken);}
+  let captchaToken;try{captchaToken=authCaptchaToken(env,captchaForm);}catch{return reply({error:'Complete the security check.'},400);}
   const cookie=(request.headers.get('cookie')||'').split(';').map(s=>s.trim()).find(s=>s.startsWith('__Host-veeays_member='))?.slice('__Host-veeays_member='.length);
   if(!uuid.test(id||'')||!uuid.test(token||'')||cookie!==`${state.user.id}.${id}.${token}`||!['suspend','reactivate','delete'].includes(action)||confirm!==`${action.toUpperCase()} ${id}`||typeof reason!=='string'||reason.trim().length<5||reason.length>500||typeof password!=='string'||!password||password.length>128)return reply({error:'Reopen member details and complete the confirmation.'},400);
   if(id===state.user.id||state.user.factors?.some(f=>f.status==='verified'))return reply({error:'Protected account or additional verification required.'},409);
@@ -45,8 +51,9 @@ export async function adminMembersEndpoint(request,env,{session=sessionForReques
   const limit=attempts.get(state.user.id)||{count:0,until:Date.now()+60000};
   if(++limit.count>5||attempts.size>500)return reply({error:'Please wait before retrying.'},429);attempts.set(state.user.id,limit);
   if(env.ADMIN_API_LIMITER&&!(await env.ADMIN_API_LIMITER.limit({key:'member-actions:'+state.user.id})).success)return reply({error:'Please wait before retrying.'},429);
-  const fresh=await verify(env,{email:state.user.email,password});freshToken=fresh.data?.access_token;
+  const fresh=await verify(env,{email:state.user.email,password,captchaToken});freshToken=fresh.data?.access_token;
   if(!fresh.response.ok||fresh.data?.user?.id!==state.user.id||!freshToken)return reply({error:'Password could not be verified.'},403);
+  if(fresh.data.user.factors?.some(f=>f.status==='verified'))return reply({error:'Additional verification required.'},409);
   if(await call(env,freshToken,'veeays_admin_access',{})!==true)return reply({error:'Admin access required.'},403);
   const args={p_actor:state.user.id,p_target:id,p_action:action,p_reason:reason.trim(),p_request:token};
   const prepared=await call(env,null,'veeays_admin_member_action',args,true);

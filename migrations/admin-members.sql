@@ -46,7 +46,10 @@ grant execute on function public.veeays_admin_members(text,text,integer,uuid) to
 -- block direct Data API access to member-owned rows while the account is banned.
 create or replace function veeays_admin.member_active() returns boolean
 language sql stable security definer set search_path='' as $$
- select exists(select 1 from auth.users where id=auth.uid() and (banned_until is null or banned_until<=now()));
+ select exists(select 1 from auth.users u join auth.sessions s on s.user_id=u.id
+  where u.id=auth.uid() and (u.banned_until is null or u.banned_until<=now())
+   and s.id::text=current_setting('request.jwt.claims',true)::jsonb->>'session_id'
+   and (s.not_after is null or s.not_after>now()));
 $$;
 revoke all on function veeays_admin.member_active() from public,anon;
 grant execute on function veeays_admin.member_active() to authenticated;
@@ -71,7 +74,7 @@ begin
   or not exists(select 1 from veeays_admin.accounts where user_id=p_actor)
   or p_actor=p_target or exists(select 1 from veeays_admin.accounts where user_id=p_target)
   then raise exception 'Forbidden' using errcode='42501'; end if;
- if p_request is null or p_target is null or p_reason is null or length(trim(p_reason))<5 or length(p_reason)>500 or p_action not in ('suspend','reactivate','delete','finish_delete') then raise exception 'Invalid action'; end if;
+ if p_request is null or p_target is null or p_reason is null or length(trim(p_reason))<5 or length(p_reason)>500 or p_action is null or p_action not in ('suspend','reactivate','delete','finish_delete') then raise exception 'Invalid action'; end if;
  perform pg_catalog.pg_advisory_xact_lock(pg_catalog.hashtextextended(p_request::text,0));
  if exists(select 1 from veeays_admin.member_audit where request_id=p_request and (actor<>p_actor or target<>p_target)) then raise exception 'Confirmation mismatch'; end if;
  if exists(select 1 from veeays_admin.member_audit where request_id=p_request and action<>p_action and not (p_action='finish_delete' and action='delete') and not (p_action='delete' and action='finish_delete')) then raise exception 'Action mismatch'; end if;

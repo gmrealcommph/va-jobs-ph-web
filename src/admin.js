@@ -49,6 +49,7 @@ async function rpc(env, token, name, body) {
 export async function adminEndpoint(request, env, {session=sessionForRequest, call=rpc, visitors=visitorAnalytics, usage=cachedEmailUsage, balances=providerBalances}={}) {
   const url=new URL(request.url), monitor=url.pathname==='/admin/api/quick-reads', api=monitor||url.pathname==='/admin/api/analytics';
   const headers=new Headers(privateHeaders);
+  if(!api&&env.ADMIN_MEMBER_ACTIONS_ENABLED==='true'&&env.TURNSTILE_SITE_KEY)headers.set('content-security-policy',privateHeaders['content-security-policy'].replace("script-src 'self'", "script-src 'self' https://challenges.cloudflare.com").replace("connect-src 'self'", "frame-src https://challenges.cloudflare.com; connect-src 'self' https://challenges.cloudflare.com"));
   const reply=(body,status,type='text/html; charset=utf-8')=>{
     headers.set('content-type',type);
     return new Response(body,{status,headers});

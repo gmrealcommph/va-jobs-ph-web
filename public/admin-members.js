@@ -1,4 +1,20 @@
 const el=(tag,text)=>{const node=document.createElement(tag);if(text!==undefined)node.textContent=String(text??'—');return node;};
+let turnstileReady;
+export function loadTurnstile(doc=document){
+ if(globalThis.turnstile)return Promise.resolve(globalThis.turnstile);
+ if(!turnstileReady)turnstileReady=new Promise((resolve,reject)=>{
+  const script=doc.createElement('script');script.src='https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit';script.async=true;
+  const timer=setTimeout(()=>{script.remove();turnstileReady=undefined;reject(Error('Security check unavailable. Reopen member details.'));},15000);
+  script.onload=()=>{clearTimeout(timer);if(globalThis.turnstile)resolve(globalThis.turnstile);else{turnstileReady=undefined;reject(Error('Security check unavailable.'));}};
+  script.onerror=()=>{clearTimeout(timer);script.remove();turnstileReady=undefined;reject(Error('Security check unavailable. Reopen member details.'));};doc.head.append(script);
+ });return turnstileReady;
+}
+export function memberChallenge(api,host,sitekey,send){
+ let token='';send.disabled=true;
+ const invalidate=()=>{token='';send.disabled=true;};
+ const widget=api.render(host,{sitekey,action:'admin-reauth',callback:value=>{token=value;send.disabled=!value;},'expired-callback':invalidate,'error-callback':invalidate,'timeout-callback':invalidate});
+ return {token:()=>token,reset:()=>{invalidate();api.reset(widget);},remove:()=>{invalidate();api.remove(widget);}};
+}
 export function initMembers(doc=document){
  const host=doc.getElementById('members');if(!host)return;
  const article=el('article'),title=el('h3','Manage members'),form=el('form'),query=el('input'),filter=el('select'),submit=el('button','Search'),status=el('p'),list=el('div'),prev=el('button','Previous'),next=el('button','Next');
@@ -14,17 +30,22 @@ export function initMembers(doc=document){
    for(const field of ['id','full_name','created_at','email_confirmed_at','last_sign_in_at','plan','plan_status','pro_expires_at','suspended','review_reason','confirmed_receipts'])dialog.append(el('p',field.replaceAll('_',' ')+': '+(member[field]??'—')));
    dialog.append(el('p','Deletion permanently removes personal data and ends Pro access. Financial receipts are detached and preserved; payments are not refunded. Open checkout links must be closed.'));
    const actions=el('form'),action=el('select'),reason=el('textarea'),confirmation=el('input'),password=el('input'),send=el('button','Confirm action'),message=el('p');
+   let challenge;const captchaHost=el('div');
    for(const value of ['suspend','reactivate','delete']){const o=el('option',value);o.value=value;action.append(o);}
    const label=(text,node)=>{const l=el('label',text);l.append(node);return l;};
    reason.required=true;reason.minLength=5;reason.maxLength=500;confirmation.required=true;password.type='password';password.autocomplete='current-password';password.required=true;password.maxLength=128;message.setAttribute('role','status');
    const hint=el('p');const paint=()=>{hint.textContent='Type '+action.value.toUpperCase()+' '+id+' to confirm.';confirmation.value='';};action.onchange=paint;paint();
-   actions.append(label('Action',action),label('Reason for audit log',reason),hint,label('Typed confirmation',confirmation),label('Your current admin password',password),send,message);
+   actions.append(label('Action',action),label('Reason for audit log',reason),hint,label('Typed confirmation',confirmation),label('Your current admin password',password),captchaHost,send,message);
    if(data.actions_enabled&&!member.protected)dialog.append(actions);else dialog.append(el('p',member.protected?'Administrator accounts are protected.':'Member actions await activation approval.'));
    dialog.append(el('h3','Recent audit history'));for(const entry of data.audit||[])dialog.append(el('p',entry.created_at+' · '+entry.action+' · '+entry.reason+' · Admin '+entry.actor));
    actions.onsubmit=async e=>{e.preventDefault();if(confirmation.value!==action.value.toUpperCase()+' '+id){message.textContent='Confirmation does not match.';return;}send.disabled=true;
-    try{const r=await fetch('/admin/api/members',{method:'POST',credentials:'same-origin',headers:{'content-type':'application/json'},body:JSON.stringify({id,action:action.value,reason:reason.value,confirm:confirmation.value,password:password.value,token:data.token})});const result=await r.json();password.value='';if(!r.ok)throw Error(result.error);dialog.close();await load();}catch(error){password.value='';message.textContent=error.message;send.disabled=false;}
+    try{if((data.captcha?.required||data.captcha?.site_key)&&!challenge?.token())throw Error('Complete the security check.');const r=await fetch('/admin/api/members',{method:'POST',credentials:'same-origin',headers:{'content-type':'application/json'},body:JSON.stringify({id,action:action.value,reason:reason.value,confirm:confirmation.value,password:password.value,token:data.token,captchaToken:challenge?.token()})});const result=await r.json();password.value='';if(!r.ok)throw Error(result.error);dialog.close();await load();}catch(error){password.value='';message.textContent=error.message;send.disabled=false;}finally{challenge?.reset();}
    };
-   dialog.addEventListener('close',()=>{password.value='';dialog.remove();});doc.body.append(dialog);dialog.showModal();close.focus();
+   dialog.addEventListener('close',()=>{password.value='';challenge?.remove();challenge=undefined;dialog.remove();});doc.body.append(dialog);dialog.showModal();close.focus();
+   if(data.actions_enabled&&!member.protected&&(data.captcha?.required||data.captcha?.site_key)){
+    send.disabled=true;
+    try{if(!data.captcha.site_key)throw Error('Security check unavailable.');const api=await loadTurnstile(doc);if(dialog.open)challenge=memberChallenge(api,captchaHost,data.captcha.site_key,send);}catch(error){message.textContent=error.message;}
+   }
   }catch(error){status.textContent=error.message;}
  }
  async function load(){if(loading)return;loading=true;prev.disabled=next.disabled=submit.disabled=true;status.textContent='Loading members…';try{const data=await read({q:query.value,filter:filter.value,offset}),table=el('table'),head=el('tr');for(const text of ['Member','Verification','Status','Review','Details'])head.append(el('th',text));table.append(head);for(const m of data.members.slice(0,50)){const row=el('tr');row.append(el('td',m.email),el('td',m.email_confirmed_at?'Verified':'Unverified'),el('td',m.suspended?'Suspended':'Active'),el('td',m.review_reason||'—'));const cell=el('td'),button=el('button','Review');button.type='button';button.onclick=()=>details(m.id);cell.append(button);row.append(cell);table.append(row);}list.replaceChildren(table);status.textContent=data.members.length?'Showing members '+(offset+1)+'–'+(offset+Math.min(50,data.members.length)): 'No members found.';prev.disabled=offset===0;next.disabled=data.members.length<=50;}catch(error){list.replaceChildren();status.textContent=error.message;}finally{loading=false;submit.disabled=false;}}
