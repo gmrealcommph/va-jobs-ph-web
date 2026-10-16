@@ -1,0 +1,27 @@
+# Admin scrolling release candidate
+
+Decision: GO for draft review; NO-GO for production until preflight blockers are cleared and separate explicit approval is given.
+
+Base: PR #6, 4b11e28883710f332b475014d040683acbb7357f. Extracted from PR #7 bdd7f5e5c28d5149fe39cbb171e94060b86dcd6a. Runtime diff is only public/admin-theme.css: explicit root vertical scrolling; mobile body overflow visible and main min-width zero at <=700px. No member code/dialog styles, SQL, policies, auth, configuration, Email Allowance or Quick Reads changes. Other additions are this note and local browser verification.
+
+## Verification
+44 focused tests pass (admin-polling, admin-quick-reads, admin-interactions, auth-production-regression). Wrangler 4.144.0 dry-run passes, no upload. git diff --check passes.
+Local Chrome synthetic dashboard: 390px touch scroll 0 -> 1069px; 700px 0 -> 970px; 1280px input scroll 0 -> 1499px. All four lower dashboard sections reachable; wheel scrolling resumes, Email Allowance renders, no horizontal overflow or page errors. No native dialogs exist in PR #6. Real-device/iOS and authenticated live dashboard checks remain unperformed.
+Reproduce: node --test test/admin-polling.test.js test/admin-quick-reads.test.js test/admin-interactions.test.js test/auth-production-regression.test.js; npm run build; node scripts/verify-admin-scroll.mjs (Playwright and installed Chrome required; PLAYWRIGHT_PACKAGE_ROOT can point to a shared package directory; ADMIN_TEST_OUTPUT selects evidence directory).
+
+## Baseline and rollback evidence
+Saved branding deployment record identifies 081b6577-3502-401c-9b7b-1785772e0014 at 100% on 2026-10-16 08:06 Manila. Current management API GET requests returned 401 with both available Wrangler credential locations. Active version, live source, bindings, settings, secrets, schedules and rollback availability cannot be freshly confirmed.
+Seven public dashboard assets returned 200 and match PR #6 after LF normalization (admin-theme.css, admin.css, admin.js, admin-interactions.js, admin-quick-reads.js/css, admin-balances.js). Three CSS files differ in byte hashes due to line endings. This is sampled content parity, not full immutable asset-manifest parity.
+45 of 48 source entries match the inherited provenance table allowing CRLF/LF. auth-support.js, render.js and worker.js do not match that table, but all three match the saved branding source after LF normalization. Treat the inherited hash table as stale for these three files; do not claim fresh live source parity.
+Recorded rollback target is the current auth baseline 081b6577; predecessor 6d139fac-5adf-4524-9fa2-adcaa1dfee4f is historical evidence only. Rollback execution and complete asset restoration are untested.
+
+## Exact staged deployment plan (requires separate approval)
+1. Restore management read access. Assert the active deployment is exactly the expected 081b6577 version at 100%; stop on drift. Fetch active source, full asset identity/inventory, settings/binding descriptors and schedules. Verify recovered compiled Worker against active Worker and resolve every baseline discrepancy. Do not use main or repository Wrangler configuration as a complete production manifest.
+2. Snapshot the current version ID, full asset set/identity, source hash, nonsecret settings, secret binding names and schedules. Confirm the baseline version remains deployable and references the original assets. Require a tested restoration method for assets before release. Preserve the snapshot outside any overwritten asset set.
+3. Freeze the reviewed candidate commit and hashes. Package the active Worker source unchanged and the complete current assets with only the reviewed admin-theme.css rules inserted. Match every other asset to production; stop if this cannot be proved. Preserve live bindings (including rate limiter and secret bindings), runtime, flags and four schedules exactly. No SQL or flag changes. Verify the resulting packaged CSS on 390/700/1280px before approval.
+4. Present exact commit, artifact hashes, metadata diff (empty), asset diff (one CSS), rollback version and verified restoration procedure for explicit upload/deploy approval. Approval must name these immutable artifacts. Approval to review this draft is not deployment authorization.
+5. Only after approval, upload the prepared asset set and Worker version without traffic, verify source/assets/bindings/runtime against approved hashes and current state, then activate that version at 100% during an agreed low-traffic window. Do not run a plain repository deploy, which could replace production-only assets/settings. Do not reconcile or merge PR #6/#7 as part of this release.
+6. Immediately verify authenticated admin at 390/700/1280px: touch/wheel, lower sections, any existing overlays, horizontal bounds, Email Allowance and existing Quick Reads display. Read-only login/signup/recovery smoke checks; compare settings/schedules. Watch errors for 15 minutes. Stop and roll back on regression.
+7. Include rollback authority in deployment approval: restore recorded baseline version at 100% plus original asset identity/set using the verified procedure, recheck source/assets/settings/schedules and smoke checks. No SQL rollback. If baseline/asset restoration cannot be confirmed, NO-GO before activation.
+
+No merge, deployment, SQL, activation or production mutation was performed. Next approval: review this scrolling-only draft; production approval is deferred until the listed preflight evidence is complete.
