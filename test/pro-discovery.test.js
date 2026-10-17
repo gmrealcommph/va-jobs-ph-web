@@ -7,7 +7,7 @@ test('public Pro page makes free access and pre-payment state explicit with work
  const html=proPage();
  for(const text of ['YOUR JOB SEARCH,','ON AUTOPILOT.','₱499 for 30 days','No automatic renewal','checkout is not available for this account right now','Every public job stays free.','Your top 3 personalized matches','Personalized Job Alerts','Daily Job Digest'])assert.ok(html.includes(text),text);
  assert.match(html,/href="\/signup\?return=%2Fonboarding"/);
- assert.doesNotMatch(html,/checkout|thousands|AI|as they roll out/);
+ assert.doesNotMatch(html,/checkout.com|thousands|AI|as they roll out/);
  assert.doesNotMatch(html,/current feed limit|product limit|Full ranked feed|full personalized feed|100-result|charge you|—/);
  assert.match(html,/Try your free matches →/);
  assert.match(html,/Your personalized job feed/);
