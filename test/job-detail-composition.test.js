@@ -32,4 +32,3 @@ test('Quick Read values are unchanged and source remains separately visible with
   assert.doesNotMatch(unavailable,/quick-read-title|Quick Read above/);
   assert.match(unavailable,/employer-listing-title/);
 });
-

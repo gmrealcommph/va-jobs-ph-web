@@ -220,4 +220,3 @@ test('logo load/error/decode failure keeps accessible decorative fallback and ne
   assert.doesNotMatch(html,/data-company-logo|TechnologyAdvice logo/);
   assert.match(detail({id:42,company:'TechnologyAdvice',description:technologySource}),/jh-company-initials/);
 });
-
