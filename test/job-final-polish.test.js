@@ -51,7 +51,7 @@ test('heading family has one unique flight and enum chip display is local',()=>{
  const job={id:123,title:'Support '.repeat(30),company:'Your Personal AI '.repeat(20),workplace_type:'remote',location:'Worldwide',description:p,job_url:'https://example.com',source:'himalayas'};
  const before=structuredClone(job);const html=detail(job,{user:{id:'u'}});
  assert.deepEqual(job,before);assert.equal((html.match(/qr-glance-flight"/g)||[]).length,1);
- assert.equal((html.match(/qr-glance-sparks"/g)||[]).length,3);
+ assert.equal((html.match(/qr-glance-sparks"/g)||[]).length,2);
  assert.match(html,/>Remote<\/span>/);assert.match(html,/Save this role or mark it applied to start your journey/);
 });
 test('ready Quick Read stays ready while its original description display dedupes',()=>{
