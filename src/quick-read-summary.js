@@ -53,18 +53,39 @@ export function validateSummary(summary, units) {
   const sourceWordCount=summarySourceUnits(units).reduce((n,u)=>n+words(u.text).length,0);
   if (total > 250 || total < (sourceWordCount < 180 ? 30 : 120)) fail();
   // Evidence coverage is mandatory for consequential facts, never every duty.
-  if (summarySourceUnits(units).some(u=>material.test(equivalent(u.text)) && !covered.has(u.id))) fail();
+  const criticalCondition = /\b(?:salary|compensation|pay range|sponsorship|work authori[sz]ation|eligible|eligibility|application deadline|auto.rejected|screening|shift|working hours|work schedule|based in|resid(?:e|ent|ents|ency)|remote|on[- ]?site|hybrid|(?:NZ|New Zealand|US|UK|Philippines) hours)\b|\b(?:schedule|location)\s*:/i;
+  // Flattened import lines can repeat separately cited passages. Match source
+  // text, never just pay amounts, and retain any additional critical condition.
+  const canonical = text => words(equivalent(text).replace(/(\d)([a-z])/gi,'$1 $2')).join(' ');
+  const evidenceIds = unit => {
+    if (covered.has(unit.id)) return [unit.id];
+    let remainder=' '+canonical(unit.text)+' ';
+    const ids=[...covered].filter(id=>words(units[id].text).length>=3)
+      .sort((a,b)=>canonical(units[b].text).length-canonical(units[a].text).length)
+      .filter(id=>{
+        const passage=' '+canonical(units[id].text)+' ';
+        if (!remainder.includes(passage)) return false;
+        remainder=remainder.replace(passage,' ');
+        return true;
+      });
+    return criticalCondition.test(remainder) || /\b(?:schedule|location)\b/i.test(remainder) ? [] : ids;
+  };
+  if (summarySourceUnits(units).some(u=>criticalCondition.test(equivalent(u.text)) && !evidenceIds(u).length)) fail();
   const combined=Object.keys(SUMMARY_SECTIONS).map(k=>summary[k].text).join(' ');
   // A citation alone cannot preserve a pay amount or minimum experience threshold.
   for(const original of summarySourceUnits(units).filter(u=>material.test(equivalent(u.text)))) {
     const unit={...original,text:equivalent(original.text)};
-    const citedText=equivalent(Object.keys(SUMMARY_SECTIONS).filter(k=>summary[k].source_ids.includes(unit.id)).map(k=>summary[k].text).join(' '));
+    const citedText=equivalent(Object.keys(SUMMARY_SECTIONS).filter(k=>summary[k].source_ids.some(id=>evidenceIds(unit).includes(id))).map(k=>summary[k].text).join(' '));
     if(numbers(unit.text).some(n=>!numbers(citedText).includes(n))) fail();
     for(const term of [/\bfull[- ]time\b/i,/\bpart[- ]time\b/i,/\bcontractor\b/i]) if(term.test(unit.text) && !term.test(citedText)) fail();
-    if(/\b(?:preferred|desirable|optional)\b/i.test(unit.text) && !/\b(?:preferred|desirable|optional)\b/i.test(citedText)) fail();
+    if(citedText && /\b(?:preferred|desirable|optional)\b/i.test(unit.text) && !/\b(?:preferred|desirable|optional)\b/i.test(citedText)) fail();
     if(noSponsorship(unit.text) && (!noSponsorship(citedText) || /\b(?:sponsorship (?:is )?(?:available|offered|provided)|(?:provides|offers) (?:visa )?sponsorship)\b/i.test(citedText))) fail();
     if(/\b(?:must|required|essential)\b/i.test(unit.text)) {
-      for(const term of [/\blaptop\b/i,/\binternet\b/i,/\bbackup\b/i,/\bNotion\b/i]) if(term.test(unit.text) && !term.test(citedText)) fail();
+      for(const term of [/\blaptop\b/i,/\binternet\b/i,/\bbackup\b/i,/\bNotion\b/i]) {
+        // The same required tool can be supported by another cited passage.
+        const supported=Object.keys(SUMMARY_SECTIONS).some(k=>term.test(summary[k].text) && summary[k].source_ids.some(id=>term.test(equivalent(units[id].text))));
+        if(term.test(unit.text) && !supported) fail();
+      }
     }
     for(const match of unit.text.matchAll(/\b(\d+\+?)\s+years?\b/gi)) if(!new RegExp('\\b'+match[1].replace('+','\\+')+'\\s+years?\\b','i').test(citedText)) fail();
   }
