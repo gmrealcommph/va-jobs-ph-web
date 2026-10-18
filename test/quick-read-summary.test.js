@@ -114,3 +114,48 @@ test('provider failures, refusals and model allowlist remain enforced on prose g
   await assert.rejects(generateWithProvider(env,sparse,async()=>Response.json({status:'completed',output:[{content:[{type:'refusal'}]}]})),/provider_refusal/);
   await assert.rejects(generateWithProvider(env,sparse,async()=>Response.json({status:'incomplete',output:[]})),/provider_incomplete/);
 });
+
+
+test('duplicate import passages accept equivalent citations, never numbers alone or extra conditions',()=>{
+  const units=sourceUnits(sparse);
+  units.push({id:3,text:'Salary: PHP 1500 per month.'});
+  const q=structuredClone(sparseSummary);
+  q.arrangements={text:'The pay is PHP 1500 per month. Working hours are not specified.',source_ids:[3]};
+  units.push({id:4,text:'Salary: PHP 1500 per month. Duties include naming files and checking folders.'});
+  assert.deepEqual(validateSummary(q,units),q);
+  for(const extra of ['Night shift required.','Location: Manila only.','Only residents of the Philippines are eligible.','Salary: USD 1500 per month.']) {
+    const changed=structuredClone(units);changed[4].text+=' '+extra;
+    assert.throws(()=>validateSummary(q,changed),/summary_quality_rejected/,extra);
+  }
+  const changed=structuredClone(units);changed[4].text='Salary: PHP 1500 per hour.';
+  assert.throws(()=>validateSummary(q,changed),/summary_quality_rejected/);
+});
+
+test('consequential schedule, location and eligibility require citations; ordinary duties do not',()=>{
+  for(const condition of ['Night shift required.','Working hours: New Zealand business hours.','Location: Manila only.','Applicants must be based in the Philippines.','Only Philippine residents may apply.','Hiring eligibility is limited to citizens.']) {
+    const units=sourceUnits(sparse);units.push({id:3,text:condition});
+    assert.throws(()=>validateSummary(sparseSummary,units),/summary_quality_rejected/,condition);
+  }
+  const units=sourceUnits(sparse);
+  units.push({id:3,text:'Schedule meetings and maintain the shared calendar.'});
+  assert.deepEqual(validateSummary(sparseSummary,units),sparseSummary);
+});
+
+
+test('required tools can cite another supporting passage, but cannot lose source support',()=>{
+  const units=sourceUnits(sparse);
+  units.push({id:3,text:'Notion is essential for this role.'},{id:4,text:'Use Notion to track shared files.'});
+  const q=structuredClone(sparseSummary);q.candidate={text:'You will use Notion to keep track of shared files and send a portfolio with your application.',source_ids:[2,4]};
+  assert.deepEqual(validateSummary(q,units),q);
+  const missing=structuredClone(q);missing.candidate.source_ids=[2];
+  assert.throws(()=>validateSummary(missing,units),/summary_quality_rejected/);
+});
+
+test('uncited ordinary preferences may be condensed, but cited preferences remain optional',()=>{
+  const units=sourceUnits(sparse);units.push({id:3,text:'Design experience is preferred.'});
+  const q=structuredClone(sparseSummary);q.candidate.text+=' A portfolio is preferred.';q.candidate.source_ids.push(3);
+  units.push({id:4,text:'Illustration experience is desirable.'});
+  assert.deepEqual(validateSummary(q,units),q);
+  const bad=structuredClone(q);bad.candidate.text=bad.candidate.text.replace('preferred','required');
+  assert.throws(()=>validateSummary(bad,units),/summary_quality_rejected/);
+});
