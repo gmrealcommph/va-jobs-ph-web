@@ -3,6 +3,7 @@ import { sectionHeadingMarks } from './job-section-heading.js';
 import { formatQuickRead } from './quick-read.js';
 import { validateStored } from './quick-read-generation.js';
 import { presentQuickRead, displayValue } from './quick-read-presentation.js';
+import {SUMMARY_SECTIONS} from './quick-read-summary.js';
 const escape = value => String(value).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const labels = {salary:'Salary', about_role:'About the role', responsibilities:"What you'll do", requirements:"What they're looking for", nice_to_have:'Nice to have', important_requirements:'Important requirements', benefits:'Benefits', company_overview:'About the company', application_notes:'Application notes', source_metadata:'Source metadata', conflicting_source_details:'Conflicting source details', other_details:'Other source details'};
 export function renderJobRead(description, stored = undefined, job = {}) {
@@ -10,6 +11,7 @@ export function renderJobRead(description, stored = undefined, job = {}) {
   const validated = stored === undefined ? formatQuickRead(description) : validateStored(stored, description);
   const quick = validated && presentQuickRead(validated, description, job);
   const original = `<div class="qr-original">${escape(originalDescriptionDisplay(description))}</div>`;
+  if(validated?.summary) return `<section class="qr"><h2>✨ VeeAys Quick Read</h2><p class="qr-disclosure">A summary of the employer's listing. Check the original description for full details.</p><div class="qr-content">${Object.entries(SUMMARY_SECTIONS).map(([key,label])=>`<section class="qr-section"><h3>${escape(label)}</h3><p>${escape(validated.summary[key].text)}</p></section>`).join('')}</div><details class="qr-source"><summary>Original description · View source</summary>${original}</details></section>`;
   if (!quick) return `<section class="qr"><h2>Original description</h2><p>This listing is shown from the employer's original description.</p>${original}</section>`;
   return `<section class="qr"><h2>✨ VeeAys Quick Read</h2><p class="qr-disclosure">We've organized this employer's listing to make it easier to scan. Important requirements and details come from the original job posting.</p><p class="qr-disclosure">Structured details above and employer wording below are shown separately; any differences are left visible.</p><div class="qr-content">${Object.entries(labels).filter(([key])=>quick[key].length).map(([key,label])=>`<section class="qr-section"><h3>${label}</h3><ul>${quick[key].map(text=>`<li>${escape(text)}</li>`).join('')}</ul></section>`).join('')}</div><details class="qr-source"><summary>Original description · View source</summary>${original}</details></section>`;
 }
