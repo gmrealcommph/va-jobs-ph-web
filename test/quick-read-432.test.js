@@ -1,12 +1,12 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
-import {SECTIONS,sourceUnits,validateSelection,validateStored,generateWithProvider,sourceFingerprint} from '../src/quick-read-generation.js';
+import {SECTIONS,sourceUnits,validateSelection,validateStored,organizeWithProvider as generateWithProvider,sourceFingerprint} from '../src/quick-read-generation.js';
 import {renderJobRead} from '../src/job-detail-read.js';
 // Public HTML-decoded Original description, GET /jobs/432 on 2026-10-05
 // Asia/Manila. Not historical database bytes or the failed provider response.
 const source=readFileSync(new URL('./fixtures/backfill-432.txt',import.meta.url),'utf8');
-const env={OPENAI_API_KEY:'test-only',QUICK_READ_MODEL:'gpt-5-mini'};
+const env={QUICK_READ_GENERATION_ENABLED:'true',OPENAI_API_KEY:'test-only',QUICK_READ_MODEL:'gpt-5-mini'};
 const response=q=>Response.json({status:'completed',output:[{content:[{type:'output_text',text:JSON.stringify(q)}]}]});
 function selection(text=source) {
  const q=Object.fromEntries(SECTIONS.map(k=>[k,[]]));q.other_details=sourceUnits(text).map(u=>u.id);return q;

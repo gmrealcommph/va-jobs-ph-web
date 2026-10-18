@@ -11,7 +11,6 @@
   "triggers": {
     "crons": [
       "* * * * *",
-      "0-59 * * * *",
       "*/15 * * * *",
       "17 */6 * * *"
     ]
@@ -19,21 +18,47 @@
   "vars": {
     "JOB_ALERTS_MODE": "disabled",
     "JOB_REPORTS_ENABLED": "true",
-    "JOB_HEALTH_VERIFY_ENABLED": "false",
+    "JOB_HEALTH_VERIFY_ENABLED": "true",
     "DAILY_DIGEST_MODE": "enabled",
     "DAILY_DIGEST_START_AT": "2026-10-04T00:00:00Z",
     "PAYMONGO_LIVE_CHECKOUT_ENABLED": "true",
     "PAYMONGO_MODE": "live",
-    "QUICK_READ_AUTO_ENABLED": "true",
-    "QUICK_READ_BATCH_ENABLED": "true",
-    "QUICK_READ_MODE": "manual",
+    "QUICK_READ_GENERATION_ENABLED": "false",
+    "QUICK_READ_AUTO_ENABLED": "false",
+    "QUICK_READ_BATCH_ENABLED": "false",
+    "QUICK_READ_MODE": "disabled",
     "QUICK_READ_MODEL": "gpt-5-mini",
     "QUICK_READ_PROVIDER": "openai",
     "SITE_URL": "https://veeays.com",
     "STRONG_MATCH_MODE": "enabled",
     "STRONG_MATCH_START_AT": "2026-10-03T04:15:00Z",
     "SUPABASE_PUBLISHABLE_KEY": "sb_publishable_ZRWxrn1CiYzfRSsJgFGUNg_m5iFhPi_",
-    "SUPABASE_URL": "https://nwqmhqiymtqkdihjadrp.supabase.co"
+    "SUPABASE_URL": "https://nwqmhqiymtqkdihjadrp.supabase.co",
+    "ADMIN_MEMBER_ACTIONS_ENABLED": "true",
+    "AUTH_CAPTCHA_ENABLED": "false",
+    "LIFECYCLE_COORDINATION_ENABLED": "true",
+    "LIFECYCLE_DAILY_CAP": "5",
+    "LIFECYCLE_MODE": "production",
+    "LIFECYCLE_MONTHLY_CAP": "50",
+    "LIFECYCLE_PRODUCTION_APPROVED": "true",
+    "LIFECYCLE_START_AT": "2026-10-14T09:50:00Z",
+    "LIFECYCLE_UI_ENABLED": "true",
+    "LIFECYCLE_WEBHOOK_ENABLED": "true",
+    "LIFECYCLE_WEBHOOK_VERIFIED": "true",
+    "MANUAL_STRONG_MATCH_IDS": "",
+    "SIGNUP_PROTECTION_ENABLED": "false",
+    "STRONG_MATCH_TEST_EMAIL": "gm.realcommph@gmail.com",
+    "TURNSTILE_SITE_KEY": "0x4AAAAAAFXdYOH9n_3qxxD7"
   },
-  "compatibility_flags": []
+  "compatibility_flags": [],
+  "ratelimits": [
+    {
+      "name": "SIGNUP_RATE_LIMITER",
+      "namespace_id": "1792077600",
+      "simple": {
+        "limit": 60,
+        "period": 60
+      }
+    }
+  ]
 }

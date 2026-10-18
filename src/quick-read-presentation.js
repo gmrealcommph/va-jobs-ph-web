@@ -1,7 +1,10 @@
 // Display-only projection. Call only AFTER complete payload validation; never persist it.
 import { sourceUnits } from './quick-read-generation.js';
 const headings = /^(?:the opportunity|about the role|about the job|job summary|what you'll do|what you will do|responsibilities|key responsibilities|duties|key duties|responsibilities include|who you are|requirements|qualifications|skills and experience|what they're looking for|what we're looking for|required qualifications|nice to have|preferred qualifications|preferred experience|what we offer you|what we offer|benefits|about us|about the company|work authorization|important requirements|application notes|how to apply|salary range|monthly pay range|eoe statement)$/i;
-const normalize = text => text.trim().replace(/[_–—-]+/g,' ').replace(/\s+/g,' ').toLowerCase();
+const normalize = text => {
+  const value=text.trim().replace(/[_–—-]+/g,' ').replace(/\s+/g,' ').toLowerCase();
+  return ['contract','contractor','independent contractor'].includes(value)?'contractor':value;
+};
 export function displayValue(value, field) {
   if (typeof value !== 'string') return '';
   const key = normalize(value);

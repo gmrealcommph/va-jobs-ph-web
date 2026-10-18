@@ -1,0 +1,267 @@
+{
+  "placement": {},
+  "compatibility_date": "2026-10-01",
+  "compatibility_flags": [],
+  "usage_model": "standard",
+  "tags": [],
+  "tail_consumers": [],
+  "logpush": false,
+  "observability": {
+    "enabled": false,
+    "head_sampling_rate": 1,
+    "redact_query_string": false,
+    "logs": {
+      "enabled": true,
+      "head_sampling_rate": 1,
+      "persist": true,
+      "invocation_logs": true
+    },
+    "traces": {
+      "enabled": false,
+      "persist": true,
+      "head_sampling_rate": 1
+    },
+    "issues": {
+      "enabled": false
+    }
+  },
+  "annotations": {
+    "workers/message": "Approved PR11 application sidebar only; current live code and 84 assets retained",
+    "workers/triggered_by": "version_upload"
+  },
+  "bindings": [
+    {
+      "name": "ADMIN_MEMBER_ACTIONS_ENABLED",
+      "text": "true",
+      "type": "plain_text"
+    },
+    {
+      "name": "ASSETS",
+      "type": "assets"
+    },
+    {
+      "name": "AUTH_CAPTCHA_ENABLED",
+      "text": "false",
+      "type": "plain_text"
+    },
+    {
+      "name": "CLOUDFLARE_ANALYTICS_TOKEN",
+      "type": "secret_text"
+    },
+    {
+      "name": "CLOUDFLARE_BILLING_TOKEN",
+      "type": "secret_text"
+    },
+    {
+      "name": "CLOUDFLARE_USAGE_ACCOUNT_ID",
+      "type": "secret_text"
+    },
+    {
+      "name": "CLOUDFLARE_USAGE_TOKEN",
+      "type": "secret_text"
+    },
+    {
+      "name": "CLOUDFLARE_USAGE_WORKER_NAME",
+      "type": "secret_text"
+    },
+    {
+      "name": "DAILY_DIGEST_MODE",
+      "text": "enabled",
+      "type": "plain_text"
+    },
+    {
+      "name": "DAILY_DIGEST_START_AT",
+      "text": "2026-10-04T00:00:00Z",
+      "type": "plain_text"
+    },
+    {
+      "name": "JOB_ALERTS_MODE",
+      "text": "disabled",
+      "type": "plain_text"
+    },
+    {
+      "name": "JOB_HEALTH_VERIFY_ENABLED",
+      "text": "true",
+      "type": "plain_text"
+    },
+    {
+      "name": "JOB_REPORTS_ENABLED",
+      "text": "true",
+      "type": "plain_text"
+    },
+    {
+      "name": "LIFECYCLE_COORDINATION_ENABLED",
+      "text": "true",
+      "type": "plain_text"
+    },
+    {
+      "name": "LIFECYCLE_DAILY_CAP",
+      "text": "5",
+      "type": "plain_text"
+    },
+    {
+      "name": "LIFECYCLE_MODE",
+      "text": "production",
+      "type": "plain_text"
+    },
+    {
+      "name": "LIFECYCLE_MONTHLY_CAP",
+      "text": "50",
+      "type": "plain_text"
+    },
+    {
+      "name": "LIFECYCLE_PRODUCTION_APPROVED",
+      "text": "true",
+      "type": "plain_text"
+    },
+    {
+      "name": "LIFECYCLE_START_AT",
+      "text": "2026-10-14T09:50:00Z",
+      "type": "plain_text"
+    },
+    {
+      "name": "LIFECYCLE_UI_ENABLED",
+      "text": "true",
+      "type": "plain_text"
+    },
+    {
+      "name": "LIFECYCLE_WEBHOOK_ENABLED",
+      "text": "true",
+      "type": "plain_text"
+    },
+    {
+      "name": "LIFECYCLE_WEBHOOK_SECRET",
+      "type": "secret_text"
+    },
+    {
+      "name": "LIFECYCLE_WEBHOOK_VERIFIED",
+      "text": "true",
+      "type": "plain_text"
+    },
+    {
+      "name": "MANUAL_NOTIFICATION_TOKEN",
+      "type": "secret_text"
+    },
+    {
+      "name": "MANUAL_STRONG_MATCH_IDS",
+      "text": "",
+      "type": "plain_text"
+    },
+    {
+      "name": "OPENAI_API_KEY",
+      "type": "secret_text"
+    },
+    {
+      "name": "OPENAI_USAGE_ADMIN_KEY",
+      "type": "secret_text"
+    },
+    {
+      "name": "PAYMONGO_LIVE_CHECKOUT_ENABLED",
+      "text": "true",
+      "type": "plain_text"
+    },
+    {
+      "name": "PAYMONGO_LIVE_SECRET_KEY",
+      "type": "secret_text"
+    },
+    {
+      "name": "PAYMONGO_LIVE_WEBHOOK_SECRET",
+      "type": "secret_text"
+    },
+    {
+      "name": "PAYMONGO_MODE",
+      "text": "live",
+      "type": "plain_text"
+    },
+    {
+      "name": "QUICK_READ_ADMIN_TOKEN",
+      "type": "secret_text"
+    },
+    {
+      "name": "QUICK_READ_AUTO_ENABLED",
+      "text": "true",
+      "type": "plain_text"
+    },
+    {
+      "name": "QUICK_READ_BATCH_ENABLED",
+      "text": "true",
+      "type": "plain_text"
+    },
+    {
+      "name": "QUICK_READ_MODE",
+      "text": "manual",
+      "type": "plain_text"
+    },
+    {
+      "name": "QUICK_READ_MODEL",
+      "text": "gpt-5-mini",
+      "type": "plain_text"
+    },
+    {
+      "name": "QUICK_READ_PROVIDER",
+      "text": "openai",
+      "type": "plain_text"
+    },
+    {
+      "name": "RESEND_API_KEY",
+      "type": "secret_text"
+    },
+    {
+      "name": "RESEND_USAGE_KEY",
+      "type": "secret_text"
+    },
+    {
+      "name": "SIGNUP_PROTECTION_ENABLED",
+      "text": "false",
+      "type": "plain_text"
+    },
+    {
+      "name": "SIGNUP_RATE_LIMITER",
+      "namespace_id": "1792077600",
+      "simple": {
+        "limit": 60,
+        "period": 60
+      },
+      "type": "ratelimit"
+    },
+    {
+      "name": "SITE_URL",
+      "text": "https://veeays.com",
+      "type": "plain_text"
+    },
+    {
+      "name": "STRONG_MATCH_MODE",
+      "text": "enabled",
+      "type": "plain_text"
+    },
+    {
+      "name": "STRONG_MATCH_START_AT",
+      "text": "2026-10-03T04:15:00Z",
+      "type": "plain_text"
+    },
+    {
+      "name": "STRONG_MATCH_TEST_EMAIL",
+      "text": "gm.realcommph@gmail.com",
+      "type": "plain_text"
+    },
+    {
+      "name": "SUPABASE_PUBLISHABLE_KEY",
+      "text": "sb_publishable_ZRWxrn1CiYzfRSsJgFGUNg_m5iFhPi_",
+      "type": "plain_text"
+    },
+    {
+      "name": "SUPABASE_SERVICE_ROLE_KEY",
+      "type": "secret_text"
+    },
+    {
+      "name": "SUPABASE_URL",
+      "text": "https://nwqmhqiymtqkdihjadrp.supabase.co",
+      "type": "plain_text"
+    },
+    {
+      "name": "TURNSTILE_SITE_KEY",
+      "text": "0x4AAAAAAFXdYOH9n_3qxxD7",
+      "type": "plain_text"
+    }
+  ]
+}

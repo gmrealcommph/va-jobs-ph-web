@@ -7,9 +7,9 @@ const user={id:'u'};
 const panel=options=>detail(job,options).split('<aside class="job-detail-sidebar">')[1].split('</aside>')[0];
 test('application panel uses exact escaped identity and safe apply route, retaining attribution',()=>{
  const html=panel({user});
- assert.match(html,/YOUR APPLICATION/);assert.match(html,/Ready to make/);
+ assert.match(html,/YOUR APPLICATION/);assert.match(html,/Keep track and take the next step/);
  assert.match(html,/Freelancer Support Specialist &lt;Senior&gt;/);
- assert.match(html,/Your Personal AI/);assert.match(html,/>YP<\/div>/);
+ assert.match(html,/Your Personal AI/);assert.match(html,/job-application-plane/);
  assert.doesNotMatch(html,/OPPORTUNITY SNAPSHOT|<dl>|<dt>|Location|Workplace|Category|Posted/);
  assert.match(html,/href="\/apply\/101"\s+target="_blank"\s+rel="nofollow noopener"/);
  assert.match(html,/Opens the employer's listing in a new tab/);assert.match(html,/https:\/\/himalayas.app\//);
@@ -21,7 +21,7 @@ test('save and unsave forms keep return intent and independent saved state',()=>
   const html=panel({user,saved});
   assert.match(html,new RegExp(`action="/${saved?'unsave':'save'}-job"`));
   assert.match(html,/name="return_to" value="\/jobs\/101"/);
-  assert.match(html,saved?/♥ Unsave job/:/♡ Save for later/);
+  assert.match(html,saved?/Unsave job/:/Save for later/);
   assert.match(html,/action="\/mark-applied"/);
   assert.equal(/aria-current="step"/.test(html),saved);
  }
@@ -69,4 +69,28 @@ test('apply requires auth, accepts only stored HTTP URLs and ignores supplied re
  let res=await handle(req(false),env);assert.equal(res.status,303);assert.match(res.headers.get('location'),/signup\?return=%2Fapply%2F101$/);
  res=await handle(req(true),env);assert.equal(res.status,302);assert.equal(res.headers.get('location'),job.job_url);
  destination='javascript:alert(1)';res=await handle(req(true),env);assert.equal(res.status,404);
+});
+
+test('primary action precedes secondary actions, progress and quiet report footer',()=>{
+ const html=panel({user,reportsEnabled:true,reported:true});
+ assert.ok(html.indexOf('job-detail-apply')<html.indexOf('job-detail-user-actions'));
+ assert.ok(html.indexOf('job-detail-user-actions')<html.indexOf('job-application-progress'));
+ assert.ok(html.indexOf('job-application-progress')<html.indexOf('job-application-footer'));
+ assert.match(html,/<footer class="job-application-footer">[\s\S]*himalayas.app[\s\S]*href="\/jobs\/101\/report"/);
+ assert.match(html,/role="status">Thank you/);
+ assert.doesNotMatch(panel({user}),/href="\/jobs\/101\/report"/);
+});
+
+
+test('mockup hierarchy uses the escaped job title, decorative icons and truthful status badge',()=>{
+ const html=panel({user});
+ assert.match(html,/<h2>Freelancer Support Specialist &lt;Senior&gt;<\/h2>/);
+ assert.doesNotMatch(html,/Ready to make|job-application-initials/);
+ assert.match(html,/job-progress-status">Not started</);
+ assert.match(panel({user,saved:true}),/job-progress-status">Saved</);
+ for(const status of ['applied','interview','offer','hired','rejected','withdrawn']) {
+  const current=panel({user,application:{status}});
+  assert.match(current,new RegExp('job-progress-status">'+status[0].toUpperCase()+status.slice(1)+'<'));
+ }
+ assert.match(html,/<svg class="application-icon"[^>]*aria-hidden="true"/);
 });

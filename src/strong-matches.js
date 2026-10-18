@@ -1,4 +1,5 @@
 import { configuration, rest, one, recipient } from './notifications.js';
+import {reserveMemberEmailGap} from './lifecycle-coordination.js';
 
 const esc = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const WINDOW = 23 * 3600000;
@@ -67,6 +68,7 @@ export async function processBatch(env, config, batch, token) {
     matches=await checkedMatches(config,batch,items);
     person=await recipient(config,batch.user_id);
     if (person.email!==payload.to[0]) throw new Review('recipient_changed');
+    await reserveMemberEmailGap(env,batch.user_id,'strong_match',batch.id);
     const started=await rpc(config,'start_strong_match_attempt',args);
     if (!Number.isFinite(Date.parse(started)) || Date.now()-Date.parse(started)>=WINDOW) throw new Review('idempotency_window_expired');
     // Keep the in-memory attempt state aligned with the durable boundary for error handling.

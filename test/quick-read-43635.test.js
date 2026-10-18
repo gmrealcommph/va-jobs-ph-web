@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {createHash} from 'node:crypto';
-import {sourceUnits,SECTIONS,validateSelection,validateStored,generateWithProvider,sourceFingerprint} from '../src/quick-read-generation.js';
+import {sourceUnits,SECTIONS,validateSelection,validateStored,organizeWithProvider as generateWithProvider,sourceFingerprint} from '../src/quick-read-generation.js';
 import {generateJob} from '../src/quick-read-service.js';
 import {presentQuickRead} from '../src/quick-read-presentation.js';
 import {renderJobRead} from '../src/job-detail-read.js';
@@ -58,7 +58,7 @@ test('43635: genuine material matches reproduce failure; allowed sections retain
   assert.match(renderJobRead(source,corrupt,{}),/This listing is shown from the employer/);
 });
 test('43635: guidance exposes exact guard matches and preference/application precedence (local mocks)',async()=>{
-  const env={OPENAI_API_KEY:'test-only',QUICK_READ_MODEL:'gpt-5-mini'};
+  const env={QUICK_READ_GENERATION_ENABLED:'true',OPENAI_API_KEY:'test-only',QUICK_READ_MODEL:'gpt-5-mini'};
   const payload=await generateWithProvider(env,source,async(url,init)=>{
     const sent=JSON.parse(init.body),input=JSON.parse(sent.input);
     assert.equal(sent.store,false);assert.equal(sent.text.format.strict,true);
@@ -86,7 +86,7 @@ test('43635: guidance exposes exact guard matches and preference/application pre
   assert.equal(bad.error,'material_condition_misplaced');assert.equal(finish.p_payload,null);
 });
 test('43635: provider correction preserves all units and rejects unrelated corruption',async()=>{
-  const env={OPENAI_API_KEY:'test-only',QUICK_READ_MODEL:'gpt-5-mini'};
+  const env={QUICK_READ_GENERATION_ENABLED:'true',OPENAI_API_KEY:'test-only',QUICK_READ_MODEL:'gpt-5-mini'};
   const q=selection();
   for(const [id,key] of [[0,'about_role'],[3,'about_role'],[9,'responsibilities'],[29,'requirements'],[35,'about_role']]) move(q,id,key);
   const result=await generateWithProvider(env,source,async()=>response(q));

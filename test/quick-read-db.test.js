@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {readFile} from 'node:fs/promises';
 import {PGlite} from '@electric-sql/pglite';
 import {pgcrypto} from '@electric-sql/pglite/contrib/pgcrypto';
-import {sourceFingerprint} from '../src/quick-read-generation.js';
+import {sourceFingerprint,generateWithProvider,validateStored} from '../src/quick-read-generation.js';
 const source='Coordinate client success operations in the Philippines.\nSalesforce and Excel experience required.\nPH work authorization required; no visa sponsorship.\nAI-generated or incomplete application answers will be auto-rejected.';
 const token='aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa';
 async function database() {
@@ -22,6 +22,24 @@ async function database() {
   return db;
 }
 const scalar=async(db,sql)=>(await db.query(sql)).rows[0].value;
+
+test('additive prose envelope survives existing SQL finish/projection and ready cache is unchanged',async()=>{
+  const db=await database();
+  try {
+    const description=await readFile(new URL('./fixtures/executive-assistant-25943.txt',import.meta.url),'utf8');
+    const summary=JSON.parse(await readFile(new URL('./fixtures/executive-assistant-25943-summary.json',import.meta.url),'utf8'));
+    const payload=await generateWithProvider({QUICK_READ_GENERATION_ENABLED:'true',OPENAI_API_KEY:'offline',QUICK_READ_MODEL:'gpt-5-mini'},description,async()=>Response.json({status:'completed',output:[{content:[{type:'output_text',text:JSON.stringify(summary)}]}]}));
+    await db.query('update public.jobs set description=$1 where id=1',[description]);
+    await scalar(db,`select public.claim_job_quick_read('1','source-organizer-v2','${token}') as value`);
+    const finish=await db.query('select public.finish_job_quick_read($1,$2,$3,$4,$5,$6) as value',['1',token,JSON.stringify(payload),'offline',2,null]);
+    assert.equal(finish.rows[0].value.status,'ready');
+    const extra=await scalar(db,"select public.public_job_detail_enrichment('1') as value");
+    assert.deepEqual(validateStored(extra.quick_read,description),payload);
+    assert.equal((await scalar(db,`select public.claim_job_quick_read('1','source-organizer-v2','${token}') as value`)).status,'unchanged');
+    await db.query('update public.jobs set description=description || $1 where id=1',[' Changed source.']);
+    assert.equal((await scalar(db,"select public.public_job_detail_enrichment('1') as value")).quick_read,null);
+  } finally {await db.close();}
+});
 test('migration and privileges: only public display fields, dedupe/inactive gate, no public cache or writes',async()=>{
   const db=await database();
   try {

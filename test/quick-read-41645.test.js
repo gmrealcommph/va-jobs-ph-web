@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {createHash} from 'node:crypto';
-import {sourceUnits,SECTIONS,validateSelection,validateStored,generateWithProvider} from '../src/quick-read-generation.js';
+import {sourceUnits,SECTIONS,validateSelection,validateStored,organizeWithProvider as generateWithProvider} from '../src/quick-read-generation.js';
 import {presentQuickRead} from '../src/quick-read-presentation.js';
 import {renderJobRead} from '../src/job-detail-read.js';
 
@@ -70,7 +70,7 @@ test('41645: synthetic preference, mixed obligation and application probes stay 
   }
 });
 test('41645: mocked provider receives hints; presentation retains substantive source and original',async()=>{
-  const payload=await generateWithProvider({OPENAI_API_KEY:'test-only',QUICK_READ_MODEL:'gpt-5-mini'},source,async(url,init)=>{
+  const payload=await generateWithProvider({QUICK_READ_GENERATION_ENABLED:'true',OPENAI_API_KEY:'test-only',QUICK_READ_MODEL:'gpt-5-mini'},source,async(url,init)=>{
     const sent=JSON.parse(init.body);assert.equal(sent.store,false);
     assert.equal(JSON.parse(sent.input).source_units[12].section_hint,'requirements');
     return Response.json({status:'completed',output:[{content:[{type:'output_text',text:JSON.stringify(selection())}]}]});

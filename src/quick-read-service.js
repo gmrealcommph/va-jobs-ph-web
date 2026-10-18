@@ -1,3 +1,4 @@
+import {generationEnabled} from './quick-read-gate.js';
 import { rest } from './notifications.js';
 import { FORMATTER_VERSION, SCHEMA_VERSION, SOURCE_RULES_VERSION, sourceFingerprint, sourceUnits, validateStored, generateWithProvider } from './quick-read-generation.js';
 import {failureDiagnostics,storedSelection} from './quick-read-diagnostics.js';
@@ -12,6 +13,7 @@ export async function rpc(env, name, args) {
   return rest(serverConfig(env),`rpc/${name}`,{}, {method:'POST',body:JSON.stringify(args)});
 }
 export async function generateJob(env, id, {call=rpc,generate=generateWithProvider}={}) {
+  if(!generationEnabled(env)) return {job_id:String(id),status:'generation_disabled'};
   const token=crypto.randomUUID();
   const claim=await call(env,'claim_job_quick_read_auto',{p_job_id:String(id),p_formatter:FORMATTER_VERSION,p_token:token,p_source_rules:SOURCE_RULES_VERSION});
   if(claim.status!=='claimed') return {job_id:String(id),status:claim.status};
@@ -27,7 +29,7 @@ export async function generateJob(env, id, {call=rpc,generate=generateWithProvid
     return {job_id:String(id),status:result.status};
   } catch(error) {
     // Only known error codes enter storage; never API responses, credentials or source text.
-    const allowed=/^(unsupported_source|unsafe_source|source_hash_mismatch|invalid_generated_output|invalid_schema|invalid_source_reference|unsupported_requirement|preference_upgraded|mixed_obligation|application_condition_misplaced|material_condition_misplaced|source_omitted|input_limit_exceeded|provider_(insufficient_credit|model_not_allowed|not_configured|http_\d{3}|incomplete|refusal|invalid_output|invalid_json))$/;
+    const allowed=/^(summary_quality_rejected|unsupported_source|unsafe_source|source_hash_mismatch|invalid_generated_output|invalid_schema|invalid_source_reference|unsupported_requirement|preference_upgraded|mixed_obligation|application_condition_misplaced|material_condition_misplaced|source_omitted|input_limit_exceeded|provider_(insufficient_credit|model_not_allowed|not_configured|http_\d{3}|incomplete|refusal|invalid_output|invalid_json))$/;
     const code=allowed.test(error.message)?error.message:'generation_failed';
     const selection=error.quickReadSelection ?? (generated ? storedSelection(generated,claim.description) : null);
     const diagnosticCodes=/^(invalid_schema|invalid_generated_output|invalid_source_reference|unsupported_requirement|preference_upgraded|mixed_obligation|application_condition_misplaced|material_condition_misplaced|source_omitted)$/;
@@ -45,7 +47,7 @@ async function tokenMatches(actual, expected) {
 export async function quickReadEndpoint(request, env, id, deps={}) {
   const json=(body,status=200)=>Response.json(body,{status,headers:{'cache-control':'no-store','x-content-type-options':'nosniff'}});
   if(request.method!=='POST') return json({error:'method_not_allowed'},405);
-  if(env.QUICK_READ_MODE!=='manual') return json({error:'generation_disabled'},503);
+  if(!generationEnabled(env) || env.QUICK_READ_MODE!=='manual') return json({error:'generation_disabled'},503);
   const expected=env.QUICK_READ_ADMIN_TOKEN;
   const actual=(request.headers.get('authorization') || '').replace(/^Bearer /,'');
   if(!expected || expected.length<32 || !actual || actual.length>512 || !await tokenMatches(actual,expected)) return json({error:'unauthorized'},401);

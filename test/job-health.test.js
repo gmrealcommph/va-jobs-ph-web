@@ -71,18 +71,18 @@ test('rate limits stop further requests to the same host, without calling jobs c
  assert.equal((await read('https://api.lever.co/one')).status,429);assert.equal((await read('https://api.lever.co/two')).reason,'source_rate_limited');assert.equal(requests,1);
 });
 
-test('six-hour pilot is registered, disabled by default and routed by the worker',async(t)=>{
+test('six-hour pilot preserves production enablement and remains explicitly disableable',async(t)=>{
  const config=JSON.parse(await readFile(new URL('../wrangler.jsonc',import.meta.url),'utf8'));
  assert.equal(JOB_HEALTH_CRON,'17 */6 * * *');
- assert.deepEqual(config.triggers.crons,['* * * * *','0-59 * * * *','*/15 * * * *',JOB_HEALTH_CRON]);
- assert.equal(config.vars.JOB_HEALTH_VERIFY_ENABLED,'false');
+ assert.deepEqual(config.triggers.crons,['* * * * *','*/15 * * * *',JOB_HEALTH_CRON]);
+ assert.equal(config.vars.JOB_HEALTH_VERIFY_ENABLED,'true');
  const calls=[];
  t.mock.method(globalThis,'fetch',async(url,options)=>{
   calls.push({url:String(url),body:options.body});
   return new Response('[]',{headers:{'content-type':'application/json'}});
  });
  const enabled={SUPABASE_URL:'https://database.example',SUPABASE_SERVICE_ROLE_KEY:'sb_secret_test-only',JOB_HEALTH_VERIFY_ENABLED:'true'};
- await worker.scheduled({cron:JOB_HEALTH_CRON},{...enabled,...config.vars},{waitUntil:()=>assert.fail()});
+ await worker.scheduled({cron:JOB_HEALTH_CRON},{...enabled,JOB_HEALTH_VERIFY_ENABLED:'false'},{waitUntil:()=>assert.fail()});
  assert.equal(calls.length,0);
  await worker.scheduled({cron:JOB_HEALTH_CRON},enabled,{waitUntil:()=>assert.fail()});
  assert.deepEqual(calls,[{url:'https://database.example/rest/v1/rpc/veeays_job_health_candidates',body:'{}'}]);

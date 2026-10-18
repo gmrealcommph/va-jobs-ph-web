@@ -1,7 +1,14 @@
+import {authSupportEndpoint} from './auth-support.js';
+import {signupProtection, authCaptchaToken} from './signup-protection.js';
+import {memberEmailUIEnabled} from './lifecycle-config.js';
+import {healthRPC as memberEmailRPC} from './job-health.js';
 import {jobAlertsWebhook} from './job-alerts-webhook.js';
+import {memberEmailsEndpoint,memberEmailsWebhook} from './lifecycle-page.js';
+import {scheduledLifecycle} from './lifecycle-email.js';
 import {jobAlertsEndpoint} from './job-alerts-page.js';
 import {scheduledJobAlerts} from './job-alerts.js';
 import { adminEndpoint } from './admin.js';
+import {adminMembersEndpoint} from './admin-members.js';
 import { jobHealthEndpoint } from './job-health.js';
 import { scheduledJobHealth, JOB_HEALTH_CRON } from './job-health-scheduled.js';
 import {trafficEndpoint,linkTrafficRegistration} from './traffic.js';
@@ -35,7 +42,7 @@ function safeReturnPath(value) {
   if (/^\/apply\/[A-Za-z0-9%._~-]{1,240}$/.test(v)) return v;
   if (/^\/jobs\/[A-Za-z0-9%._~-]{1,240}(?:\?save=1)?$/.test(v)) return v;
   if (v === '/admin' || v === '/my-jobs' || v === '/matches' || v === '/jobs' || v === '/email-preferences' || v === '/job-alerts') return v;
-  if (v === '/pro' || v === '/onboarding' || v === '/') return v;
+  if (v === '/pro' || v === '/onboarding' || v === '/' || v === '/member-emails') return v;
   return '';
 }
 async function defaultPostAuthPath(env, state) {
@@ -55,11 +62,14 @@ function hasCookie(request, name, expected = '1') {
 function xml(body) { return new Response(`<?xml version="1.0" encoding="UTF-8"?>${body}`, { headers: { 'content-type': 'application/xml; charset=utf-8', 'cache-control': 'public, max-age=300' } }); }
 export async function handle(request, env) {
   const url = new URL(request.url);
+  if(url.pathname==='/member-emails'||url.pathname==='/member-emails/unsubscribe')return memberEmailsEndpoint(request,env);
+  if(url.pathname==='/webhooks/member-emails')return memberEmailsWebhook(request,env);
   if(url.pathname==='/webhooks/job-alerts')return jobAlertsWebhook(request,env);
   if(/^\/jobs\/[1-9]\d{0,18}\/report$/.test(url.pathname)||['/admin/job-health','/admin/api/job-health'].includes(url.pathname)||(url.pathname==='/admin'&&url.searchParams.get('view')==='job-health'))return jobHealthEndpoint(request,env);
   if(url.pathname === '/privacy') refreshDeletionDisclosure(env);
   if(['/account/delete','/account/deleted','/account/deletion.css','/account/deletion.js'].includes(url.pathname)) return accountDeletionEndpoint(request,env);
   if(url.pathname==='/traffic/event')return trafficEndpoint(request,env);
+  if (url.pathname === '/admin/api/members') return adminMembersEndpoint(request, env);
   if (url.pathname === '/admin' || url.pathname.startsWith('/admin/')) return adminEndpoint(request, env);
   if (['/pro/checkout', '/pro/return', '/webhooks/paymongo'].includes(url.pathname)) return proCheckoutEndpoint(request, env);
   const quickReadMatch=url.pathname.match(/^\/internal\/quick-read\/([1-9]\d{0,18}|batch)$/);
@@ -74,6 +84,8 @@ export async function handle(request, env) {
   if (url.pathname === '/email-preferences') { if(env.JOB_ALERTS_MODE==='enabled')return Response.redirect(url.origin+'/job-alerts',303); return emailPreferences(request, env); }
 
   const siteOrigin = origin(env, url);
+  const support = await authSupportEndpoint(request, env, siteOrigin, headers);
+  if (support) return support;
 
   const sameOriginPost = () => {
     const requestOrigin = request.headers.get('origin');
@@ -155,6 +167,10 @@ export async function handle(request, env) {
       if (invalid) return Response.redirect(`${url.origin}/onboarding?error=${encodeURIComponent('Please complete each step before finishing your profile.')}`, 303);
       try {
         await saveJobPreferences(env, state.accessToken, { user_id: state.user.id, target_roles: targetRoles, minimum_salary_usd: minimumSalary, employment_types: employmentTypes, schedule_preferences: schedulePreferences, experience_level: experienceLevel, skills });
+        if(memberEmailUIEnabled(env)&&form.has('member_email_choices')){
+          if(form.getAll('member_email_choices').length!==1||form.get('member_email_choices')!=='v1'||['member_tips','member_pro'].some(k=>form.getAll(k).length>1||(form.has(k)&&form.get(k)!=='yes')))throw Error('Invalid email choices');
+          if(await memberEmailRPC(env,state.accessToken,'save_member_email_preferences',{p_tips:form.get('member_tips')==='yes',p_pro:form.get('member_pro')==='yes'})!==true)throw Error('Email choices temporarily unavailable');
+        }
         await completeOnboarding(env, state.accessToken);
       } catch (error) {
         console.error('Onboarding save failed:', error);
@@ -169,14 +185,23 @@ export async function handle(request, env) {
     const password = String(form.get('password') || '');
     const fullName = String(form.get('full_name') || '').trim().slice(0, 100);
     const returnTo = safeReturnPath(form.get('return'));
+    const retry = (message) => new Response(layout({title:'Complete your sign in', body:authPage({mode:url.pathname === '/signup' ? 'signup' : 'login', email, fullName, returnTo, error:message, turnstileSiteKey:env.TURNSTILE_SITE_KEY || ''})}), {status:400, headers:{...headers, 'cache-control':'no-store', 'content-security-policy':headers['content-security-policy'].replace("script-src 'self'; connect-src 'self';", "script-src 'self' https://challenges.cloudflare.com; frame-src https://challenges.cloudflare.com; connect-src 'self' https://challenges.cloudflare.com;")}});
+    if (request.headers.get('origin') !== url.origin) return new Response('Forbidden', {status:403});
+    if (env.AUTH_CAPTCHA_ENABLED === 'true' && !env.TURNSTILE_SITE_KEY) return new Response('Security check temporarily unavailable', {status:503});
+    let captchaToken;
+    try { captchaToken = authCaptchaToken(env, form); }
+    catch { return retry('Please complete the security check and re-enter your password. Your other details are preserved.'); }
     if (!email || !email.includes('@') || password.length < 8 || password.length > 128) {
       const target = url.pathname === '/signup' ? '/signup' : '/login';
       return Response.redirect(`${url.origin}${target}?error=${encodeURIComponent('Enter a valid email and a password of at least 8 characters.')}&email=${encodeURIComponent(email)}${returnTo ? `&return=${encodeURIComponent(returnTo)}` : ''}`, 303);
     }
 
     if (url.pathname === '/signup') {
+      const protection = await signupProtection(request, env);
+      if (protection !== 200) return new Response('Please try again later.', {status:protection, headers:{'retry-after':'60','cache-control':'no-store'}});
       if (!fullName) return Response.redirect(`${url.origin}/signup?error=${encodeURIComponent('Enter your full name.')}&email=${encodeURIComponent(email)}${returnTo ? `&return=${encodeURIComponent(returnTo)}` : ''}`, 303);
-      const { response, data } = await signUp(env, { email, password, fullName, redirectTo: `${siteOrigin}/auth/callback${returnTo ? `?return=${encodeURIComponent(returnTo)}` : ''}` });
+      const { response, data } = await signUp(env, { email, password, fullName, captchaToken, redirectTo: `${siteOrigin}/auth/callback${returnTo ? `?return=${encodeURIComponent(returnTo)}` : ''}` });
+      if (!response.ok && /captcha/i.test(authError(data, ''))) return retry('Please complete a fresh security check and re-enter your password.');
       if (!response.ok) return Response.redirect(`${url.origin}/signup?error=${encodeURIComponent(authError(data, 'We could not create your account.'))}&email=${encodeURIComponent(email)}${returnTo ? `&return=${encodeURIComponent(returnTo)}` : ''}`, 303);
       await linkTrafficRegistration(request,env,data?.user);
       if (data?.access_token && data?.refresh_token) {
@@ -188,7 +213,8 @@ export async function handle(request, env) {
       return Response.redirect(`${url.origin}/check-email?email=${encodeURIComponent(email)}${returnTo ? `&return=${encodeURIComponent(returnTo)}` : ''}`, 303);
     }
 
-    const { response, data } = await signIn(env, { email, password });
+    const { response, data } = await signIn(env, { email, password, captchaToken });
+    if (!response.ok && /captcha/i.test(authError(data, ''))) return retry('Please complete a fresh security check and re-enter your password.');
     if (!response.ok || !data?.access_token) return Response.redirect(`${url.origin}/login?error=${encodeURIComponent(authError(data, 'Email or password is incorrect.'))}&email=${encodeURIComponent(email)}${returnTo ? `&return=${encodeURIComponent(returnTo)}` : ''}`, 303);
     const state = { user: data.user || await getUser(env, data.access_token), accessToken: data.access_token };
     const target = returnTo || await defaultPostAuthPath(env, state);
@@ -248,7 +274,10 @@ export async function handle(request, env) {
         status,
         headers: (() => {
           const h = new Headers(headers);
-          h.set('cache-control', status === 200 && !authState.user ? 'public, max-age=60' : 'no-store');
+          if (env.TURNSTILE_SITE_KEY && ['/signup', '/login'].includes(url.pathname)) {
+            h.set('content-security-policy', headers['content-security-policy'].replace("script-src 'self'; connect-src 'self';", "script-src 'self' https://challenges.cloudflare.com; frame-src https://challenges.cloudflare.com; connect-src 'self' https://challenges.cloudflare.com;"));
+          }
+          h.set('cache-control', status === 200 && !authState.user && !['/signup','/login','/check-email','/auth/callback'].includes(url.pathname) ? 'public, max-age=60' : 'no-store');
           if (authState.refreshed && typeof authState.refreshed === 'object') setSessionCookies(h, authState.refreshed);
           else if (authState.refreshed === false) clearSessionCookies(h);
           return h;
@@ -596,8 +625,11 @@ if (
       const mode = url.pathname === '/signup' ? 'signup' : 'login';
       return render(mode === 'signup' ? 'Create your account' : 'Log in', authPage({
         mode,
+        turnstileSiteKey: env.TURNSTILE_SITE_KEY || '',
+        authCaptcha: env.AUTH_CAPTCHA_ENABLED === 'true',
         error: (url.searchParams.get('error') || '').slice(0, 240),
         message: (url.searchParams.get('message') || '').slice(0, 240),
+        fullName: (url.searchParams.get('full_name') || '').slice(0,100),
         email: (url.searchParams.get('email') || '').slice(0, 254),
         returnTo: safeReturnPath(url.searchParams.get('return'))
       }), { noindex: true });
@@ -626,7 +658,8 @@ if (
       let preferences = null;
       try { preferences = await getJobPreferences(env, authState.accessToken, authState.user.id); }
       catch (error) { console.error('Preferences load failed:', error); }
-      return render('Set up your account', onboardingPage({ user: authState.user, preferences, error: (url.searchParams.get('error') || '').slice(0, 240) }) + '<link rel="stylesheet" href="/account/deletion.css?v=20261012-fun">' + deletionDanger, { noindex: true });
+      const memberEmailChoices=memberEmailUIEnabled(env)?await memberEmailRPC(env,authState.accessToken,'my_member_email_preferences',{}):null;
+      return render('Set up your account', onboardingPage({ user: authState.user, preferences, memberEmailChoices, error: (url.searchParams.get('error') || '').slice(0, 240) }) + '<link rel="stylesheet" href="/account/deletion.css?v=20261012-fun">' + deletionDanger, { noindex: true });
     }
 
     const company = companyPage(url.pathname);
@@ -1127,6 +1160,7 @@ if (
   }
 }
 export default { fetch: handle, scheduled(controller,env,ctx) {
+  if(['preview','staging','production'].includes(env.LIFECYCLE_MODE)&&controller.cron==='*/15 * * * *')ctx.waitUntil(scheduledLifecycle(controller,env));
   if(controller.cron===JOB_HEALTH_CRON)return scheduledJobHealth(controller,env);
   // Independent observer cannot delay or replace operational schedules.
   if(env.ADMIN_HEALTH_MONITOR_ENABLED==='true'&&controller.cron==='*/15 * * * *')ctx.waitUntil(scheduledAdminHealth(controller,env));

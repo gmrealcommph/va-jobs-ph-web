@@ -1,9 +1,10 @@
+import {generationEnabled} from './quick-read-gate.js';
 import {generateJob, rpc} from './quick-read-service.js';
 
 export const QUICK_READ_CRON = '0-59 * * * *';
 // Bounded invocation work; the database serializes claims and provider cooldowns.
 export async function scheduledQuickReads(controller, env, {call=rpc, run=generateJob, log=console.log}={}) {
-  if(controller.cron!==QUICK_READ_CRON || env.QUICK_READ_AUTO_ENABLED!=='true') return;
+  if(!generationEnabled(env) || env.QUICK_READ_MODE!=='auto' || controller.cron!==QUICK_READ_CRON || env.QUICK_READ_AUTO_ENABLED!=='true') return;
   if(!env.OPENAI_API_KEY || env.QUICK_READ_MODEL!=='gpt-5-mini' || (env.QUICK_READ_PROVIDER || 'openai')!=='openai') {
     log(JSON.stringify({event:'quick_read_auto',status:'provider_not_configured'})); return;
   }

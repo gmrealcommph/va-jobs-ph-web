@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {sourceUnits,isRedundantTimezoneList,SECTIONS,validateSelection,validateStored,generateWithProvider} from '../src/quick-read-generation.js';
+import {sourceUnits,isRedundantTimezoneList,SECTIONS,validateSelection,validateStored,organizeWithProvider as generateWithProvider} from '../src/quick-read-generation.js';
 const offsets='-11, -10, -9.5, -9, -8, -7, -6, -5, -4, -3.5, -3, -2, -1, 0, 1, 2, 3, 3.5, 4, 4.5, 5, 5.5, 5.75, 6, 6.5, 7, 8, 8.75, 9, 9.5, 10, 10.5, 11, 12, 12.75, 13, 14';
 const broad='Timezone restrictions: '+offsets;
 const base='About the role\nSupport customers and resolve their questions through clear written communication.\nWork schedule: must overlap with US Eastern business hours.\nPreferred Qualifications\nExperience with a CRM is preferred.';
@@ -29,7 +29,7 @@ test('meaningful schedules cannot be omitted and invalid references remain block
 });
 test('provider receives filtered units and strict selection still succeeds',async()=>{
  const source=base+'\n'+broad;
- const result=await generateWithProvider({OPENAI_API_KEY:'test',QUICK_READ_MODEL:'gpt-5-mini'},source,async(url,options)=>{
+ const result=await generateWithProvider({QUICK_READ_GENERATION_ENABLED:'true',OPENAI_API_KEY:'test',QUICK_READ_MODEL:'gpt-5-mini'},source,async(url,options)=>{
   const body=JSON.parse(options.body),input=JSON.parse(body.input);
   assert.equal(input.source_units.some(u=>u.text===broad),false);
   assert.ok(input.source_units.some(u=>u.text.includes('US Eastern')));

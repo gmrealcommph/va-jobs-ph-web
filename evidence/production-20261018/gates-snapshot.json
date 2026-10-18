@@ -1,0 +1,59 @@
+[
+  {
+    "observed_at": "2026-10-18 10:34:30.065874+00",
+    "control": {
+      "id": true,
+      "next_claim_at": "2026-10-18T05:00:17.888459+00:00"
+    },
+    "auto_control": {
+      "id": true,
+      "enabled": true,
+      "activated_at": "2026-10-08T09:44:38.96073+00:00"
+    },
+    "rollout": {
+      "id": true,
+      "enabled": true,
+      "claims": 882,
+      "budget_usd": null,
+      "reserved_usd": 123.48,
+      "worst_request_usd": 0.14,
+      "ongoing": true,
+      "cooldown_until": null,
+      "pause_reason": null
+    },
+    "cache": [
+      {
+        "n": 2690,
+        "status": "ready",
+        "max_lease": null,
+        "last_update": "2026-10-18T05:00:40.004531+00:00"
+      },
+      {
+        "n": 90,
+        "status": "failed",
+        "max_lease": null,
+        "last_update": "2026-10-18T04:43:39.739131+00:00"
+      }
+    ],
+    "queue": [
+      {
+        "n": 123,
+        "state": "stopped",
+        "last_update": "2026-10-18T04:43:39.739131+00:00",
+        "max_next_attempt": "2026-10-18T05:43:07.376947+00:00"
+      },
+      {
+        "n": 183,
+        "state": "pending",
+        "last_update": "2026-10-18T04:38:59.632537+00:00",
+        "max_next_attempt": "2026-10-18T04:38:59.632537+00:00"
+      },
+      {
+        "n": 662,
+        "state": "done",
+        "last_update": "2026-10-18T05:00:40.004531+00:00",
+        "max_next_attempt": "2026-10-18T06:00:07.888459+00:00"
+      }
+    ]
+  }
+]

@@ -1,0 +1,1 @@
+{"observed_at":"2026-10-18T12:16:36.982953Z","method":"read-only database transaction","next_claim_at":"infinity","auto_enabled":false,"rollout_enabled":false,"claims":893,"reserved_usd":"125.02","running_cache":0,"unexpired_leases":0,"running_queue":0,"provider_inactivity_certified":false}

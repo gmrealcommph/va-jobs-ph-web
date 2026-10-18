@@ -1,0 +1,43 @@
+{
+  "reference_sha256": "a69f08256bc6f936db2356683cc6f1ae80efc853bcc9a25939538f885b201376",
+  "bundle_sha256": "8f2dba69ec8858f92615ed62033d7b5d181aea05c9c6bd830f48173d88b2f1a7",
+  "live_declarations": 325,
+  "built_declarations": 345,
+  "changed": [
+    "validateSelectionUnchecked",
+    "validateStored",
+    "generateWithProvider",
+    "init_quick_read_generation",
+    "normalize2",
+    "renderJobRead",
+    "generateJob",
+    "quickReadEndpoint",
+    "scheduledQuickReads"
+  ],
+  "added": [
+    "requireGenerationEnabled",
+    "generationEnabled",
+    "init_quick_read_gate",
+    "validateSummary",
+    "generateSummary",
+    "SUMMARY_SECTIONS",
+    "equivalent",
+    "words",
+    "metadata",
+    "raw",
+    "isMetadata",
+    "summarySourceUnits",
+    "numbers",
+    "noSponsorship",
+    "summaryInstructions",
+    "partSchema",
+    "summarySchema",
+    "init_quick_read_summary",
+    "organizeWithProvider",
+    "material2"
+  ],
+  "startup_match": false,
+  "exports_match": true,
+  "known_assets_matching": 84,
+  "asset_inventory_complete": false
+}
