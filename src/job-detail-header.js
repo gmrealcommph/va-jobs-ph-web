@@ -1,8 +1,6 @@
-import {jobLocation} from './job-location.js';
 import {quickReadMarker} from './quick-read-availability.js';
-import { sectionHeadingMarks } from './job-section-heading.js';
 // Static, local category artwork: no remote assets or request-time generation.
-import { displayValue } from './quick-read-presentation.js';
+import { renderAtAGlance } from './job-detail-read.js';
 const esc = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const paths = {
   category:'<rect x="3" y="5" width="18" height="15" rx="2"/><path d="M8 5V3h8v2M3 10h18M10 10v3h4v-3"/>',
@@ -202,8 +200,9 @@ export function renderJobHeader(job, {company, title, location, workplace, poste
   const pill = (name, value, href) => `<${href ? 'a' : 'span'} class="jh-pill"${href ? ` href="${href}"` : ''}>${icon(name)}<span>${esc(value)}</span></${href ? 'a' : 'span'}>`;
   return `<div class="job-detail-hero-card jh-card">
     ${artwork ? '' : '<svg class="jh-globe" viewBox="0 0 240 240" aria-hidden="true" focusable="false"><circle cx="120" cy="120" r="110"/><ellipse cx="120" cy="120" rx="55" ry="110"/><path d="M10 120h220M120 10v220M25 65h190M25 175h190"/></svg>'}
-    <div class="jh-top"><div class="jh-company"><div class="jh-eyebrow job-polish-heading">${sectionHeadingMarks('THE COMPANY')}</div><div>${esc(company)}</div></div>${posted ? `<div class="jh-posted">${icon('calendar')}<span>Posted ${esc(posted)}</span></div>` : ''}</div>
-    <div class="jh-body"><div class="jh-copy"><h1><span>${esc(title)}${quickReadMarker(job)}</span></h1><div class="jh-pills">${job.category ? pill('category', job.category, `/categories/${encodeURIComponent(job.category)}`) : ''}${jobLocation(job).setup ? pill('setup', jobLocation(job).setup) : ''}${pill('location', jobLocation(job).hiring)}</div></div>${visual}</div>
-    <div class="jh-footer">FILIPINO TALENT · GLOBAL OPPORTUNITIES</div><span class="job-detail-corner" aria-hidden="true"></span>
+    <div class="jh-top"><div class="jh-company"><span class="jh-company-initials" aria-hidden="true">${esc(company.trim().split(/\s+/).slice(0,2).map(word=>word[0]).join('').toUpperCase())}</span><div class="jh-company-name">${esc(company)}<span class="jh-eyebrow">THE COMPANY</span></div></div>${posted ? `<div class="jh-posted">${icon('calendar')}<span>Posted ${esc(posted)}</span></div>` : ''}</div>
+    <div class="jh-body"><div class="jh-copy"><h1><span>${esc(title)}${quickReadMarker(job)}</span></h1></div>${visual}</div>
+    ${renderAtAGlance(job, {compact:true})}
+    <div class="jh-footer">${job.category ? pill('category', job.category, `/categories/${encodeURIComponent(job.category)}`) : ''}<span>Better Jobs. From Home.</span></div>
   </div>`;
 }

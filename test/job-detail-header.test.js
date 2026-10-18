@@ -16,9 +16,9 @@ test('header preserves employer text, escapes unsafe fields and does not mutate 
   assert.match(html, /href="\/#opportunities"/);
   assert.match(html, /href="\/apply\/42"/);
   assert.match(html, /Original employer description\./);
-  const header = html.slice(html.indexOf('class="job-detail-hero-card'), html.indexOf('<section class="wrap job-detail-layout'));
+  const header = html.slice(html.indexOf('class="job-detail-hero-card'), html.indexOf('<div class="description job-detail-description"'));
   assert.ok(!/plane|PH<|WORLD<|https?:/.test(header));
-  assert.match(header, /FILIPINO TALENT · GLOBAL OPPORTUNITIES/);
+  assert.match(header, /Better Jobs. From Home./);
   assert.equal((header.match(/<h1>/g)||[]).length, 1);
 });
 
@@ -46,14 +46,14 @@ test('support artwork is decorative and leaves all employer information in HTML'
     workplace_type:'On-site', posted_at:'2026-10-01', description:'Original description'};
   const before = structuredClone(job);
   const html = detail(job);
-  const header = html.slice(html.indexOf('class="job-detail-hero-card'), html.indexOf('<section class="wrap job-detail-layout'));
+  const header = html.slice(html.indexOf('class="job-detail-hero-card'), html.indexOf('<div class="description job-detail-description"'));
   assert.deepEqual(job, before);
   assert.match(header, /src="\/images\/job-header-customer-support\.png" width="1678" height="937" alt=""/);
   assert.match(header, /class="jh-artwork" aria-hidden="true"/);
   assert.ok(!header.includes('jh-workspace'));
   assert.ok(!header.includes('jh-globe'));
   assert.ok(header.includes(job.title.replaceAll('<', '&lt;').replaceAll('>', '&gt;')));
-  for (const text of ['Employer &amp; Co', 'Customer Support', 'Philippines', 'On-site', 'Posted ', 'FILIPINO TALENT · GLOBAL OPPORTUNITIES']) assert.ok(header.includes(text), text);
+  for (const text of ['Employer &amp; Co', 'Customer Support', 'Philippines', 'On-site', 'Posted ', 'Better Jobs. From Home.']) assert.ok(header.includes(text), text);
   assert.ok(!/plane|https?:/.test(header));
   const png = readFileSync(new URL('../public/images/job-header-customer-support.png', import.meta.url));
   assert.equal(png.readUInt32BE(16), 1678);

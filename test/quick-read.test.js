@@ -36,7 +36,7 @@ test('unknown sections and all source conditions retained; duplicate company int
 test('original is untouched text, safely escaped, with a native keyboard-accessible toggle',()=>{
   const s=source+'\n\nA & B < 10; "quoted".\r\n';
   const html=renderJobRead(s);
-  assert.match(html,/<details class="qr-source"><summary>/);
+  assert.match(html,/<details class="qr-source" open><summary>/);
   const original=html.match(/<div class="qr-original">([\s\S]*?)<\/div>/)[1];
   const decoded=original.replace(/&quot;/g,'"').replace(/&#39;/g,"'").replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&amp;/g,'&');
   assert.equal(decoded,s);

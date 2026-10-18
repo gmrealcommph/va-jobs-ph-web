@@ -47,12 +47,12 @@ test('absent and ready reads only dedupe source display; unsafe HTML is escaped'
  const html=renderJobRead(source,null);assert.match(html,/This listing is shown from the employer/);assert.match(html,/Original description/);assert.doesNotMatch(html,/<script>/);
  assert.equal(html.split('At Your Personal AI').length-1,1);
 });
-test('heading family has one unique flight and enum chip display is local',()=>{
+test('compact job chips replace the glance panel without changing job data',()=>{
  const job={id:123,title:'Support '.repeat(30),company:'Your Personal AI '.repeat(20),workplace_type:'remote',location:'Worldwide',description:p,job_url:'https://example.com',source:'himalayas'};
  const before=structuredClone(job);const html=detail(job,{user:{id:'u'}});
- assert.deepEqual(job,before);assert.equal((html.match(/qr-glance-flight"/g)||[]).length,1);
- assert.equal((html.match(/qr-glance-sparks"/g)||[]).length,2);
- assert.match(html,/>Remote<\/span>/);assert.match(html,/Save this role or mark it applied to start your journey/);
+ assert.deepEqual(job,before);assert.equal((html.match(/qr-glance-flight"/g)||[]).length,0);
+ assert.match(html,/class="job-detail-chips"/);
+ assert.match(html,/>Remote<\/dd>/);assert.match(html,/Save this role or mark it applied to start your journey/);
 });
 test('ready Quick Read stays ready while its original description display dedupes',()=>{
  const source='About the company\n\n'+p+'\n\n'+p+'\n\nResponsibilities\nManage client operations and coordinate delivery.\nRequirements\nThree years of customer support experience required.';
