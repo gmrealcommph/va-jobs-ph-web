@@ -4,7 +4,7 @@ import { categoryDescriptor, categoryNote } from './category-context.js';
 import { recovery } from './recovery.js';
 import { sectionHeadingMarks } from './job-section-heading.js';
 import { renderJobHeader } from './job-detail-header.js';
-import { renderJobRead, renderAtAGlance } from './job-detail-read.js';
+import { renderJobRead } from './job-detail-read.js';
 export const esc = value => String(value ?? '').replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[char]));
 export const jobPath = job => `/jobs/${encodeURIComponent(job.id)}`;
 export const categoryPath = name => `/categories/${encodeURIComponent(name)}`;
@@ -68,7 +68,7 @@ export function layout({ title, description, canonical, body, noindex = false, u
     type="image/svg+xml"
   >
 
-  <link rel="stylesheet" href="/styles.css?v=20261018-switches">
+  <link rel="stylesheet" href="/styles.css?v=20261018-job-detail">
 <link rel="stylesheet" href="/traffic.css?v=20261012-dismiss">
 <script src="/traffic.js?v=20261012-dismiss" type="module"></script>
 </head>
@@ -1042,52 +1042,16 @@ export function detail(job, { user = null, saved = false, application = null, sa
   return `
     <div class="job-detail-page">
 
-      <section class="job-detail-hero">
-
-        <div class="wrap">
-
-          <a
-            class="job-detail-back"
-            href="/#opportunities"
-          >
-            ← Back to opportunities
-          </a>
-
-
-          ${renderJobHeader(job, {company, title, location, workplace, posted})}
-
-        </div>
-
-      </section>
-
-
       <section class="wrap job-detail-layout">
-
-        <article class="job-detail-content">${renderAtAGlance(job)}
-
-          <div class="job-detail-section-heading">
-
-            <span aria-hidden="true">✦</span>
-
-            <div>
-              <div class="eyebrow">
-                THE OPPORTUNITY
-              </div>
-
-              <h2>
-                The employer listing
-              </h2>
-            </div>
-
-          </div>
-
-
+        <article class="job-detail-content">
+          <section class="job-detail-hero">
+            <a class="job-detail-back" href="/#opportunities">← Back to opportunities</a>
+            ${renderJobHeader(job, {company, title, location, workplace, posted})}
+          </section>
           <div class="description job-detail-description">
             ${renderJobRead(description, job.quick_read ?? null, job)}
           </div>
-
         </article>
-
 
         <aside class="job-detail-sidebar">
 

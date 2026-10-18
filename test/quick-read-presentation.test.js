@@ -17,7 +17,7 @@ function payload() {
   return validateSelection(q,source);
 }
 const job={location:'Philippines',employment_type:'full_time',experience_level:'Entry Level',schedule_region:'philippines'};
-const content=html=>html.split('<div class="qr-content">')[1]?.split('<details class="qr-source">')[0] || '';
+const content=html=>html.split('<div class="qr-content">')[1]?.split('<section class="employer-listing"')[0] || '';
 test('37688 cleanup removes labels and SEO only after full validation, preserving material facts and original',()=>{
   const q=payload(), before=structuredClone(q);
   const view=presentQuickRead(q,source,job);
