@@ -218,5 +218,6 @@ test('logo load/error/decode failure keeps accessible decorative fallback and ne
   const html=detail({id:42,company:'TechnologyAdvice',description:technologySource,company_logo_url:'https://invalid.example/logo'});
   assert.match(html,/class="jh-company-initials" aria-hidden="true">T<\/span>/);
   assert.doesNotMatch(html,/data-company-logo|TechnologyAdvice logo/);
-  assert.match(detail({id:42,company:'TechnologyAdvice',description:technologySource}),/job-application-initials/);
+  assert.match(detail({id:42,company:'TechnologyAdvice',description:technologySource}),/jh-company-initials/);
 });
+
