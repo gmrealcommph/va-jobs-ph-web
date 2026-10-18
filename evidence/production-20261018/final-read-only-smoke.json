@@ -1,0 +1,510 @@
+{
+  "observed_at": "2026-10-18T12:15:36.117Z",
+  "versions": [
+    {
+      "id": "bb53a981-3369-4275-9b8b-20bba39954f0",
+      "created": "2026-10-18T02:05:52.199623Z"
+    },
+    {
+      "id": "0397ca13-9edc-479e-a238-3f9dce57ce2f",
+      "created": "2026-10-18T01:48:58.841311Z"
+    },
+    {
+      "id": "28669fd3-7ac9-4b69-84d5-344009532dc3",
+      "created": "2026-10-18T00:34:18.354513Z"
+    },
+    {
+      "id": "fa2797c0-2050-421a-95db-31fa115160af",
+      "created": "2026-10-16T09:20:40.539181Z"
+    },
+    {
+      "id": "c8f2e732-708d-4ee5-ae1b-11c646c3e267",
+      "created": "2026-10-16T02:37:50.422371Z"
+    }
+  ],
+  "domains": [
+    {
+      "id": "151763ac3fa43f34b722851c33959e2af0cc9046",
+      "zone_id": "0452b454b85225373eeca3938c72db42",
+      "zone_name": "veeays.com",
+      "hostname": "veeays.com",
+      "service": "va-jobs-ph-web",
+      "environment": "production",
+      "cert_id": "ce84508d-c0bb-48b3-bf1d-20116dd43135",
+      "previews_enabled": false,
+      "enabled": true
+    }
+  ],
+  "settings": {
+    "matches_retained": true
+  },
+  "deployments": {
+    "id": "d742b2ae-e363-4b0d-9b99-c46a69d13fb3",
+    "source": "api",
+    "strategy": "percentage",
+    "author_email": "gm.realcommph@gmail.com",
+    "annotations": {
+      "workers/message": "User-approved PR11: branded job application sidebar; current production baseline retained",
+      "workers/triggered_by": "deployment"
+    },
+    "versions": [
+      {
+        "version_id": "bb53a981-3369-4275-9b8b-20bba39954f0",
+        "percentage": 100
+      }
+    ],
+    "created_on": "2026-10-18T02:06:30.291727Z"
+  },
+  "assets": [
+    {
+      "path": "/admin-balances.js",
+      "status": 200,
+      "match": true
+    },
+    {
+      "path": "/admin-email-health.js",
+      "status": 200,
+      "match": true
+    },
+    {
+      "path": "/admin-interactions.js",
+      "status": 200,
+      "match": true
+    },
+    {
+      "path": "/admin-live.js",
+      "status": 200,
+      "match": true
+    },
+    {
+      "path": "/admin-members.js",
+      "status": 200,
+      "match": true
+    },
+    {
+      "path": "/admin-quick-reads.css",
+      "status": 200,
+      "match": true
+    },
+    {
+      "path": "/admin-quick-reads.js",
+      "status": 200,
+      "match": true
+    },
+    {
+      "path": "/admin-theme.css",
+      "status": 200,
+      "match": true
+    },
+    {
+      "path": "/admin-theme.js",
+      "status": 200,
+      "match": true
+    },
+    {
+      "path": "/admin-traffic.css",
+      "status": 200,
+      "match": true
+    },
+    {
+      "path": "/admin-traffic.js",
+      "status": 200,
+      "match": true
+    },
+    {
+      "path": "/admin-wallpaper.svg",
+      "status": 200,
+      "match": true
+    },
+    {
+      "path": "/admin-world-map.svg",
+      "status": 200,
+      "match": true
+    },
+    {
+      "path": "/admin.css",
+      "status": 200,
+      "match": true
+    },
+    {
+      "path": "/admin.js",
+      "status": 200,
+      "match": true
+    },
+    {
+      "path": "/auth-callback.js",
+      "status": 200,
+      "match": true
+    },
+    {
+      "path": "/auth.css",
+      "status": 200,
+      "match": true
+    },
+    {
+      "path": "/category-sidebar.js",
+      "status": 200,
+      "match": true
+    },
+    {
+      "path": "/email-preferences.js",
+      "status": 200,
+      "match": true
+    },
+    {
+      "path": "/email/card-icons/finance.png",
+      "status": 200,
+      "match": true
+    },
+    {
+      "path": "/email/card-icons/general.png",
+      "status": 200,
+      "match": true
+    },
+    {
+      "path": "/email/card-icons/operations.png",
+      "status": 200,
+      "match": true
+    },
+    {
+      "path": "/email/card-icons/sales.png",
+      "status": 200,
+      "match": true
+    },
+    {
+      "path": "/email/category-art/job-header-account-management.jpg",
+      "status": 200,
+      "match": true
+    },
+    {
+      "path": "/email/category-art/job-header-bookkeeping-finance.jpg",
+      "status": 200,
+      "match": true
+    },
+    {
+      "path": "/email/category-art/job-header-customer-support.jpg",
+      "status": 200,
+      "match": true
+    },
+    {
+      "path": "/email/category-art/job-header-data-entry.jpg",
+      "status": 200,
+      "match": true
+    },
+    {
+      "path": "/email/category-art/job-header-design-creative.jpg",
+      "status": 200,
+      "match": true
+    },
+    {
+      "path": "/email/category-art/job-header-e-commerce.jpg",
+      "status": 200,
+      "match": true
+    },
+    {
+      "path": "/email/category-art/job-header-executive-assistant.jpg",
+      "status": 200,
+      "match": true
+    },
+    {
+      "path": "/email/category-art/job-header-marketing.jpg",
+      "status": 200,
+      "match": true
+    },
+    {
+      "path": "/email/category-art/job-header-operations-admin.jpg",
+      "status": 200,
+      "match": true
+    },
+    {
+      "path": "/email/category-art/job-header-other-remote.jpg",
+      "status": 200,
+      "match": true
+    },
+    {
+      "path": "/email/category-art/job-header-project-management.jpg",
+      "status": 200,
+      "match": true
+    },
+    {
+      "path": "/email/category-art/job-header-recruitment-hr.jpg",
+      "status": 200,
+      "match": true
+    },
+    {
+      "path": "/email/category-art/job-header-sales.jpg",
+      "status": 200,
+      "match": true
+    },
+    {
+      "path": "/email/category-art/job-header-social-media.jpg",
+      "status": 200,
+      "match": true
+    },
+    {
+      "path": "/email/category-art/job-header-virtual-assistant.jpg",
+      "status": 200,
+      "match": true
+    },
+    {
+      "path": "/email/category-art/job-header-writing-content.jpg",
+      "status": 200,
+      "match": true
+    },
+    {
+      "path": "/email/job-alerts-morning-v1.jpg",
+      "status": 200,
+      "match": true
+    },
+    {
+      "path": "/favicon.svg",
+      "status": 200,
+      "match": true
+    },
+    {
+      "path": "/home-discovery.js",
+      "status": 200,
+      "match": true
+    },
+    {
+      "path": "/images/about-workspace.svg",
+      "status": 200,
+      "match": true
+    },
+    {
+      "path": "/images/category-workspace.svg",
+      "status": 200,
+      "match": true
+    },
+    {
+      "path": "/images/category-workspace.webp",
+      "status": 200,
+      "match": true
+    },
+    {
+      "path": "/images/employer-enquiry-desk.svg",
+      "status": 200,
+      "match": true
+    },
+    {
+      "path": "/images/employer-workspace.svg",
+      "status": 200,
+      "match": true
+    },
+    {
+      "path": "/images/job-header-account-management.png",
+      "status": 200,
+      "match": true
+    },
+    {
+      "path": "/images/job-header-bookkeeping-finance.png",
+      "status": 200,
+      "match": true
+    },
+    {
+      "path": "/images/job-header-customer-support.png",
+      "status": 200,
+      "match": true
+    },
+    {
+      "path": "/images/job-header-data-entry.png",
+      "status": 200,
+      "match": true
+    },
+    {
+      "path": "/images/job-header-design-creative.png",
+      "status": 200,
+      "match": true
+    },
+    {
+      "path": "/images/job-header-e-commerce.png",
+      "status": 200,
+      "match": true
+    },
+    {
+      "path": "/images/job-header-executive-assistant.png",
+      "status": 200,
+      "match": true
+    },
+    {
+      "path": "/images/job-header-marketing.png",
+      "status": 200,
+      "match": true
+    },
+    {
+      "path": "/images/job-header-operations-admin.png",
+      "status": 200,
+      "match": true
+    },
+    {
+      "path": "/images/job-header-other-remote.png",
+      "status": 200,
+      "match": true
+    },
+    {
+      "path": "/images/job-header-project-management.png",
+      "status": 200,
+      "match": true
+    },
+    {
+      "path": "/images/job-header-recruitment-hr.png",
+      "status": 200,
+      "match": true
+    },
+    {
+      "path": "/images/job-header-sales.png",
+      "status": 200,
+      "match": true
+    },
+    {
+      "path": "/images/job-header-social-media.png",
+      "status": 200,
+      "match": true
+    },
+    {
+      "path": "/images/job-header-virtual-assistant.png",
+      "status": 200,
+      "match": true
+    },
+    {
+      "path": "/images/job-header-writing-content.png",
+      "status": 200,
+      "match": true
+    },
+    {
+      "path": "/images/veeays-social-v1.png",
+      "status": 200,
+      "match": true
+    },
+    {
+      "path": "/job-alerts.css",
+      "status": 200,
+      "match": true
+    },
+    {
+      "path": "/job-detail-logo.js",
+      "status": 200,
+      "match": true
+    },
+    {
+      "path": "/job-health.css",
+      "status": 200,
+      "match": true
+    },
+    {
+      "path": "/job-health.js",
+      "status": 200,
+      "match": true
+    },
+    {
+      "path": "/job-report.css",
+      "status": 200,
+      "match": true
+    },
+    {
+      "path": "/match-filters.js",
+      "status": 200,
+      "match": true
+    },
+    {
+      "path": "/match-interactions.js",
+      "status": 200,
+      "match": true
+    },
+    {
+      "path": "/member-emails.css",
+      "status": 200,
+      "match": true
+    },
+    {
+      "path": "/navigation.js",
+      "status": 200,
+      "match": true
+    },
+    {
+      "path": "/onboarding-complete.js",
+      "status": 200,
+      "match": true
+    },
+    {
+      "path": "/onboarding.css",
+      "status": 200,
+      "match": true
+    },
+    {
+      "path": "/onboarding.js",
+      "status": 200,
+      "match": true
+    },
+    {
+      "path": "/opportunity-count.js",
+      "status": 200,
+      "match": true
+    },
+    {
+      "path": "/recovery.css",
+      "status": 200,
+      "match": true
+    },
+    {
+      "path": "/styles.css",
+      "status": 200,
+      "match": true
+    },
+    {
+      "path": "/traffic.css",
+      "status": 200,
+      "match": true
+    },
+    {
+      "path": "/traffic.js",
+      "status": 200,
+      "match": true
+    },
+    {
+      "path": "/veeays-hero-approved.png",
+      "status": 200,
+      "match": true
+    },
+    {
+      "path": "/veeays-hero-collage.png",
+      "status": 200,
+      "match": true
+    },
+    {
+      "path": "/veeays-logo.png",
+      "status": 200,
+      "match": true
+    }
+  ],
+  "public": [
+    {
+      "path": "/",
+      "status": 200,
+      "location": null,
+      "bytes": 38845,
+      "cached_summary": true
+    },
+    {
+      "path": "/login",
+      "status": 200,
+      "location": null,
+      "bytes": 8484,
+      "cached_summary": false
+    },
+    {
+      "path": "/jobs/25943",
+      "status": 200,
+      "location": null,
+      "bytes": 35178,
+      "cached_summary": true
+    },
+    {
+      "path": "/admin",
+      "status": 303,
+      "location": "/login?return=%2Fadmin",
+      "bytes": 0,
+      "cached_summary": false
+    }
+  ]
+}

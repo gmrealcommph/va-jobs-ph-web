@@ -24,5 +24,6 @@ test('manual, missing and malformed modes block cron even with explicit master a
 test('checked-in release disables generation, batch and auto and removes only Quick Reads schedule',async()=>{
  const config=JSON.parse(await readFile(new URL('../wrangler.jsonc',import.meta.url)));
  for(const key of ['QUICK_READ_GENERATION_ENABLED','QUICK_READ_AUTO_ENABLED','QUICK_READ_BATCH_ENABLED'])assert.equal(config.vars[key],'false');
+ assert.equal(config.vars.QUICK_READ_MODE,'disabled');
  assert.deepEqual(config.triggers.crons,['* * * * *','*/15 * * * *','17 */6 * * *']);
 });

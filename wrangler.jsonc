@@ -26,7 +26,7 @@
     "QUICK_READ_GENERATION_ENABLED": "false",
     "QUICK_READ_AUTO_ENABLED": "false",
     "QUICK_READ_BATCH_ENABLED": "false",
-    "QUICK_READ_MODE": "manual",
+    "QUICK_READ_MODE": "disabled",
     "QUICK_READ_MODEL": "gpt-5-mini",
     "QUICK_READ_PROVIDER": "openai",
     "SITE_URL": "https://veeays.com",

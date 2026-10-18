@@ -1,3 +1,7 @@
+# Current release plan
+
+See [quick-reads-release-package.md](quick-reads-release-package.md) for the current disabled-only candidate, fresh containment readback and approval boundary. The historical findings below predate DB/cron containment and the final candidate config.
+
 # Quick Reads production reconciliation — 18 October 2026
 
 **Decision: NO-GO for deployment or generation activation.** The reconciliation is ready for draft review. Production was read only. No settings, schedules, database rows, schema, deployments, or provider requests were changed by this investigation.

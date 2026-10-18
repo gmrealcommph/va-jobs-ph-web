@@ -216,7 +216,8 @@ test('logo load/error/decode failure keeps accessible decorative fallback and ne
     handlers.error();assert.equal(img.hidden,true);assert.equal(classes.size,0);
   }
   const html=detail({id:42,company:'TechnologyAdvice',description:technologySource,company_logo_url:'https://invalid.example/logo'});
-  assert.match(html,/class="job-application-initials" aria-hidden="true">T<\/div>/);
+  // The deployed application sidebar uses decorative plane artwork, not initials.
+  assert.match(html,/class="job-application-plane" aria-hidden="true"/);
   assert.doesNotMatch(html,/data-company-logo|TechnologyAdvice logo/);
-  assert.match(detail({id:42,company:'TechnologyAdvice',description:technologySource}),/job-application-initials/);
+  assert.match(detail({id:42,company:'TechnologyAdvice',description:technologySource}),/job-application-plane/);
 });

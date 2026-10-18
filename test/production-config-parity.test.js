@@ -6,7 +6,7 @@ const root=new URL('../',import.meta.url),read=p=>JSON.parse(readFileSync(new UR
 test('effective nonsecret bindings retained, only Quick Reads generation configuration intentionally differs',()=>{
  const config=read('wrangler.jsonc'),settings=read('evidence/production-20261018/settings.json');
  for(const b of settings.bindings){
-  if(b.type==='plain_text')assert.equal(config.vars[b.name],['QUICK_READ_AUTO_ENABLED','QUICK_READ_BATCH_ENABLED'].includes(b.name)?'false':b.text,b.name);
+  if(b.type==='plain_text')assert.equal(config.vars[b.name],b.name==='QUICK_READ_MODE'?'disabled':['QUICK_READ_AUTO_ENABLED','QUICK_READ_BATCH_ENABLED'].includes(b.name)?'false':b.text,b.name);
   else if(b.type==='ratelimit')assert.deepEqual(config.ratelimits.find(r=>r.name===b.name),{name:b.name,namespace_id:b.namespace_id,simple:b.simple});
   else assert.ok(['assets','secret_text'].includes(b.type),'unrepresented binding '+b.name);
  }
