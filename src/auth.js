@@ -74,7 +74,12 @@ export async function getUser(env, accessToken) {
     headers: { Authorization: `Bearer ${accessToken}` }
   });
   if (response.status === 429 || response.status >= 500) throw new Error('Authentication temporarily unavailable.');
-  return response.ok && data?.id ? data : null;
+  if (response.ok && data?.id && env.ADMIN_MEMBER_ACTIONS_ENABLED === 'true') {
+    const active = await authFetch(env, '/rest/v1/rpc/veeays_member_active', {method:'POST', headers:{Authorization:'Bearer '+accessToken}, body:'{}'});
+    if (!active.response.ok) throw new Error('Authentication temporarily unavailable.');
+    if (active.data !== true) return null;
+  }
+  return response.ok && data?.id && data.banned_until !== 'infinity' && !(Date.parse(data.banned_until) > Date.now()) ? data : null;
 }
 
 export async function sessionForRequest(request, env) {
@@ -85,7 +90,7 @@ export async function sessionForRequest(request, env) {
   const { response, data } = await exchangeRefreshToken(env, cookies[REFRESH_COOKIE]);
   if (response.status === 429 || response.status >= 500) throw new Error('Authentication temporarily unavailable.');
   if (!response.ok || !data?.access_token) return { user: null, refreshed: false, accessToken: null };
-  user = data.user || await getUser(env, data.access_token);
+  user = env.ADMIN_MEMBER_ACTIONS_ENABLED === 'true' ? await getUser(env, data.access_token) : data.user || await getUser(env, data.access_token);
   return { user, refreshed: user ? data : false, accessToken: user ? data.access_token : null };
 }
 
