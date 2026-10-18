@@ -29,7 +29,7 @@ test('meaningful schedules cannot be omitted and invalid references remain block
 });
 test('provider receives filtered units and strict selection still succeeds',async()=>{
  const source=base+'\n'+broad;
- const result=await generateWithProvider({OPENAI_API_KEY:'test',QUICK_READ_MODEL:'gpt-5-mini'},source,async(url,options)=>{
+ const result=await generateWithProvider({QUICK_READ_GENERATION_ENABLED:'true',OPENAI_API_KEY:'test',QUICK_READ_MODEL:'gpt-5-mini'},source,async(url,options)=>{
   const body=JSON.parse(options.body),input=JSON.parse(body.input);
   assert.equal(input.source_units.some(u=>u.text===broad),false);
   assert.ok(input.source_units.some(u=>u.text.includes('US Eastern')));

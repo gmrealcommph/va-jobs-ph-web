@@ -70,7 +70,7 @@ test('37688 provider routing cues identify real application conditions, not ordi
   const screening=units.find(u=>u.text==='Pre-employment screening required.');
   const qualification=units.find(u=>u.text==='Proactive about spotting issues, finding answers, and escalating problems when needed.');
   const selection=liveTechnologySelection();
-  const env={OPENAI_API_KEY:'test-only',QUICK_READ_MODEL:'gpt-5-mini'};
+  const env={QUICK_READ_GENERATION_ENABLED:'true',OPENAI_API_KEY:'test-only',QUICK_READ_MODEL:'gpt-5-mini'};
   const result=await generateWithProvider(env,liveTechnologySource,async(url,init)=>{
     const body=JSON.parse(init.body);
     const ids=JSON.parse(body.input).application_note_ids;
@@ -149,7 +149,7 @@ test('no invention of salary/country from timezone; contradictions and source ta
 });
 test('Responses adapter uses server key, strict schema, no remote storage and validates completed output',async()=>{
   let sent;
-  const env={OPENAI_API_KEY:'test-only',QUICK_READ_MODEL:'gpt-5-mini'};
+  const env={QUICK_READ_GENERATION_ENABLED:'true',OPENAI_API_KEY:'test-only',QUICK_READ_MODEL:'gpt-5-mini'};
   const q=await generateWithProvider(env,technologySource,async(url,init)=>{
     sent={url,init,body:JSON.parse(init.body)};
     return Response.json({status:'completed',output:[{type:'message',content:[{type:'output_text',text:JSON.stringify(validSelection())}]}]});
@@ -165,23 +165,23 @@ test('Responses adapter uses server key, strict schema, no remote storage and va
 test('fingerprint unchanged skips provider, changed source fingerprint differs',async()=>{
   assert.equal(await sourceFingerprint(technologySource),await sourceFingerprint(technologySource));
   assert.notEqual(await sourceFingerprint(technologySource),await sourceFingerprint(technologySource+' changed'));
-  const result=await generateJob({QUICK_READ_MODEL:'gpt-5-mini'},'42',{call:async()=>({status:'unchanged'}),generate:()=>assert.fail('Provider must not run')});
+  const result=await generateJob({QUICK_READ_GENERATION_ENABLED:'true',QUICK_READ_MODEL:'gpt-5-mini'},'42',{call:async()=>({status:'unchanged'}),generate:()=>assert.fail('Provider must not run')});
   assert.equal(result.status,'unchanged');
 });
 test('generation persists validated payload; malformed provider writes only failure metadata',async()=>{
   const hash=await sourceFingerprint(technologySource);let finish;
   const call=async(env,name,args)=>name==='claim_job_quick_read_auto'?{status:'claimed',description:technologySource,source_hash:hash}:(finish=args,{status:args.p_error?'failed':'ready'});
   const deps={call,generate:async()=>validateSelection(validSelection(),technologySource)};
-  assert.equal((await generateJob({QUICK_READ_MODEL:'gpt-5-mini'},42,deps)).status,'ready');
+  assert.equal((await generateJob({QUICK_READ_GENERATION_ENABLED:'true',QUICK_READ_MODEL:'gpt-5-mini'},42,deps)).status,'ready');
   assert.equal(finish.p_payload.version,2);
   deps.generate=async()=>({summary:'Invented'});
-  assert.equal((await generateJob({QUICK_READ_MODEL:'gpt-5-mini'},42,deps)).status,'failed');assert.equal(finish.p_payload,null);
+  assert.equal((await generateJob({QUICK_READ_GENERATION_ENABLED:'true',QUICK_READ_MODEL:'gpt-5-mini'},42,deps)).status,'failed');assert.equal(finish.p_payload,null);
 });
 test('manual endpoint disabled, unauthorized, GET and batch gate never generate',async()=>{
   let calls=0;const deps={call:async()=>{calls++;}};
   assert.equal((await quickReadEndpoint(new Request('https://x',{method:'POST'}),{},42,deps)).status,503);
   assert.equal((await quickReadEndpoint(new Request('https://x'),{},42,deps)).status,405);
-  const env={QUICK_READ_MODE:'manual',QUICK_READ_ADMIN_TOKEN:'x'.repeat(32),OPENAI_API_KEY:'test-only',QUICK_READ_MODEL:'test'};
+  const env={QUICK_READ_GENERATION_ENABLED:'true',QUICK_READ_MODE:'manual',QUICK_READ_ADMIN_TOKEN:'x'.repeat(32),OPENAI_API_KEY:'test-only',QUICK_READ_MODEL:'test'};
   assert.equal((await quickReadEndpoint(new Request('https://x',{method:'POST'}),env,42,deps)).status,401);
   const req=()=>new Request('https://x',{method:'POST',headers:{authorization:'Bearer '+env.QUICK_READ_ADMIN_TOKEN},body:'{"limit":1900}'});
   assert.equal((await quickReadEndpoint(req(),env,null,deps)).status,403);
@@ -189,7 +189,7 @@ test('manual endpoint disabled, unauthorized, GET and batch gate never generate'
   assert.equal(calls,0);
 });
 test('bounded batch stops at rate gate without advancing cursor past unprocessed job',async()=>{
-  const env={QUICK_READ_MODE:'manual',QUICK_READ_ADMIN_TOKEN:'x'.repeat(32),OPENAI_API_KEY:'test-only',QUICK_READ_MODEL:'test',QUICK_READ_BATCH_ENABLED:'true'};
+  const env={QUICK_READ_GENERATION_ENABLED:'true',QUICK_READ_MODE:'manual',QUICK_READ_ADMIN_TOKEN:'x'.repeat(32),OPENAI_API_KEY:'test-only',QUICK_READ_MODEL:'test',QUICK_READ_BATCH_ENABLED:'true'};
   const called=[];
   const call=async(e,name,args)=>{
     called.push({name,args});

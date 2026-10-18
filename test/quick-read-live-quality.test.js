@@ -45,7 +45,7 @@ test('metadata paraphrases and internal fields fail even with valid citations an
 
 test('provider input omits headings and metadata, keeps IDs/pay/employment; stored archive stays complete',async()=>{
   let calls=0;
-  const payload=await generateWithProvider({OPENAI_API_KEY:'offline',QUICK_READ_MODEL:'gpt-5-mini'},source,async(url,init)=>{
+  const payload=await generateWithProvider({QUICK_READ_GENERATION_ENABLED:'true',OPENAI_API_KEY:'offline',QUICK_READ_MODEL:'gpt-5-mini'},source,async(url,init)=>{
     calls++;const body=JSON.parse(init.body),units=JSON.parse(body.input).source_units;
     assert.equal(body.store,false);assert.equal(body.max_output_tokens,4096);
     assert.ok(!units.some(u=>u.is_heading||/^(Originally posted|Timezone restrictions|Categories:|Job functions:|Seniority:)/i.test(u.text)));

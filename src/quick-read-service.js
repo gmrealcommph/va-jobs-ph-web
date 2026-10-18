@@ -1,3 +1,4 @@
+import {generationEnabled} from './quick-read-gate.js';
 import { rest } from './notifications.js';
 import { FORMATTER_VERSION, SCHEMA_VERSION, SOURCE_RULES_VERSION, sourceFingerprint, sourceUnits, validateStored, generateWithProvider } from './quick-read-generation.js';
 import {failureDiagnostics,storedSelection} from './quick-read-diagnostics.js';
@@ -12,6 +13,7 @@ export async function rpc(env, name, args) {
   return rest(serverConfig(env),`rpc/${name}`,{}, {method:'POST',body:JSON.stringify(args)});
 }
 export async function generateJob(env, id, {call=rpc,generate=generateWithProvider}={}) {
+  if(!generationEnabled(env)) return {job_id:String(id),status:'generation_disabled'};
   const token=crypto.randomUUID();
   const claim=await call(env,'claim_job_quick_read_auto',{p_job_id:String(id),p_formatter:FORMATTER_VERSION,p_token:token,p_source_rules:SOURCE_RULES_VERSION});
   if(claim.status!=='claimed') return {job_id:String(id),status:claim.status};
@@ -45,7 +47,7 @@ async function tokenMatches(actual, expected) {
 export async function quickReadEndpoint(request, env, id, deps={}) {
   const json=(body,status=200)=>Response.json(body,{status,headers:{'cache-control':'no-store','x-content-type-options':'nosniff'}});
   if(request.method!=='POST') return json({error:'method_not_allowed'},405);
-  if(env.QUICK_READ_MODE!=='manual') return json({error:'generation_disabled'},503);
+  if(!generationEnabled(env) || env.QUICK_READ_MODE!=='manual') return json({error:'generation_disabled'},503);
   const expected=env.QUICK_READ_ADMIN_TOKEN;
   const actual=(request.headers.get('authorization') || '').replace(/^Bearer /,'');
   if(!expected || expected.length<32 || !actual || actual.length>512 || !await tokenMatches(actual,expected)) return json({error:'unauthorized'},401);
