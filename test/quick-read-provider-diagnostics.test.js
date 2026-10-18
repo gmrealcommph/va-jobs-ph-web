@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {readFile} from 'node:fs/promises';
 import {PGlite} from '@electric-sql/pglite';
 import {pgcrypto} from '@electric-sql/pglite/contrib/pgcrypto';
-import {generateWithProvider,sourceFingerprint,sourceUnits,SECTIONS,validateSelection} from '../src/quick-read-generation.js';
+import {organizeWithProvider as generateWithProvider,sourceFingerprint,sourceUnits,SECTIONS,validateSelection} from '../src/quick-read-generation.js';
 import {generateJob} from '../src/quick-read-service.js';
 import {providerFailureDiagnostics} from '../src/quick-read-provider-diagnostics.js';
 const source='About the role\nCoordinate customer relationships across a distributed team.\nClear communication and accurate reporting are part of the role.';

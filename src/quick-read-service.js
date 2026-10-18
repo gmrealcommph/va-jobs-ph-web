@@ -27,7 +27,7 @@ export async function generateJob(env, id, {call=rpc,generate=generateWithProvid
     return {job_id:String(id),status:result.status};
   } catch(error) {
     // Only known error codes enter storage; never API responses, credentials or source text.
-    const allowed=/^(unsupported_source|unsafe_source|source_hash_mismatch|invalid_generated_output|invalid_schema|invalid_source_reference|unsupported_requirement|preference_upgraded|mixed_obligation|application_condition_misplaced|material_condition_misplaced|source_omitted|input_limit_exceeded|provider_(insufficient_credit|model_not_allowed|not_configured|http_\d{3}|incomplete|refusal|invalid_output|invalid_json))$/;
+    const allowed=/^(summary_quality_rejected|unsupported_source|unsafe_source|source_hash_mismatch|invalid_generated_output|invalid_schema|invalid_source_reference|unsupported_requirement|preference_upgraded|mixed_obligation|application_condition_misplaced|material_condition_misplaced|source_omitted|input_limit_exceeded|provider_(insufficient_credit|model_not_allowed|not_configured|http_\d{3}|incomplete|refusal|invalid_output|invalid_json))$/;
     const code=allowed.test(error.message)?error.message:'generation_failed';
     const selection=error.quickReadSelection ?? (generated ? storedSelection(generated,claim.description) : null);
     const diagnosticCodes=/^(invalid_schema|invalid_generated_output|invalid_source_reference|unsupported_requirement|preference_upgraded|mixed_obligation|application_condition_misplaced|material_condition_misplaced|source_omitted)$/;
