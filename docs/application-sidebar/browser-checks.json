@@ -1,0 +1,182 @@
+[
+  {
+    "width": 320,
+    "overflow": false,
+    "sideBySide": true,
+    "saveWidth": 121,
+    "trackWidth": 121,
+    "sequence": [
+      {
+        "label": "Apply for this role\n                    ↗",
+        "outline": "solid"
+      },
+      {
+        "label": "♡ Save for later",
+        "outline": "solid"
+      },
+      {
+        "label": "✓ Mark as applied",
+        "outline": "solid"
+      },
+      {
+        "label": "Himalayas",
+        "outline": "solid"
+      },
+      {
+        "label": "Report this job",
+        "outline": "solid"
+      }
+    ],
+    "submissions": [
+      {
+        "action": "/save-job",
+        "data": {
+          "job_id": "101",
+          "return_to": "/jobs/101"
+        }
+      },
+      {
+        "action": "/mark-applied",
+        "data": {
+          "job_id": "101",
+          "return_to": "/jobs/101"
+        }
+      }
+    ]
+  },
+  {
+    "width": 390,
+    "overflow": false,
+    "sideBySide": true,
+    "saveWidth": 156,
+    "trackWidth": 156,
+    "sequence": [
+      {
+        "label": "Apply for this role\n                    ↗",
+        "outline": "solid"
+      },
+      {
+        "label": "♡ Save for later",
+        "outline": "solid"
+      },
+      {
+        "label": "✓ Mark as applied",
+        "outline": "solid"
+      },
+      {
+        "label": "Himalayas",
+        "outline": "solid"
+      },
+      {
+        "label": "Report this job",
+        "outline": "solid"
+      }
+    ],
+    "submissions": [
+      {
+        "action": "/save-job",
+        "data": {
+          "job_id": "101",
+          "return_to": "/jobs/101"
+        }
+      },
+      {
+        "action": "/mark-applied",
+        "data": {
+          "job_id": "101",
+          "return_to": "/jobs/101"
+        }
+      }
+    ]
+  },
+  {
+    "width": 768,
+    "overflow": false,
+    "sideBySide": true,
+    "saveWidth": 273,
+    "trackWidth": 273,
+    "sequence": [
+      {
+        "label": "Apply for this role\n                    ↗",
+        "outline": "solid"
+      },
+      {
+        "label": "♡ Save for later",
+        "outline": "solid"
+      },
+      {
+        "label": "✓ Mark as applied",
+        "outline": "solid"
+      },
+      {
+        "label": "Himalayas",
+        "outline": "solid"
+      },
+      {
+        "label": "Report this job",
+        "outline": "solid"
+      }
+    ],
+    "submissions": [
+      {
+        "action": "/save-job",
+        "data": {
+          "job_id": "101",
+          "return_to": "/jobs/101"
+        }
+      },
+      {
+        "action": "/mark-applied",
+        "data": {
+          "job_id": "101",
+          "return_to": "/jobs/101"
+        }
+      }
+    ]
+  },
+  {
+    "width": 1280,
+    "overflow": false,
+    "sideBySide": true,
+    "saveWidth": 140.5,
+    "trackWidth": 140.5,
+    "sequence": [
+      {
+        "label": "Apply for this role\n                    ↗",
+        "outline": "solid"
+      },
+      {
+        "label": "♡ Save for later",
+        "outline": "solid"
+      },
+      {
+        "label": "✓ Mark as applied",
+        "outline": "solid"
+      },
+      {
+        "label": "Himalayas",
+        "outline": "solid"
+      },
+      {
+        "label": "Report this job",
+        "outline": "solid"
+      }
+    ],
+    "submissions": [
+      {
+        "action": "/save-job",
+        "data": {
+          "job_id": "101",
+          "return_to": "/jobs/101"
+        }
+      },
+      {
+        "action": "/mark-applied",
+        "data": {
+          "job_id": "101",
+          "return_to": "/jobs/101"
+        }
+      }
+    ]
+  }
+]

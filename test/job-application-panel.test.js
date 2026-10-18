@@ -9,7 +9,7 @@ test('application panel uses exact escaped identity and safe apply route, retain
  const html=panel({user});
  assert.match(html,/YOUR APPLICATION/);assert.match(html,/Ready to make/);
  assert.match(html,/Freelancer Support Specialist &lt;Senior&gt;/);
- assert.match(html,/Your Personal AI/);assert.match(html,/>YP<\/div>/);
+ assert.match(html,/Your Personal AI/);assert.match(html,/job-application-plane/);
  assert.doesNotMatch(html,/OPPORTUNITY SNAPSHOT|<dl>|<dt>|Location|Workplace|Category|Posted/);
  assert.match(html,/href="\/apply\/101"\s+target="_blank"\s+rel="nofollow noopener"/);
  assert.match(html,/Opens the employer's listing in a new tab/);assert.match(html,/https:\/\/himalayas.app\//);
@@ -69,4 +69,14 @@ test('apply requires auth, accepts only stored HTTP URLs and ignores supplied re
  let res=await handle(req(false),env);assert.equal(res.status,303);assert.match(res.headers.get('location'),/signup\?return=%2Fapply%2F101$/);
  res=await handle(req(true),env);assert.equal(res.status,302);assert.equal(res.headers.get('location'),job.job_url);
  destination='javascript:alert(1)';res=await handle(req(true),env);assert.equal(res.status,404);
+});
+
+test('primary action precedes secondary actions, progress and quiet report footer',()=>{
+ const html=panel({user,reportsEnabled:true,reported:true});
+ assert.ok(html.indexOf('job-detail-apply')<html.indexOf('job-detail-user-actions'));
+ assert.ok(html.indexOf('job-detail-user-actions')<html.indexOf('job-application-progress'));
+ assert.ok(html.indexOf('job-application-progress')<html.indexOf('job-application-footer'));
+ assert.match(html,/<footer class="job-application-footer">[\s\S]*himalayas.app[\s\S]*href="\/jobs\/101\/report"/);
+ assert.match(html,/role="status">Thank you/);
+ assert.doesNotMatch(panel({user}),/href="\/jobs\/101\/report"/);
 });

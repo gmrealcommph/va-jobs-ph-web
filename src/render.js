@@ -1082,21 +1082,12 @@ export function detail(job, { user = null, saved = false, application = null, sa
 
           <div class="job-detail-snapshot">
 
-            <div class="job-detail-snapshot-kicker job-polish-heading">${sectionHeadingMarks('YOUR APPLICATION')}</div>
+            <div class="job-detail-snapshot-kicker">YOUR APPLICATION <svg class="job-application-plane" aria-hidden="true" viewBox="0 0 48 48" fill="none"><path d="M7 22 41 7 30 41l-8-13-15-6Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="m22 28 19-21" stroke="currentColor" stroke-width="2"/></svg></div>
 
 
-            <div class="job-application-initials" aria-hidden="true">${esc(company.trim().split(/\s+/).slice(0,2).map(word=>word[0]).join('').toUpperCase())}</div>
             <h2>Ready to make<br>your move?</h2>
             <p class="job-application-intro">Apply directly on the employer's site and keep track of your application right here on VeeAys.</p>
             <div class="job-application-identity"><strong>${esc(title)}</strong><span>${esc(company)}</span></div>
-
-            <div class="job-detail-user-actions">
-              ${reportsEnabled ? `<a href="/jobs/${esc(job.id)}/report">Report this job</a>${reported ? '<p role="status">Thank you. Your report has been sent for review.</p>' : ''}` : ''}
-              ${saveIntent && user && !saved ? '<p class="save-intent-note">You’re signed in. Save this job so you can come back to it anytime.</p>' : ''}
-              ${user ? `<form method="post" action="${saved ? '/unsave-job' : '/save-job'}"><input type="hidden" name="job_id" value="${esc(job.id)}"><input type="hidden" name="return_to" value="${jobPath(job)}"><button class="job-detail-save${saved ? ' is-saved' : ''}" type="submit">${saved ? '♥ Unsave job' : '♡ Save for later'}</button></form>` : `<a class="job-detail-save" href="/signup?return=${encodeURIComponent(jobPath(job) + '?save=1')}">♡ Save for later</a>`}
-              ${user && !application ? `<form method="post" action="/mark-applied"><input type="hidden" name="job_id" value="${esc(job.id)}"><input type="hidden" name="return_to" value="${jobPath(job)}"><button class="job-detail-track" type="submit">✓ Mark as applied</button></form>` : ''}
-              ${user && application ? `<a class="job-detail-track is-tracked" href="/my-jobs">Update application</a>` : ''}
-            </div>
 
             ${
               apply
@@ -1112,8 +1103,23 @@ export function detail(job, { user = null, saved = false, application = null, sa
 
                   <p class="job-detail-external">
   Opens the employer's listing in a new tab.
-</p>
+</p>`
+                : `<p class="job-detail-unavailable">
+                    The application link is currently unavailable.
+                  </p>`
+            }
 
+
+            <div class="job-detail-user-actions">
+              ${saveIntent && user && !saved ? '<p class="save-intent-note">You’re signed in. Save this job so you can come back to it anytime.</p>' : ''}
+              ${user ? `<form method="post" action="${saved ? '/unsave-job' : '/save-job'}"><input type="hidden" name="job_id" value="${esc(job.id)}"><input type="hidden" name="return_to" value="${jobPath(job)}"><button class="job-detail-save${saved ? ' is-saved' : ''}" type="submit">${saved ? '♥ Unsave job' : '♡ Save for later'}</button></form>` : `<a class="job-detail-save" href="/signup?return=${encodeURIComponent(jobPath(job) + '?save=1')}">♡ Save for later</a>`}
+              ${user && !application ? `<form method="post" action="/mark-applied"><input type="hidden" name="job_id" value="${esc(job.id)}"><input type="hidden" name="return_to" value="${jobPath(job)}"><button class="job-detail-track" type="submit">✓ Mark as applied</button></form>` : ''}
+              ${user && application ? `<a class="job-detail-track is-tracked" href="/my-jobs">Update application</a>` : ''}
+            </div>
+
+            ${renderApplicationProgress({ user, saved, application })}
+
+            <footer class="job-application-footer">
 ${
   isHimalayas
     ? `<p class="job-detail-source">
@@ -1125,14 +1131,9 @@ ${
         >Himalayas</a>.
       </p>`
     : ''
-}`
-                : `<p class="job-detail-unavailable">
-                    The application link is currently unavailable.
-                  </p>`
-            }
-
-
-            ${renderApplicationProgress({ user, saved, application })}
+}
+              ${reportsEnabled ? `<a href="/jobs/${esc(job.id)}/report">Report this job</a>${reported ? '<p role="status">Thank you. Your report has been sent for review.</p>' : ''}` : ''}
+            </footer>
 
           </div>
 

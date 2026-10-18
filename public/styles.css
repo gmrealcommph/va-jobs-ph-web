@@ -6348,3 +6348,34 @@ label.va-switch input[type=checkbox]{position:absolute;inset:0;width:100%;height
 @media(max-width:600px){label.va-switch{gap:12px;padding:14px}.onboard-email-choices{padding:14px}}
 @media(prefers-reduced-motion:reduce){.va-switch-track,.va-switch-track:before{transition:none}}
 @media(forced-colors:active){.va-switch-track{border-color:ButtonText;background:Canvas}.va-switch-track:before{background:ButtonText}.va-switch input:checked+.va-switch-control .va-switch-track{background:Highlight;border-color:Highlight}.va-switch input:checked+.va-switch-control .va-switch-track:before{background:HighlightText}.va-switch input:focus-visible+.va-switch-control .va-switch-track{outline-color:Highlight}}
+
+/* Branded application sidebar: presentation only; forms and progress retain their contracts. */
+.job-detail-sidebar .job-detail-snapshot{background:#F8F6EE;color:#0F3D2E;border:1px solid #0f3d2e26;border-top:4px solid #0F3D2E;padding:22px;border-radius:20px;box-shadow:0 10px 28px #0f3d2e0a;}
+.job-detail-sidebar .job-detail-snapshot-kicker{display:flex;justify-content:space-between;align-items:center;margin:0 0 12px;color:#0F3D2E;font-size:11px;letter-spacing:1.7px;line-height:1.4;}
+.job-application-plane{width:36px;height:36px;flex:none;color:#0F3D2E;background:#A7E3C1;border-radius:50%;padding:7px;box-sizing:border-box;}
+.job-detail-sidebar .job-detail-snapshot h2{font-size:28px;line-height:1.1;color:#0F3D2E;margin-bottom:10px;}
+.job-detail-sidebar .job-application-intro{font-size:12px;line-height:1.5;margin-bottom:14px;}
+.job-detail-sidebar .job-application-identity{margin-bottom:16px;padding:12px 0;}
+.job-detail-sidebar .job-application-identity strong{color:#0F3D2E;font-size:14px;}
+.job-detail-sidebar .job-detail-apply{background:#0F3D2E;color:#F8F6EE;border:1px solid #0F3D2E;border-radius:12px;min-height:50px;padding:8px 12px 8px 16px;box-shadow:none;font-weight:700;}
+.job-detail-sidebar .job-detail-apply b{width:28px;height:28px;flex-basis:28px;background:#FFC83D;color:#0F3D2E;border:0;font-size:18px;}
+.job-detail-sidebar .job-detail-apply:hover{background:#17563f;transform:none;box-shadow:none;}
+.job-detail-sidebar .job-detail-external{margin:8px 0 14px;font-size:11px;line-height:1.5;}
+.job-detail-sidebar .job-detail-user-actions{grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:8px;margin:14px 0 0;}
+.job-detail-sidebar .job-detail-user-actions>*{min-width:0;}
+.job-detail-sidebar .job-detail-user-actions .save-intent-note{grid-column:1/-1;box-sizing:border-box;}
+.job-detail-sidebar .job-detail-save,.job-detail-sidebar .job-detail-track{padding:9px 6px;min-height:46px;height:100%;border-radius:10px;font-size:12px;line-height:1.4;font-weight:600;color:#0F3D2E;background:#F8F6EE;border-color:#0f3d2e40;text-align:center;white-space:normal;}
+.job-detail-sidebar .job-detail-save.is-saved,.job-detail-sidebar .job-detail-track.is-tracked{background:#A7E3C1;}
+.job-detail-sidebar .job-detail-save:hover,.job-detail-sidebar .job-detail-track:hover{background:#A7E3C1;border-color:#0F3D2E;}
+.job-detail-sidebar .job-application-progress{margin-top:18px;padding-top:16px;border-top:1px solid #0f3d2e26;}
+.job-detail-sidebar .job-application-progress h3{color:#0F3D2E;margin-bottom:14px;}
+.job-detail-sidebar .job-progress-dot{background:#F8F6EE;border-color:#698377;color:#0F3D2E;}
+.job-detail-sidebar .is-complete .job-progress-dot{background:#A7E3C1;border-color:#22B07D;}
+.job-detail-sidebar .is-current .job-progress-dot{outline-color:#0F3D2E;}
+.job-detail-sidebar .job-application-progress p{margin-top:12px;}
+.job-application-footer{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:8px;margin-top:16px;padding-top:12px;border-top:1px solid #0f3d2e26;font-size:11px;line-height:1.5;color:#49685e;}
+.job-detail-sidebar .job-detail-source{margin:0;font-size:11px;line-height:1.5;}
+.job-application-footer a{color:#49685e;text-underline-offset:3px;}
+.job-application-footer [role=status]{flex-basis:100%;margin:0;}
+.job-detail-sidebar a:focus-visible,.job-detail-sidebar button:focus-visible{outline:3px solid #0F3D2E;outline-offset:3px;}
+@media(max-width:480px){.job-detail-sidebar .job-detail-snapshot{padding:20px 16px;}.job-detail-sidebar .job-detail-snapshot h2{font-size:28px;}}
