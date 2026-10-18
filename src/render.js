@@ -68,7 +68,7 @@ export function layout({ title, description, canonical, body, noindex = false, u
     type="image/svg+xml"
   >
 
-  <link rel="stylesheet" href="/styles.css?v=20261007-category-cream">
+  <link rel="stylesheet" href="/styles.css?v=20261018-switches">
 <link rel="stylesheet" href="/traffic.css?v=20261012-dismiss">
 <script src="/traffic.js?v=20261012-dismiss" type="module"></script>
 </head>
@@ -980,8 +980,19 @@ function formatJobDescription(text = '') {
   return html;
 }
 
+function applicationPanelIcon(name) {
+  const paths = {
+  "company": "<path d=\"M4 21h16M6 21V3h10v18M16 9h4v12M9 7h1m3 0h1M9 11h1m3 0h1M9 15h1m3 0h1M10 21v-3h2v3\"/>",
+  "bookmark": "<path d=\"M6 21V3h12v18l-6-5-6 5Z\"/>",
+  "check": "<circle cx=\"12\" cy=\"12\" r=\"10\" fill=\"currentColor\" stroke=\"none\"/><path d=\"m7 12 3 3 7-7\" stroke=\"#fff\"/>",
+  "source": "<ellipse cx=\"12\" cy=\"5\" rx=\"8\" ry=\"3\"/><path d=\"M4 5v14c0 4 16 4 16 0V5M4 12c0 4 16 4 16 0\"/>",
+  "flag": "<path d=\"M5 22V3c5-5 9 5 15 0v11c-6 5-10-5-15 0\"/>"
+};
+  return `<svg class="application-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${paths[name]}</svg>`;
+}
+
 function renderApplicationProgress({ user, saved, application }) {
-  if (!user) return '<section class="job-application-progress"><h3>Track your progress</h3><p>Create a free VeeAys account to save jobs and track your progress.</p></section>';
+  if (!user) return '<section class="job-application-progress"><h3>Application progress</h3><p>Create a free VeeAys account to save jobs and track your progress.</p></section>';
   const status = application?.status;
   const labels = { applied: 'Applied', interview: 'Interview', offer: 'Offer', hired: 'Hired', rejected: 'Rejected', withdrawn: 'Withdrawn' };
   const rank = { applied: 1, interview: 2, offer: 3, hired: 4 }[status] || 0;
@@ -989,7 +1000,7 @@ function renderApplicationProgress({ user, saved, application }) {
   const steps = [['saved', 'Saved'], ['applied', 'Applied'], ['interview', 'Interview'], ['offer', 'Offer']];
   if (status === 'hired') steps.push(['hired', 'Hired']);
   return `<section class="job-application-progress" aria-label="Application progress">
-    <h3>Track your progress</h3>
+    <div class="job-progress-heading"><h3>Application progress</h3><span class="job-progress-status">${esc(labels[status] || (saved ? 'Saved' : 'Not started'))}</span></div>
     <ol>${steps.map(([key, label], index) => {
       // Saved is independent of application status; closed outcomes imply no later stage.
       const done = index === 0 ? saved : (closed ? index === 1 : rank >= index);
@@ -1082,21 +1093,13 @@ export function detail(job, { user = null, saved = false, application = null, sa
 
           <div class="job-detail-snapshot">
 
-            <div class="job-detail-snapshot-kicker job-polish-heading">${sectionHeadingMarks('YOUR APPLICATION')}</div>
-
-
-            <div class="job-application-initials" aria-hidden="true">${esc(company.trim().split(/\s+/).slice(0,2).map(word=>word[0]).join('').toUpperCase())}</div>
-            <h2>Ready to make<br>your move?</h2>
-            <p class="job-application-intro">Apply directly on the employer's site and keep track of your application right here on VeeAys.</p>
-            <div class="job-application-identity"><strong>${esc(title)}</strong><span>${esc(company)}</span></div>
-
-            <div class="job-detail-user-actions">
-              ${reportsEnabled ? `<a href="/jobs/${esc(job.id)}/report">Report this job</a>${reported ? '<p role="status">Thank you. Your report has been sent for review.</p>' : ''}` : ''}
-              ${saveIntent && user && !saved ? '<p class="save-intent-note">You’re signed in. Save this job so you can come back to it anytime.</p>' : ''}
-              ${user ? `<form method="post" action="${saved ? '/unsave-job' : '/save-job'}"><input type="hidden" name="job_id" value="${esc(job.id)}"><input type="hidden" name="return_to" value="${jobPath(job)}"><button class="job-detail-save${saved ? ' is-saved' : ''}" type="submit">${saved ? '♥ Unsave job' : '♡ Save for later'}</button></form>` : `<a class="job-detail-save" href="/signup?return=${encodeURIComponent(jobPath(job) + '?save=1')}">♡ Save for later</a>`}
-              ${user && !application ? `<form method="post" action="/mark-applied"><input type="hidden" name="job_id" value="${esc(job.id)}"><input type="hidden" name="return_to" value="${jobPath(job)}"><button class="job-detail-track" type="submit">✓ Mark as applied</button></form>` : ''}
-              ${user && application ? `<a class="job-detail-track is-tracked" href="/my-jobs">Update application</a>` : ''}
-            </div>
+            <header class="job-application-header">
+              <div class="job-detail-snapshot-kicker">YOUR APPLICATION</div>
+              <p>Keep track and take the next step.</p>
+              <svg class="job-application-plane" aria-hidden="true" viewBox="0 0 100 70" fill="none"><path d="M3 62c16-39 42 13 61-22" stroke="#22B07D" stroke-width="2" stroke-linecap="round" stroke-dasharray="5 6"/><path d="m56 21 37-16-10 36-13-10-14-10Z" fill="#FFC83D"/><path d="m70 31 18-21-24 17 6 14Z" fill="#FF8A5B"/></svg>
+            </header>
+            <div class="job-application-body">
+              <div class="job-application-identity"><h2>${esc(title)}</h2><span>${applicationPanelIcon('company')}${esc(company)}</span></div>
 
             ${
               apply
@@ -1112,28 +1115,38 @@ export function detail(job, { user = null, saved = false, application = null, sa
 
                   <p class="job-detail-external">
   Opens the employer's listing in a new tab.
-</p>
-
-${
-  isHimalayas
-    ? `<p class="job-detail-source">
-        Job data sourced from
-        <a
-          href="https://himalayas.app/"
-          target="_blank"
-          rel="noopener noreferrer"
-        >Himalayas</a>.
-      </p>`
-    : ''
-}`
+</p>`
                 : `<p class="job-detail-unavailable">
                     The application link is currently unavailable.
                   </p>`
             }
 
 
+            <div class="job-detail-user-actions">
+              ${saveIntent && user && !saved ? '<p class="save-intent-note">You’re signed in. Save this job so you can come back to it anytime.</p>' : ''}
+              ${user ? `<form method="post" action="${saved ? '/unsave-job' : '/save-job'}"><input type="hidden" name="job_id" value="${esc(job.id)}"><input type="hidden" name="return_to" value="${jobPath(job)}"><button class="job-detail-save${saved ? ' is-saved' : ''}" type="submit">${applicationPanelIcon('bookmark')}${saved ? 'Unsave job' : 'Save for later'}</button></form>` : `<a class="job-detail-save" href="/signup?return=${encodeURIComponent(jobPath(job) + '?save=1')}">${applicationPanelIcon('bookmark')}Save for later</a>`}
+              ${user && !application ? `<form method="post" action="/mark-applied"><input type="hidden" name="job_id" value="${esc(job.id)}"><input type="hidden" name="return_to" value="${jobPath(job)}"><button class="job-detail-track" type="submit">${applicationPanelIcon('check')}Mark as applied</button></form>` : ''}
+              ${user && application ? `<a class="job-detail-track is-tracked" href="/my-jobs">Update application</a>` : ''}
+            </div>
+
             ${renderApplicationProgress({ user, saved, application })}
 
+            <footer class="job-application-footer">
+${
+  isHimalayas
+    ? `<p class="job-detail-source">
+        ${applicationPanelIcon('source')}<span>Job data sourced from
+        <a
+          href="https://himalayas.app/"
+          target="_blank"
+          rel="noopener noreferrer"
+        >Himalayas</a></span>
+      </p>`
+    : ''
+}
+              ${reportsEnabled ? `<a href="/jobs/${esc(job.id)}/report">${applicationPanelIcon('flag')}<span>Report<br>this job</span></a>${reported ? '<p role="status">Thank you. Your report has been sent for review.</p>' : ''}` : ''}
+            </footer>
+            </div>
           </div>
 
         </aside>
@@ -1145,7 +1158,7 @@ ${
 }
 
 
-export function authPage({ mode = 'login', error = '', message = '', email = '', returnTo = '' } = {}) {
+export function authPage({ mode = 'login', error = '', message = '', email = '', returnTo = '', turnstileSiteKey = '', authCaptcha = false, fullName = '' } = {}) {
   const signup = mode === 'signup';
   const applyIntent = returnTo.startsWith('/apply/');
   return `
@@ -1164,12 +1177,13 @@ export function authPage({ mode = 'login', error = '', message = '', email = '',
         ${message ? `<div class="auth-alert success" role="status">${esc(message)}</div>` : ''}
         <form class="auth-form" method="post" action="${signup ? '/signup' : '/login'}">
           ${returnTo ? `<input type="hidden" name="return" value="${esc(returnTo)}">` : ''}
-          ${signup ? `<div class="auth-field"><label for="full_name">Full name</label><input id="full_name" name="full_name" type="text" autocomplete="name" maxlength="100" required></div>` : ''}
+          ${signup ? `<div class="auth-field"><label for="full_name">Full name</label><input id="full_name" name="full_name" type="text" autocomplete="name" maxlength="100" value="${esc(fullName)}" required></div>` : ''}
           <div class="auth-field"><label for="email">Email address</label><input id="email" name="email" type="email" autocomplete="email" maxlength="254" value="${esc(email)}" required></div>
-          <div class="auth-field"><label for="password">Password</label><input id="password" name="password" type="password" autocomplete="${signup ? 'new-password' : 'current-password'}" minlength="8" maxlength="128" ${signup ? 'aria-describedby="auth-password-help" ' : ''}required>${signup ? '<small id="auth-password-help">Use 8–128 characters for your password.</small>' : ''}</div>
+          <div class="auth-field"><label for="password">Password</label><input id="password" name="password" type="password" autocomplete="${signup ? 'new-password' : 'current-password'}" minlength="8" maxlength="128" ${signup ? 'aria-describedby="auth-password-help" ' : ''}required>${signup ? '<small id="auth-password-help">Use 8–128 characters for your password.</small>' : ''}</div>${turnstileSiteKey ? `
+          <div class="cf-turnstile" data-sitekey="${esc(turnstileSiteKey)}" data-action="${signup ? 'signup' : 'login'}"></div><script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>` : ''}
           <button type="submit">${signup ? 'Create account' : 'Log in'}</button>
         </form>
-        <p class="auth-switch">${signup ? `Already have an account? <a href="/login${returnTo ? `?return=${encodeURIComponent(returnTo)}` : ''}">Log in</a>` : `New to VeeAys? <a href="/signup${returnTo ? `?return=${encodeURIComponent(returnTo)}` : ''}">Create an account</a>`}</p>
+        <p><a href="/forgot-password">Forgot password?</a> · <a href="/auth/resend">Resend verification email</a></p><p class="auth-switch">${signup ? `Already have an account? <a href="/login${returnTo ? `?return=${encodeURIComponent(returnTo)}` : ''}">Log in</a>` : `New to VeeAys? <a href="/signup${returnTo ? `?return=${encodeURIComponent(returnTo)}` : ''}">Create an account</a>`}</p>
       </div>
     </section>`;
 }
@@ -1180,14 +1194,14 @@ function authPostcard(label) {
 
 export function checkEmailPage(email = '', returnTo = '') {
   const loginHref = '/login' + (returnTo ? `?return=${encodeURIComponent(returnTo)}` : '');
-  return `<link rel="stylesheet" href="/auth.css?v=20261006"><section class="auth-shell auth-polish"><div class="auth-intro"><div class="kicker">ONE MORE STEP</div><h1>Check your<br><em>inbox.</em></h1><p>We sent a confirmation link${email ? ` to <strong>${esc(email)}</strong>` : ''}. Click it to verify your email and continue setting up your VeeAys account.</p>${authPostcard('A little inbox delivery')}</div><div class="auth-card"><div class="auth-card-label">YOUR EMAIL CONFIRMATION</div><h2>Verify your email</h2><p>Open the email from VeeAys and follow the confirmation link. It will take you back here.</p><div class="auth-inbox-note"><strong>Still looking for it?</strong><p>Check your spam or junk folder, and make sure you’re checking the email address you signed up with.</p></div><a class="button" href="${esc(loginHref)}">Back to log in</a></div></section>`;
+  return `<link rel="stylesheet" href="/auth.css?v=20261006"><section class="auth-shell auth-polish"><div class="auth-intro"><div class="kicker">ONE MORE STEP</div><h1>Check your<br><em>inbox.</em></h1><p>We sent a confirmation link${email ? ` to <strong>${esc(email)}</strong>` : ''}. Click it to verify your email and continue setting up your VeeAys account.</p>${authPostcard('A little inbox delivery')}</div><div class="auth-card"><div class="auth-card-label">YOUR EMAIL CONFIRMATION</div><h2>Verify your email</h2><p>Open the email from VeeAys and follow the confirmation link. It will take you back here.</p><div class="auth-inbox-note"><strong>Still looking for it?</strong><p>Check your spam or junk folder, and make sure you’re checking the email address you signed up with.</p></div><p><a href="/auth/resend?email=${encodeURIComponent(email)}&amp;return=${encodeURIComponent(returnTo)}">Resend verification email</a></p><a class="button" href="${esc(loginHref)}">Back to log in</a></div></section>`;
 }
 
 export function authCallbackPage() {
   return `<link rel="stylesheet" href="/auth.css?v=20261006"><section class="auth-callback auth-polish">${authPostcard('Almost there')}<div role="status" aria-live="polite"><div class="kicker">VERIFYING</div><h1>Finishing your sign in…</h1><p>Please keep this page open for a moment.</p></div><noscript><p>JavaScript is needed to finish email verification. Enable it, then reopen the confirmation link from your email.</p><a href="/login">Back to log in</a></noscript></section><script src="/auth-callback.js" defer></script>`;
 }
 
-export function onboardingPage({ user, preferences = null, error = '' } = {}) {
+export function onboardingPage({ user, preferences = null, error = '', memberEmailChoices = null } = {}) {
   const roles = ['Executive Assistant','General VA','Customer Support','Social Media','Marketing','Sales','E-commerce','Bookkeeping','Graphic Design','Video Editing','Operations','Web/Development','Other'];
   const employment = ['Full-time','Part-time','Contract/Freelance'];
   const schedules = ['Philippines daytime','UK/Europe hours','Australia hours','US hours','Flexible/Any'];
@@ -1232,6 +1246,7 @@ export function onboardingPage({ user, preferences = null, error = '' } = {}) {
       <section class="onboard-step" data-step="5">
         <div class="onboard-step-label">YOUR SEARCH PROFILE</div><h2 tabindex="-1">Your search profile, ready to go.</h2><p>Here’s what matters to you. Go back to adjust anything, then save your profile and explore jobs.</p>
         <h3 class="onboard-recap-title">Your search profile</h3><div class="onboard-review" id="onboard-review"></div>
+        ${memberEmailChoices===null?'':`<fieldset class="onboard-email-choices"><legend>A little inbox boost? Totally your call.</legend><input type="hidden" name="member_email_choices" value="v1"><p><label class="va-switch"><input type="checkbox" role="switch" name="member_tips" value="yes" ${memberEmailChoices.tips===true?'checked':''}><span class="va-switch-control" aria-hidden="true"><span class="va-switch-track"></span><span class="va-switch-state"></span></span><span class="va-switch-copy">Send me getting-started emails and practical career tips during my first two weeks.</span></label></p><p><label class="va-switch"><input type="checkbox" role="switch" name="member_pro" value="yes" ${memberEmailChoices.pro===true?'checked':''}><span class="va-switch-control" aria-hidden="true"><span class="va-switch-track"></span><span class="va-switch-state"></span></span><span class="va-switch-copy">Send me the optional introduction to VeeAys Pro.</span></label></p><p>These are separate from job digests. Unsubscribe anytime. <a href="/privacy">Privacy policy</a>.</p></fieldset>`}
         <div class="onboard-ready"><strong>${esc(user?.email || 'Your account')}</strong><span>✓ Your preferences will be saved to this account. You can update them later.</span></div>
       </section>
       <div class="onboard-actions"><button class="button secondary" type="button" id="onboard-back" hidden>Back</button><button type="button" id="onboard-next">Continue</button><button type="submit" id="onboard-finish" hidden>Save profile &amp; explore jobs</button></div>
@@ -1528,4 +1543,17 @@ export function myJobsPage({ saved = [], applications = [], message = '', error 
     }));
   })();
   </script>`;
+}
+
+// Share the established login/signup design with account recovery and email states.
+export function authSupportPage(title, body, pathname) {
+  const resend = pathname === '/auth/resend';
+  const copy = title === 'Check your inbox'
+    ? ['ONE MORE STEP', 'A little inbox<br><em>delivery.</em>', 'Your next step is on its way. Check your inbox and spam folder for an email from VeeAys.', 'A little inbox delivery']
+    : title === 'Password updated'
+    ? ['READY TO GO', 'A fresh start,<br><em>all yours.</em>', 'Your password is updated. Head back to your saved jobs and your next possibilities.', 'Welcome back']
+    : resend
+    ? ['ONE MORE STEP', 'Your next chapter,<br><em>one click away.</em>', 'Verify your email to keep exploring opportunities open to Filipino talent.', 'Your next chapter']
+    : ['WELCOME BACK', 'A fresh start,<br><em>without the fuss.</em>', 'Let’s get you back to your saved jobs, preferences, and next possibilities.', 'Back to possibilities'];
+  return `<link rel="stylesheet" href="/auth.css?v=20261006"><section class="auth-shell auth-polish"><div class="auth-intro"><div class="kicker">${copy[0]}</div><h1>${copy[1]}</h1><p>${copy[2]}</p>${authPostcard(copy[3])}</div><div class="auth-card"><div class="auth-card-label">${resend ? 'YOUR EMAIL CONFIRMATION' : 'YOUR VEEAYS ACCOUNT'}</div><h2>${esc(title)}</h2>${body}</div></section>`;
 }

@@ -1,3 +1,4 @@
+import {reserveMemberEmailGap} from './lifecycle-coordination.js';
 // Deliberately manual and restricted to runtime-allowlisted notifications.
 // No scheduled handler, background work, or browser-accessible credentials.
 
@@ -182,6 +183,7 @@ export async function manualNotification(request, env, notificationId) {
     if (!await one(config, 'public_jobs', { id: `eq.${jobId}` })) stop('job_no_longer_public');
     person = await recipient(config, fresh.user_id);
     if (person.email !== delivery.payload.to[0]) stop('recipient_changed');
+    await reserveMemberEmailGap(env,notification.user_id,'manual',notificationId);
     const response = await fetch('https://api.resend.com/emails', {
       method: 'POST', headers: { Authorization: `Bearer ${env.RESEND_API_KEY}`, 'content-type': 'application/json',
         'Idempotency-Key': `veeays-strong-match-${config.url.hostname}-${notificationId}` },
