@@ -6331,13 +6331,13 @@ body:has(.employer-page)>.site-footer .footer-bottom{padding-top:15px;padding-bo
 label.va-switch,.alerts-page label.va-switch,.member-inbox label.va-switch{position:relative;display:flex;align-items:flex-start;gap:16px;min-height:44px;margin:12px 0;padding:16px;border:1px solid #cbd5bf;border-radius:14px;background:#fffdf5;color:#173d32;cursor:pointer;box-sizing:border-box}
 label.va-switch:hover{border-color:#71876b;background:#f8faef}
 label.va-switch input[type=checkbox]{position:absolute;inset:0;width:100%;height:100%;margin:0;opacity:0;cursor:pointer;z-index:1}
-.va-switch-control{display:grid;justify-items:center;gap:5px;flex:0 0 58px;pointer-events:none}
+.va-switch .va-switch-control{display:grid;justify-items:center;gap:5px;flex:0 0 58px;pointer-events:none}
 .va-switch-track{position:relative;display:block;box-sizing:border-box;width:58px;height:34px;border:1px solid #82917c;border-radius:999px;background:#d9dfd4;transition:background .2s ease}
 .va-switch-track:before{content:'';position:absolute;left:4px;top:4px;width:24px;height:24px;border-radius:50%;background:#fffdf5;box-shadow:0 2px 4px #123e3026;transition:transform .2s ease}
 .va-switch input:checked+.va-switch-control .va-switch-track{background:#123e30;border-color:#123e30}
 .va-switch input:checked+.va-switch-control .va-switch-track:before{transform:translateX(24px);background:#d8ed93}
 .va-switch input:focus-visible+.va-switch-control .va-switch-track{outline:3px solid #527a2b;outline-offset:4px}
-.va-switch-state{font-size:11px;font-weight:700;line-height:1;color:#465a49}
+.va-switch .va-switch-state{font-size:11px;font-weight:700;line-height:1;color:#465a49}
 .va-switch-state:before{content:'Off'}
 .va-switch input:checked+.va-switch-control .va-switch-state:before{content:'On'}
 .va-switch-copy{min-width:0;line-height:1.65;align-self:center;overflow-wrap:anywhere}

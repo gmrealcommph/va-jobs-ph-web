@@ -21,4 +21,6 @@ Validation (18 October 2026):
 ![Review at desktop width](../evidence/preference-switches/review-1280.png)
 ![Keyboard focus and on state](../evidence/preference-switches/switch-keyboard-focus.png)
 
-Limit: the inherited recovered branch references `public/member-emails.css`, which is absent there. Shared switch styling and behavior were checked, but full production member-email page styling was not reproduced. No unrelated stylesheet recovery or live audit was attempted. Draft review only; no merge or deployment.
+Release preparation after user approval: downloaded the current live Worker and existing 84 assets read-only. Repeated browser checks with the current compiled rendering functions and live CSS, including the member-email stylesheet absent from the recovered Git base. Added specificity for the shared control and state text so the existing member-email rules cannot override them. The full member-email preview now passes at 390px. The deployment candidate changes only UI markup in layout/onboardingPage/memberEmailForm/alertForm and appends the same switch CSS to the live stylesheet; every other live code declaration and asset is preserved. No branch-wide reconciliation is included.
+
+![Member email switches with current live styling](../evidence/preference-switches/member-emails-390.png)
