@@ -5,7 +5,7 @@ import {PGlite} from '@electric-sql/pglite';
 import {pgcrypto} from '@electric-sql/pglite/contrib/pgcrypto';
 import {generateJob,quickReadEndpoint} from '../src/quick-read-service.js';
 import {failureDiagnostics} from '../src/quick-read-diagnostics.js';
-import {sourceFingerprint,sourceUnits,SECTIONS,validateSelection,generateWithProvider} from '../src/quick-read-generation.js';
+import {sourceFingerprint,sourceUnits,SECTIONS,validateSelection,organizeWithProvider as generateWithProvider} from '../src/quick-read-generation.js';
 const source='About the role\nCoordinate customer relationships across a distributed team.\nClear communication and accurate reporting are part of the role.\nExcel experience is preferred.';
 const token='aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa';
 const selection=()=>({...Object.fromEntries(SECTIONS.map(k=>[k,[]])),other_details:sourceUnits(source).map(u=>u.id)});

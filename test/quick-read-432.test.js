@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
-import {SECTIONS,sourceUnits,validateSelection,validateStored,generateWithProvider,sourceFingerprint} from '../src/quick-read-generation.js';
+import {SECTIONS,sourceUnits,validateSelection,validateStored,organizeWithProvider as generateWithProvider,sourceFingerprint} from '../src/quick-read-generation.js';
 import {renderJobRead} from '../src/job-detail-read.js';
 // Public HTML-decoded Original description, GET /jobs/432 on 2026-10-05
 // Asia/Manila. Not historical database bytes or the failed provider response.

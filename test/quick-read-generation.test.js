@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {sourceUnits,sourceFingerprint,validateSelection,validateStored,generateWithProvider,SECTIONS} from '../src/quick-read-generation.js';
+import {sourceUnits,sourceFingerprint,validateSelection,validateStored,organizeWithProvider as generateWithProvider,SECTIONS} from '../src/quick-read-generation.js';
 import {generateJob,quickReadEndpoint} from '../src/quick-read-service.js';
 import {renderJobRead,renderAtAGlance,formatSalary} from '../src/job-detail-read.js';
 import {installLogoFallback} from '../public/job-detail-logo.js';

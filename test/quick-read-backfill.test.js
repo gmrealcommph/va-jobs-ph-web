@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
-import {sourceUnits,SECTIONS,validateSelection,validateStored,generateWithProvider,sourceFingerprint} from '../src/quick-read-generation.js';
+import {sourceUnits,SECTIONS,validateSelection,validateStored,organizeWithProvider as generateWithProvider,sourceFingerprint} from '../src/quick-read-generation.js';
 import {renderJobRead} from '../src/job-detail-read.js';
 // Public HTML-decoded Original description GETs, 2026-10-05 Asia/Manila.
 // Not historical database bytes or failed provider responses. All provider calls are mocks.
