@@ -11,7 +11,6 @@
   "triggers": {
     "crons": [
       "* * * * *",
-      "0-59 * * * *",
       "*/15 * * * *",
       "17 */6 * * *"
     ]
@@ -24,8 +23,9 @@
     "DAILY_DIGEST_START_AT": "2026-10-04T00:00:00Z",
     "PAYMONGO_LIVE_CHECKOUT_ENABLED": "true",
     "PAYMONGO_MODE": "live",
-    "QUICK_READ_AUTO_ENABLED": "true",
-    "QUICK_READ_BATCH_ENABLED": "true",
+    "QUICK_READ_GENERATION_ENABLED": "false",
+    "QUICK_READ_AUTO_ENABLED": "false",
+    "QUICK_READ_BATCH_ENABLED": "false",
     "QUICK_READ_MODE": "manual",
     "QUICK_READ_MODEL": "gpt-5-mini",
     "QUICK_READ_PROVIDER": "openai",

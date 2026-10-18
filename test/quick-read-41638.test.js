@@ -47,7 +47,7 @@ test('41638: captured source checksum and exact qualification block, without met
 });
 
 test('41638: corrected hints reach mocked provider and validated persistence',async()=>{
-  const q=selection(),payload=await generateWithProvider({OPENAI_API_KEY:'test-only',QUICK_READ_MODEL:'gpt-5-mini'},source,async(url,init)=>{
+  const q=selection(),payload=await generateWithProvider({QUICK_READ_GENERATION_ENABLED:'true',OPENAI_API_KEY:'test-only',QUICK_READ_MODEL:'gpt-5-mini'},source,async(url,init)=>{
     const sent=JSON.parse(init.body);
     assert.equal(sent.store,false);assert.equal(sent.text.format.strict,true);
     assert.deepEqual(JSON.parse(sent.input).source_units,sourceUnits(source));
@@ -55,7 +55,7 @@ test('41638: corrected hints reach mocked provider and validated persistence',as
     return response(q);
   });
   let finish;
-  const result=await generateJob({QUICK_READ_MODEL:'gpt-5-mini'},'41638',{
+  const result=await generateJob({QUICK_READ_GENERATION_ENABLED:'true',QUICK_READ_MODEL:'gpt-5-mini'},'41638',{
     call:async(e,name,args)=>name==='claim_job_quick_read_auto'
       ?{status:'claimed',description:source,source_hash:await sourceFingerprint(source)}
       :(finish=args,{status:'ready'}),generate:async()=>payload
@@ -69,7 +69,7 @@ test('41638: unsupported duties/tail, omitted IDs and invented references still 
   for(const text of ['Manage accounts payable and receivable, including processing invoices, payments, and collections.','Employment type: Full Time']) {
     const q=move(selection(),units.find(u=>u.text===text).id,'requirements');
     assert.throws(()=>validateSelection(q,source),/unsupported_requirement/);
-    await assert.rejects(generateWithProvider({OPENAI_API_KEY:'test-only',QUICK_READ_MODEL:'gpt-5-mini'},source,async()=>response(q)),/unsupported_requirement/);
+    await assert.rejects(generateWithProvider({QUICK_READ_GENERATION_ENABLED:'true',OPENAI_API_KEY:'test-only',QUICK_READ_MODEL:'gpt-5-mini'},source,async()=>response(q)),/unsupported_requirement/);
   }
   for(const u of units) {
     const q=selection();for(const k of SECTIONS) q[k]=q[k].filter(id=>id!==u.id);

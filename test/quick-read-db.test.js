@@ -28,7 +28,7 @@ test('additive prose envelope survives existing SQL finish/projection and ready 
   try {
     const description=await readFile(new URL('./fixtures/executive-assistant-25943.txt',import.meta.url),'utf8');
     const summary=JSON.parse(await readFile(new URL('./fixtures/executive-assistant-25943-summary.json',import.meta.url),'utf8'));
-    const payload=await generateWithProvider({OPENAI_API_KEY:'offline',QUICK_READ_MODEL:'gpt-5-mini'},description,async()=>Response.json({status:'completed',output:[{content:[{type:'output_text',text:JSON.stringify(summary)}]}]}));
+    const payload=await generateWithProvider({QUICK_READ_GENERATION_ENABLED:'true',OPENAI_API_KEY:'offline',QUICK_READ_MODEL:'gpt-5-mini'},description,async()=>Response.json({status:'completed',output:[{content:[{type:'output_text',text:JSON.stringify(summary)}]}]}));
     await db.query('update public.jobs set description=$1 where id=1',[description]);
     await scalar(db,`select public.claim_job_quick_read('1','source-organizer-v2','${token}') as value`);
     const finish=await db.query('select public.finish_job_quick_read($1,$2,$3,$4,$5,$6) as value',['1',token,JSON.stringify(payload),'offline',2,null]);
