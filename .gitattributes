@@ -10,22 +10,23 @@ public/admin-quick-reads.css -whitespace
 public/admin.js -whitespace
 
 # Retain deployed asset bytes, including mixed line endings; disable normalization.
-public/admin-members.js -text
-public/admin-quick-reads.css -text
-public/admin-theme.css -text
-public/admin-traffic.css -text
-public/admin-wallpaper.svg -text
-public/admin.css -text
-public/auth.css -text
-public/favicon.svg -text
-public/images/about-workspace.svg -text
-public/images/employer-enquiry-desk.svg -text
-public/images/employer-workspace.svg -text
-public/job-alerts.css -text
-public/job-health.css -text
-public/job-report.css -text
-public/member-emails.css -text
-public/onboarding.css -text
-public/recovery.css -text
-public/styles.css -text
-public/traffic.css -text
+evidence/production-20261018/worker.reference.mjs -text -whitespace
+public/admin-members.js -text -whitespace
+public/admin-quick-reads.css -text -whitespace
+public/admin-theme.css -text -whitespace
+public/admin-traffic.css -text -whitespace
+public/admin-wallpaper.svg -text -whitespace
+public/admin.css -text -whitespace
+public/auth.css -text -whitespace
+public/favicon.svg -text -whitespace
+public/images/about-workspace.svg -text -whitespace
+public/images/employer-enquiry-desk.svg -text -whitespace
+public/images/employer-workspace.svg -text -whitespace
+public/job-alerts.css -text -whitespace
+public/job-health.css -text -whitespace
+public/job-report.css -text -whitespace
+public/member-emails.css -text -whitespace
+public/onboarding.css -text -whitespace
+public/recovery.css -text -whitespace
+public/styles.css -text -whitespace
+public/traffic.css -text -whitespace
