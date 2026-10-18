@@ -1,3 +1,4 @@
+import {requireGenerationEnabled} from './quick-read-gate.js';
 import {boundedProviderBody} from './quick-read-input-bound.js';
 import {providerFailureDiagnostics} from './quick-read-provider-diagnostics.js';
 
@@ -102,6 +103,7 @@ export const summaryInstructions = `Write a VeeAys Quick Read like a knowledgeab
 const partSchema={type:'object',additionalProperties:false,required:['text','source_ids'],properties:{text:{type:'string'},source_ids:{type:'array',items:{type:'integer'}}}};
 export const summarySchema={type:'object',additionalProperties:false,required:['version',...Object.keys(SUMMARY_SECTIONS)],properties:{version:{type:'integer',enum:[1]},...Object.fromEntries(Object.keys(SUMMARY_SECTIONS).map(k=>[k,partSchema]))}};
 export async function generateSummary(env, units, fetcher) {
+  requireGenerationEnabled(env);
   if ((env.QUICK_READ_PROVIDER || 'openai') !== 'openai' || !env.OPENAI_API_KEY || !env.QUICK_READ_MODEL) throw new Error('provider_not_configured');
   const response=await fetcher('https://api.openai.com/v1/responses', {method:'POST',headers:{Authorization:`Bearer ${env.OPENAI_API_KEY}`,'content-type':'application/json'},signal:AbortSignal.timeout(90000),body:boundedProviderBody({model:env.QUICK_READ_MODEL,store:false,service_tier:'default',truncation:'disabled',instructions:summaryInstructions,input:JSON.stringify({source_units:summarySourceUnits(units)}),max_output_tokens:4096,text:{format:{type:'json_schema',name:'veeays_quick_read_summary',strict:true,schema:summarySchema}}})});
   if (!response.ok) {

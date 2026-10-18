@@ -9,7 +9,7 @@ import {presentQuickRead} from '../src/quick-read-presentation.js';
 const fixture=name=>readFileSync(new URL('./fixtures/'+name,import.meta.url),'utf8');
 const source=fixture('executive-assistant-25943.txt');
 const sample=JSON.parse(fixture('executive-assistant-25943-summary.json'));
-const env={OPENAI_API_KEY:'offline-test',QUICK_READ_MODEL:'gpt-5-mini'};
+const env={QUICK_READ_GENERATION_ENABLED:'true',OPENAI_API_KEY:'offline-test',QUICK_READ_MODEL:'gpt-5-mini'};
 const response=summary=>Response.json({status:'completed',output:[{content:[{type:'output_text',text:JSON.stringify(summary)}]}]});
 
 test('25943: new generator, source-bound persistence and four prose sections with no dump',async()=>{

@@ -6,7 +6,7 @@ import {SUMMARY_SECTIONS} from '../src/quick-read-summary.js';
 const source=await readFile(new URL('../test/fixtures/executive-assistant-25943.txt',import.meta.url),'utf8');
 const sample=JSON.parse(await readFile(new URL('../test/fixtures/executive-assistant-25943-summary.json',import.meta.url),'utf8'));
 let request;
-const payload=await generateWithProvider({OPENAI_API_KEY:'offline-placeholder',QUICK_READ_MODEL:'gpt-5-mini'},source,async(url,init)=>{
+const payload=await generateWithProvider({QUICK_READ_GENERATION_ENABLED:'true',OPENAI_API_KEY:'offline-placeholder',QUICK_READ_MODEL:'gpt-5-mini'},source,async(url,init)=>{
   request=JSON.parse(init.body);
   return Response.json({status:'completed',output:[{content:[{type:'output_text',text:JSON.stringify(sample)}]}]});
 });

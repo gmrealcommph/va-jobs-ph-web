@@ -74,7 +74,7 @@ test('rate limits stop further requests to the same host, without calling jobs c
 test('six-hour pilot is registered, disabled by default and routed by the worker',async(t)=>{
  const config=JSON.parse(await readFile(new URL('../wrangler.jsonc',import.meta.url),'utf8'));
  assert.equal(JOB_HEALTH_CRON,'17 */6 * * *');
- assert.deepEqual(config.triggers.crons,['* * * * *','0-59 * * * *','*/15 * * * *',JOB_HEALTH_CRON]);
+ assert.deepEqual(config.triggers.crons,['* * * * *','*/15 * * * *',JOB_HEALTH_CRON]);
  assert.equal(config.vars.JOB_HEALTH_VERIFY_ENABLED,'false');
  const calls=[];
  t.mock.method(globalThis,'fetch',async(url,options)=>{

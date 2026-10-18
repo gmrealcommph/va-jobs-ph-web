@@ -7,7 +7,7 @@ import {organizeWithProvider as generateWithProvider,sourceFingerprint,sourceUni
 import {generateJob} from '../src/quick-read-service.js';
 import {providerFailureDiagnostics} from '../src/quick-read-provider-diagnostics.js';
 const source='About the role\nCoordinate customer relationships across a distributed team.\nClear communication and accurate reporting are part of the role.';
-const env={QUICK_READ_PROVIDER:'openai',QUICK_READ_MODEL:'gpt-5-mini',OPENAI_API_KEY:'SECRET_SENTINEL'};
+const env={QUICK_READ_GENERATION_ENABLED:'true',QUICK_READ_PROVIDER:'openai',QUICK_READ_MODEL:'gpt-5-mini',OPENAI_API_KEY:'SECRET_SENTINEL'};
 const token='aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa';
 const response=data=>async()=>({ok:true,status:200,json:async()=>data});
 async function failure(data) {
