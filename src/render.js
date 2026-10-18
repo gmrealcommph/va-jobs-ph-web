@@ -68,7 +68,7 @@ export function layout({ title, description, canonical, body, noindex = false, u
     type="image/svg+xml"
   >
 
-  <link rel="stylesheet" href="/styles.css?v=20261007-category-cream">
+  <link rel="stylesheet" href="/styles.css?v=20261018-switches">
 <link rel="stylesheet" href="/traffic.css?v=20261012-dismiss">
 <script src="/traffic.js?v=20261012-dismiss" type="module"></script>
 </head>
@@ -1233,7 +1233,7 @@ export function onboardingPage({ user, preferences = null, error = '', memberEma
       <section class="onboard-step" data-step="5">
         <div class="onboard-step-label">YOUR SEARCH PROFILE</div><h2 tabindex="-1">Your search profile, ready to go.</h2><p>Here’s what matters to you. Go back to adjust anything, then save your profile and explore jobs.</p>
         <h3 class="onboard-recap-title">Your search profile</h3><div class="onboard-review" id="onboard-review"></div>
-        ${memberEmailChoices===null?'':`<fieldset><legend>A little inbox boost? Totally your call.</legend><input type="hidden" name="member_email_choices" value="v1"><p><label><input type="checkbox" name="member_tips" value="yes" ${memberEmailChoices.tips===true?'checked':''}> Send me getting-started emails and practical career tips during my first two weeks.</label></p><p><label><input type="checkbox" name="member_pro" value="yes" ${memberEmailChoices.pro===true?'checked':''}> Send me the optional introduction to VeeAys Pro.</label></p><p>These are separate from job digests. Unsubscribe anytime. <a href="/privacy">Privacy policy</a>.</p></fieldset>`}
+        ${memberEmailChoices===null?'':`<fieldset class="onboard-email-choices"><legend>A little inbox boost? Totally your call.</legend><input type="hidden" name="member_email_choices" value="v1"><p><label class="va-switch"><input type="checkbox" role="switch" name="member_tips" value="yes" ${memberEmailChoices.tips===true?'checked':''}><span class="va-switch-control" aria-hidden="true"><span class="va-switch-track"></span><span class="va-switch-state"></span></span><span class="va-switch-copy">Send me getting-started emails and practical career tips during my first two weeks.</span></label></p><p><label class="va-switch"><input type="checkbox" role="switch" name="member_pro" value="yes" ${memberEmailChoices.pro===true?'checked':''}><span class="va-switch-control" aria-hidden="true"><span class="va-switch-track"></span><span class="va-switch-state"></span></span><span class="va-switch-copy">Send me the optional introduction to VeeAys Pro.</span></label></p><p>These are separate from job digests. Unsubscribe anytime. <a href="/privacy">Privacy policy</a>.</p></fieldset>`}
         <div class="onboard-ready"><strong>${esc(user?.email || 'Your account')}</strong><span>✓ Your preferences will be saved to this account. You can update them later.</span></div>
       </section>
       <div class="onboard-actions"><button class="button secondary" type="button" id="onboard-back" hidden>Back</button><button type="button" id="onboard-next">Continue</button><button type="submit" id="onboard-finish" hidden>Save profile &amp; explore jobs</button></div>
