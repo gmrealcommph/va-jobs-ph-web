@@ -8,3 +8,24 @@
 evidence/production-20261012/worker.reference.mjs -whitespace
 public/admin-quick-reads.css -whitespace
 public/admin.js -whitespace
+
+# Retain byte-identical CRLF assets from deployed bb53 (Git stores normalized text).
+public/admin-members.js -text
+public/admin-quick-reads.css -text
+public/admin-theme.css -text
+public/admin-traffic.css -text
+public/admin-wallpaper.svg -text
+public/admin.css -text
+public/auth.css -text
+public/favicon.svg -text
+public/images/about-workspace.svg -text
+public/images/employer-enquiry-desk.svg -text
+public/images/employer-workspace.svg -text
+public/job-alerts.css -text
+public/job-health.css -text
+public/job-report.css -text
+public/member-emails.css -text
+public/onboarding.css -text
+public/recovery.css -text
+public/styles.css -text
+public/traffic.css -text
