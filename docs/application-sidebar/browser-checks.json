@@ -3,19 +3,19 @@
     "width": 320,
     "overflow": false,
     "sideBySide": true,
-    "saveWidth": 121,
-    "trackWidth": 121,
+    "saveWidth": 122,
+    "trackWidth": 122,
     "sequence": [
       {
         "label": "Apply for this role\n                    ↗",
         "outline": "solid"
       },
       {
-        "label": "♡ Save for later",
+        "label": "Save for later",
         "outline": "solid"
       },
       {
-        "label": "✓ Mark as applied",
+        "label": "Mark as applied",
         "outline": "solid"
       },
       {
@@ -23,7 +23,7 @@
         "outline": "solid"
       },
       {
-        "label": "Report this job",
+        "label": "Reportthis job",
         "outline": "solid"
       }
     ],
@@ -48,19 +48,19 @@
     "width": 390,
     "overflow": false,
     "sideBySide": true,
-    "saveWidth": 156,
-    "trackWidth": 156,
+    "saveWidth": 157,
+    "trackWidth": 157,
     "sequence": [
       {
         "label": "Apply for this role\n                    ↗",
         "outline": "solid"
       },
       {
-        "label": "♡ Save for later",
+        "label": "Save for later",
         "outline": "solid"
       },
       {
-        "label": "✓ Mark as applied",
+        "label": "Mark as applied",
         "outline": "solid"
       },
       {
@@ -68,7 +68,7 @@
         "outline": "solid"
       },
       {
-        "label": "Report this job",
+        "label": "Reportthis job",
         "outline": "solid"
       }
     ],
@@ -93,19 +93,19 @@
     "width": 768,
     "overflow": false,
     "sideBySide": true,
-    "saveWidth": 273,
-    "trackWidth": 273,
+    "saveWidth": 275,
+    "trackWidth": 275,
     "sequence": [
       {
         "label": "Apply for this role\n                    ↗",
         "outline": "solid"
       },
       {
-        "label": "♡ Save for later",
+        "label": "Save for later",
         "outline": "solid"
       },
       {
-        "label": "✓ Mark as applied",
+        "label": "Mark as applied",
         "outline": "solid"
       },
       {
@@ -113,7 +113,7 @@
         "outline": "solid"
       },
       {
-        "label": "Report this job",
+        "label": "Reportthis job",
         "outline": "solid"
       }
     ],
@@ -138,19 +138,19 @@
     "width": 1280,
     "overflow": false,
     "sideBySide": true,
-    "saveWidth": 140.5,
-    "trackWidth": 140.5,
+    "saveWidth": 142.5,
+    "trackWidth": 142.5,
     "sequence": [
       {
         "label": "Apply for this role\n                    ↗",
         "outline": "solid"
       },
       {
-        "label": "♡ Save for later",
+        "label": "Save for later",
         "outline": "solid"
       },
       {
-        "label": "✓ Mark as applied",
+        "label": "Mark as applied",
         "outline": "solid"
       },
       {
@@ -158,7 +158,7 @@
         "outline": "solid"
       },
       {
-        "label": "Report this job",
+        "label": "Reportthis job",
         "outline": "solid"
       }
     ],
