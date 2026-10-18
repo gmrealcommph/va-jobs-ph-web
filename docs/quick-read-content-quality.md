@@ -1,5 +1,7 @@
 # Quick Read content quality — draft review only
 
+For the subsequent captured-output regression fixes and current offline validation, see [live-quality follow-up](quick-read-live-quality-followup.md). The cost and test results below describe the original ceff0fd implementation.
+
 Job 25943 currently has roughly 1,130 words of source-like bullets, repeated duties, `8+ years years`, concatenated fields, and a false contractor conflict. The proposed acceptance sample is 174 words in four prose sections. The generator now asks for an explanation of the actual job, normally 150–220 words, with a 250-word ceiling and shorter output allowed for sparse sources.
 
 - [Captured before Quick Read](quick-read-samples/25943-before.html)

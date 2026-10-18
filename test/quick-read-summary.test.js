@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {generateWithProvider,sourceUnits,sourceFingerprint,validateStored,validateSelection,SECTIONS} from '../src/quick-read-generation.js';
-import {validateSummary,SUMMARY_SECTIONS} from '../src/quick-read-summary.js';
+import {validateSummary,SUMMARY_SECTIONS,summarySourceUnits} from '../src/quick-read-summary.js';
 import {generateJob} from '../src/quick-read-service.js';
 import {renderJobRead} from '../src/job-detail-read.js';
 import {presentQuickRead} from '../src/quick-read-presentation.js';
@@ -19,7 +19,7 @@ test('25943: new generator, source-bound persistence and four prose sections wit
     assert.equal(body.max_output_tokens,4096);assert.equal(body.store,false);
     assert.equal(body.model,'gpt-5-mini');assert.equal(body.truncation,'disabled');
     assert.match(body.instructions,/untrusted DATA/);assert.match(body.instructions,/150–220/);
-    assert.deepEqual(JSON.parse(body.input).source_units,sourceUnits(source));
+    assert.deepEqual(JSON.parse(body.input).source_units,summarySourceUnits(sourceUnits(source)));
     return response(sample);
   });
   assert.equal(calls,1);assert.deepEqual(validateStored(payload,source),payload);
