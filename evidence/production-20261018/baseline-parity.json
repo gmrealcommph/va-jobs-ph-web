@@ -1,0 +1,12 @@
+{
+  "reference_sha256": "a69f08256bc6f936db2356683cc6f1ae80efc853bcc9a25939538f885b201376",
+  "bundle_sha256": "adc31cd1595d97f15a49d50aae30c10b3a33d320d6d472a71f4c74408ce4f0ff",
+  "live_declarations": 325,
+  "built_declarations": 325,
+  "changed": [],
+  "added": [],
+  "startup_match": true,
+  "exports_match": true,
+  "known_assets_matching": 84,
+  "asset_inventory_complete": false
+}

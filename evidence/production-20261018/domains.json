@@ -1,0 +1,24 @@
+{
+  "result": [
+    {
+      "id": "151763ac3fa43f34b722851c33959e2af0cc9046",
+      "zone_id": "0452b454b85225373eeca3938c72db42",
+      "zone_name": "veeays.com",
+      "hostname": "veeays.com",
+      "service": "va-jobs-ph-web",
+      "environment": "production",
+      "cert_id": "ce84508d-c0bb-48b3-bf1d-20116dd43135",
+      "previews_enabled": false,
+      "enabled": true
+    }
+  ],
+  "success": true,
+  "errors": null,
+  "messages": null,
+  "result_info": {
+    "page": 1,
+    "per_page": 2,
+    "count": 2,
+    "total_count": 2
+  }
+}

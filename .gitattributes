@@ -9,7 +9,7 @@ evidence/production-20261012/worker.reference.mjs -whitespace
 public/admin-quick-reads.css -whitespace
 public/admin.js -whitespace
 
-# Retain byte-identical CRLF assets from deployed bb53 (Git stores normalized text).
+# Retain deployed asset bytes, including mixed line endings; disable normalization.
 public/admin-members.js -text
 public/admin-quick-reads.css -text
 public/admin-theme.css -text
