@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {generateWithProvider} from '../src/quick-read-generation.js';
+import {organizeWithProvider as generateWithProvider} from '../src/quick-read-generation.js';
 const source='About the role\nCoordinate customer relationships across a distributed team.\nClear communication and accurate reporting are part of the role.';
 const env={QUICK_READ_MODEL:'gpt-5-mini',OPENAI_API_KEY:'synthetic'};
 test('credit exhaustion is distinct from rate limits and excludes provider messages',async()=>{

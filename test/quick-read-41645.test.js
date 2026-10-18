@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {createHash} from 'node:crypto';
-import {sourceUnits,SECTIONS,validateSelection,validateStored,generateWithProvider} from '../src/quick-read-generation.js';
+import {sourceUnits,SECTIONS,validateSelection,validateStored,organizeWithProvider as generateWithProvider} from '../src/quick-read-generation.js';
 import {presentQuickRead} from '../src/quick-read-presentation.js';
 import {renderJobRead} from '../src/job-detail-read.js';
 
