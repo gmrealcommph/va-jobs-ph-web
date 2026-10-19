@@ -4,6 +4,7 @@ import { categoryDescriptor, categoryNote } from './category-context.js';
 import { recovery } from './recovery.js';
 import { sectionHeadingMarks } from './job-section-heading.js';
 import { renderJobHeader } from './job-detail-header.js';
+import {freshnessNotice} from './job-freshness.js';
 import { renderJobRead, renderAtAGlance } from './job-detail-read.js';
 export const esc = value => String(value ?? '').replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[char]));
 export const jobPath = job => `/jobs/${encodeURIComponent(job.id)}`;
@@ -267,7 +268,7 @@ export function card(job, { user = null, saved = false } = {}) {
         ${user ? `<form method="post" action="${saved ? '/unsave-job' : '/save-job'}"><input type="hidden" name="job_id" value="${esc(job.id)}"><input type="hidden" name="return_to" value="${jobPath(job)}"><button class="job-save-button${saved ? ' is-saved' : ''}" type="submit">${saved ? '♥ Saved' : '♡ Save job'}</button></form>` : `<a class="job-save-button" href="/signup?return=${encodeURIComponent(jobPath(job) + '?save=1')}">♡ Save job</a>`}
       </div>
 
-      <h2 class="opportunity-title">
+      ${freshnessNotice(job)}<h2 class="opportunity-title">
         <a href="${jobPath(job)}">
           ${esc(job.title || 'Job opportunity')}${quickReadMarker(job)}
         </a>
@@ -344,7 +345,7 @@ export function discoveryCard(job, { user = null, saved = false, categoryListing
   const posted = job.posted_at && Number.isFinite(Date.parse(job.posted_at)) ? date(job.posted_at) : '';
   const heart = `<span class="discovery-heart" aria-hidden="true">${saved ? '♥' : '♡'}</span>`;
   const save = user ? `<form data-home-save method="post" action="${saved ? '/unsave-job' : '/save-job'}"><input type="hidden" name="job_id" value="${esc(job.id)}"><input type="hidden" name="return_to" value="${categoryListing ? jobPath(job) : '/#opportunities'}"><button class="job-save-button${saved ? ' is-saved' : ''}" type="submit" aria-pressed="${saved}" aria-label="${saved ? 'Unsave' : 'Save'} ${esc(job.title || 'job opportunity')}">${heart} ${saved ? 'Saved' : 'Save'}</button><span class="ep-sr-only" role="status" aria-live="polite" data-save-status></span></form>` : `<a class="job-save-button" href="/signup?return=${encodeURIComponent(jobPath(job) + '?save=1')}">${heart} Save</a>`;
-  return `<article class="job-card opportunity-card discovery-card"><div class="opportunity-card-top"><span class="opportunity-company">${esc(job.company || 'Company not specified')}</span>${posted ? `<span class="opportunity-date">Posted ${esc(posted)}</span>` : ''}</div><h2 class="opportunity-title"><a href="${jobPath(job)}">${esc(job.title || 'Job opportunity')}${quickReadMarker(job)}</a></h2>${metadata.length ? `<div class="opportunity-meta">${metadata.map(value=>`<span>${esc(value)}</span>`).join('')}</div>` : ''}${salary ? `<p class="discovery-salary">${esc(salary)}</p>` : ''}<div class="opportunity-card-bottom">${job.category ? `<a class="opportunity-category" href="${categoryPath(job.category)}">${esc(job.category)}</a>` : ''}<div class="discovery-actions">${save}${categoryListing ? `<a class="opportunity-arrow" href="${jobPath(job)}" aria-label="View ${esc(job.title || 'job opportunity')}"><span aria-hidden="true">↗</span></a>` : `<a class="discovery-view-job" href="${jobPath(job)}">View job <span aria-hidden="true">→</span></a>`}</div></div></article>`;
+  return `<article class="job-card opportunity-card discovery-card"><div class="opportunity-card-top"><span class="opportunity-company">${esc(job.company || 'Company not specified')}</span>${posted ? `<span class="opportunity-date">Posted ${esc(posted)}</span>` : ''}</div>${freshnessNotice(job)}<h2 class="opportunity-title"><a href="${jobPath(job)}">${esc(job.title || 'Job opportunity')}${quickReadMarker(job)}</a></h2>${metadata.length ? `<div class="opportunity-meta">${metadata.map(value=>`<span>${esc(value)}</span>`).join('')}</div>` : ''}${salary ? `<p class="discovery-salary">${esc(salary)}</p>` : ''}<div class="opportunity-card-bottom">${job.category ? `<a class="opportunity-category" href="${categoryPath(job.category)}">${esc(job.category)}</a>` : ''}<div class="discovery-actions">${save}${categoryListing ? `<a class="opportunity-arrow" href="${jobPath(job)}" aria-label="View ${esc(job.title || 'job opportunity')}"><span aria-hidden="true">↗</span></a>` : `<a class="discovery-view-job" href="${jobPath(job)}">View job <span aria-hidden="true">→</span></a>`}</div></div></article>`;
 }
 
 export function searchForm(search = '', category = '', action = '/', sort = 'newest') {
@@ -1043,7 +1044,7 @@ export function detail(job, { user = null, saved = false, application = null, sa
           </a>
 
 
-          ${renderJobHeader(job, {company, title, location, workplace, posted})}
+          ${renderJobHeader(job, {company, title, location, workplace, posted})}${freshnessNotice(job)}
 
         </div>
 
