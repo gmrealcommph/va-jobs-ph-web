@@ -9,7 +9,7 @@ function reviewForm(job,report){
  const reason=node('textarea');reason.name='reason';reason.required=true;reason.minLength=3;reason.maxLength=1000;const reasonLabel=node('label','Review reason (required)');reasonLabel.append(reason);box.append(reasonLabel);
  if(!report){const expiry=node('input');expiry.type='date';expiry.name='expires_at';const l=node('label','Evergreen review expiry (within 90 days)');l.append(expiry);box.append(l);action.addEventListener('change',()=>{expiry.required=action.value==='evergreen';});}
  const button=node('button','Save review');button.type='submit';box.append(button);form.append(box);
- form.addEventListener('submit',async event=>{event.preventDefault();button.disabled=true;message.textContent='Saving review…';try{const r=await fetch('/admin/api/job-health',{method:'POST',headers:{'content-type':'application/x-www-form-urlencoded'},body:new URLSearchParams(new FormData(form))});const d=await r.json();if(!r.ok)throw Error(d.error||'Review failed.');message.textContent='Review saved. Listing visibility is unchanged.';await load(0);}catch(e){message.textContent=e.message;}finally{button.disabled=false;}});return form;
+ form.addEventListener('submit',async event=>{event.preventDefault();button.disabled=true;message.textContent='Saving review…';try{const r=await fetch('/admin/api/job-health',{method:'POST',headers:{'content-type':'application/x-www-form-urlencoded'},body:new URLSearchParams(new FormData(form))});const d=await r.json();if(!r.ok)throw Error(d.error||'Review failed.');message.textContent='Review saved. Evergreen exceptions apply to public visibility.';await load(0);}catch(e){message.textContent=e.message;}finally{button.disabled=false;}});return form;
 }
 async function load(after=0){
  if(busy)return;busy=true;$('health-refresh').disabled=true;$('health-next').disabled=true;message.textContent='Loading Job Health…';
@@ -20,7 +20,7 @@ async function load(after=0){
  card.append(node('p',`Source last publication: ${date(job.source_published_at)} · Date provenance: ${job.date_provenance||'unknown'}`));
  if(job.evidence_url){try{const u=new URL(job.evidence_url);if(u.protocol==='https:'){const a=node('a','Source evidence');a.href=u.href;a.target='_blank';a.rel='noopener noreferrer';card.append(a);}}catch{}}
  for(const report of job.reports){card.append(node('h4',report.category.replaceAll('_',' ')+' · '+date(report.created_at)),node('p',report.details||'No additional details'),reviewForm(job,report));}card.append(reviewForm(job));return card;}));
- cursor=d.next_after;$('health-next').hidden=cursor===null;message.textContent=`Checked ${date(d.checked_at)}. ${d.queue.length} review candidates on this page. Automatic hiding is disabled.`;
+ cursor=d.next_after;$('health-next').hidden=cursor===null;message.textContent=`Checked ${date(d.checked_at)}. ${d.queue.length} review candidates on this page. Date-based public freshness rules are active.`;
  }catch(e){message.textContent=e.message;}finally{busy=false;$('health-refresh').disabled=false;$('health-next').disabled=false;}
 }
 $('health-refresh').addEventListener('click',()=>load(0));$('health-filter').addEventListener('change',()=>load(0));$('health-next').addEventListener('click',()=>load(cursor));load();

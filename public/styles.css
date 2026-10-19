@@ -6326,3 +6326,5 @@ body:has(.employer-page)>.site-footer .footer-bottom{padding-top:15px;padding-bo
 
 /* Completed, current Quick Read indicator beside the job title. */
 .quick-read-marker{display:inline-block;white-space:nowrap;font-size:.85em;line-height:1;vertical-align:.05em}
+
+.job-freshness { margin: .5rem 0; font-size: .875rem; color: #805000; }
