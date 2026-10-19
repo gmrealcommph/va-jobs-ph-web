@@ -6343,3 +6343,12 @@ body:has(.employer-page)>.site-footer .footer-bottom{padding-top:15px;padding-bo
 .preferences-reminder .preferences-card-actions { margin-top: 0; }
 .preferences-reminder .preferences-card-primary { box-sizing: border-box; }
 .preferences-reminder .preferences-card-dismiss { display: inline-flex; align-items: center; min-height: 44px; }
+/* Keep membership discoverable without opening the mobile account menu. */
+.veeays-navigation .mobile-pro-link{display:none}
+@media(max-width:1000px){
+ .veeays-navigation .header{gap:10px}
+ .veeays-navigation .mobile-pro-link{display:flex;align-items:center;justify-content:center;margin-left:auto;min-height:44px;padding:0 12px;border-radius:22px;background:#edf2df;color:#123e30;font-size:12px;font-weight:700;text-decoration:none;white-space:nowrap}
+}
+@media(max-width:360px){.veeays-navigation .veeays-brand{max-width:118px}.veeays-navigation .mobile-menu summary{padding-inline:12px}.veeays-navigation .mobile-pro-link{padding-inline:10px}}
+@media(max-width:360px){.veeays-navigation .veeays-brand{max-width:100px}}
+@media(max-width:1000px){.mobile-member strong{flex:1;min-width:0;max-width:none}.mobile-member .member-free,.mobile-member .member-pro{flex:none}}

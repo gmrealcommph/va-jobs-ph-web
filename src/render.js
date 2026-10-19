@@ -14,7 +14,7 @@ export function date(value) { const d = new Date(value); return value && !Number
 
 export function layout({ title, description, canonical, body, noindex = false, user = null, profile = null, showPreferencesPrompt = false }) {
   const firstName = String(profile?.full_name || '').trim().split(/\s+/)[0] || 'Your account';
-  const isPro = profile?.plan === 'pro' && profile?.plan_status === 'active';
+  const isPro = profile?.plan === 'pro' && profile?.plan_status === 'active' && (!profile.pro_expires_at || Date.parse(profile.pro_expires_at) > Date.now());
   let currentPath = '/';
   try { currentPath = new URL(canonical).pathname; } catch {}
   const navLink = (href, label, cls = '') => '<a class="' + cls + '" href="' + href + '"' + ((href === '/' ? currentPath === '/' || currentPath.startsWith('/jobs') : currentPath === href || currentPath.startsWith(href + '/')) ? ' aria-current="page"' : '') + '>' + label + '</a>';
@@ -69,7 +69,7 @@ export function layout({ title, description, canonical, body, noindex = false, u
     type="image/svg+xml"
   >
 
-  <link rel="stylesheet" href="/styles.css?v=20261019-reminder">
+  <link rel="stylesheet" href="/styles.css?v=20261019-pro">
 <link rel="stylesheet" href="/traffic.css?v=20261012-dismiss">
 <script src="/traffic.js?v=20261012-dismiss" type="module"></script>
 </head>
@@ -83,7 +83,7 @@ export function layout({ title, description, canonical, body, noindex = false, u
 <header class="site-header veeays-navigation">
   <div class="wrap header">
     <a class="veeays-brand" href="/" aria-label="VeeAys home"><img class="veeays-logo-img" src="/veeays-logo.png" alt="VeeAys" width="1200" height="400"></a>
-    <nav class="discovery-nav" aria-label="Explore">${discoveryLinks}${!user ? navLink('/pro', 'VeeAys Pro', 'nav-pro') : ''}</nav>
+    <nav class="discovery-nav" aria-label="Explore">${discoveryLinks}${navLink('/pro', isPro ? 'Your Pro' : 'VeeAys Pro', 'nav-pro')}</nav>
     <div class="header-actions">
       ${user ? `<nav class="workspace-nav" aria-label="Your workspace">${navLink('/matches', 'My matches')}${navLink('/my-jobs', 'My jobs')}</nav>
       <details class="member-menu nav-disclosure">
@@ -91,6 +91,7 @@ export function layout({ title, description, canonical, body, noindex = false, u
         <div class="member-panel" id="member-panel"><div class="member-panel-heading"><span>Your VeeAys</span><small>${isPro ? 'Pro member' : 'Free member'}</small></div>${accountLinks}</div>
       </details>` : `${navLink('/login', 'Log in', 'auth-link')}${navLink('/signup', 'Sign up', 'post-job-cta')}`}
     </div>
+    ${user ? navLink('/pro', isPro ? 'Your Pro' : 'Explore Pro', 'mobile-pro-link') : ''}
     <details class="mobile-menu nav-disclosure">
       <summary aria-controls="mobile-panel"><span class="menu-lines" aria-hidden="true"></span><span>Menu</span></summary>
       <div class="mobile-panel" id="mobile-panel"><nav aria-label="Mobile explore"><p class="nav-section-label">Explore</p>${discoveryLinks}${!user ? navLink('/pro', 'VeeAys Pro', 'nav-pro') : ''}</nav>
@@ -1293,9 +1294,9 @@ export function matchesPage({ matches = [], preferences = null, summary = null, 
       <div class="pro-unlock-copy">
         <div class="kicker">VEEAYS PRO</div>
         <h2>${lockedMatches > 0 ? `${esc(lockedMatches)} more match${lockedMatches === 1 ? '' : 'es'} found.` : 'Unlock your full match feed.'}</h2>
-        <p>Stop digging through every listing. Pro unlocks your full ranked match feed, so you can focus on opportunities that fit your preferences.</p>
+        <p>Go beyond your three free matches. See more matching roles in one ranked feed, narrow them by salary and schedule, and opt in to a daily email of new matches.</p>
         <div class="pro-benefits">
-          <span>✓ Full ranked feed</span><span>✓ Match filters</span><span>✓ Salary &amp; schedule filters</span><span>✓ Daily Job Digest</span>
+          <span>✓ Full ranked feed</span><span>✓ Salary &amp; schedule filters</span><span>✓ Opt-in Daily Job Digest</span>
         </div>
       </div>
       <div class="pro-unlock-action">
@@ -1439,14 +1440,14 @@ export function proPage({ isPro = false, user = null, profile = null, testChecko
       <p class="pro-plan-price"><strong>₱499<span>/30 days</span></strong><span>One-time purchase</span></p>
       <p class="pro-plan-includes">Everything in Free, plus:</p>
       <ul class="pro-plan-benefits">
-        <li>Your personalized job feed</li>
+        <li>Your full ranked match feed, beyond the free top 3</li>
         <li>Salary, schedule and work-type match filters</li>
         <li>90%+ match score filter</li>
-        <li>Daily Job Digest</li>
+        <li>Opt-in daily email of new matches</li>
       </ul>
     </article>
   </div>`;
-  return '<div class="pro-marketing"><section class="pro-marketing-hero"><div class="wrap"><div class="kicker">VEEAYS PRO</div><h1>YOUR NEXT MOVE,<br><em>WITH MORE FOCUS.</em></h1><p class="pro-marketing-intro">Stop searching. Let the right jobs find you.</p><p>See your full personalized match feed, filter for what matters and receive new matching jobs in an opt-in daily digest.</p>'+proPlane+'<p class="pro-marketing-price"><strong>₱499 for 30 days</strong> · No automatic renewal</p>'+action+(!isPro && !testCheckout && !liveCheckout ? '<p class="pro-launch-note">Checkout is currently unavailable. You can still browse every public job and try your free matches.</p>' : '')+'</div></section><section class="wrap pro-marketing-details"><h2>A little less searching.<br><em>A little more possibility.</em></h2>'+proBenefits()+'<p>Pro members can sort and filter their match feed by salary, schedule, work type and 90%+ scores. Email preferences stay in your control.</p><div class="pro-flight-divider" aria-hidden="true"><span>PH → WORLD</span><svg viewBox="0 0 300 36" focusable="false"><path d="M2 25c50-36 62 26 126 0s78-20 151-9" fill="none" stroke="currentColor" stroke-dasharray="2 6"/><path d="m275 8 21 7-20 9 4-9Z" fill="#f2bb52" stroke="currentColor"/></svg><span>Your next move</span></div><h2>All the jobs are free.<br><em>Pro helps you find the right ones faster.</em></h2>'+board+'<p class="pro-availability-note">Matches depend on your preferences and available job information. Daily match digests require active Pro access and your email opt-in. Personalized category and salary email preferences are not active yet.</p><p class="pro-free-note"><strong>Every public job stays free.</strong> Pro adds a full match feed, filters and a daily digest. Browsing and applying stay free.</p></section></div>';
+  return '<div class="pro-marketing"><section class="pro-marketing-hero"><div class="wrap"><div class="kicker">VEEAYS PRO</div><h1>YOUR NEXT MOVE,<br><em>WITH MORE FOCUS.</em></h1><p class="pro-marketing-intro">More matching roles. Less time sorting.</p><p>Go beyond your three free matches with a full ranked feed. Filter by salary, schedule and work type, then opt in to a daily email of new matches.</p>'+proPlane+'<p class="pro-marketing-price"><strong>₱499 for 30 days</strong> · No automatic renewal</p>'+action+(!isPro && !testCheckout && !liveCheckout ? '<p class="pro-launch-note">Checkout is currently unavailable. You can still browse every public job and try your free matches.</p>' : '')+'</div></section><section class="wrap pro-marketing-details"><h2>A little less searching.<br><em>A little more possibility.</em></h2>'+proBenefits()+'<p>Pro members can sort and filter their match feed by salary, schedule, work type and 90%+ scores. Email preferences stay in your control.</p><div class="pro-flight-divider" aria-hidden="true"><span>PH → WORLD</span><svg viewBox="0 0 300 36" focusable="false"><path d="M2 25c50-36 62 26 126 0s78-20 151-9" fill="none" stroke="currentColor" stroke-dasharray="2 6"/><path d="m275 8 21 7-20 9 4-9Z" fill="#f2bb52" stroke="currentColor"/></svg><span>Your next move</span></div><h2>All the jobs are free.<br><em>Pro helps you find the right ones faster.</em></h2>'+board+'<p class="pro-availability-note">Matches depend on your preferences and available job information. Daily match digests require active Pro access and your email opt-in. Personalized category and salary email preferences are not active yet.</p><p class="pro-free-note"><strong>Every public job stays free.</strong> Pro adds a full match feed, filters and a daily digest. Browsing and applying stay free.</p></section></div>';
 }
 
 
