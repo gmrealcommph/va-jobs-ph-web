@@ -6328,3 +6328,18 @@ body:has(.employer-page)>.site-footer .footer-bottom{padding-top:15px;padding-bo
 .quick-read-marker{display:inline-block;white-space:nowrap;font-size:.85em;line-height:1;vertical-align:.05em}
 
 .job-freshness { margin: .5rem 0; font-size: .875rem; color: #805000; }
+
+/* Shared, non-blocking member reminder. */
+.preferences-reminder { padding-top: 20px; }
+.preferences-reminder .preferences-card { box-sizing: border-box; width: 100%; margin: 0; padding: 20px 24px; flex-direction: row; gap: 24px; text-align: left; box-shadow: none; }
+.preferences-reminder .preferences-card-copy { flex: 1; min-width: 0; justify-items: start; }
+.preferences-reminder .preferences-card-actions { flex-wrap: wrap; flex-shrink: 0; }
+.preferences-reminder[hidden] { display: none; }
+@media(max-width:760px) {
+  .preferences-reminder .preferences-card { flex-direction: column; align-items: stretch; padding: 20px; gap: 16px; }
+  .preferences-reminder .preferences-card-actions { width: 100%; }
+  .preferences-reminder .preferences-card-primary { white-space: normal; text-align: center; }
+}
+.preferences-reminder .preferences-card-actions { margin-top: 0; }
+.preferences-reminder .preferences-card-primary { box-sizing: border-box; }
+.preferences-reminder .preferences-card-dismiss { display: inline-flex; align-items: center; min-height: 44px; }
