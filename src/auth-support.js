@@ -13,7 +13,7 @@ export async function authSupportEndpoint(request, env, siteOrigin, baseHeaders)
   if (!['GET','HEAD','POST'].includes(request.method)) return new Response('Method not allowed',{status:405,headers:{Allow:'GET, HEAD, POST'}});
   if(url.pathname === '/auth/recovery.js') return new Response(request.method==='HEAD'?null:callbackScript,{status:request.method==='POST'?405:200,headers:{...headers,'content-type':'application/javascript'}});
   if(url.pathname === '/auth/recovery' && request.method === 'POST') return new Response('Method not allowed',{status:405});
-  if(url.pathname === '/auth/recovery') return page('Reset your password','<p id="recovery-status" role="status" aria-live="polite">Verifying your reset linkΓÇª</p><a href="/forgot-password">Request a new reset link</a><script src="/auth/recovery.js" defer></script>');
+  if(url.pathname === '/auth/recovery') return page('Reset your password','<p id="recovery-status" role="status" aria-live="polite">Verifying your reset link…</p><a href="/forgot-password">Request a new reset link</a><script src="/auth/recovery.js" defer></script>');
   const reset = url.pathname === '/reset-password';
   const resend = url.pathname === '/auth/resend';
   const title = reset ? 'Choose a new password' : resend ? 'Resend verification email' : 'Reset your password';
@@ -30,11 +30,11 @@ export async function authSupportEndpoint(request, env, siteOrigin, baseHeaders)
   if(reset){
     const state=await sessionForRequest(request,env);
     if(!state.user||!state.accessToken) return page(title,'<p>Open the link in your reset email first.</p><a class="button" href="/forgot-password">Request a reset link</a>',401);
-    const passwordForm=(error='')=>`${error ? `<div class="auth-alert error" role="alert">${esc(error)}</div>` : ''}<form class="auth-form" method="post" action="/reset-password"><div class="auth-field"><label for="recovery-password">New password</label><input id="recovery-password" type="password" name="password" autocomplete="new-password" minlength="8" maxlength="128" aria-describedby="recovery-password-help" required><small id="recovery-password-help">Use 8ΓÇô128 characters for your password.</small></div><button type="submit">Save password</button></form>`;
+    const passwordForm=(error='')=>`${error ? `<div class="auth-alert error" role="alert">${esc(error)}</div>` : ''}<form class="auth-form" method="post" action="/reset-password"><div class="auth-field"><label for="recovery-password">New password</label><input id="recovery-password" type="password" name="password" autocomplete="new-password" minlength="8" maxlength="128" aria-describedby="recovery-password-help" required><small id="recovery-password-help">Use 8–128 characters for your password.</small></div><button type="submit">Save password</button></form>`;
     const passwordPage=(title,body,status=200)=>{const response=page(title,body,status);if(state.refreshed)setSessionCookies(response.headers,state.refreshed);return response;};
     if(request.method==='POST'){
       const password=String(form.get('password')||'');
-      if(password.length<8||password.length>128)return passwordPage(title,passwordForm('Use 8ΓÇô128 characters.'),400);
+      if(password.length<8||password.length>128)return passwordPage(title,passwordForm('Use 8–128 characters.'),400);
       let result;try{result=await authFetch(env,'/auth/v1/user',{method:'PUT',headers:{Authorization:`Bearer ${state.accessToken}`},body:JSON.stringify({password})});}catch{return passwordPage(title,passwordForm('Password service is temporarily unavailable. Please try again.'),503);}
       if(!result.response.ok)return passwordPage(title,passwordForm('Password could not be updated. Try again or request a new link.'),400);
       return passwordPage('Password updated','<p>Your new password is saved.</p><a class="button" href="/login">Continue to log in</a>');
