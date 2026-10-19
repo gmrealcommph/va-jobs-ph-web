@@ -1,3 +1,4 @@
+import {jobAlertsTest} from './job-alerts-test.js';
 import {savedSearchesEndpoint} from './saved-searches.js';
 import {authSupportEndpoint} from './auth-support.js';
 import {jobAlertsWebhook} from './job-alerts-webhook.js';
@@ -57,6 +58,7 @@ function hasCookie(request, name, expected = '1') {
 function xml(body) { return new Response(`<?xml version="1.0" encoding="UTF-8"?>${body}`, { headers: { 'content-type': 'application/xml; charset=utf-8', 'cache-control': 'public, max-age=300' } }); }
 export async function handle(request, env) {
   const url = new URL(request.url);
+  if(url.pathname==='/internal/job-alerts-test')return jobAlertsTest(request,env);
   if(url.pathname==='/saved-searches')return savedSearchesEndpoint(request,env);
   if(url.pathname==='/webhooks/job-alerts')return jobAlertsWebhook(request,env);
   if(/^\/jobs\/[1-9]\d{0,18}\/report$/.test(url.pathname)||['/admin/job-health','/admin/api/job-health'].includes(url.pathname)||(url.pathname==='/admin'&&url.searchParams.get('view')==='job-health'))return jobHealthEndpoint(request,env);
