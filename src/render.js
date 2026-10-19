@@ -398,91 +398,21 @@ export function listing({ rows, total, page, search, category, names, categoryEn
     ? `<section class="jobs-browse-hero"><div class="wrap"><div class="kicker"><span></span> REMOTE JOBS FOR FILIPINO TALENT</div><h1>Find your next<br><em>opportunity.</em></h1><p>Search and explore roles open to talent in the Philippines.</p>${searchForm(search, '', '/jobs')}</div></section>`
     : category
     ? `<section class="category-jobs-hero"><div class="wrap category-jobs-hero-grid"><div><div class="kicker"><span></span> BUILT FOR FILIPINO TALENT</div><h1>${esc(category)}<br><em>jobs for Filipino talent.</em></h1><p class="category-jobs-descriptor">${esc(categoryDescriptor(category))}</p><p class="category-jobs-context"><strong>${(categoryEntries.find(entry => entry.name === category)?.count ?? total).toLocaleString('en-US')} opportunities</strong></p>${searchForm(search, category, action, sort)}</div><div class="category-jobs-art"><img src="/images/category-workspace.webp" width="768" height="432" decoding="async" alt="" aria-hidden="true"><p class="category-sticky-note">${esc(categoryNote(category))}</p></div></div></section>`
-    : `<section class="home-hero">
-        <div class="wrap">
-
-          <div class="premium-hero-grid">
-
-            <div class="premium-copy">
-              <div class="home-kicker">
-                <span></span>
-                FILIPINO TALENT, MEET THE WORLD
-              </div>
-
-              <h1>
-                Same skills.<br>
-                <span>Bigger opportunities.</span>
-              </h1>
-
-              <div class="hero-scribble" aria-hidden="true"></div>
-
-              <div class="hero-message">
-                <strong>
-                  Your skills can take you
-                  <span>further.</span>
-                </strong>
-
-                <p>
-                  Discover remote opportunities from companies around the
-                  world, open to Filipino talent.
-                </p>
-              </div>
-
-              <a class="home-jump hero-cta" href="#opportunities">
-                <span class="hero-cta-label">Explore opportunities</span>
-
-                <span class="hero-cta-arrow" aria-hidden="true">
-                  ↓
-                </span>
-
-                <span class="hero-cta-rays" aria-hidden="true">
-                  <i></i>
-                  <i></i>
-                  <i></i>
-                </span>
-              </a>
+    : `<section class="home-hero green-room-hero">
+        <div class="wrap green-room-wrap">
+          <div class="green-room-grid">
+            <div class="green-room-scene">
+              <!-- Temporary existing approved artwork; replace with the clean green-room illustration before launch. -->
+              <img src="/veeays-hero-approved.png" width="1591" height="989" decoding="async" fetchpriority="high" alt="Illustration celebrating the possibilities of working remotely.">
             </div>
-
-            <div class="premium-collage approved-hero-art">
-              <img
-                src="/veeays-hero-approved.png"
-                alt="Remote work possibilities: earn in USD, work with global companies, build skills and grow your career, skip the commute, work from anywhere, and enjoy better work-life balance."
-                width="1591"
-                height="989"
-                loading="eager"
-                fetchpriority="high"
-                decoding="async"
-              >
+            <div class="green-room-content">
+              <div class="home-kicker"><span></span> REMOTE JOBS FOR FILIPINOS</div>
+              <h1>Better Jobs.<br><span>From Home.</span></h1>
+              <p>Discover remote opportunities open to Filipino applicants. Find work that fits your skills and your life.</p>
+              <div class="green-room-search">${searchForm(search, category, action)}</div>
+              <div class="green-room-links"><a href="/categories">Browse categories <span aria-hidden="true">↗</span></a><a href="#opportunities">Explore opportunities <span aria-hidden="true">↓</span></a></div>
             </div>
-
           </div>
-
-          <div class="torn-search">
-
-            <div class="search-intro">
-              <span>Where could your skills take you?</span>
-              <small>
-                Search thousands of possibilities. Start with one.
-              </small>
-            </div>
-
-            <div class="home-search">
-
-              ${searchForm(search, category, action)}
-
-              <div class="search-caption">
-                <span>Small search. Big possibilities.</span>
-
-                <a href="/categories">
-                  Explore all categories
-                  <span aria-hidden="true">↗</span>
-                </a>
-              </div>
-
-            </div>
-
-          </div>
-
         </div>
       </section>
 
