@@ -1538,6 +1538,6 @@ export function authSupportPage(title, body, pathname) {
     ? ['READY TO GO', 'A fresh start,<br><em>all yours.</em>', 'Your password is updated. Head back to your saved jobs and your next possibilities.', 'Welcome back']
     : resend
     ? ['ONE MORE STEP', 'Your next chapter,<br><em>one click away.</em>', 'Verify your email to keep exploring opportunities open to Filipino talent.', 'Your next chapter']
-    : ['WELCOME BACK', 'A fresh start,<br><em>without the fuss.</em>', 'LetΓÇÖs get you back to your saved jobs, preferences, and next possibilities.', 'Back to possibilities'];
+    : ['WELCOME BACK', 'A fresh start,<br><em>without the fuss.</em>', 'Let’s get you back to your saved jobs, preferences, and next possibilities.', 'Back to possibilities'];
   return `<link rel="stylesheet" href="/auth.css?v=20261006"><section class="auth-shell auth-polish"><div class="auth-intro"><div class="kicker">${copy[0]}</div><h1>${copy[1]}</h1><p>${copy[2]}</p>${authPostcard(copy[3])}</div><div class="auth-card"><div class="auth-card-label">${resend ? 'YOUR EMAIL CONFIRMATION' : 'YOUR VEEAYS ACCOUNT'}</div><h2>${esc(title)}</h2>${body}</div></section>`;
 }
