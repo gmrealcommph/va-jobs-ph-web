@@ -3,12 +3,28 @@ import assert from 'node:assert/strict';
 import {jobAlertsEndpoint,alertForm} from '../src/job-alerts-page.js';
 import {alertMessage,runJobAlerts,processJobAlert} from '../src/job-alerts.js';
 import {verifyResendEvent} from '../src/job-alerts-webhook.js';
+import {jobAlertsWebhook} from '../src/job-alerts-webhook.js';
 const original=globalThis.fetch;afterEach(()=>globalThis.fetch=original);
 const uid='11111111-1111-4111-8111-111111111111';
 const session=async()=>({user:{id:uid},accessToken:'token'});
 const item={job_id:'1',title:'<Support>',company:'Employer',employment_type:'full_time',salary_min_usd:null,salary_max_usd:null,salary_period:null};
 const person={email:'member@example.com',frequency:'weekly',token:uid,items:[item]};
 const config={site:'https://veeays.test',url:new URL('https://test.supabase.co'),key:'sb_secret_test',modernKey:true};
+
+test('delivery evidence is logged only after signature verification',async t=>{
+ const body=JSON.stringify({type:'email.delivered',data:{email_id:'provider-test'}}),ts=String(Math.floor(Date.now()/1000)),id='event-test';
+ const raw=new TextEncoder().encode('12345678901234567890123456789012');
+ const base64=b=>btoa(String.fromCharCode(...new Uint8Array(b)));
+ const key=await crypto.subtle.importKey('raw',raw,{name:'HMAC',hash:'SHA-256'},false,['sign']);
+ const signature=base64(await crypto.subtle.sign('HMAC',key,new TextEncoder().encode(id+'.'+ts+'.'+body)));
+ const log=t.mock.method(console,'log',()=>{});
+ const headers={'svix-id':id,'svix-timestamp':ts,'svix-signature':'v1,'+signature};
+ const env={JOB_ALERTS_WEBHOOK_SECRET:'whsec_'+base64(raw)};
+ assert.equal((await jobAlertsWebhook(new Request('https://veeays.test/webhooks/job-alerts',{method:'POST',body:body+' ',headers}),env)).status,401);
+ assert.equal(log.mock.calls.length,0);
+ assert.equal((await jobAlertsWebhook(new Request('https://veeays.test/webhooks/job-alerts',{method:'POST',body,headers}),env)).status,204);
+ assert.deepEqual(log.mock.calls[0].arguments,['job_alerts_signed_delivery','provider-test',id]);
+});
 test('settings require sign in, same origin, valid form and preserve explicit consent',async()=>{
  const url='https://veeays.test/job-alerts';
  const page=await jobAlertsEndpoint(new Request(url),{JOB_ALERTS_MODE:'disabled'},{session,call:async()=>({})});
