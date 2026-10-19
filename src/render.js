@@ -401,19 +401,13 @@ export function listing({ rows, total, page, search, category, names, categoryEn
     : `<section class="home-hero green-room-hero">
         <div class="wrap green-room-wrap">
           <div class="green-room-grid">
-            <div class="green-room-scene">
-              <!-- Approved green-room artwork pending upload; no unrelated hero art. -->
-              <picture class="green-room-art">
-                <source srcset="/images/veeays-green-room.webp" type="image/webp">
-                <img src="/images/veeays-green-room.webp" width="1536" height="1024" decoding="async" fetchpriority="high" alt="Cozy green home office with a woman wearing glasses working at a desk, plants, and a sleeping pure-black Shih Tzu.">
-              </picture>
-            </div>
+            <div class="green-room-scene" aria-hidden="true"></div>
             <div class="green-room-content">
               <div class="home-kicker"><span></span> REMOTE JOBS FOR FILIPINOS</div>
               <h1>Better Jobs.<br><span>From Home.</span></h1>
-              <p>Discover remote opportunities open to Filipino applicants. Find work that fits your skills and your life.</p>
+              <p>Find legitimate work-from-home opportunities, built for Filipino talent and your goals.</p>
               <div class="green-room-search">${searchForm(search, category, action)}</div>
-              <div class="green-room-links"><a href="/categories">Browse categories <span aria-hidden="true">↗</span></a><a href="#opportunities">Explore opportunities <span aria-hidden="true">↓</span></a></div>
+              <div class="green-room-benefits"><span>✓ Legitimate opportunities</span><span>♧ Work from anywhere</span><span>♡ Built for Filipinos</span></div><div class="green-room-links"><a href="/categories">Browse categories <span aria-hidden="true">↗</span></a></div>
             </div>
           </div>
         </div>
