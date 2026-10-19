@@ -402,8 +402,11 @@ export function listing({ rows, total, page, search, category, names, categoryEn
         <div class="wrap green-room-wrap">
           <div class="green-room-grid">
             <div class="green-room-scene">
-              <!-- Temporary existing approved artwork; replace with the clean green-room illustration before launch. -->
-              <img src="/veeays-hero-approved.png" width="1591" height="989" decoding="async" fetchpriority="high" alt="Illustration celebrating the possibilities of working remotely.">
+              <!-- Approved green-room artwork pending upload; no unrelated hero art. -->
+              <picture class="green-room-art">
+                <source srcset="/images/veeays-green-room.webp" type="image/webp">
+                <img src="/images/veeays-green-room.webp" width="1536" height="1024" decoding="async" fetchpriority="high" alt="Cozy green home office with a woman wearing glasses working at a desk, plants, and a sleeping pure-black Shih Tzu.">
+              </picture>
             </div>
             <div class="green-room-content">
               <div class="home-kicker"><span></span> REMOTE JOBS FOR FILIPINOS</div>
