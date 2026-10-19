@@ -407,7 +407,8 @@ export function listing({ rows, total, page, search, category, names, categoryEn
               <h1>Better Jobs.<br><span>From Home.</span></h1>
               <p>Find legitimate work-from-home opportunities, built for Filipino talent and your goals.</p>
               <div class="green-room-search">${searchForm(search, category, action)}</div>
-              <div class="green-room-benefits"><span>✓ Legitimate opportunities</span><span>♧ Work from anywhere</span><span>♡ Built for Filipinos</span></div><div class="green-room-links"><a href="/categories">Browse categories <span aria-hidden="true">↗</span></a></div>
+              <div class="green-room-benefits" aria-label="Why VeeAys"><div><span class="green-room-benefit-icon" aria-hidden="true">♢</span><span>Legitimate<br>opportunities</span></div><div><span class="green-room-benefit-icon" aria-hidden="true">♙</span><span>Work from<br>anywhere</span></div><div><span class="green-room-benefit-icon" aria-hidden="true">♡</span><span>Built for<br>Filipinos</span></div></div>
+              <div class="green-room-stats"><div><strong>${Number(publicJobTotal || total).toLocaleString('en-US')}+</strong><span>Remote jobs</span></div><div><strong>For Filipino</strong><span>applicants</span></div><div><strong>New opportunities</strong><span>added regularly</span></div></div>
             </div>
           </div>
         </div>
