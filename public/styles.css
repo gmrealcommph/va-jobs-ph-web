@@ -6352,3 +6352,26 @@ body:has(.employer-page)>.site-footer .footer-bottom{padding-top:15px;padding-bo
 @media(max-width:360px){.veeays-navigation .veeays-brand{max-width:118px}.veeays-navigation .mobile-menu summary{padding-inline:12px}.veeays-navigation .mobile-pro-link{padding-inline:10px}}
 @media(max-width:360px){.veeays-navigation .veeays-brand{max-width:100px}}
 @media(max-width:1000px){.mobile-member strong{flex:1;min-width:0;max-width:none}.mobile-member .member-free,.mobile-member .member-pro{flex:none}}
+
+/* Draft-only green room hero: scoped to the home listing, never auth pages. */
+.green-room-hero{background:#0f3d2e;color:#f8f6ee;overflow:hidden}
+.green-room-hero>.green-room-wrap{padding:0;max-width:1440px}
+.green-room-grid{display:grid;grid-template-columns:minmax(0,1.08fr) minmax(0,.92fr);align-items:center;min-height:520px}
+.green-room-scene{align-self:stretch;display:flex;align-items:center;justify-content:center;overflow:hidden;min-width:0;background:#0f3d2e}
+.green-room-scene img{display:block;width:100%;height:100%;max-height:650px;object-fit:contain;object-position:center}
+.green-room-content{padding:52px clamp(22px,4vw,68px) 52px clamp(18px,3vw,44px);min-width:0}
+.green-room-content .home-kicker{color:#a7e3c1}
+.green-room-content h1{font-family:'Arial Rounded MT Bold','Trebuchet MS',sans-serif;font-size:clamp(42px,4.8vw,72px);font-weight:800;letter-spacing:-2.5px;line-height:1.06;margin:24px 0}
+.green-room-content h1 span{color:#a7e3c1}
+.green-room-content>p{color:#e0ebdf;line-height:1.65;font-size:16px;max-width:470px;margin:0 0 28px}
+.green-room-search .search{max-width:560px}
+.green-room-links{display:flex;gap:20px;flex-wrap:wrap;margin-top:22px}
+.green-room-links a{color:#f8f6ee;text-underline-offset:4px;font-size:13px;font-weight:700}
+@media(max-width:850px){
+ .green-room-grid{grid-template-columns:1fr}
+ .green-room-content{grid-row:1;padding:42px 24px 24px}
+ .green-room-scene{grid-row:2;max-height:380px}
+ .green-room-scene img{max-height:380px}
+ .green-room-content h1{font-size:clamp(38px,9vw,58px)}
+}
+@media(prefers-reduced-motion:reduce){.green-room-hero *{animation:none!important;transition:none!important}}
