@@ -1,3 +1,4 @@
+import {authSupportEndpoint} from './auth-support.js';
 import {jobAlertsWebhook} from './job-alerts-webhook.js';
 import {jobAlertsEndpoint} from './job-alerts-page.js';
 import {scheduledJobAlerts} from './job-alerts.js';
@@ -74,6 +75,8 @@ export async function handle(request, env) {
   if (url.pathname === '/email-preferences') { if(env.JOB_ALERTS_MODE==='enabled')return Response.redirect(url.origin+'/job-alerts',303); return emailPreferences(request, env); }
 
   const siteOrigin = origin(env, url);
+  const support = await authSupportEndpoint(request, env, siteOrigin, headers);
+  if (support) return support;
 
   const sameOriginPost = () => {
     const requestOrigin = request.headers.get('origin');
