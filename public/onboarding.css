@@ -10,7 +10,7 @@
 .onboard-profile-note>span{font-size:9px;letter-spacing:1.4px;font-weight:800;display:block;margin-bottom:14px}
 .onboard-profile-note strong{font:italic 24px/1.2 Georgia,serif;display:block}
 .onboard-profile-note svg{color:#cf8154;width:130px;height:12px;margin-top:14px}
-.onboard-progress{position:relative;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px;margin:0 0 26px;padding:0;list-style:none;overflow:visible}
+.onboard-progress{position:relative;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:0 0 26px;padding:0;list-style:none;overflow:visible}
 .onboard-progress:before{content:"";position:absolute;top:20px;left:10%;right:10%;border-top:1px dashed #acb49f}
 .onboard-progress li{position:relative;display:flex;align-items:center;flex-direction:column;gap:8px;min-width:0;color:#66736a}
 .onboard-progress .onboard-progress-number{box-sizing:border-box;width:40px;height:40px;display:grid;place-items:center;border:1px solid #bec7b8;border-radius:8px;background:#faf8ef;color:#65715e;font-size:13px;font-weight:800;box-shadow:2px 2px 0 #173d3208}
@@ -65,3 +65,5 @@
 @media(max-width:760px){.onboard-shell{padding:30px 18px 52px}.onboard-top{display:block;margin-bottom:26px}.onboard-top h1{font-size:39px;letter-spacing:-1.3px;max-width:560px}.onboard-top p{font-size:14px}.onboard-profile-note{display:none}.onboard-progress{gap:4px;margin-bottom:22px}.onboard-progress .onboard-progress-title{font-size:10px}.onboard-progress .onboard-progress-number{width:34px;height:34px}.onboard-progress:before{top:17px}.onboard-card{padding:25px 20px;box-shadow:3px 4px 0 #e6e9d8}.onboard-step h2{font-size:28px}.onboard-step>p{font-size:13px}.onboard-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.onboard-choice .onboard-choice-face{padding:11px 10px;gap:8px;font-size:12px;min-height:64px}.onboard-choice-icon{width:22px}.onboard-choice-icon svg{width:21px}.onboard-choice-check{width:16px;height:16px;font-size:10px}.onboard-grid.compact{grid-template-columns:1fr}.salary-box{padding:16px}.salary-box label .onboard-optional{display:block;margin:5px 0 0}.onboard-review div{grid-template-columns:1fr;gap:5px;padding:13px 15px}.onboard-actions{gap:10px}.onboard-actions button{padding:12px 15px}.onboard-actions .secondary{flex:0 0 auto}.onboard-ready{padding:13px 15px}}
 @media(max-width:400px){.onboard-top h1{font-size:35px}.onboard-grid{grid-template-columns:1fr}.onboard-choice .onboard-choice-face{min-height:54px}.onboard-shell{padding-inline:14px}.onboard-card{padding-inline:17px}.onboard-progress .onboard-progress-title{font-size:9px}.onboard-actions button{font-size:13px;padding-inline:12px}}
 @media(prefers-reduced-motion:reduce){.onboard-choice .onboard-choice-face{transition:none}}
+
+.onboard-skip{font-size:14px;line-height:1.7;margin-top:24px}.onboard-skip a{display:inline-block;padding-block:10px}.onboard-actions{flex-wrap:wrap}.onboard-actions #onboard-finish{white-space:normal}
