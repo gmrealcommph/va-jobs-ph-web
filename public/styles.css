@@ -6460,3 +6460,20 @@ body:has(.green-room-hero) .veeays-navigation .discovery-nav a:hover{color:#a7e3
  .green-room-benefit-icon{width:38px;height:38px}
  .green-room-benefit-icon svg{width:20px;height:20px}
 }
+
+/* Fix: make the shared hero background independent of main stacking contexts.
+   The header and hero both use the same image, with aligned viewport sizing. */
+@media(min-width:851px){
+ body:has(.green-room-hero)::before{display:none!important}
+ body:has(.green-room-hero){--green-room-full-height:calc(92px + clamp(600px,47vw,770px))}
+ body:has(.green-room-hero) .site-header{
+   background:#0f3d2e url('/images/veeays-green-room.jpg') center top / 100% var(--green-room-full-height) no-repeat!important;
+   border-bottom:0;
+ }
+ body:has(.green-room-hero) .green-room-hero{
+   background:#0f3d2e url('/images/veeays-green-room.jpg') center -92px / 100% var(--green-room-full-height) no-repeat!important;
+ }
+}
+@media(max-width:850px){
+ body:has(.green-room-hero) .green-room-hero{background-color:#0f3d2e!important}
+}
