@@ -6375,3 +6375,23 @@ body:has(.employer-page)>.site-footer .footer-bottom{padding-top:15px;padding-bo
  .green-room-content h1{font-size:clamp(38px,9vw,58px)}
 }
 @media(prefers-reduced-motion:reduce){.green-room-hero *{animation:none!important;transition:none!important}}
+
+/* User-supplied exact green-room artwork (upload /public/images/veeays-green-room.jpg before preview). */
+.green-room-hero{background:#0f3d2e url('/images/veeays-green-room.jpg') center center/cover no-repeat}
+.green-room-hero>.green-room-wrap{max-width:none}
+.green-room-grid{grid-template-columns:minmax(0,55%) minmax(0,45%);min-height:clamp(570px,53vw,790px)}
+.green-room-scene{background:transparent}
+.green-room-content{padding:80px clamp(24px,5vw,90px) 80px 0;text-shadow:0 1px 10px #09271c30}
+.green-room-content h1{font-size:clamp(50px,5.2vw,84px)}
+.green-room-content>p{font-size:clamp(16px,1.35vw,21px);line-height:1.55}
+.green-room-benefits{display:flex;gap:18px;flex-wrap:wrap;margin:30px 0 12px;color:#f8f6ee;font-size:13px}
+.green-room-benefits span{flex:1 1 115px}
+.green-room-search .search{background:transparent}
+@media(max-width:850px){
+ .green-room-hero{background-position:32% bottom;background-size:auto 55%;background-color:#0f3d2e}
+ .green-room-grid{grid-template-columns:1fr;min-height:740px;align-content:start}
+ .green-room-content{grid-row:1;padding:36px 22px 0;background:linear-gradient(#0f3d2e 70%,transparent)}
+ .green-room-scene{grid-row:2;min-height:330px}
+ .green-room-content h1{font-size:clamp(42px,9vw,64px)}
+ .green-room-benefits{font-size:12px}
+}
