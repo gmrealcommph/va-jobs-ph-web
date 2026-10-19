@@ -15,7 +15,9 @@ export async function jobAlertsWebhook(request,env){
  const body=await request.text();if(body.length>64000)return new Response('Too large',{status:413});
  if(!await verifyResendEvent(request.headers,body,env.JOB_ALERTS_WEBHOOK_SECRET))return new Response('Unauthorized',{status:401});
  try{
- const event=JSON.parse(body);if(['email.bounced','email.complained','email.suppressed'].includes(event.type)&&typeof event.data?.email_id==='string'){
+ const event=JSON.parse(body);
+ if(event.type==='email.delivered'&&/^[a-zA-Z0-9-]{1,100}$/.test(event.data?.email_id||''))console.log('job_alerts_signed_delivery',event.data.email_id,request.headers.get('svix-id'));
+ if(['email.bounced','email.complained','email.suppressed'].includes(event.type)&&typeof event.data?.email_id==='string'){
  const c=configuration(env,true);await rest(c,'rpc/suppress_job_alert',{}, {method:'POST',body:JSON.stringify({p_provider:event.data.email_id})});
  }return new Response(null,{status:204});
  }catch{return new Response('Temporarily unavailable',{status:503});}
