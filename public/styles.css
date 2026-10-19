@@ -6477,3 +6477,16 @@ body:has(.green-room-hero) .veeays-navigation .discovery-nav a:hover{color:#a7e3
 @media(max-width:850px){
  body:has(.green-room-hero) .green-room-hero{background-color:#0f3d2e!important}
 }
+
+/* Preserve original artwork proportions; remove monochrome logo filter. */
+@media(min-width:851px){
+ body:has(.green-room-hero) .site-header{
+  background:#0f3d2e url('/images/veeays-green-room.jpg') center top / cover no-repeat!important;
+  background-size:100% auto!important;
+ }
+ body:has(.green-room-hero) .green-room-hero{
+  background:#0f3d2e url('/images/veeays-green-room.jpg') center -92px / cover no-repeat!important;
+  background-size:100% auto!important;
+ }
+}
+body:has(.green-room-hero) .veeays-logo-img{filter:none!important}
