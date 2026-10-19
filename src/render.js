@@ -1529,3 +1529,15 @@ export function myJobsPage({ saved = [], applications = [], message = '', error 
   })();
   </script>`;
 }
+
+export function authSupportPage(title, body, pathname) {
+  const resend = pathname === '/auth/resend';
+  const copy = title === 'Check your inbox'
+    ? ['ONE MORE STEP', 'A little inbox<br><em>delivery.</em>', 'Your next step is on its way. Check your inbox and spam folder for an email from VeeAys.', 'A little inbox delivery']
+    : title === 'Password updated'
+    ? ['READY TO GO', 'A fresh start,<br><em>all yours.</em>', 'Your password is updated. Head back to your saved jobs and your next possibilities.', 'Welcome back']
+    : resend
+    ? ['ONE MORE STEP', 'Your next chapter,<br><em>one click away.</em>', 'Verify your email to keep exploring opportunities open to Filipino talent.', 'Your next chapter']
+    : ['WELCOME BACK', 'A fresh start,<br><em>without the fuss.</em>', 'LetΓÇÖs get you back to your saved jobs, preferences, and next possibilities.', 'Back to possibilities'];
+  return `<link rel="stylesheet" href="/auth.css?v=20261006"><section class="auth-shell auth-polish"><div class="auth-intro"><div class="kicker">${copy[0]}</div><h1>${copy[1]}</h1><p>${copy[2]}</p>${authPostcard(copy[3])}</div><div class="auth-card"><div class="auth-card-label">${resend ? 'YOUR EMAIL CONFIRMATION' : 'YOUR VEEAYS ACCOUNT'}</div><h2>${esc(title)}</h2>${body}</div></section>`;
+}
