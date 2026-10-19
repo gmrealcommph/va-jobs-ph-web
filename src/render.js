@@ -18,7 +18,7 @@ export function layout({ title, description, canonical, body, noindex = false, u
   let currentPath = '/';
   try { currentPath = new URL(canonical).pathname; } catch {}
   const navLink = (href, label, cls = '') => '<a class="' + cls + '" href="' + href + '"' + ((href === '/' ? currentPath === '/' || currentPath.startsWith('/jobs') : currentPath === href || currentPath.startsWith(href + '/')) ? ' aria-current="page"' : '') + '>' + label + '</a>';
-  const accountLinks = navLink('/onboarding', 'My account') + navLink('/job-alerts', 'My Job Alerts') + navLink('/pro', isPro ? 'Your Pro membership' : 'Explore VeeAys Pro', 'member-plan-link') + '<a class="member-logout" href="/logout">Log out <span aria-hidden="true">↗</span></a>';
+  const accountLinks = navLink('/onboarding', 'My account') + navLink('/saved-searches', 'Saved searches') + navLink('/job-alerts', 'My Job Alerts') + navLink('/pro', isPro ? 'Your Pro membership' : 'Explore VeeAys Pro', 'member-plan-link') + '<a class="member-logout" href="/logout">Log out <span aria-hidden="true">↗</span></a>';
   const discoveryLinks = navLink('/', 'Find a job') + navLink('/categories', 'Categories') + navLink('/employers', 'For Employers');
   return `<!doctype html>
 <html lang="en-PH">
@@ -1394,7 +1394,7 @@ const proBenefits = () => `<div class="pro-marketing-benefits">
   </g>
   </svg>
   <h3>Find your fit faster</h3>
-  <p>Narrow your match feed by salary, schedule, work type and 90%+ match scores.</p>
+  <p>Narrow your match feed by salary, schedule, work type and 90%+ match scores. Keep up to five keyword and category presets in Saved searches.</p>
   </article>
   <article>
   <svg class="pro-story" viewBox="0 0 240 140" aria-hidden="true" focusable="false">
@@ -1441,6 +1441,7 @@ export function proPage({ isPro = false, user = null, profile = null, testChecko
       <p class="pro-plan-includes">Everything in Free, plus:</p>
       <ul class="pro-plan-benefits">
         <li>Your full ranked match feed, beyond the free top 3</li>
+        <li><a href="/saved-searches">Up to five saved keyword and category searches</a></li>
         <li>Salary, schedule and work-type match filters</li>
         <li>90%+ match score filter</li>
         <li>Opt-in daily email of new matches</li>
