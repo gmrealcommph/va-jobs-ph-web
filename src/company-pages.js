@@ -27,7 +27,7 @@ const pages = {
     cards: [
       ['01', 'Explore for free', 'Public job browsing remains free. Discover roles, explore categories and read the details before following the original employer listing to apply.'],
       ['02', 'Keep your search together', 'An account helps you save jobs and track your applications. Your tracker is your workspace; recording an application does not submit it to an employer.'],
-      ['03', 'A little more with Pro', 'VeeAys Pro adds matching, alerts and convenience to your search. Visit the Pro page for the current features and availability.']
+      ['03', 'A little more with Pro', 'VeeAys Pro adds a full ranked match feed, match filters and an opt-in daily digest to your search. Visit the Pro page for the current features and availability.']
     ],
     bottomTitle: 'Your next opportunity could be here.',
     bottom: 'Explore the roles that fit your skills, check the original listing and take your next step. Employers manage their own applications and hiring decisions.',
@@ -87,7 +87,7 @@ function aboutPage(page) {
   const steps = [
     ['DISCOVER', 'Find opportunities open to Filipino talent.', 'Public job browsing remains free. Explore roles and categories, read the details, then apply through the employer’s original application process.', 'A world to explore'],
     ['ORGANISE', 'Save jobs. Track applications. Keep your search together.', 'Your account gives you a place to save jobs and record your progress. Tracking an application in VeeAys does not submit it to an employer.', 'A little more clarity'],
-    ['GET MATCHED', 'Let VeeAys surface opportunities that fit you.', 'Personalized matching connects your preferences with available job information. Pro expands your feed with match filters, Strong Match Alerts and a Daily Job Digest.', 'A search that feels like you']
+    ['GET MATCHED', 'Let VeeAys surface opportunities that fit you.', 'Personalized matching connects your preferences with available job information. Pro expands your feed with match filters and an opt-in Daily Job Digest.', 'A search that feels like you']
   ];
   const roles = ['Executive / Virtual Assistant', 'Customer Support', 'Marketing / Social Media', 'Bookkeeping & Finance', 'Design & Creative', 'Operations & Admin', 'Project Management'];
   return { title: page.title, description: page.description, body: `<div class="company-page about-page">
@@ -98,7 +98,7 @@ function aboutPage(page) {
     <section class="wrap ab-journey" aria-labelledby="ab-journey-title">
       <div class="ab-section-head"><div><span class="company-eyebrow">YOUR SEARCH, YOUR WAY</span><h2 id="ab-journey-title">From possibility<br>to <em>your next move.</em></h2></div><p>Discover what’s out there.<br>Keep what matters close.</p></div>
       <ol class="ab-steps">${steps.map(([label,title,copy,caption],i)=>`<li><div class="ab-step-top"><span class="ab-number">0${i+1}</span><span class="company-eyebrow">${label}</span><svg viewBox="0 0 64 64" aria-hidden="true">${icons[i]}</svg></div><h3>${title}</h3><p>${copy}</p><span class="ab-handnote">${caption}</span></li>`).join('')}</ol>
-      <p class="ab-pro-note">Pro upgrades are coming soon. Alerts and digests require active Pro access and enabled email preferences. <a href="/pro">See current Pro features &amp; availability →</a></p>
+      <p class="ab-pro-note">VeeAys Pro is ₱499 for 30 days, with no automatic renewal. Daily match digests require active Pro access and email opt-in. Public job browsing stays free. <a href="/pro">See current Pro features &amp; availability →</a></p>
     </section>
     <section class="ab-purpose" aria-labelledby="ab-purpose-title"><div class="wrap ab-purpose-grid">
       <div class="ab-purpose-copy"><span class="company-eyebrow">BUILT FOR FILIPINO REMOTE WORKERS</span><h2 id="ab-purpose-title">The world of remote work is big.<br><em>Finding the right opportunity shouldn’t feel that way.</em></h2><p>VeeAys brings remote opportunities from different companies and sources into one place, with a focus on roles Filipino professionals can explore.</p><p>Our aim is simple: make discovering global work easier to navigate, more organised and more useful — whether you’re looking for your first remote role or your next one.</p><span class="ab-purpose-signoff">Local roots. Wider horizons.</span></div>
