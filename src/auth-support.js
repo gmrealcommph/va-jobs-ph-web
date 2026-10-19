@@ -4,6 +4,23 @@ import {authCaptchaToken, rateProtection} from './signup-protection.js';
 
 const callbackScript = `const p=new URLSearchParams(location.hash.slice(1));history.replaceState(null,'',location.pathname);if(p.has('access_token')&&p.has('refresh_token')){fetch('/auth/session',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({access_token:p.get('access_token'),refresh_token:p.get('refresh_token'),expires_in:Number(p.get('expires_in'))||3600})}).then(r=>{if(!r.ok)throw Error();location.replace('/reset-password')}).catch(()=>{document.getElementById('recovery-status').textContent='This reset link could not be verified. Request a new password reset.'})}else{document.getElementById('recovery-status').textContent='This reset link is missing or expired. Request a new password reset.'}`;
 const paths = ['/auth/resend','/forgot-password','/reset-password','/auth/recovery','/auth/recovery.js'];
+
+// Only inspect claims after sessionForRequest has validated this exact token with
+// Supabase (or obtained it directly from Supabase's refresh endpoint). A URL or
+// client-supplied recovery flag is not proof of recovery authorization.
+function hasRecentRecovery(state) {
+  if (!state.user || !state.accessToken) return false;
+  try {
+    const parts = state.accessToken.split('.');
+    if (parts.length !== 3) return false;
+    const claims = JSON.parse(atob(parts[1].replace(/-/g, '+').replace(/_/g, '/')));
+    const now = Math.floor(Date.now() / 1000);
+    return claims.sub === state.user.id && Number.isFinite(claims.exp) && claims.exp > now &&
+      Array.isArray(claims.amr) && claims.amr.some(entry => entry?.method === 'recovery' &&
+        Number.isFinite(entry.timestamp) && entry.timestamp <= now && entry.timestamp > now - 900);
+  } catch { return false; }
+}
+
 export async function authSupportEndpoint(request, env, siteOrigin, baseHeaders) {
   const url = new URL(request.url);
   if (!paths.includes(url.pathname)) return null;
@@ -29,7 +46,7 @@ export async function authSupportEndpoint(request, env, siteOrigin, baseHeaders)
   const emailForm=(error='')=>`${error?`<div class="auth-alert error" role="alert">${esc(error)}</div>`:''}<form class="auth-form" method="post" action="${url.pathname}"><div class="auth-field"><label for="recovery-email">Email address</label><input id="recovery-email" name="email" type="email" maxlength="254" autocomplete="email" value="${esc(email)}" required></div><input type="hidden" name="return" value="${esc(returnTo)}">${widget}<button type="submit">${resend?'Resend verification':'Send reset link'}</button></form><p class="auth-switch"><a href="/login">Back to log in</a></p>`;
   if(reset){
     const state=await sessionForRequest(request,env);
-    if(!state.user||!state.accessToken) return page(title,'<p>Open the link in your reset email first.</p><a class="button" href="/forgot-password">Request a reset link</a>',401);
+    if(!hasRecentRecovery(state)) return page(title,'<p>Open the link in your reset email first.</p><a class="button" href="/forgot-password">Request a reset link</a>',401);
     const passwordForm=(error='')=>`${error ? `<div class="auth-alert error" role="alert">${esc(error)}</div>` : ''}<form class="auth-form" method="post" action="/reset-password"><div class="auth-field"><label for="recovery-password">New password</label><input id="recovery-password" type="password" name="password" autocomplete="new-password" minlength="8" maxlength="128" aria-describedby="recovery-password-help" required><small id="recovery-password-help">Use 8–128 characters for your password.</small></div><button type="submit">Save password</button></form>`;
     const passwordPage=(title,body,status=200)=>{const response=page(title,body,status);if(state.refreshed)setSessionCookies(response.headers,state.refreshed);return response;};
     if(request.method==='POST'){
