@@ -6395,3 +6395,35 @@ body:has(.employer-page)>.site-footer .footer-bottom{padding-top:15px;padding-bo
  .green-room-content h1{font-size:clamp(42px,9vw,64px)}
  .green-room-benefits{font-size:12px}
 }
+
+/* Hero visual parity pass — reference composition, desktop first. */
+@media(min-width:851px){
+ .green-room-grid{grid-template-columns:minmax(0,54%) minmax(0,46%);min-height:clamp(600px,47vw,770px)}
+ .green-room-content{padding:50px clamp(28px,3vw,56px) 50px 0}
+ .green-room-content h1{font-size:clamp(43px,4.15vw,76px);line-height:1.03;letter-spacing:-2.5px;white-space:nowrap;margin:20px 0 18px}
+ .green-room-content>p{max-width:620px}
+ .green-room-search .search{max-width:none;width:100%;margin:28px 0 0}
+ .green-room-search .search>label{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+ .green-room-search .search-row{display:flex;align-items:center;gap:12px;border-radius:999px;padding:7px 8px 7px 18px;background:#fff;min-height:64px}
+ .green-room-search .search-row input{flex:1;min-width:0}
+ .green-room-search .search-row button{border-radius:999px;min-height:49px;background:#a7e3c1;color:#0f3d2e;white-space:nowrap}
+}
+.green-room-benefits{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:0;margin:30px 0 0;padding-bottom:24px;border-bottom:1px solid #ffffff35}
+.green-room-benefits>div{display:flex;align-items:center;gap:12px;padding:0 12px;border-right:1px solid #ffffff35;font-size:clamp(12px,1vw,15px);line-height:1.45}
+.green-room-benefits>div:first-child{padding-left:0}
+.green-room-benefits>div:last-child{border:0;padding-right:0}
+.green-room-benefit-icon{font-size:32px;line-height:1;color:#f8f6ee;flex:none}
+.green-room-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));margin-top:22px}
+.green-room-stats>div{display:flex;flex-direction:column;align-items:center;text-align:center;gap:4px;padding:0 8px;border-right:1px solid #ffffff60}
+.green-room-stats>div:last-child{border:0}
+.green-room-stats strong{font-size:clamp(13px,1.25vw,22px);line-height:1.2;color:#fff}
+.green-room-stats span{font-size:clamp(11px,.95vw,15px);line-height:1.35}
+@media(max-width:850px){
+ .green-room-content h1{white-space:normal;line-height:1.05}
+ .green-room-benefits{margin-top:22px;gap:8px}
+ .green-room-benefits>div{flex-direction:column;text-align:center;gap:6px;padding:0 6px;font-size:11px}
+ .green-room-benefit-icon{font-size:25px}
+ .green-room-stats{margin-top:18px}
+ .green-room-stats strong{font-size:13px}
+ .green-room-stats span{font-size:11px}
+}
