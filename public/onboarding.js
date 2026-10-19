@@ -14,29 +14,16 @@
   function validate() {
     let ok = true;
     if (step === 0) ok = checked('target_roles').length > 0;
-    if (step === 1) ok = checked('employment_types').length > 0;
-    if (step === 2) ok = checked('schedule_preferences').length > 0;
-    if (step === 3) ok = checked('experience_level').length > 0;
+    if (step === 1) ok = checked('employment_types').length > 0 && checked('schedule_preferences').length > 0;
+    if (step === 2) ok = checked('experience_level').length > 0;
     const current = steps[step];
     let message = current.querySelector('.onboard-validation');
     if (!ok) {
       if (!message) { message = document.createElement('p'); message.className = 'onboard-validation'; message.setAttribute('role', 'alert'); current.appendChild(message); }
-      message.textContent = 'Choose at least one option to continue.';
+      message.textContent = 'Choose an option in each required group to continue.';
     } else if (message) message.remove();
     return ok;
   }
-  function review() {
-    const groups = [
-      ['Roles', checked('target_roles').map(x => x.value).join(', ')],
-      ['Minimum salary', salary.value ? `$${Number(salary.value).toLocaleString()} / month · approx. ₱${Math.round(Number(salary.value) * 58).toLocaleString()} / month` : 'No minimum set'],
-      ['Employment', checked('employment_types').map(x => x.value).join(', ')],
-      ['Schedule', checked('schedule_preferences').map(x => x.value).join(', ')],
-      ['Experience', checked('experience_level')[0]?.value || ''],
-      ['Skills', document.getElementById('skills').value.trim() || 'None added']
-    ];
-    document.getElementById('onboard-review').innerHTML = groups.map(([a,b]) => `<div><span>${a}</span><strong>${escapeHtml(b)}</strong></div>`).join('');
-  }
-  function escapeHtml(v) { const d=document.createElement('div'); d.textContent=v; return d.innerHTML; }
   function show(focus = false) {
     steps.forEach((el,i) => { el.classList.toggle('active', i === step); el.hidden = i !== step; });
     dots.forEach((el,i) => {
@@ -53,7 +40,6 @@
     back.style.display = isFirst ? 'none' : '';
     next.style.display = isLast ? 'none' : '';
     finish.style.display = isLast ? '' : 'none';
-    if (isLast) review();
     if (focus) steps[step].querySelector('h2').focus({ preventScroll: true });
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
@@ -61,8 +47,13 @@
     const usd = Number(salary.value);
     php.textContent = usd > 0 ? `About ₱${Math.round(usd * 58).toLocaleString()} / month (rough estimate at ₱58/USD).` : `Optional. We'll use this as a matching preference.`;
   }
-  next.addEventListener('click', () => { if (validate()) { step++; show(true); } });
+  next.addEventListener('click', () => {
+    if (!validate()) return;
+    if (step === 1 && !salary.checkValidity()) { salary.reportValidity(); return; }
+    step++; show(true);
+  });
   back.addEventListener('click', () => { if (step > 0) { step--; show(true); } });
+  form.addEventListener('submit', e => { if (!validate() || !salary.checkValidity()) { e.preventDefault(); salary.reportValidity(); } });
   salary.addEventListener('input', updatePhp);
   updatePhp(); show();
 })();

@@ -565,7 +565,7 @@ export function listing({ rows, total, page, search, category, names, categoryEn
           <div class="preferences-card-icon" aria-hidden="true">✈</div>
           <div class="preferences-card-copy">
             <strong>Get jobs matched to you</strong>
-            <span>Tell us your role, salary and preferred working hours. It takes about 2 minutes.</span>
+            <span>Choose your roles, work preferences and experience to find relevant matches. You can finish anytime through My account.</span>
           </div>
           <div class="preferences-card-actions">
             <a class="preferences-card-primary" href="/onboarding">Set my preferences</a>
@@ -1203,13 +1203,13 @@ export function onboardingPage({ user, preferences = null, error = '' } = {}) {
   const radios = (name, options, value = '') => options.map((item, i) => `<label class="onboard-choice"><input type="radio" name="${esc(name)}" value="${esc(item)}" ${item===value?'checked':''}>${choiceContent(name,item,i)}</label>`).join('');
   const skills = Array.isArray(preferences?.skills) ? preferences.skills.join(', ') : '';
   return `
-  <link rel="stylesheet" href="/onboarding.css?v=20261006">
+  <link rel="stylesheet" href="/onboarding.css?v=20261019">
   <section class="onboard-shell">
     <div class="onboard-top">
-      <div><div class="kicker">LET’S FIND YOUR FIT</div><h1>Tell VeeAys what you’re <em>looking for.</em></h1><p>A few details help us rank opportunities around what matters to you.</p></div><div class="onboard-profile-note" aria-hidden="true"><span>MADE AROUND YOU</span><strong>Your next chapter<br>starts here.</strong><svg viewBox="0 0 130 12"><path d="M3 8Q60 1 126 5M14 10Q68 5 112 8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></div>
+      <div><div class="kicker">LET’S FIND YOUR FIT</div><h1>Tell VeeAys what you’re <em>looking for.</em></h1><p>Choose your roles, work preferences and experience to see more relevant job matches. Pay and skills are optional. You can change everything later.</p></div><div class="onboard-profile-note" aria-hidden="true"><span>MADE AROUND YOU</span><strong>Your next chapter<br>starts here.</strong><svg viewBox="0 0 130 12"><path d="M3 8Q60 1 126 5M14 10Q68 5 112 8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></div>
       
     </div>
-    <ol class="onboard-progress" aria-label="Your search profile journey">${['Roles','Pay & work','Schedule','Experience','Review'].map((label,i) => `<li${i===0 ? ' class="active" aria-current="step"' : ''}><span class="onboard-progress-number" aria-hidden="true">${i+1}</span><span class="onboard-progress-title">${label}</span><span class="onboard-sr-only onboard-progress-state">${i===0 ? ': current step' : ': upcoming'}</span></li>`).join('')}</ol>
+    <ol class="onboard-progress" aria-label="Your search profile journey">${['Roles','Work & schedule','Experience'].map((label,i) => `<li${i===0 ? ' class="active" aria-current="step"' : ''}><span class="onboard-progress-number" aria-hidden="true">${i+1}</span><span class="onboard-progress-title">${label}</span><span class="onboard-sr-only onboard-progress-state">${i===0 ? ': current step' : ': upcoming'}</span></li>`).join('')}</ol>
     ${error ? `<div class="auth-alert error onboard-error" role="alert">${esc(error === 'Please complete each step before finishing your profile.' ? error : 'We could not save your preferences. Please try again.')}</div>` : ''}
     <form class="onboard-card" method="post" action="/onboarding" id="onboarding-form">
       <section class="onboard-step active" data-step="1">
@@ -1220,25 +1220,19 @@ export function onboardingPage({ user, preferences = null, error = '' } = {}) {
         <div class="onboard-step-label">PAY & WORK</div><h2 tabindex="-1">What would work look like for you?</h2><p>Set an optional pay preference and choose the types of work you’re open to.</p>
         <div class="salary-box"><label for="minimum_salary_usd">Minimum monthly salary <span class="onboard-optional">optional · USD</span></label><div class="salary-input"><span>$</span><input id="minimum_salary_usd" name="minimum_salary_usd" type="number" min="0" max="50000" step="50" inputmode="numeric" value="${esc(preferences?.minimum_salary_usd ?? '')}" placeholder="1000" aria-describedby="salary-php salary-note"></div><small id="salary-php">Optional. We'll use this as a matching preference.</small><small id="salary-note">A matching preference, not a guarantee of pay.</small></div>
         <h3>Employment type <span class="onboard-optional">select all that fit</span></h3><div class="onboard-grid compact">${choices('employment_types', employment, preferences?.employment_types)}</div>
-      </section>
-      <section class="onboard-step" data-step="3">
-        <div class="onboard-step-label">YOUR SCHEDULE</div><h2 tabindex="-1">Which schedules fit your life?</h2><p>Choose all the schedules you’d consider from the Philippines. Flexible/Any keeps your schedule unrestricted.</p>
+        <h3>Which schedules fit your life?</h3><p>Choose all the schedules you’d consider from the Philippines. Flexible/Any keeps your schedule unrestricted.</p>
         <div class="onboard-grid compact">${choices('schedule_preferences', schedules, preferences?.schedule_preferences)}</div>
       </section>
-      <section class="onboard-step" data-step="4">
+      <section class="onboard-step" data-step="3">
         <div class="onboard-step-label">EXPERIENCE & SKILLS</div><h2 tabindex="-1">What do you bring to the role?</h2><p>Help us understand your experience and the skills you’d like to use.</p>
         <h3>Experience level <span class="onboard-optional">choose one</span></h3><div class="onboard-grid compact">${radios('experience_level', experience, preferences?.experience_level)}</div>
         <div class="skills-box"><label for="skills">Your skills <span class="onboard-optional">optional</span></label><textarea id="skills" name="skills" rows="4" maxlength="1200" aria-describedby="skills-help" placeholder="e.g. Google Workspace, Canva, HubSpot, customer support, bookkeeping">${esc(skills)}</textarea><small id="skills-help">Separate skills with commas. These help describe your strengths; every skill isn’t required for every match.</small></div>
       </section>
-      <section class="onboard-step" data-step="5">
-        <div class="onboard-step-label">YOUR SEARCH PROFILE</div><h2 tabindex="-1">Your search profile, ready to go.</h2><p>Here’s what matters to you. Go back to adjust anything, then save your profile and explore jobs.</p>
-        <h3 class="onboard-recap-title">Your search profile</h3><div class="onboard-review" id="onboard-review"></div>
-        <div class="onboard-ready"><strong>${esc(user?.email || 'Your account')}</strong><span>✓ Your preferences will be saved to this account. You can update them later.</span></div>
-      </section>
-      <div class="onboard-actions"><button class="button secondary" type="button" id="onboard-back" hidden>Back</button><button type="button" id="onboard-next">Continue</button><button type="submit" id="onboard-finish" hidden>Save profile &amp; explore jobs</button></div>
+      <div class="onboard-actions"><button class="button secondary" type="button" id="onboard-back" hidden>Back</button><button type="button" id="onboard-next">Continue</button><button type="submit" id="onboard-finish" hidden>Save &amp; see my matches</button></div>
     </form>
+    <p class="onboard-skip"><a href="/jobs">Browse jobs for now</a> · Return anytime through <a href="/onboarding">My account</a> to finish your preferences. Unsaved changes won’t be kept.</p>
   </section>
-  <script src="/onboarding.js?v=20261006-profile" defer></script>`;
+  <script src="/onboarding.js?v=20261019" defer></script>`;
 }
 
 

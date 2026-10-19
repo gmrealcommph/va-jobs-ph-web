@@ -163,7 +163,7 @@ export async function handle(request, env) {
         console.error('Onboarding save failed:', error);
         return Response.redirect(`${url.origin}/onboarding?error=${encodeURIComponent('We could not save your preferences. Please try again.')}`, 303);
       }
-      const h = new Headers({ location: '/?onboarding=complete', 'cache-control': 'no-store' });
+      const h = new Headers({ location: '/matches', 'cache-control': 'no-store' });
       if (state.refreshed && typeof state.refreshed === 'object') setSessionCookies(h, state.refreshed);
       return new Response(null, { status: 303, headers: h });
     }
