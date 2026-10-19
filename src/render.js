@@ -69,7 +69,7 @@ export function layout({ title, description, canonical, body, noindex = false, u
     type="image/svg+xml"
   >
 
-  <link rel="stylesheet" href="/styles.css?v=20261007-category-cream">
+  <link rel="stylesheet" href="/styles.css?v=20261019-reminder">
 <link rel="stylesheet" href="/traffic.css?v=20261012-dismiss">
 <script src="/traffic.js?v=20261012-dismiss" type="module"></script>
 </head>
@@ -103,6 +103,20 @@ export function layout({ title, description, canonical, body, noindex = false, u
 
 
 <main id="main">
+${user && profile?.onboarding_completed === false && showPreferencesPrompt && currentPath !== "/onboarding" ? `
+  <div class="wrap preferences-reminder" data-preferences-reminder>
+    <aside class="preferences-card" aria-label="Finish your job preferences">
+      <div class="preferences-card-copy">
+        <strong>Find jobs that fit you</strong>
+        <span>Finish your job preferences in 3 short steps for more relevant matches. Browse freely and return anytime through My account.</span>
+      </div>
+      <div class="preferences-card-actions">
+        <a class="preferences-card-primary" href="/onboarding">Finish my preferences</a>
+        <a class="preferences-card-dismiss" href="/dismiss-preferences-prompt">Not now</a>
+      </div>
+    </aside>
+  </div>
+  <script src="/preferences-reminder.js?v=20261019" defer></script>` : ''}
   ${body}
 </main>
 
@@ -560,19 +574,7 @@ export function listing({ rows, total, page, search, category, names, categoryEn
         <script src="/onboarding-complete.js?v=20261002" defer></script>
       ` : ''}
 
-      ${showPreferencesPrompt && !category ? `
-        <aside class="preferences-card" aria-label="Personalize your job recommendations">
-          <div class="preferences-card-icon" aria-hidden="true">✈</div>
-          <div class="preferences-card-copy">
-            <strong>Get jobs matched to you</strong>
-            <span>Choose your roles, work preferences and experience to find relevant matches. You can finish anytime through My account.</span>
-          </div>
-          <div class="preferences-card-actions">
-            <a class="preferences-card-primary" href="/onboarding">Set my preferences</a>
-            <a class="preferences-card-dismiss" href="/dismiss-preferences-prompt">Not now</a>
-          </div>
-        </aside>
-      ` : ''}
+
 
       <div class="results-heading opportunity-heading">
 
