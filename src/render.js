@@ -403,15 +403,9 @@ export function listing({ rows, total, page, search, category, names, categoryEn
         </div>
       </section>
 
-      <div class="home-values">
-        <div class="wrap">
-          <span>Made for Filipino talent</span>
-          <i aria-hidden="true">✦</i>
-          <span>Global &amp; remote opportunities</span>
-          <i aria-hidden="true">✦</i>
-          <span>Apply directly to employers</span>
-        </div>
-      </div>`;
+      <section class="home-counter-strip" aria-label="Job opportunities"><div class="wrap home-counter-inner">
+${!search ? `<div class="opportunity-count home-strip-count" role="img" aria-label="${total.toLocaleString('en-US')} opportunities"><span class="home-counter-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="7" width="18" height="14" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M3 12h18m-11 0v2h4v-2"/></svg></span><strong data-live-opportunity-count="${total}" aria-hidden="true">${total}</strong></div><script src="/opportunity-count.js?v=20261006-flip" defer></script>` : ''}
+<div class="home-counter-copy"><p>REAL JOBS. <span>REAL POSSIBILITIES.</span></p><a href="/jobs">Explore what’s waiting for you <span aria-hidden="true">→</span></a></div></div></section>`;
 
   const categoryCounts = new Map(categoryEntries.map(({ name, count }) => [name, count]));
   const countBadge = name => Number.isSafeInteger(categoryCounts.get(name))
@@ -509,7 +503,7 @@ export function listing({ rows, total, page, search, category, names, categoryEn
 
         
         ${category ? `<form class="category-sort" action="${esc(action)}" method="get">${search ? `<input type="hidden" name="q" value="${esc(search)}">` : ''}<label for="category-sort">Sort jobs</label><select id="category-sort" name="sort"><option value="newest"${sort === 'newest' ? ' selected' : ''}>Newest first</option><option value="oldest"${sort === 'oldest' ? ' selected' : ''}>Oldest first</option></select><noscript><p>JavaScript is required to change sorting automatically.</p></noscript></form>` : ''}
-        ${!search && !category ? `
+        ${browseOnly && !search && !category ? `
           <div
             class="opportunity-count"
             role="img"
