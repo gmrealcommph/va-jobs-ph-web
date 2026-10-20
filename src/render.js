@@ -1353,7 +1353,10 @@ export function proDiscovery() {
   return '<section class="wrap pro-discovery" aria-labelledby="pro-discovery-title"><div class="kicker">VEEAYS PRO</div><h2 id="pro-discovery-title">Stop searching.<br><em>Let the right jobs find you.</em></h2>'+proBenefits()+'<div class="pro-discovery-action"><a class="button" href="/pro">Explore VeeAys Pro →</a><p><strong>₱499 for 30 days</strong> · No automatic renewal</p></div><p class="pro-discovery-promise">All the jobs are free. Pro helps you find the right ones faster.</p></section>';
 }
 export function proPage({ isPro = false, user = null, profile = null, testCheckout = false, liveCheckout = false } = {}) {
-  const action = liveCheckout ? '<form method="post" action="/pro/checkout"><button class="button" type="submit">'+(isPro ? 'Add 30 days' : 'Get Pro for 30 days')+' — ₱499</button></form><p>One-time purchase; no automatic renewal.</p>' : testCheckout ? '<form method="post" action="/pro/checkout"><button class="button" type="submit">'+(isPro ? 'Add 30 days' : 'Try Pro for 30 days')+' — ₱499 (TEST)</button></form><p>TEST MODE · No real money is charged. One-time purchase; no automatic renewal.</p>' : isPro ? '<a class="button" href="/matches">View my Pro matches →</a><p>Your account already has Pro access.</p>' : user ? '<a class="button" href="'+(profile?.onboarding_completed ? '/matches' : '/onboarding')+'">Try your free matches →</a>' : '<a class="button" href="/signup?return=%2Fonboarding">Try your free matches →</a><p>Already a member? <a href="/login?return=%2Fpro">Log in</a></p>';
+  const action = liveCheckout ? '<form id="pro-checkout" method="post" action="/pro/checkout"><button class="button" type="submit">'+(isPro ? 'Add 30 days' : 'Get Pro for 30 days')+' — ₱499</button></form><p>One-time purchase; no automatic renewal.</p>' : testCheckout ? '<form id="pro-checkout" method="post" action="/pro/checkout"><button class="button" type="submit">'+(isPro ? 'Add 30 days' : 'Try Pro for 30 days')+' — ₱499 (TEST)</button></form><p>TEST MODE · No real money is charged. One-time purchase; no automatic renewal.</p>' : isPro ? '<a class="button" href="/matches">View my Pro matches →</a><p>Your account already has Pro access.</p>' : user ? '<a class="button" href="'+(profile?.onboarding_completed ? '/matches' : '/onboarding')+'">Try your free matches →</a>' : '<a class="button" href="/signup?return=%2Fonboarding">Try your free matches →</a><p>Already a member? <a href="/login?return=%2Fpro">Log in</a></p>';
+  const repeatAction = liveCheckout || testCheckout ? '<button class="button" type="submit" form="pro-checkout">'+(isPro ? 'Add 30 days' : 'Get VeeAys Pro')+' — ₱499'+(testCheckout && !liveCheckout ? ' (TEST)' : '')+' <span aria-hidden="true">→</span></button>' : '<a class="button" href="#pro-purchase">Explore your options ↑</a>';
+  const plane = '<svg class="pro-flight" viewBox="0 0 300 100" aria-hidden="true"><path d="M5 72C55 18 115 130 152 62S85 3 132 36 215 62 248 28" fill="none" stroke="currentColor" stroke-dasharray="2 7"/><path d="m240 22 48-12-22 39-7-20Z" fill="#ffcb39" stroke="currentColor" stroke-width="2"/><path d="m259 29 29-19" stroke="currentColor" stroke-width="2"/></svg>';
+  const feed = '<div class="pro-demo-feed" aria-label="Illustrative preview. Example roles and scores only, not live listings."><p><span aria-hidden="true">▣</span> Top matches for you</p>'+[['Virtual Assistant','Full-time','96'],['Customer Support','Part-time','93'],['Operations Assistant','Contract','91']].map(([title,type,score])=>'<div class="pro-ui-job"><span class="pro-ui-icon" aria-hidden="true">▣</span><div><strong>'+title+'</strong><span>Remote · '+type+'</span></div><b>'+score+'%<small>match</small></b></div>').join('')+'<small class="pro-demo-caption">Illustrative preview · Example roles &amp; scores</small></div>';
   const board = `<div class="pro-comparison-board" role="group" aria-label="Find your fit: Free and VeeAys Pro">
     <article class="pro-plan-paper" aria-labelledby="pro-free-title">
       <p class="pro-plan-label">FREE</p>
@@ -1370,7 +1373,7 @@ export function proPage({ isPro = false, user = null, profile = null, testChecko
       <span class="pro-plan-note">FOR ACTIVE JOB SEEKERS</span>
       <svg class="pro-board-flight" viewBox="0 0 170 56" aria-hidden="true" focusable="false"><path class="pro-route" d="M4 44c30-38 43 17 78-6s30-20 49-18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-dasharray="2 6" stroke-linecap="round"/><g class="pro-alert-plane"><path d="m128 16 32-10-12 29-6-13Z" fill="#f2bb52" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="m142 22 18-16" stroke="currentColor" stroke-width="1.5"/></g></svg>
       <p class="pro-plan-label">VEEAYS PRO</p>
-      <h3 id="pro-plus-title">VeeAys searches<br>with you.</h3>
+      <h3 id="pro-plus-title">VeeAys searches with you.</h3>
       <p class="pro-plan-price"><strong>₱499<span>/30 days</span></strong><span>One-time purchase</span></p>
       <p class="pro-plan-includes">Everything in Free, plus:</p>
       <ul class="pro-plan-benefits">
@@ -1379,44 +1382,33 @@ export function proPage({ isPro = false, user = null, profile = null, testChecko
         <li>Salary, schedule and work-type match filters</li>
         <li>90%+ match score filter</li>
         <li>Opt-in daily email of new matches</li>
-      </ul>
+      </ul><div class="pro-plan-action">`+repeatAction+`</div>
     </article>
   </div>`;
   return `<link rel="stylesheet" href="/pro-premium.css"><div class="pro-premium">
-  <section class="pro-premium-hero" aria-labelledby="pro-title"><div class="wrap pro-premium-grid">
-    <div class="pro-premium-copy"><p class="pro-premium-eyebrow">VEEAYS PRO <span>YOUR SEARCH, WITH MORE FOCUS</span></p>
+  <section class="pro-premium-hero" aria-labelledby="pro-title"><picture class="pro-hero-art"><source media="(max-width:700px)" srcset="/pro-cozy-mobile.webp"><img src="/pro-cozy-hero.webp" width="1536" height="1024" alt="" fetchpriority="high" decoding="async"></picture><div class="wrap pro-premium-grid">
+    <div class="pro-premium-copy"><p class="pro-premium-eyebrow">VEEAYS PRO</p>
       <h1 id="pro-title">Less searching.<br><span>More matching.</span></h1>
-      <p class="pro-premium-lead">Make room for your next move.</p><p>Go beyond your three free matches. See your full ranked feed and focus on roles that fit the way you want to work.</p>
-      <div class="pro-premium-purchase"><p class="pro-premium-price"><strong>₱499</strong><span>for 30 days<br>One-time payment</span></p>`+action+`</div>
+      <p class="pro-premium-lead">Find the opportunities that fit you,<br>without sorting through every listing yourself.</p>
+      <ul class="pro-hero-perks"><li><span aria-hidden="true">⌕</span>Personalized<br>matches</li><li><span aria-hidden="true">☷</span>Smarter<br>filters</li><li><span aria-hidden="true">✉</span>Optional daily<br>digest</li></ul>
+      <div class="pro-premium-purchase" id="pro-purchase">`+action+`</div>
+      <p class="pro-premium-reassurance">₱499 for 30 days · One-time payment · No automatic renewal</p>
       `+(!isPro && !testCheckout && !liveCheckout ? '<p class="pro-launch-note">Checkout is currently unavailable. You can still browse every public job and try your free matches.</p>' : '')+`
-      <p class="pro-premium-reassurance">No automatic renewal · Every public job stays free.</p>
     </div>
-    <div class="pro-premium-scene" role="img" aria-label="Illustrative match feed showing ranked roles, match filters and saved searches. Example roles and scores only, not live listings.">
-      <div class="pro-premium-orbit" aria-hidden="true"></div><div class="pro-premium-ui" aria-hidden="true">
-        <div class="pro-ui-top"><span>YOUR NEXT CHAPTER</span><b>PRO</b></div><h2>A little more you.</h2><p>Your matches, in focus.</p>
-        <div class="pro-ui-filters"><span>Salary</span><span>Schedule</span><span>Work type</span><span>90%+</span></div>
-        <div class="pro-ui-job"><span class="pro-ui-icon">01</span><div><strong>Virtual Assistant</strong><span>Remote · Full-time</span></div><b>96%<small>match</small></b></div>
-        <div class="pro-ui-job"><span class="pro-ui-icon">02</span><div><strong>Customer Support</strong><span>Remote · Part-time</span></div><b>93%<small>match</small></b></div>
-        <div class="pro-ui-job"><span class="pro-ui-icon">03</span><div><strong>Operations Assistant</strong><span>Remote · Contract</span></div><b>91%<small>match</small></b></div>
-        <div class="pro-ui-saved"><span>✓</span><div><strong>Keep your focus.</strong><small>Up to 5 saved searches</small></div></div>
-        <p class="pro-ui-caption">ILLUSTRATIVE PREVIEW · EXAMPLE ROLES &amp; SCORES</p>
-      </div><span class="pro-premium-spark" aria-hidden="true">✦</span>
-    </div>
+    <div class="pro-premium-scene">`+plane+feed+`</div>
   </div></section>
-  <section class="wrap pro-premium-benefits" aria-labelledby="pro-benefits-title"><p class="pro-premium-eyebrow">A MORE INTENTIONAL JOB SEARCH</p><h2 id="pro-benefits-title">Less noise. More possibility.</h2><p class="pro-section-intro">Three ways to make your next 30 days feel more focused.</p>
-    <div class="pro-benefit-grid"><article><span class="pro-benefit-number" aria-hidden="true">01 / DISCOVER</span><div class="pro-benefit-visual pro-visual-feed" aria-hidden="true"><i></i><i></i><i></i><b>Beyond the top 3 ↗</b></div><h3>Your full ranked match feed</h3><p>See matching roles beyond the free top 3, ranked around your profile and preferences.</p></article>
-    <article><span class="pro-benefit-number" aria-hidden="true">02 / FOCUS</span><div class="pro-benefit-visual pro-visual-focus" aria-hidden="true"><span>Salary ✓</span><span>Schedule ✓</span><span>Work type ✓</span><b>90%+ matches</b></div><h3>Find your kind of fit</h3><p>Filter by salary, schedule, work type and 90%+ match scores. Spend more time on the roles that matter to you.</p></article>
-    <article><span class="pro-benefit-number" aria-hidden="true">03 / RETURN</span><div class="pro-benefit-visual pro-visual-save" aria-hidden="true"><span>☆</span><b>Your search, saved.</b><small>01 — 02 — 03 — 04 — 05</small></div><h3>Pick up where you left off</h3><p>Keep up to five saved keyword and category searches, ready for your next visit.</p></article></div>
+  <section class="wrap pro-premium-benefits" aria-labelledby="pro-benefits-title"><div class="pro-section-heading"><div><p class="pro-premium-eyebrow">A MORE INTENTIONAL JOB SEARCH</p><h2 id="pro-benefits-title">Everything you need<br>to find <span>the right roles.</span></h2><p class="pro-section-intro">Go beyond basic search and get tools that save you time<br>and show you better opportunities.</p></div>`+plane+`</div>
+    <div class="pro-benefit-grid"><article class="pro-benefit-feed"><div class="pro-benefit-visual">`+feed+`<span class="pro-doodle" aria-hidden="true">✧</span></div><h3>Personalized match feed</h3><p>See matching roles beyond the free top 3, ranked around your profile and preferences.</p></article>
+    <article class="pro-benefit-filters"><div class="pro-benefit-visual pro-visual-focus" aria-label="Illustrative filter preview"><span>Salary⌄</span><span>Schedule⌄</span><span>Work type⌄</span><b>90%+ matches</b><span>Part-time</span><span>Full-time</span><span>Contract</span></div><h3>Smarter filters</h3><p>Filter by salary, schedule, work type and 90%+ match scores so you can focus on the roles that matter.</p></article>
+    <article class="pro-benefit-saved"><div class="pro-saved-demo" aria-hidden="true"><span class="pro-envelope">✉<b>✓</b></span><div><strong>5 saved searches</strong><p>Virtual Assistant <b>01</b></p><p>Customer Support <b>02</b></p><p>Admin &amp; Operations <b>03</b></p></div></div><h3>Your search, saved.</h3><p>Keep up to five saved keyword and category searches, ready for your next visit. Saving a search does not subscribe you to email.</p></article></div>
     <aside class="pro-premium-digest"><span aria-hidden="true">✉</span><div><h3>A daily catch-up, if you want it.</h3><p>Opt-in daily email of new matches. Requires active Pro access and email opt-in; empty digests are skipped. Personalized category and salary email preferences are not active yet.</p></div><a href="/email-preferences">Email preferences →</a></aside>
   </section>
-  <section class="wrap pro-premium-compare" aria-labelledby="pro-compare-title"><p class="pro-premium-eyebrow">CHOOSE YOUR PACE</p><h2 id="pro-compare-title">Free to explore.<br><span>Pro to focus.</span></h2><p class="pro-section-intro">All the jobs are free. Pro helps you find the right ones faster.</p>`+board+`
+  <section class="wrap pro-premium-compare" aria-labelledby="pro-compare-title"><div class="pro-section-heading"><div><p class="pro-premium-eyebrow">CHOOSE YOUR PACE</p><h2 id="pro-compare-title">Free to explore.<br><span>Pro to focus.</span></h2><p class="pro-section-intro">All the jobs are free. VeeAys Pro gives you more tools<br>to find the right ones, faster.</p></div>`+plane+`</div>`+board+`
     <p class="pro-availability-note">Matches depend on your preferences and available job information. Match scores indicate fit, not a guarantee of an interview or a job.</p>
-    <div class="pro-premium-close"><div><h2>Your next move starts with a little focus.</h2><p><strong>₱499 for 30 days</strong> · No automatic renewal</p></div><a class="button" href="#pro-title">Explore Pro above ↑</a></div>
+    <div class="pro-premium-close"><div><p class="pro-premium-eyebrow">VEEAYS PRO</p><h2>Your next opportunity,<br><span>a little closer.</span></h2><p>More matching roles. Less time searching.</p>`+repeatAction+`<p class="pro-close-terms">One-time payment · No automatic renewal · Every public job stays free.</p></div><span class="pro-close-flight">`+plane+`</span></div>
     <p class="pro-free-note"><strong>Every public job stays free.</strong> Browsing and applying stay free.</p>
   </section></div>`;
-
 }
-
 
 export function myJobsPage({ saved = [], applications = [], message = '', error = '', loadFailed = false } = {}) {
   if (loadFailed) return recovery({title:'Your job search is still yours.',copy:'We couldn’t load your saved jobs and applications right now. Try again to see your latest shortlist and progress.',href:'/my-jobs',label:'Reload My Jobs'});

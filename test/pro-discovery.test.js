@@ -48,7 +48,7 @@ test('Pro comparison uses ordered accessible paper cards and preserves free acce
  assert.doesNotMatch(html,/<table|pro-comparison-scroll|Not included/);
  assert.match(html,/role="group" aria-label="Find your fit: Free and VeeAys Pro"/);
  assert.ok(html.indexOf('id="pro-free-title"')<html.indexOf('id="pro-plus-title"'));
- for(const copy of ['You search.','VeeAys searches<br>with you.','Free to use','Everything in Free, plus:','Every public job stays free.','Browsing and applying stay free.'])assert.ok(html.includes(copy),copy);
+ for(const copy of ['You search.','VeeAys searches with you.','Free to use','Everything in Free, plus:','Every public job stays free.','Browsing and applying stay free.'])assert.ok(html.includes(copy),copy);
 });
 test('Match filter claim follows existing Pro-only controls',()=>{
  const free=matchesPage({matches:[{job_id:1,title:'Role',match_score:92}],summary:{is_pro:false}});

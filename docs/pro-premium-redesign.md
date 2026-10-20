@@ -1,27 +1,34 @@
-# Pro page premium redesign — draft only
+# VeeAys Pro — approved cozy visual redesign
 
-The Pro page now follows the approved homepage's forest green, mint and warm cream palette, Manrope headings and rounded surfaces. A compact pricing block leads into a labeled, static match-feed illustration, three focused benefits, an optional daily digest note, and Free/Pro cards. No new raster assets, libraries or client JavaScript. Existing official header/footer logos are used unchanged.
+Draft PR #28. Do not merge or deploy.
 
-## Product verification
+## Reference and scope
 
-Based on main e80c624 (including merged homepage #26 and CAPTCHA #27). A fresh read-only production request on 2026-10-20 returned the current `YOUR NEXT MOVE, WITH MORE FOCUS.` headline, daily-email benefit and paused personalized-category/salary-email caveat. Anonymous production rendering uses the existing free-match fallback. No live purchase was attempted.
+Inspected the exact user-attached `VeeAys Pro_ Less Searching, More Matching.jpg` on October 20, 2026 before implementation. It supplies the approved tall page composition: cozy 3D hero, forest green/mint/cream, yellow rounded CTAs, floating match cards, asymmetric benefits, dark Pro comparison and home-office closing banner. The earlier plain draft is replaced with this direction. Shared official header/footer logos remain untouched.
 
-- Price: PHP 499, 30 days, one-time payment, no automatic renewal. Existing checkout action and every account/test/live/fallback branch remain intact.
-- Full ranked match feed beyond free top 3; salary, schedule, work type and 90%+ match filters are existing controls.
-- Saved searches: up to five keyword/category presets; saving does not subscribe anyone to email.
-- `wrangler.jsonc`: `DAILY_DIGEST_MODE=enabled`; existing daily scheduler requires active Pro and opt-in, skips empty digests. Provider secrets/delivery health were not independently verified.
-- `JOB_ALERTS_MODE=disabled` remains unchanged. No Smart Alerts benefit is advertised. Personalized category/salary email preference caveat remains explicit.
-- Public browsing/applying stays free; match scores are not interview or job guarantees.
+Only the Pro renderer, its stylesheet, optimized new illustration assets, relevant marketing assertions and review evidence change. Homepage #26, CAPTCHA #27, payment implementation, configuration, schedulers, database and Smart Alerts are unchanged.
 
-## Validation and previews
+## Truthful capabilities and checkout
 
-- Desktop: [1440px](../evidence/pro-redesign/desktop.png); mobile: [390px](../evidence/pro-redesign/mobile.png).
-- Local screenshots use the actual shared layout and Pro renderer, live-checkout rendering, local assets, external requests blocked, and optional analytics declined through its existing control. Illustrative jobs/scores are labeled, not real inventory.
-- Browser widths 320, 390, 768 and 1440: document width equals viewport; primary CTA >=48px tall; single POST /pro/checkout form. Native navigation and purchase semantics preserved; visible keyboard focus and reduced-motion rules provided.
-- 52 focused tests pass: Pro marketing/account states, checkout/payment validation, CAPTCHA, saved searches, daily digest and homepage discovery.
-- Wrangler dry-run build passes. No deploy command was run.
-- Two stale marketing tests already failed on baseline main (old autopilot/coming-soon claims); updated their expectations to current truthful copy.
+- ₱499 for 30 days, one-time payment, no automatic renewal. Public jobs stay free and Free retains its top 3 personalized matches.
+- Pro retains full ranked feed, five saved keyword/category searches, salary/schedule/work-type and 90%+ match filters.
+- Existing `DAILY_DIGEST_MODE=enabled`, scheduler and eligibility tests support optional legacy daily digest wording: active Pro and explicit email opt-in required; empty digests skipped. Delivery health and external provider configuration are not certified by this page change.
+- `JOB_ALERTS_MODE=disabled` stays untouched. Saved searches do not imply email subscriptions. No claim that paused personalized category/salary emails or Smart Alerts are live. The reference's saved-search-driven digest illustration is therefore adapted into a truthful saved-search demonstration, with optional digest separately qualified.
+- One original POST checkout form, now with an ID, remains the authoritative action. Comparison and closing buttons use native HTML `form` association with that form. Account, unavailable-checkout and test-mode branches remain intact; test CTAs retain TEST labels. No live payment attempted.
+- Preview jobs and scores are explicitly illustrative. All text, buttons and filter demonstrations are HTML. Preview filter chips are noninteractive illustrations; actual filters remain on the matches page.
 
-No changes to homepage, auth, payments, worker, cron, configuration or existing assets. Do not merge or deploy without owner review.
+## Media
 
-Full suite: 451 tests; 447 passed, 4 skipped, 0 failed.
+Built-in image generation created text-free illustrations using the approved attachment as the visual reference. No generated branding. Hero: 117,682 bytes; mobile crop: 75,608 bytes; desk banner: 53,204 bytes. Responsive WebP hero, explicit dimensions, high fetch priority and async decoding. The below-fold background is a separate optimized WebP. Full-resolution generation sources are not shipped.
+
+Generation specs: hero — wide premium polished 3D render of an adult Filipina with glasses, dark bun, cream sweater and green trousers using a plain laptop on a green sofa, black fluffy dog, plants, bookshelves and amber lighting; character right, forest green negative space left, no text/UI/logos. Desk — matching cozy 3D home office, plain laptop and cream mug, green books, plants, amber lamp; scene right, dark green negative space left; no person/text/UI/logos. Built-in imagegen used; no API fallback.
+
+## Validation
+
+- 40 focused tests pass: Pro states and marketing, checkout, live-payment validation, discovery, visibility and daily digest.
+- Wrangler dry-run build passes. No deployment.
+- Chromium layout checks at 320, 390, 768 and 1440: no horizontal overflow; all purchase controls at least 48px tall and associated with `/pro/checkout`; one checkout form; responsive hero loads.
+- Screenshots use the actual shared layout and renderer with the live checkout state, local assets and blocked external requests. Optional analytics is declined via its existing UI before capture. No production purchase or external request.
+- Desktop and mobile images visually inspected; mobile crop and price contrast refined after first capture. Keyboard focus styling and reduced-motion support retained.
+
+Review: [desktop](../evidence/pro-redesign/desktop.png), [mobile](../evidence/pro-redesign/mobile.png), [layout checks](../evidence/pro-redesign/visual-checks.json).
