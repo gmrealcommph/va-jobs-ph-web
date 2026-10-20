@@ -24,6 +24,6 @@
   header.addEventListener('focusout', () => setTimeout(() => {
     disclosures.forEach(item => { if (item.open && !item.contains(document.activeElement)) close(item); });
   }, 0));
-  const mobile = matchMedia('(max-width: 1000px)');
+  const mobile = matchMedia('(max-width: 1150px)');
   mobile.addEventListener('change', () => disclosures.forEach(item => close(item)));
 })();

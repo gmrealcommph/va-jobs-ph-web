@@ -1,0 +1,154 @@
+[
+  {
+    "route": "/",
+    "view": "390",
+    "header": 351,
+    "logo": 1200,
+    "scroll": 375,
+    "width": 390
+  },
+  {
+    "route": "/pro",
+    "view": "390",
+    "header": 351,
+    "logo": 1200,
+    "scroll": 375,
+    "width": 390
+  },
+  {
+    "route": "/categories/Marketing",
+    "view": "390",
+    "header": 351,
+    "logo": 1200,
+    "scroll": 375,
+    "width": 390
+  },
+  {
+    "route": "/jobs",
+    "view": "390",
+    "header": 351,
+    "logo": 1200,
+    "scroll": 375,
+    "width": 390
+  },
+  {
+    "route": "/jobs/123",
+    "view": "390",
+    "header": 351,
+    "logo": 1200,
+    "scroll": 375,
+    "width": 390
+  },
+  {
+    "route": "/employers",
+    "view": "390",
+    "header": 351,
+    "logo": 1200,
+    "scroll": 375,
+    "width": 390
+  },
+  {
+    "route": "/login",
+    "view": "390",
+    "header": 351,
+    "logo": 1200,
+    "scroll": 375,
+    "width": 390
+  },
+  {
+    "route": "/signup",
+    "view": "390",
+    "header": 351,
+    "logo": 1200,
+    "scroll": 375,
+    "width": 390
+  },
+  {
+    "route": "/my-jobs?member=free",
+    "view": "390",
+    "header": 351,
+    "logo": 1200,
+    "scroll": 375,
+    "width": 390
+  },
+  {
+    "route": "/",
+    "view": "1440",
+    "header": 1360,
+    "logo": 1200,
+    "scroll": 1425,
+    "width": 1440
+  },
+  {
+    "route": "/pro",
+    "view": "1440",
+    "header": 1360,
+    "logo": 1200,
+    "scroll": 1425,
+    "width": 1440
+  },
+  {
+    "route": "/categories/Marketing",
+    "view": "1440",
+    "header": 1360,
+    "logo": 1200,
+    "scroll": 1425,
+    "width": 1440
+  },
+  {
+    "route": "/jobs",
+    "view": "1440",
+    "header": 1360,
+    "logo": 1200,
+    "scroll": 1425,
+    "width": 1440
+  },
+  {
+    "route": "/jobs/123",
+    "view": "1440",
+    "header": 1360,
+    "logo": 1200,
+    "scroll": 1425,
+    "width": 1440
+  },
+  {
+    "route": "/employers",
+    "view": "1440",
+    "header": 1360,
+    "logo": 1200,
+    "scroll": 1425,
+    "width": 1440
+  },
+  {
+    "route": "/login",
+    "view": "1440",
+    "header": 1360,
+    "logo": 1200,
+    "scroll": 1425,
+    "width": 1440
+  },
+  {
+    "route": "/signup",
+    "view": "1440",
+    "header": 1360,
+    "logo": 1200,
+    "scroll": 1425,
+    "width": 1440
+  },
+  {
+    "route": "/my-jobs?member=free",
+    "view": "1440",
+    "header": 1360,
+    "logo": 1200,
+    "scroll": 1425,
+    "width": 1440
+  },
+  {
+    "route": "/pro?member=pro",
+    "view": "1440",
+    "header": 1360,
+    "logo": 1200,
+    "scroll": 1425,
+    "width": 1440
+  }
+]
