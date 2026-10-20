@@ -1,3 +1,4 @@
+import {authCaptchaToken} from './signup-protection.js';
 import {savedSearchesEndpoint} from './saved-searches.js';
 import {authSupportEndpoint} from './auth-support.js';
 import {jobAlertsWebhook} from './job-alerts-webhook.js';
@@ -179,9 +180,17 @@ export async function handle(request, env) {
       return Response.redirect(`${url.origin}${target}?error=${encodeURIComponent('Enter a valid email and a password of at least 8 characters.')}&email=${encodeURIComponent(email)}${returnTo ? `&return=${encodeURIComponent(returnTo)}` : ''}`, 303);
     }
 
+    let captchaToken;
+    try {
+      captchaToken = authCaptchaToken(env, form);
+      if (env.TURNSTILE_SITE_KEY && !captchaToken) throw Error("Complete the security check.");
+    } catch {
+      const target = url.pathname === "/signup" ? "/signup" : "/login";
+      return Response.redirect(url.origin + target + "?error=" + encodeURIComponent("Complete a fresh security check and try again.") + "&email=" + encodeURIComponent(email) + (returnTo ? "&return=" + encodeURIComponent(returnTo) : ""), 303);
+    }
     if (url.pathname === '/signup') {
       if (!fullName) return Response.redirect(`${url.origin}/signup?error=${encodeURIComponent('Enter your full name.')}&email=${encodeURIComponent(email)}${returnTo ? `&return=${encodeURIComponent(returnTo)}` : ''}`, 303);
-      const { response, data } = await signUp(env, { email, password, fullName, redirectTo: `${siteOrigin}/auth/callback${returnTo ? `?return=${encodeURIComponent(returnTo)}` : ''}` });
+      const { response, data } = await signUp(env, { email, password, fullName, captchaToken, redirectTo: `${siteOrigin}/auth/callback${returnTo ? `?return=${encodeURIComponent(returnTo)}` : ''}` });
       if (!response.ok) return Response.redirect(`${url.origin}/signup?error=${encodeURIComponent(authError(data, 'We could not create your account.'))}&email=${encodeURIComponent(email)}${returnTo ? `&return=${encodeURIComponent(returnTo)}` : ''}`, 303);
       await linkTrafficRegistration(request,env,data?.user);
       if (data?.access_token && data?.refresh_token) {
@@ -193,7 +202,7 @@ export async function handle(request, env) {
       return Response.redirect(`${url.origin}/check-email?email=${encodeURIComponent(email)}${returnTo ? `&return=${encodeURIComponent(returnTo)}` : ''}`, 303);
     }
 
-    const { response, data } = await signIn(env, { email, password });
+    const { response, data } = await signIn(env, { email, password, captchaToken });
     if (!response.ok || !data?.access_token) return Response.redirect(`${url.origin}/login?error=${encodeURIComponent(authError(data, 'Email or password is incorrect.'))}&email=${encodeURIComponent(email)}${returnTo ? `&return=${encodeURIComponent(returnTo)}` : ''}`, 303);
     const state = { user: data.user || await getUser(env, data.access_token), accessToken: data.access_token };
     const target = returnTo || await defaultPostAuthPath(env, state);
@@ -599,13 +608,17 @@ if (
         return new Response(null,{status:303,headers:h});
       }
       const mode = url.pathname === '/signup' ? 'signup' : 'login';
-      return render(mode === 'signup' ? 'Create your account' : 'Log in', authPage({
+      const response = render(mode === 'signup' ? 'Create your account' : 'Log in', authPage({
         mode,
+        turnstileSiteKey: env.TURNSTILE_SITE_KEY || '',
         error: (url.searchParams.get('error') || '').slice(0, 240),
         message: (url.searchParams.get('message') || '').slice(0, 240),
         email: (url.searchParams.get('email') || '').slice(0, 254),
         returnTo: safeReturnPath(url.searchParams.get('return'))
       }), { noindex: true });
+      response.headers.set('cache-control', 'no-store');
+      if (env.TURNSTILE_SITE_KEY) response.headers.set('content-security-policy', headers['content-security-policy'].replace("script-src 'self'; connect-src 'self';", "script-src 'self' https://challenges.cloudflare.com; frame-src https://challenges.cloudflare.com; connect-src 'self' https://challenges.cloudflare.com;"));
+      return response;
     }
 
     if (url.pathname === '/check-email') {
