@@ -6588,8 +6588,9 @@ body:has(.green-room-hero) .veeays-logo-img{filter:none!important}
 
 /* Original text-free mobile illustration; desktop keeps its approved artwork. */
 @media(max-width:850px){
- .green-room-scene{aspect-ratio:4/3;background-image:url('/images/veeays-mobile-cozy-feathered.webp');background-size:contain}
- .green-room-scene::before{content:none}
+ .green-room-scene{aspect-ratio:4/3;background-image:url('/images/veeays-mobile-room.webp');background-size:contain}
+ /* Only the empty wall/floor boundaries transition; the room stays opaque. */
+ .green-room-scene::before{content:'';inset:0;height:auto;background:linear-gradient(to bottom,#0f3d2e,transparent 7%,transparent 93%,#0f3d2e)}
  /* Compact cream backing keeps the authentic logo readable within the header. */
  body:has(.green-room-hero) .site-header .header{min-height:58px}
  body:has(.green-room-hero) .veeays-brand{height:36px;max-width:130px;padding:0 8px}
