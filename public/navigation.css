@@ -1,0 +1,92 @@
+/* Shared cream floating shell; original logo sits directly on the cream. */
+body > .site-header.veeays-navigation {
+  background:transparent!important;border:0;padding:12px 20px;position:relative;z-index:30;
+}
+body > .veeays-navigation .header {
+  box-sizing:border-box;display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);align-items:center;justify-content:space-between;
+  width:100%;max-width:1360px;min-height:76px!important;margin:auto;padding:10px 14px;
+  gap:20px;border:1px solid #0f3d2e12;border-radius:999px;background:#f8f6ee;
+  box-shadow:0 4px 16px #06291d12;
+}
+body > .veeays-navigation .veeays-brand {
+  box-sizing:border-box;max-width:150px!important;height:48px!important;padding:2px 10px!important;
+  background:transparent!important;border-radius:0;flex:0 0 auto;
+}
+body > .veeays-navigation .veeays-logo-img {height:44px!important;max-width:100%;filter:none;mix-blend-mode:normal}
+body > .veeays-navigation .discovery-nav {
+  display:flex;gap:3px;justify-content:center;padding:4px;border-radius:999px;
+  background:#0f3d2e;border:1px solid #a7e3c11f;margin-inline:auto;
+}
+body > .veeays-navigation .discovery-nav a {
+  min-height:40px;padding:0 12px;border-radius:999px;color:#fffdf3;font-size:12px;line-height:1.25;
+  font-family:inherit;font-style:normal;font-weight:600;text-decoration:none;
+}
+body > .veeays-navigation .discovery-nav a:hover {background:#204d3d;color:#fffdf3}
+body > .veeays-navigation .discovery-nav a[aria-current=page] {background:#c9efdc;color:#0f3d2e}
+body > .veeays-navigation nav a[aria-current=page]::after {display:none}
+body > .veeays-navigation .header-actions {justify-self:end;display:flex;gap:8px;margin:0;flex:0 0 auto}
+body > .veeays-navigation .header-actions > a {display:flex;align-items:center;justify-content:center;box-sizing:border-box;min-height:44px;padding:0 22px;border-radius:999px;text-decoration:none;font-size:13px;font-weight:700;color:#fffdf3;background:#0f3d2e;border:1px solid #a7e3c12e}
+body > .veeays-navigation .header-actions > a[href='/signup'] {background:#a7e3c1;color:#0f3d2e;border-color:#a7e3c1}
+body > .veeays-navigation .header-actions > a[aria-current=page] {outline:2px solid #c9efdc;outline-offset:2px}
+body > .veeays-navigation .workspace-nav {display:flex;padding-left:0;border:0;gap:12px}
+body > .veeays-navigation .workspace-nav a {color:#0f3d2e;font-size:12px}
+body > .veeays-navigation .workspace-nav a[aria-current=page] {color:#0f3d2e;text-decoration:underline;text-underline-offset:6px}
+body > .veeays-navigation .member-menu summary {background:#e4f9ec;border-color:#e4f9ec;color:#0f3d2e;min-height:44px}
+body > .veeays-navigation .member-name {max-width:84px}
+body > .veeays-navigation :is(a,summary):focus-visible {outline:3px solid #267653;outline-offset:3px}
+body > .veeays-navigation :is(.member-panel,.mobile-panel) a {color:#0f3d2e}
+body > .veeays-navigation :is(.member-panel,.mobile-panel) a:hover {color:#0f3d2e;background:#e4f9ec}
+body > .veeays-navigation :is(.member-panel,.mobile-panel) :is(a,summary):focus-visible {outline-color:#0f3d2e}
+body > .veeays-navigation .mobile-menu {display:none}
+@media(min-width:1151px) and (max-width:1200px) {
+  body > .veeays-navigation .header {gap:12px}
+  body > .veeays-navigation .discovery-nav a {padding-inline:10px;font-size:12px}
+  body > .veeays-navigation .veeays-brand {max-width:125px!important}
+  body > .veeays-navigation .workspace-nav {gap:8px}
+  body > .veeays-navigation .member-name {max-width:60px}
+}
+@media(max-width:1150px) {
+  body > .site-header.veeays-navigation {padding:10px 12px}
+  body > .veeays-navigation .header {display:flex;min-height:64px!important;padding:7px 9px;gap:8px}
+  body > .veeays-navigation .veeays-brand {height:44px!important;max-width:134px!important;padding:2px 8px!important}
+  body > .veeays-navigation .veeays-logo-img {height:40px!important}
+  body > .veeays-navigation .discovery-nav,body > .veeays-navigation .header-actions {display:none}
+  body > .veeays-navigation .mobile-menu {display:block}
+  body > .veeays-navigation .mobile-menu summary {background:#e4f9ec;color:#0f3d2e;border:0;min-height:44px;padding:0 16px;font-size:13px;gap:8px}
+  body > .veeays-navigation .mobile-panel {top:calc(100% + 8px);left:0;right:0;border-radius:24px;padding:16px;max-height:calc(100dvh - 108px);overscroll-behavior:contain}
+  body > .veeays-navigation .mobile-panel a[aria-current=page] {background:#c9efdc;color:#0f3d2e}
+}
+@media(max-width:360px) {
+  body > .site-header.veeays-navigation {padding-inline:8px}
+  body > .veeays-navigation .veeays-brand {max-width:108px!important}
+  body > .veeays-navigation .mobile-menu summary {padding-inline:12px}
+}
+
+body > .veeays-navigation .nav-pro {font-family:inherit;font-style:normal;font-weight:600}
+
+/* Float over existing illustrated heroes while reserving space for content. */
+body:has(:is(.green-room-hero,.pro-premium-hero)) > .site-header.veeays-navigation {
+  position:absolute;inset:0 0 auto;background:transparent!important;
+}
+body:has(.green-room-hero) .green-room-hero {padding-top:100px}
+body:has(.pro-premium-hero) .pro-premium-hero {padding-top:100px}
+@media(min-width:1101px) {
+  body:has(.green-room-hero) .green-room-hero {background-position:center top!important}
+  body:has(.green-room-hero) .green-room-grid {min-height:calc(var(--room-height) - 100px)}
+}
+@media(max-width:1150px) {
+  body:has(.green-room-hero) .green-room-hero,
+  body:has(.pro-premium-hero) .pro-premium-hero {padding-top:84px}
+}
+body:has(.green-room-hero) .veeays-navigation :is(a,summary):focus-visible {outline-color:#267653}
+body > .veeays-navigation .discovery-nav a:focus-visible {outline-color:#a7e3c1}
+body:has(.green-room-hero) > .veeays-navigation .discovery-nav a:focus-visible {outline-color:#a7e3c1}
+
+/* Pro remains gold independently of the current discovery route. */
+body > .veeays-navigation :is(.discovery-nav,.mobile-panel) a.nav-pro {
+ display:flex;align-items:center;justify-content:center;gap:6px;
+ background:#FFC83D;color:#0f3d2e;font-weight:800;border-radius:999px;
+}
+body > .veeays-navigation :is(.discovery-nav,.mobile-panel) a.nav-pro:hover {background:#ffd466;color:#0f3d2e}
+body > .veeays-navigation a.nav-pro[aria-current=page] {box-shadow:inset 0 0 0 2px #0f3d2e}
+body > .veeays-navigation .nav-crown {flex:none}
