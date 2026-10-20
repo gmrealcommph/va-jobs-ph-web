@@ -1382,7 +1382,39 @@ export function proPage({ isPro = false, user = null, profile = null, testChecko
       </ul>
     </article>
   </div>`;
-  return '<div class="pro-marketing"><section class="pro-marketing-hero"><div class="wrap"><div class="kicker">VEEAYS PRO</div><h1>YOUR NEXT MOVE,<br><em>WITH MORE FOCUS.</em></h1><p class="pro-marketing-intro">More matching roles. Less time sorting.</p><p>Go beyond your three free matches with a full ranked feed. Filter by salary, schedule and work type, then opt in to a daily email of new matches.</p>'+proPlane+'<p class="pro-marketing-price"><strong>₱499 for 30 days</strong> · No automatic renewal</p>'+action+(!isPro && !testCheckout && !liveCheckout ? '<p class="pro-launch-note">Checkout is currently unavailable. You can still browse every public job and try your free matches.</p>' : '')+'</div></section><section class="wrap pro-marketing-details"><h2>A little less searching.<br><em>A little more possibility.</em></h2>'+proBenefits()+'<p>Pro members can sort and filter their match feed by salary, schedule, work type and 90%+ scores. Email preferences stay in your control.</p><div class="pro-flight-divider" aria-hidden="true"><span>PH → WORLD</span><svg viewBox="0 0 300 36" focusable="false"><path d="M2 25c50-36 62 26 126 0s78-20 151-9" fill="none" stroke="currentColor" stroke-dasharray="2 6"/><path d="m275 8 21 7-20 9 4-9Z" fill="#f2bb52" stroke="currentColor"/></svg><span>Your next move</span></div><h2>All the jobs are free.<br><em>Pro helps you find the right ones faster.</em></h2>'+board+'<p class="pro-availability-note">Matches depend on your preferences and available job information. Daily match digests require active Pro access and your email opt-in. Personalized category and salary email preferences are not active yet.</p><p class="pro-free-note"><strong>Every public job stays free.</strong> Pro adds a full match feed, filters and a daily digest. Browsing and applying stay free.</p></section></div>';
+  return `<link rel="stylesheet" href="/pro-premium.css"><div class="pro-premium">
+  <section class="pro-premium-hero" aria-labelledby="pro-title"><div class="wrap pro-premium-grid">
+    <div class="pro-premium-copy"><p class="pro-premium-eyebrow">VEEAYS PRO <span>YOUR SEARCH, WITH MORE FOCUS</span></p>
+      <h1 id="pro-title">Less searching.<br><span>More matching.</span></h1>
+      <p class="pro-premium-lead">Make room for your next move.</p><p>Go beyond your three free matches. See your full ranked feed and focus on roles that fit the way you want to work.</p>
+      <div class="pro-premium-purchase"><p class="pro-premium-price"><strong>₱499</strong><span>for 30 days<br>One-time payment</span></p>`+action+`</div>
+      `+(!isPro && !testCheckout && !liveCheckout ? '<p class="pro-launch-note">Checkout is currently unavailable. You can still browse every public job and try your free matches.</p>' : '')+`
+      <p class="pro-premium-reassurance">No automatic renewal · Every public job stays free.</p>
+    </div>
+    <div class="pro-premium-scene" role="img" aria-label="Illustrative match feed showing ranked roles, match filters and saved searches. Example roles and scores only, not live listings.">
+      <div class="pro-premium-orbit" aria-hidden="true"></div><div class="pro-premium-ui" aria-hidden="true">
+        <div class="pro-ui-top"><span>YOUR NEXT CHAPTER</span><b>PRO</b></div><h2>A little more you.</h2><p>Your matches, in focus.</p>
+        <div class="pro-ui-filters"><span>Salary</span><span>Schedule</span><span>Work type</span><span>90%+</span></div>
+        <div class="pro-ui-job"><span class="pro-ui-icon">01</span><div><strong>Virtual Assistant</strong><span>Remote · Full-time</span></div><b>96%<small>match</small></b></div>
+        <div class="pro-ui-job"><span class="pro-ui-icon">02</span><div><strong>Customer Support</strong><span>Remote · Part-time</span></div><b>93%<small>match</small></b></div>
+        <div class="pro-ui-job"><span class="pro-ui-icon">03</span><div><strong>Operations Assistant</strong><span>Remote · Contract</span></div><b>91%<small>match</small></b></div>
+        <div class="pro-ui-saved"><span>✓</span><div><strong>Keep your focus.</strong><small>Up to 5 saved searches</small></div></div>
+        <p class="pro-ui-caption">ILLUSTRATIVE PREVIEW · EXAMPLE ROLES &amp; SCORES</p>
+      </div><span class="pro-premium-spark" aria-hidden="true">✦</span>
+    </div>
+  </div></section>
+  <section class="wrap pro-premium-benefits" aria-labelledby="pro-benefits-title"><p class="pro-premium-eyebrow">A MORE INTENTIONAL JOB SEARCH</p><h2 id="pro-benefits-title">Less noise. More possibility.</h2><p class="pro-section-intro">Three ways to make your next 30 days feel more focused.</p>
+    <div class="pro-benefit-grid"><article><span class="pro-benefit-number" aria-hidden="true">01 / DISCOVER</span><div class="pro-benefit-visual pro-visual-feed" aria-hidden="true"><i></i><i></i><i></i><b>Beyond the top 3 ↗</b></div><h3>Your full ranked match feed</h3><p>See matching roles beyond the free top 3, ranked around your profile and preferences.</p></article>
+    <article><span class="pro-benefit-number" aria-hidden="true">02 / FOCUS</span><div class="pro-benefit-visual pro-visual-focus" aria-hidden="true"><span>Salary ✓</span><span>Schedule ✓</span><span>Work type ✓</span><b>90%+ matches</b></div><h3>Find your kind of fit</h3><p>Filter by salary, schedule, work type and 90%+ match scores. Spend more time on the roles that matter to you.</p></article>
+    <article><span class="pro-benefit-number" aria-hidden="true">03 / RETURN</span><div class="pro-benefit-visual pro-visual-save" aria-hidden="true"><span>☆</span><b>Your search, saved.</b><small>01 — 02 — 03 — 04 — 05</small></div><h3>Pick up where you left off</h3><p>Keep up to five saved keyword and category searches, ready for your next visit.</p></article></div>
+    <aside class="pro-premium-digest"><span aria-hidden="true">✉</span><div><h3>A daily catch-up, if you want it.</h3><p>Opt-in daily email of new matches. Requires active Pro access and email opt-in; empty digests are skipped. Personalized category and salary email preferences are not active yet.</p></div><a href="/email-preferences">Email preferences →</a></aside>
+  </section>
+  <section class="wrap pro-premium-compare" aria-labelledby="pro-compare-title"><p class="pro-premium-eyebrow">CHOOSE YOUR PACE</p><h2 id="pro-compare-title">Free to explore.<br><span>Pro to focus.</span></h2><p class="pro-section-intro">All the jobs are free. Pro helps you find the right ones faster.</p>`+board+`
+    <p class="pro-availability-note">Matches depend on your preferences and available job information. Match scores indicate fit, not a guarantee of an interview or a job.</p>
+    <div class="pro-premium-close"><div><h2>Your next move starts with a little focus.</h2><p><strong>₱499 for 30 days</strong> · No automatic renewal</p></div><a class="button" href="#pro-title">Explore Pro above ↑</a></div>
+    <p class="pro-free-note"><strong>Every public job stays free.</strong> Browsing and applying stay free.</p>
+  </section></div>`;
+
 }
 
 
