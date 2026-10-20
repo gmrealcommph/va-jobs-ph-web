@@ -69,7 +69,7 @@ export function layout({ title, description, canonical, body, noindex = false, u
     type="image/svg+xml"
   >
 
-  <link rel="stylesheet" href="/styles.css?v=20261019-pro">
+  <link rel="stylesheet" href="/styles.css?v=20261020-manrope">
 <link rel="stylesheet" href="/traffic.css?v=20261012-dismiss">
 <script src="/traffic.js?v=20261012-dismiss" type="module"></script>
 </head>
@@ -394,6 +394,11 @@ export function listing({ rows, total, page, search, category, names, categoryEn
     'Writing & Content': '✐'
   }[name] || '•');
 
+  // Available public-job categories, ranked by inventory, not search activity.
+  const popularRoles = categoryEntries
+    .filter(({ name, count }) => typeof name === 'string' && name.trim() && name !== 'Other' && Number.isSafeInteger(count) && count > 0)
+    .sort((a, b) => b.count - a.count || a.name.localeCompare(b.name))
+    .slice(0, 5);
   const hero = browseOnly
     ? `<section class="jobs-browse-hero"><div class="wrap"><div class="kicker"><span></span> REMOTE JOBS FOR FILIPINO TALENT</div><h1>Find your next<br><em>opportunity.</em></h1><p>Search and explore roles open to talent in the Philippines.</p>${searchForm(search, '', '/jobs')}</div></section>`
     : category
@@ -405,10 +410,10 @@ export function listing({ rows, total, page, search, category, names, categoryEn
             <div class="green-room-content">
               <div class="home-kicker"><span></span> REMOTE JOBS FOR FILIPINOS</div>
               <h1>Better Jobs.<br><span>From Home.</span></h1>
-              <p>Find legitimate work-from-home opportunities, built for Filipino talent and your goals.</p>
               <div class="green-room-search">${searchForm(search, category, action)}</div>
               <div class="green-room-benefits" aria-label="Why VeeAys"><div><span class="green-room-benefit-icon mint" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="7" width="18" height="14" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M3 12h18m-11 0v2h4v-2"/></svg></span><span>Legitimate<br>opportunities</span></div><div><span class="green-room-benefit-icon yellow" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 5-8 11-8 11S4 15 4 10a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="2.5"/></svg></span><span>Work from<br>anywhere</span></div><div><span class="green-room-benefit-icon coral" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2"/><path d="M3 20v-2a6 6 0 0 1 12 0v2m1-7a5 5 0 0 1 5 5v2"/></svg></span><span>Built for<br>Filipinos</span></div></div>
-              <div class="green-room-stats"><div><strong>${Number(publicJobTotal ?? total).toLocaleString('en-US')}+</strong><span>Remote jobs</span></div><div><strong>For Filipino</strong><span>applicants</span></div><div><strong>New opportunities</strong><span>added regularly</span></div></div>
+              ${popularRoles.length ? `<nav class="green-room-roles" aria-labelledby="popular-remote-roles"><h2 id="popular-remote-roles">Popular Remote Roles</h2><div>${popularRoles.map(({ name }) => `<a href="${categoryPath(name)}">${esc(name)}</a>`).join('')}</div></nav>` : ''}
+              <a class="green-room-explore" href="#job-categories">Explore more job categories <span aria-hidden="true">↓</span></a>
             </div>
           </div>
         </div>
@@ -453,7 +458,7 @@ export function listing({ rows, total, page, search, category, names, categoryEn
 
   <section class="wrap listings" id="opportunities">
 
-    <aside class="opportunity-map category-discovery" aria-label="Explore work categories">
+    <aside class="opportunity-map category-discovery" id="job-categories" aria-label="Explore work categories">
 
       <div class="category-panel">
 
