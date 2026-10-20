@@ -6558,3 +6558,30 @@ body:has(.green-room-hero) .veeays-logo-img{filter:none!important}
 @media(max-width:1100px){.green-room-content h1{font-size:clamp(36px,7.8vw,64px)}.green-room-roles a{min-height:44px}.green-room-explore{margin-top:10px}}
 @media(prefers-reduced-motion:no-preference){html:has(.green-room-explore){scroll-behavior:smooth}}
 .green-room-content .green-room-roles{display:block}
+
+/* Mobile reading order: headline, search, complete artwork, benefits, discovery. */
+@media(max-width:850px){
+ body:has(.green-room-hero) .site-header .header{min-height:68px}
+ body:has(.green-room-hero) .green-room-hero{background:#0f3d2e!important}
+ .green-room-grid{display:grid;grid-template-columns:minmax(0,1fr);gap:0;min-height:0;padding:12px 20px 20px}
+ .green-room-content{display:contents}
+ .green-room-content .home-kicker{display:none}
+ .green-room-content h1{grid-row:1;font-size:clamp(36px,8.5vw,64px);margin:0 0 18px;line-height:1.12}
+ .green-room-search{grid-row:2;min-width:0}
+ .green-room-search .search{margin:0}
+ .green-room-search .search-row{min-height:56px;padding:5px 6px 5px 12px;gap:6px}
+ .green-room-search .search-row input{font-size:16px}
+ .green-room-search .search-row button{min-height:44px;padding-inline:14px;font-size:13px}
+ .green-room-scene{grid-row:3;min-height:0;max-height:none;aspect-ratio:1672/941;margin:14px -20px 0;background:url('/images/veeays-green-room.jpg') center/contain no-repeat;position:relative}
+ .green-room-scene::before{content:'';position:absolute;inset:0 0 auto;height:20%;background:linear-gradient(#0f3d2e,transparent);pointer-events:none}
+ .green-room-benefits{grid-row:4;margin:12px 0 0;padding-bottom:14px;gap:6px}
+ .green-room-benefits>div{flex-direction:column;text-align:center;gap:6px;padding:0 4px;font-size:11px}
+ .green-room-benefits .green-room-benefit-icon{width:34px;height:34px;flex:0 0 34px}
+ .green-room-benefit-icon svg{width:19px;height:19px}
+ .green-room-roles{grid-row:5;margin-top:16px}
+ .green-room-roles h2{margin-bottom:8px}
+ .green-room-roles>div{gap:6px}
+ .green-room-roles a{padding:6px 11px}
+ .green-room-explore{grid-row:6;margin-top:8px;font-size:12px;justify-self:start}
+ body:has(.green-room-hero) .veeays-navigation :is(a,summary):focus-visible{outline-color:#a7e3c1}
+}

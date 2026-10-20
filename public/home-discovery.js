@@ -1,5 +1,20 @@
 // Keep homepage saving independent of the stretched job link.
 (() => {
+  // Keep the native GET form and restore its desktop copy on viewport changes.
+  const heroSearch = document.querySelector('.green-room-search input[type="search"]');
+  const heroButton = document.querySelector('.green-room-search button');
+  if (heroSearch && heroButton) {
+    const mobile = window.matchMedia('(max-width:850px)');
+    const desktopPlaceholder = heroSearch.placeholder;
+    const desktopButton = heroButton.innerHTML;
+    const updateHeroSearch = () => {
+      heroSearch.placeholder = mobile.matches ? 'Job title or keyword' : desktopPlaceholder;
+      if (mobile.matches) heroButton.textContent = 'Search';
+      else heroButton.innerHTML = desktopButton;
+    };
+    updateHeroSearch();
+    mobile.addEventListener('change', updateHeroSearch);
+  }
   document.querySelectorAll('.home-page .discovery-actions').forEach(actions => {
     actions.addEventListener('click', event => event.stopPropagation());
     actions.addEventListener('keydown', event => event.stopPropagation());
