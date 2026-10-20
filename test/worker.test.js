@@ -87,14 +87,14 @@ test('safe application links and allowed methods', async () => {
 test('homepage branding is scoped away from category and detail content', async () => {
   mock();
   const home = await (await handle(request('/'), env)).text();
-  assert.match(home, /Same skills\./);
+  assert.match(home, /Better Jobs\.<br><span>From Home\./);
   assert.match(home, /class="home-page"/);
   for (const path of ['/categories', '/categories/Admin%20%26%20Support', '/jobs/101']) {
     const res = await handle(request(path), env);
     assert.equal(res.status, 200);
     const html = await res.text();
     assert.match(html, /aria-label="VeeAys home"/);
-    assert.doesNotMatch(html, /class="home-page"|Same skills\./);
+    assert.doesNotMatch(html, /class="home-page"|green-room-hero/);
   }
 });
 
