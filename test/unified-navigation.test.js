@@ -8,7 +8,7 @@ test('all public and member routes share one header, unchanged authentic logo an
     const html=render(route);
     assert.equal((html.match(/<header class="site-header veeays-navigation">/g)||[]).length,1,route);
     assert.match(html,/src="\/veeays-logo.png" alt="VeeAys" width="1200" height="400"/);
-    assert.match(html,/href="\/navigation.css\?v=20261020-cream"/);
+    assert.match(html,/href="\/navigation.css\?v=20261020-gold"/);
     assert.match(html,/<main id="main">\s*<p>Approved page content<\/p>/);
     assert.match(html,/class="skip" href="#main"/);
   }
