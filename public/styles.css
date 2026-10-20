@@ -6588,6 +6588,6 @@ body:has(.green-room-hero) .veeays-logo-img{filter:none!important}
 
 /* Original text-free mobile illustration; desktop keeps its approved artwork. */
 @media(max-width:850px){
- .green-room-scene{aspect-ratio:1;background-image:url('/images/veeays-mobile-cozy-office.webp');background-size:contain}
+ .green-room-scene{aspect-ratio:4/3;background-image:url('/images/veeays-mobile-cozy-reference.webp');background-size:contain}
  .green-room-scene::before{inset:0;height:100%;background:linear-gradient(#0f3d2e,transparent 12%,transparent 86%,#0f3d2e)}
 }
