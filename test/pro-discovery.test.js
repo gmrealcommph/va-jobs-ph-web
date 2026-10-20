@@ -5,12 +5,12 @@ import {emailPreferences} from '../src/email-preferences.js';
 const original=globalThis.fetch;afterEach(()=>{globalThis.fetch=original;});
 test('public Pro page makes free access and pre-payment state explicit with working auth links',()=>{
  const html=proPage();
- for(const text of ['YOUR JOB SEARCH,','ON AUTOPILOT.','₱499 for 30 days','No automatic renewal','membership is coming soon','Every public job stays free.','Your top 3 personalized matches','Personalized Job Alerts','Daily Job Digest'])assert.ok(html.includes(text),text);
+ for(const text of ['Less searching.','More matching.','₱499 for 30 days','No automatic renewal','Checkout is currently unavailable','Every public job stays free.','Your top 3 personalized matches','Your full ranked match feed','Opt-in daily email of new matches'])assert.ok(html.includes(text),text);
  assert.match(html,/href="\/signup\?return=%2Fonboarding"/);
- assert.doesNotMatch(html,/checkout|thousands|AI|as they roll out/);
- assert.doesNotMatch(html,/current feed limit|product limit|Full ranked feed|full personalized feed|100-result|charge you|—/);
+ assert.doesNotMatch(html,/action="\/pro\/checkout"|thousands|AI|as they roll out/);
+ assert.doesNotMatch(html,/current feed limit|product limit|100-result|charge you/);
  assert.match(html,/Try your free matches →/);
- assert.match(html,/Your personalized job feed/);
+ assert.match(html,/Your full ranked match feed/);
  assert.match(proPage({user:{id:'u'},profile:{onboarding_completed:false}}),/href="\/onboarding"/);
  assert.match(proPage({user:{id:'u'},profile:{onboarding_completed:true}}),/href="\/matches"/);
  assert.doesNotMatch(proPage({isPro:true}),/membership is coming soon/);
@@ -48,7 +48,7 @@ test('Pro comparison uses ordered accessible paper cards and preserves free acce
  assert.doesNotMatch(html,/<table|pro-comparison-scroll|Not included/);
  assert.match(html,/role="group" aria-label="Find your fit: Free and VeeAys Pro"/);
  assert.ok(html.indexOf('id="pro-free-title"')<html.indexOf('id="pro-plus-title"'));
- for(const copy of ['You search.','VeeAys searches<br>with you.','Free to use','Everything in Free, plus:','Every public job stays free.','Pro adds matching, alerts and convenience, not access to jobs.'])assert.ok(html.includes(copy),copy);
+ for(const copy of ['You search.','VeeAys searches with you.','Free to use','Everything in Free, plus:','Every public job stays free.','Browsing and applying stay free.'])assert.ok(html.includes(copy),copy);
 });
 test('Match filter claim follows existing Pro-only controls',()=>{
  const free=matchesPage({matches:[{job_id:1,title:'Role',match_score:92}],summary:{is_pro:false}});

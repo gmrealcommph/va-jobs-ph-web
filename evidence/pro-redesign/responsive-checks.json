@@ -1,0 +1,114 @@
+[
+  {
+    "width": 320,
+    "scroll": 320,
+    "forms": 1,
+    "ctas": [
+      {
+        "height": 50,
+        "form": "http://127.0.0.1:4173/pro/checkout",
+        "text": "Get Pro for 30 days — ₱499"
+      },
+      {
+        "height": 69,
+        "form": "http://127.0.0.1:4173/pro/checkout",
+        "text": "Get VeeAys Pro — ₱499 →"
+      },
+      {
+        "height": 69,
+        "form": "http://127.0.0.1:4173/pro/checkout",
+        "text": "Get VeeAys Pro — ₱499 →"
+      }
+    ],
+    "images": [
+      {
+        "ok": true,
+        "src": "http://127.0.0.1:4173/pro-cozy-mobile.webp"
+      }
+    ]
+  },
+  {
+    "width": 390,
+    "scroll": 390,
+    "forms": 1,
+    "ctas": [
+      {
+        "height": 50,
+        "form": "http://127.0.0.1:4173/pro/checkout",
+        "text": "Get Pro for 30 days — ₱499"
+      },
+      {
+        "height": 50,
+        "form": "http://127.0.0.1:4173/pro/checkout",
+        "text": "Get VeeAys Pro — ₱499 →"
+      },
+      {
+        "height": 50,
+        "form": "http://127.0.0.1:4173/pro/checkout",
+        "text": "Get VeeAys Pro — ₱499 →"
+      }
+    ],
+    "images": [
+      {
+        "ok": true,
+        "src": "http://127.0.0.1:4173/pro-cozy-mobile.webp"
+      }
+    ]
+  },
+  {
+    "width": 768,
+    "scroll": 768,
+    "forms": 1,
+    "ctas": [
+      {
+        "height": 54.09375,
+        "form": "http://127.0.0.1:4173/pro/checkout",
+        "text": "Get Pro for 30 days — ₱499"
+      },
+      {
+        "height": 73.59375,
+        "form": "http://127.0.0.1:4173/pro/checkout",
+        "text": "Get VeeAys Pro — ₱499 →"
+      },
+      {
+        "height": 48,
+        "form": "http://127.0.0.1:4173/pro/checkout",
+        "text": "Get VeeAys Pro — ₱499 →"
+      }
+    ],
+    "images": [
+      {
+        "ok": true,
+        "src": "http://127.0.0.1:4173/pro-cozy-hero.webp"
+      }
+    ]
+  },
+  {
+    "width": 1440,
+    "scroll": 1440,
+    "forms": 1,
+    "ctas": [
+      {
+        "height": 54.09375,
+        "form": "http://127.0.0.1:4173/pro/checkout",
+        "text": "Get Pro for 30 days — ₱499"
+      },
+      {
+        "height": 52.796875,
+        "form": "http://127.0.0.1:4173/pro/checkout",
+        "text": "Get VeeAys Pro — ₱499 →"
+      },
+      {
+        "height": 48,
+        "form": "http://127.0.0.1:4173/pro/checkout",
+        "text": "Get VeeAys Pro — ₱499 →"
+      }
+    ],
+    "images": [
+      {
+        "ok": true,
+        "src": "http://127.0.0.1:4173/pro-cozy-hero.webp"
+      }
+    ]
+  }
+]
