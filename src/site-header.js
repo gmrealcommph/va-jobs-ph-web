@@ -13,7 +13,6 @@ export function siteHeader({ discoveryLinks, navLink, isPro, user, firstName, ac
         <div class="member-panel" id="member-panel"><div class="member-panel-heading"><span>Your VeeAys</span><small>${isPro ? 'Pro member' : 'Free member'}</small></div>${accountLinks}</div>
       </details>` : `${navLink('/login', 'Log in', 'auth-link')}${navLink('/signup', 'Sign up', 'post-job-cta')}`}
     </div>
-    ${navLink('/pro', proLabel, 'mobile-pro-link nav-pro')}
     <details class="mobile-menu nav-disclosure">
       <summary aria-controls="mobile-panel"><span class="menu-lines" aria-hidden="true"></span><span>Menu</span></summary>
       <div class="mobile-panel" id="mobile-panel"><nav aria-label="Mobile explore"><p class="nav-section-label">Explore</p>${discoveryLinks}${navLink('/pro', proLabel, 'nav-pro')}</nav>
