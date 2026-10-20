@@ -1,21 +1,21 @@
-/* One forest-green navigation shell on every public and member page. */
+/* Shared cream floating shell; original logo sits directly on the cream. */
 body > .site-header.veeays-navigation {
   background:transparent!important;border:0;padding:12px 20px;position:relative;z-index:30;
 }
 body > .veeays-navigation .header {
   box-sizing:border-box;display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);align-items:center;justify-content:space-between;
   width:100%;max-width:1360px;min-height:76px!important;margin:auto;padding:10px 14px;
-  gap:20px;border:1px solid #a7e3c130;border-radius:999px;background:#0f3d2e;
+  gap:20px;border:1px solid #0f3d2e12;border-radius:999px;background:#f8f6ee;
   box-shadow:0 4px 16px #06291d12;
 }
 body > .veeays-navigation .veeays-brand {
   box-sizing:border-box;max-width:150px!important;height:48px!important;padding:2px 10px!important;
-  background:#fffdf3;border-radius:999px;flex:0 0 auto;
+  background:transparent!important;border-radius:0;flex:0 0 auto;
 }
 body > .veeays-navigation .veeays-logo-img {height:44px!important;max-width:100%;filter:none;mix-blend-mode:normal}
 body > .veeays-navigation .discovery-nav {
   display:flex;gap:3px;justify-content:center;padding:4px;border-radius:999px;
-  background:#092b21;border:1px solid #a7e3c11f;margin-inline:auto;
+  background:#0f3d2e;border:1px solid #a7e3c11f;margin-inline:auto;
 }
 body > .veeays-navigation .discovery-nav a {
   min-height:44px;padding:0 16px;border-radius:999px;color:#fffdf3;font-size:13px;line-height:1.25;
@@ -25,15 +25,15 @@ body > .veeays-navigation .discovery-nav a:hover {background:#204d3d;color:#fffd
 body > .veeays-navigation .discovery-nav a[aria-current=page] {background:#c9efdc;color:#0f3d2e}
 body > .veeays-navigation nav a[aria-current=page]::after {display:none}
 body > .veeays-navigation .header-actions {justify-self:end;display:flex;gap:8px;margin:0;flex:0 0 auto}
-body > .veeays-navigation .header-actions > a {display:flex;align-items:center;justify-content:center;box-sizing:border-box;min-height:44px;padding:0 22px;border-radius:999px;text-decoration:none;font-size:13px;font-weight:700;color:#fffdf3;background:#204d3d;border:1px solid #a7e3c12e}
-body > .veeays-navigation .header-actions > a[href='/signup'] {background:#e4f9ec;color:#0f3d2e;border-color:#e4f9ec}
+body > .veeays-navigation .header-actions > a {display:flex;align-items:center;justify-content:center;box-sizing:border-box;min-height:44px;padding:0 22px;border-radius:999px;text-decoration:none;font-size:13px;font-weight:700;color:#fffdf3;background:#0f3d2e;border:1px solid #a7e3c12e}
+body > .veeays-navigation .header-actions > a[href='/signup'] {background:#a7e3c1;color:#0f3d2e;border-color:#a7e3c1}
 body > .veeays-navigation .header-actions > a[aria-current=page] {outline:2px solid #c9efdc;outline-offset:2px}
 body > .veeays-navigation .workspace-nav {display:flex;padding-left:0;border:0;gap:12px}
-body > .veeays-navigation .workspace-nav a {color:#fffdf3;font-size:12px}
-body > .veeays-navigation .workspace-nav a[aria-current=page] {color:#c9efdc;text-decoration:underline;text-underline-offset:6px}
+body > .veeays-navigation .workspace-nav a {color:#0f3d2e;font-size:12px}
+body > .veeays-navigation .workspace-nav a[aria-current=page] {color:#0f3d2e;text-decoration:underline;text-underline-offset:6px}
 body > .veeays-navigation .member-menu summary {background:#e4f9ec;border-color:#e4f9ec;color:#0f3d2e;min-height:44px}
 body > .veeays-navigation .member-name {max-width:84px}
-body > .veeays-navigation :is(a,summary):focus-visible {outline:3px solid #a7e3c1;outline-offset:3px}
+body > .veeays-navigation :is(a,summary):focus-visible {outline:3px solid #267653;outline-offset:3px}
 body > .veeays-navigation :is(.member-panel,.mobile-panel) a {color:#0f3d2e}
 body > .veeays-navigation :is(.member-panel,.mobile-panel) a:hover {color:#0f3d2e;background:#e4f9ec}
 body > .veeays-navigation :is(.member-panel,.mobile-panel) :is(a,summary):focus-visible {outline-color:#0f3d2e}
@@ -65,3 +65,21 @@ body > .veeays-navigation .mobile-pro-link,body > .veeays-navigation .mobile-men
 }
 
 body > .veeays-navigation .nav-pro {font-family:inherit;font-style:normal;font-weight:600}
+
+/* Float over existing illustrated heroes while reserving space for content. */
+body:has(:is(.green-room-hero,.pro-premium-hero)) > .site-header.veeays-navigation {
+  position:absolute;inset:0 0 auto;background:transparent!important;
+}
+body:has(.green-room-hero) .green-room-hero {padding-top:100px}
+body:has(.pro-premium-hero) .pro-premium-hero {padding-top:100px}
+@media(min-width:1101px) {
+  body:has(.green-room-hero) .green-room-hero {background-position:center top!important}
+  body:has(.green-room-hero) .green-room-grid {min-height:calc(var(--room-height) - 100px)}
+}
+@media(max-width:1150px) {
+  body:has(.green-room-hero) .green-room-hero,
+  body:has(.pro-premium-hero) .pro-premium-hero {padding-top:84px}
+}
+body:has(.green-room-hero) .veeays-navigation :is(a,summary):focus-visible {outline-color:#267653}
+body > .veeays-navigation .discovery-nav a:focus-visible {outline-color:#a7e3c1}
+body:has(.green-room-hero) > .veeays-navigation .discovery-nav a:focus-visible {outline-color:#a7e3c1}

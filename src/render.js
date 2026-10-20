@@ -71,7 +71,7 @@ export function layout({ title, description, canonical, body, noindex = false, u
   >
 
   <link rel="stylesheet" href="/styles.css?v=20261020-manrope">
-<link rel="stylesheet" href="/navigation.css?v=20261020-forest">
+<link rel="stylesheet" href="/navigation.css?v=20261020-cream">
 <link rel="stylesheet" href="/traffic.css?v=20261012-dismiss">
 <script src="/traffic.js?v=20261012-dismiss" type="module"></script>
 </head>
@@ -83,7 +83,7 @@ export function layout({ title, description, canonical, body, noindex = false, u
 </a>
 
 ${siteHeader({ discoveryLinks, navLink, isPro, user, firstName, accountLinks, esc })}
-<script src="/navigation.js?v=20261020-forest" defer></script>
+<script src="/navigation.js?v=20261020-cream" defer></script>
 
 
 
