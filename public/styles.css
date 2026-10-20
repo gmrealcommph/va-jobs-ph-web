@@ -6597,3 +6597,25 @@ body:has(.green-room-hero) .veeays-logo-img{filter:none!important}
  body:has(.green-room-hero) .veeays-logo-img{height:34px}
  body:has(.green-room-hero) .mobile-menu summary{min-height:40px;padding-inline:13px;gap:8px;font-size:12px}
 }
+
+/* Homepage live strip: preserve shared flip mechanics. */
+.home-counter-strip{background:#f0f3e5;border-bottom:1px solid #dce3d2;color:#123e30}
+.home-counter-inner{display:flex;align-items:center;justify-content:center;gap:28px;padding-block:20px}
+.home-counter-strip .home-strip-count{display:flex;gap:16px;max-width:100%}
+.home-strip-count .home-counter-icon{display:grid;place-items:center;flex:0 0 42px;width:42px;height:42px;border-radius:50%;background:#c5e9d5;color:#123e30}
+.home-counter-icon svg{width:23px;height:23px}
+.home-strip-count strong{background:#fff;color:#111;font:800 36px/48px Manrope,system-ui,sans-serif;padding:0 10px}
+.home-strip-count strong.is-flip-count{gap:6px;flex-wrap:wrap}
+.home-strip-count .count-digit{flex-basis:35px;width:35px;height:48px;color:#111;box-shadow:0 2px 4px #123e3015}
+.home-strip-count .count-numeral{height:48px;color:#111;font:800 36px/48px Manrope,system-ui,sans-serif}
+.home-strip-count .count-top{background:#fff;border-bottom:1px solid #c3c8bf}
+.home-strip-count .count-bottom{background:#fff;border-top:1px solid #e0e3dc}
+.home-strip-count .count-hinge{background:#a1aaa0}
+.home-counter-copy{border-left:1px solid #b8c6b3;padding-left:28px;min-width:0}
+.home-counter-copy p{margin:0 0 4px;font:800 clamp(14px,1.6vw,20px)/1.4 Manrope,system-ui,sans-serif;letter-spacing:.015em}
+.home-counter-copy p span{color:#358c35}
+.home-counter-copy a{display:inline-block;color:#315740;font-size:14px;line-height:1.5;text-underline-offset:4px}
+.home-counter-copy a:hover{text-decoration:underline}
+.home-counter-copy a:focus-visible{outline:2px solid #123e30;outline-offset:4px}
+@media(max-width:600px){.home-counter-inner{gap:13px;padding-block:15px;flex-wrap:wrap}.home-counter-strip .home-strip-count{gap:12px}.home-counter-copy{padding-left:16px}.home-counter-copy p{font-size:13px;max-width:190px}.home-counter-copy a{font-size:12px}.home-strip-count .count-digit{flex-basis:29px;width:29px;height:42px}.home-strip-count .count-numeral{height:42px;font-size:30px;line-height:42px}.home-strip-count .home-counter-icon{flex-basis:34px;width:34px;height:34px}}
+@media(max-width:450px){.home-counter-inner{flex-direction:column;gap:11px}.home-counter-copy{border-left:0;padding-left:0;text-align:center}.home-counter-copy p{max-width:none;font-size:13px}}
