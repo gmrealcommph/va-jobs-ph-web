@@ -1,0 +1,124 @@
+[
+  {
+    "buttons": [
+      {
+        "action": "/pro/checkout",
+        "height": 50
+      },
+      {
+        "action": "/pro/checkout",
+        "height": 69
+      },
+      {
+        "action": "/pro/checkout",
+        "height": 69
+      }
+    ],
+    "overflow": [],
+    "scroll": 305,
+    "width": 320
+  },
+  {
+    "buttons": [
+      {
+        "action": "/pro/checkout",
+        "height": 50
+      },
+      {
+        "action": "/pro/checkout",
+        "height": 50
+      },
+      {
+        "action": "/pro/checkout",
+        "height": 50
+      }
+    ],
+    "overflow": [],
+    "scroll": 360,
+    "width": 375
+  },
+  {
+    "buttons": [
+      {
+        "action": "/pro/checkout",
+        "height": 50
+      },
+      {
+        "action": "/pro/checkout",
+        "height": 50
+      },
+      {
+        "action": "/pro/checkout",
+        "height": 50
+      }
+    ],
+    "overflow": [],
+    "scroll": 375,
+    "width": 390
+  },
+  {
+    "buttons": [
+      {
+        "action": "/pro/checkout",
+        "height": 50
+      },
+      {
+        "action": "/pro/checkout",
+        "height": 50
+      },
+      {
+        "action": "/pro/checkout",
+        "height": 50
+      }
+    ],
+    "overflow": [],
+    "scroll": 415,
+    "width": 430
+  },
+  {
+    "buttons": [
+      {
+        "action": "/pro/checkout",
+        "height": 54.09375
+      },
+      {
+        "action": "/pro/checkout",
+        "height": 52.796875
+      },
+      {
+        "action": "/pro/checkout",
+        "height": 48
+      }
+    ],
+    "overflow": [
+      "wrap pro-premium-grid",
+      "pro-premium-scene",
+      "pro-benefit-visual"
+    ],
+    "scroll": 753,
+    "width": 768
+  },
+  {
+    "buttons": [
+      {
+        "action": "/pro/checkout",
+        "height": 54.09375
+      },
+      {
+        "action": "/pro/checkout",
+        "height": 52.796875
+      },
+      {
+        "action": "/pro/checkout",
+        "height": 48
+      }
+    ],
+    "overflow": [
+      "wrap pro-premium-grid",
+      "pro-premium-scene",
+      "pro-benefit-visual"
+    ],
+    "scroll": 1425,
+    "width": 1440
+  }
+]

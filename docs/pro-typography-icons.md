@@ -11,3 +11,9 @@ Validation: 40 focused tests passed (pro-premium, pro-checkout, pro-live, pro-di
 Changes are limited to Pro rendering, Pro CSS, the font, and review evidence. No auth/CAPTCHA, logo assets, payment code, database, worker, schedule or configuration changes. Smart Alerts remains untouched/paused; no production mutation, merge or deployment.
 
 Font source: https://github.com/google/fonts/blob/main/ofl/manrope/Manrope%5Bwght%5D.ttf ; existing public/fonts/Manrope-OFL.txt applies.
+
+## Mobile alignment follow-up
+
+Mobile-only CSS straightens both match previews, uses stable icon/title/score columns, gives hero perks equal columns and purchase controls the content width, regularizes filter chips into two columns, stacks the saved-search illustration above its example panel, aligns the digest link with its text, and moves the floating plan note into normal flow. Plan prices and closing controls share consistent edges. Additional compact preview spacing applies below 360px. Desktop composition stays unchanged.
+
+Rechecked at 320/375/390/430: no internally overflowing Pro elements or horizontal page overflow. At 768/1440 no page overflow; existing desktop rotated artwork retains intentional local visual overflow. Checkout associations remain /pro/checkout with controls >=48px. All 40 focused tests and dry-run build pass again. Updated mobile screenshot and mobile-benefits detail included. No merge or deployment.
