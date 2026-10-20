@@ -665,6 +665,8 @@ if (
       const response = render('VeeAys Pro', proPage({ isPro, user: authState.user, profile: currentProfile, testCheckout, liveCheckout }), { noindex: false });
       // The form's 303 redirect must be allowed by the originating page's CSP.
       if (testCheckout || liveCheckout) response.headers.set('content-security-policy', headers['content-security-policy'].replace("form-action 'self'", "form-action 'self' https://checkout.paymongo.com"));
+      // Pro's locally hosted Manrope weights are blocked by default-src 'none'.
+      response.headers.set('content-security-policy', response.headers.get('content-security-policy') + "; font-src 'self'");
       return response;
     }
 
