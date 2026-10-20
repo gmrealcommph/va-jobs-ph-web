@@ -6585,3 +6585,9 @@ body:has(.green-room-hero) .veeays-logo-img{filter:none!important}
  .green-room-explore{grid-row:6;margin-top:8px;font-size:12px;justify-self:start}
  body:has(.green-room-hero) .veeays-navigation :is(a,summary):focus-visible{outline-color:#a7e3c1}
 }
+
+/* Original text-free mobile illustration; desktop keeps its approved artwork. */
+@media(max-width:850px){
+ .green-room-scene{aspect-ratio:1;background-image:url('/images/veeays-mobile-cozy-office.webp');background-size:contain}
+ .green-room-scene::before{inset:0;height:100%;background:linear-gradient(#0f3d2e,transparent 12%,transparent 86%,#0f3d2e)}
+}

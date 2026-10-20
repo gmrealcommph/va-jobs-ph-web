@@ -1,0 +1,7 @@
+# Mobile hero illustration
+
+`public/images/veeays-mobile-cozy-office.webp` is an original image generated with OpenAI's built-in image generation tool on 2026-10-20 for VeeAys. No stock artwork or third-party reference image was used. The preceding ChatGPT mockup was inaccessible (content-reference placeholders only); this asset follows the user's explicit written art direction. It contains no baked-in text or interface. AI output is not guaranteed unique or copyrightable.
+
+Prompt: Warm polished high-end 3D editorial cozy home-office close-up. Glasses-wearing Filipina woman seated comfortably on a cream textured sofa with an open laptop on her lap, next to a prominently visible fluffy pure-black Shih Tzu. Both woman and dog entirely within frame with breathing room; no cropped heads, bodies or paws. Green plants, tactile cream knit cushions and sofa textures, warm glowing floor lamplight, dark forest-green room backdrop (#0f3d2e). Intimate inviting premium art direction, rounded believable 3D forms and refined soft material detail. Square composition. Top and bottom edges fade naturally to dark forest green for web integration. No text, letters, logo, UI, search bar, buttons, role chips or watermark. Original illustration for a commercial website.
+
+The generated image was resized to 960 × 960 and encoded as WebP quality 82 (119,092 bytes). Mobile-only CSS uses contain sizing and a soft edge gradient, preserving the complete composition. Desktop does not request this image through these rules.
