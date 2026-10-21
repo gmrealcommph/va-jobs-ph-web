@@ -261,3 +261,27 @@ html{scroll-behavior:smooth;scrollbar-width:thin;scrollbar-color:var(--line) tra
 /* Edge-to-edge, enlarged geography with recognizable coastlines and borders. */
 .reference-board .traffic-mix-tile:before{inset:0;background-size:160% auto;background-position:54% 43%;opacity:.28;border-radius:inherit}
 :root[data-theme=dark] .reference-board .traffic-mix-tile:before{opacity:.22}
+/* Compact Traffic Galaxy: stays inside the existing 210px insight tile. */
+.reference-board .traffic-mix-tile:before{display:none}
+.reference-board .traffic-mix-tile{overflow:hidden}
+.reference-board .traffic-mix-tile>h3{margin-bottom:0!important;height:24px;min-height:24px}
+.tg-period{font-size:9px;color:var(--muted);line-height:15px}
+.tg-space{position:relative;flex:1;min-height:88px;max-height:112px;width:100%;background:radial-gradient(ellipse at center,#22b07d13,transparent 68%)}
+.tg-orbits{position:absolute;inset:0;width:100%;height:100%;fill:none;stroke:#22b07d38;stroke-width:.7;pointer-events:none}
+.tg-orbits path{stroke-dasharray:2 4;stroke:#a7e3c126}
+.tg-core{position:absolute;left:50%;top:46%;transform:translate(-50%,-50%);width:82px;height:82px;display:flex;flex-direction:column;align-items:center;justify-content:center;border-radius:50%;border:1px solid #22b07d90;background:radial-gradient(circle at 35% 25%,#235d47,#0c2d24 80%);color:#f8f6ee;box-shadow:0 0 20px #22b07d30,inset 0 0 15px #22b07d20;animation:tg-breathe 7s ease-in-out infinite}
+.tg-core strong{font-size:clamp(17px,1.5vw,23px);font-weight:650;line-height:1.2;max-width:76px;overflow-wrap:anywhere;font-variant-numeric:tabular-nums}
+.tg-core span{font-size:8px;color:#a7e3c1;margin-top:4px}
+.tg-node{position:absolute;left:var(--x);top:var(--y);transform:translate(-50%,-50%);width:var(--size);height:var(--size);min-width:30px;min-height:30px;padding:0;border-radius:50%;background:color-mix(in srgb,var(--source) 14%,#102b25);border:1px solid color-mix(in srgb,var(--source) 65%,transparent);color:var(--source);box-shadow:0 0 12px color-mix(in srgb,var(--source) 14%,transparent);font-size:16px;transition:box-shadow .2s,background .2s;touch-action:manipulation}
+.tg-node:hover,.tg-node:focus-visible{background:color-mix(in srgb,var(--source) 28%,#102b25);box-shadow:0 0 16px color-mix(in srgb,var(--source) 35%,transparent);outline:2px solid var(--source);outline-offset:2px}
+.tg-detail{min-height:27px;font-size:10px;line-height:13px;color:var(--text);padding-top:5px;overflow-wrap:anywhere}
+.tg-bottom{display:flex;justify-content:space-between;gap:5px;flex-wrap:wrap;font-size:8px;line-height:12px;color:var(--muted)}
+.tg-bottom a,.tg-link{color:#22b07d;text-decoration:none}.tg-unavailable{flex:1;display:grid;place-items:center;font-size:12px;color:var(--muted)}.tg-link{font-size:10px}
+.tg-breakdown{display:flex;flex-wrap:wrap;gap:12px 22px;margin:18px 0;font-size:12px}.tg-breakdown span{display:flex;align-items:center;gap:7px}.tg-breakdown i{width:9px;height:9px;border-radius:50%;background:var(--source)}.tg-breakdown b{font-weight:600}.tg-daily-chart{width:100%;height:auto;display:block;color:var(--muted)}.tg-daily-chart text{font-size:10px;fill:currentColor}
+@keyframes tg-breathe{50%{box-shadow:0 0 27px #22b07d50,inset 0 0 15px #22b07d20}}
+@media(max-width:700px){.reference-board .traffic-mix-tile{height:210px;min-height:210px!important}.tg-space{max-height:112px}.tg-core strong{font-size:22px}.tg-node{min-width:34px;min-height:34px}}
+@media(prefers-reduced-motion:reduce){.tg-core{animation:none}.tg-node{transition:none}}
+.tg-source-0{--source:#FFC83D;--x:22%;--y:18%}.tg-source-1{--source:#22B07D;--x:80%;--y:20%}.tg-source-2{--source:#B69CFF;--x:12%;--y:69%}.tg-source-3{--source:#69AAFF;--x:88%;--y:70%}.tg-source-4{--source:#FF8A5B;--x:58%;--y:88%}.tg-size-0{--size:30px}.tg-size-1{--size:35px}.tg-size-2{--size:40px}.tg-core{width:64px;height:64px;top:40%}.tg-core strong{max-width:60px;font-size:19px}.tg-core span{font-size:7px}.tg-detail{color:var(--ink)}
+@media(max-width:700px){.reference-board .overview-insights{grid-template-columns:minmax(0,1fr)}.reference-board .traffic-mix-tile{height:210px}.tg-detail{font-size:11px}.tg-bottom{font-size:9px}.tg-period{font-size:10px}}
+@media(max-width:700px){:root:not([data-display-mode=on]) .reference-board .overview-insights>.traffic-mix-tile:nth-child(2){grid-column:1/-1;grid-row:auto}}
+.tg-core{top:35%}

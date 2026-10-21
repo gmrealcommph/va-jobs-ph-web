@@ -1,3 +1,4 @@
+import {renderDailyTraffic} from './admin-traffic-galaxy.js';
 const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const n=v=>Number(v).toLocaleString('en-PH');
 const ratio=(value,total)=>total>0?(100*value/total).toFixed(1)+'%':'—';
@@ -26,6 +27,13 @@ export function renderTraffic(d){
  html+='<section class="tf-panel">'+head('Top landing pages','The public pages visitors arrive on','VISIT ENTRIES');
  html+=a?.available&&a.landings.some(x=>x.visits>0)?landings(a.landings,'visits'):empty('No landing pages to show',a?.available?'No public landing visits were recorded in this period.':'Landing-page data unavailable.');
  html+=foot('Public paths only. Private pages and query strings are excluded.')+'</section></div>';
+ // Daily channel counts use the consented-session dataset, not Cloudflare visits.
+ if(t?.available){
+  html+='<section class="tf-panel tf-daily">'+head('Daily sessions by source','Consented sessions · Asia/Manila · today is partial','SUPABASE');
+  html+=renderDailyTraffic(d);
+  html+=foot('¹ Google organic combines tagged organic Google visits and Google referrer-inferred visits. ² Other includes LinkedIn, paid campaigns, and other campaigns. Today is partial until midnight PH. These session counts are not Cloudflare visit totals and do not represent unique visitors.');
+  html+='</section>';
+ }
  // Campaign reporting is temporarily omitted while attribution is being tested. Collection is unchanged.
  if(t?.available&&t.historical_unavailable)html+='<p class="tf-history">This period includes dates before collection; historical UTM attribution and linked conversions are unavailable.</p>';
  html+='<details class="tf-details tf-method"><summary><span>'+icon('info')+' How these numbers are measured</span><span class="tf-hint">Coverage &amp; definitions</span></summary><div class="tf-definition-grid"><div><h4>Traffic coverage</h4><p>Cloudflare visits and consented sessions are separate measures and are never added together. Google organic is inferred from the referrer; untagged paid traffic cannot be separated. Consent, blockers, stripped referrers, bots and provider sampling affect coverage. Neither measure represents unique people.</p></div><div><h4>Linked conversions</h4><p>A registration is a new account created during its first-touch, fixed 30-minute visit, counted once per account. A Pro buyer has a confirmed live purchase after that registration, counted once within 90 days of the visit and as of this refresh. Renewals, grants and test payments do not add conversions.</p></div><div><h4>Attribution limits</h4><p>Later purchases can change earlier cohorts. Cross-device journeys and registrations outside 30 minutes are unlinked. No Meta view-through attribution is claimed. Analytics records expire after 90 days through daily cleanup; historical attribution is never invented.</p></div></div></details>';
