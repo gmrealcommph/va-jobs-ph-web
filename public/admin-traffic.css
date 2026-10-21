@@ -24,3 +24,7 @@
 @media(min-width:701px) and (max-width:1000px){#marketing-detail .tf-metric-icon{display:none}#marketing-detail .tf-metric{padding:10px}#marketing-detail .tf-metric>div{column-gap:8px}#marketing-detail .tf-metric strong{font-size:25px}#marketing-detail .tf-metric-label{font-size:12px}}
 @media(max-width:700px){#marketing-detail{padding:14px}#marketing-detail .traffic-heading{flex-direction:row;align-items:center}#marketing-detail .traffic-heading h3{font-size:17px}#marketing-detail .traffic-heading p{font-size:11px;line-height:1.5}#marketing-detail .traffic-badge{display:none}#marketing-detail .traffic-summary{grid-template-columns:1fr;gap:7px}#marketing-detail .tf-metric{min-height:60px;padding:10px 12px}#marketing-detail .tf-metric strong{font-size:26px}#marketing-detail .tf-metric-label{font-size:12px}#marketing-detail .tf-metric-note{font-size:10px}#marketing-detail .tf-grid{grid-template-columns:1fr;gap:10px}#marketing-detail .tf-panel{padding:12px}#marketing-detail .tf-panel-head{flex-wrap:nowrap}#marketing-detail .tf-definition-grid{grid-template-columns:1fr}#marketing-detail .tf-details summary{min-height:40px}}
 #marketing-detail .tf-history{font-size:11px;line-height:1.5;color:var(--muted);margin:10px 0 2px}
+/* Analytics charts must not inherit the panel's small decorative icon size. */
+#marketing-detail .tf-daily svg.tg-daily-chart{display:block;width:100%;height:auto;margin:16px 0;min-width:0}
+@media(max-width:700px){#marketing-detail .tf-daily svg.tg-daily-chart text{font-size:21px}}
+
