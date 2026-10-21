@@ -1,7 +1,7 @@
 const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const num=v=>v.toLocaleString('en-PH');
 export const channels=[
- {key:'google_organic',name:'Google Search',mark:'G',color:'#FFC83D'},
+ {key:'google_organic',name:'Google Search',mark:'G',color:'#EF4444'},
  {key:'direct_unknown',name:'Direct / Unknown',mark:'↗',color:'#22B07D'},
  {key:'referrals',name:'Referrals',mark:'↗↗',color:'#B69CFF'},
  {key:'facebook',name:'Facebook',mark:'f',color:'#69AAFF'},
