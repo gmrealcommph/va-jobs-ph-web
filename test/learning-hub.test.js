@@ -60,5 +60,3 @@ test('page sitemap includes every published guide',async()=>{
   assert.equal(r.status,200);const xml=await r.text();
   for(const path of resourcePaths)assert.ok(xml.includes(`<loc>${env.SITE_URL+path}</loc>`));
 });
-
-
