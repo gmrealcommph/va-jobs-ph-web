@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import {styles,renderResume} from '../public/resume-layouts.js';
 import {studioBody} from '../src/resume-studio.js';
+import {layout} from '../src/render.js';
 class Element {
  constructor(tag){this.tagName=tag;this.children=[];this.dataset={};this.ownerDocument={createElement:tag=>new Element(tag)};this.textContent='';}
  append(el){this.children.push(el);}
@@ -45,7 +46,7 @@ test('desktop scrolling, mobile mode and print overrides have explicit contracts
  assert.ok(css.includes('.studio-grid .studio-preview{display:block!important}'));
  assert.ok(css.includes('@page{size:A4;margin:18mm}'));
  assert.ok(css.includes('orphans:3;widows:3'));
- assert.ok(html.includes('src="/veeays-logo.png"'));
+ assert.ok(layout({title:'Résumé Studio',body:html}).includes('src="/veeays-logo.png"'));
  assert.ok(html.includes('Better Jobs. From Home.'));
  assert.ok(html.includes('tabindex="0" aria-label="Scrollable résumé pages"'));
  assert.ok(!html.match(/<article id="resume-preview"[^>]*>[^<]+/));
