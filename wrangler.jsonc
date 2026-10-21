@@ -33,7 +33,9 @@
     "STRONG_MATCH_MODE": "enabled",
     "STRONG_MATCH_START_AT": "2026-10-03T04:15:00Z",
     "SUPABASE_PUBLISHABLE_KEY": "sb_publishable_ZRWxrn1CiYzfRSsJgFGUNg_m5iFhPi_",
-    "SUPABASE_URL": "https://nwqmhqiymtqkdihjadrp.supabase.co"
+    "SUPABASE_URL": "https://nwqmhqiymtqkdihjadrp.supabase.co",
+    "RESUME_STUDIO_ENABLED": "true",
+    "RESUME_AI_ENABLED": "false"
   },
   "compatibility_flags": []
 }
