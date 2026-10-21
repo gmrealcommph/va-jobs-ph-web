@@ -32,4 +32,3 @@ test('account actions preserve signed-out, Free, active Pro and expired Pro beha
     assert.match(html,/aria-controls="member-panel"/);assert.match(html,/aria-controls="mobile-panel"/);
   }
 });
-
