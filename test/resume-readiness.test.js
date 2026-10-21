@@ -4,6 +4,9 @@ import {readiness} from '../public/resume-tools.js';
 import {wordBlob} from '../public/resume-word.js';
 import {styles} from '../public/resume-layouts.js';
 import {inflateRawSync} from 'node:zlib';
+import {readFileSync} from 'node:fs';
+import {parse} from 'acorn';
+test('browser controller parses as a module',()=>{assert.doesNotThrow(()=>parse(readFileSync('public/resume-studio.js','utf8'),{ecmaVersion:'latest',sourceType:'module'}));});
 function unzip(bytes){const b=Buffer.from(bytes),files={};let i=0;while(i<b.length-4){if(b.readUInt32LE(i)!==0x04034b50){i++;continue;}const method=b.readUInt16LE(i+8),size=b.readUInt32LE(i+18),nameSize=b.readUInt16LE(i+26),extra=b.readUInt16LE(i+28),name=b.subarray(i+30,i+30+nameSize).toString(),start=i+30+nameSize+extra;files[name]=(method===8?inflateRawSync(b.subarray(start,start+size)):b.subarray(start,start+size)).toString();i=start+size;}return files;}
 test('local readiness flags common errors without changing facts or scoring',()=>{
  const d={name:'Alex',contact:'alex@invalid',experience:'Support 2025–2022\nResponsible for emails',education:'Jan 2023 to 02/2024'};const original=structuredClone(d),items=readiness(d);

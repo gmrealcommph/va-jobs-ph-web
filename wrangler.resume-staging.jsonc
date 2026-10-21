@@ -1,0 +1,19 @@
+{
+  "name":"veeays-resume-studio-preview",
+  "main":"src/worker.js",
+  "compatibility_date":"2026-10-01",
+  "workers_dev":true,
+  "assets":{"directory":"./public","binding":"ASSETS"},
+  "vars":{
+    "SITE_URL":"https://veeays.com",
+    "RESUME_STUDIO_ENABLED":"true",
+    "RESUME_AI_ENABLED":"false",
+    "PAYMONGO_LIVE_CHECKOUT_ENABLED":"false",
+    "JOB_ALERTS_MODE":"disabled",
+    "DAILY_DIGEST_MODE":"disabled",
+    "STRONG_MATCH_MODE":"disabled",
+    "QUICK_READ_AUTO_ENABLED":"false",
+    "QUICK_READ_BATCH_ENABLED":"false",
+    "JOB_HEALTH_VERIFY_ENABLED":"false"
+  }
+}
