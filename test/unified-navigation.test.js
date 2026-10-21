@@ -32,3 +32,11 @@ test('account actions preserve signed-out, Free, active Pro and expired Pro beha
     assert.match(html,/aria-controls="member-panel"/);assert.match(html,/aria-controls="mobile-panel"/);
   }
 });
+
+test('dropdown parents track all child routes and have unique desktop/mobile controls',()=>{
+ for(const [route,label] of [['/','Find Jobs'],['/jobs/123','Find Jobs'],['/categories/Marketing','Find Jobs'],['/resume-studio','Career Tools']]){
+  const html=render(route);const summaries=[...html.matchAll(/<summary[^>]*class="nav-label is-active"[^>]*><span>(.*?)<\/span>/g)].map(m=>m[1]);assert.deepEqual(summaries,[label,label]);
+  const ids=[...html.matchAll(/id="((?:find-jobs|career-tools)-[^"]+)"/g)].map(m=>m[1]);assert.equal(new Set(ids).size,4);
+ }
+ for(const route of ['/resources','/resources/remote-job-applications'])assert.match(render(route),/href="\/resources" aria-current="page"/);
+});
