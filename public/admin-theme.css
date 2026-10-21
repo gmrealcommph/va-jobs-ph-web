@@ -285,3 +285,12 @@ html{scroll-behavior:smooth;scrollbar-width:thin;scrollbar-color:var(--line) tra
 @media(max-width:700px){.reference-board .overview-insights{grid-template-columns:minmax(0,1fr)}.reference-board .traffic-mix-tile{height:210px}.tg-detail{font-size:11px}.tg-bottom{font-size:9px}.tg-period{font-size:10px}}
 @media(max-width:700px){:root:not([data-display-mode=on]) .reference-board .overview-insights>.traffic-mix-tile:nth-child(2){grid-column:1/-1;grid-row:auto}}
 .tg-core{top:35%}
+/* Ambient motion uses opacity and shadow only; interactive targets stay still. */
+.tg-orbits ellipse{stroke-dasharray:4 7;animation:tg-orbit-shimmer 20s linear infinite}
+.tg-orbits ellipse:nth-child(2){animation-direction:reverse;animation-duration:27s}
+.tg-node{animation:tg-source-pulse 8s ease-in-out infinite}
+.tg-node.tg-source-1{animation-delay:-1.6s}.tg-node.tg-source-2{animation-delay:-3.2s}.tg-node.tg-source-3{animation-delay:-4.8s}.tg-node.tg-source-4{animation-delay:-6.4s}
+.tg-node:is(:hover,:focus-visible){animation-play-state:paused}
+@keyframes tg-orbit-shimmer{to{stroke-dashoffset:110}}
+@keyframes tg-source-pulse{50%{box-shadow:0 0 17px color-mix(in srgb,var(--source) 30%,transparent)}}
+@media(prefers-reduced-motion:reduce){.tg-orbits ellipse,.tg-node{animation:none}}
