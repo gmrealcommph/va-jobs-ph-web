@@ -37,6 +37,10 @@ export function validateDraft(data){
   if(data?.version!==1||!data.sections||typeof data.sections!=='object'||Array.isArray(data.sections))throw Error('This is not a supported résumé draft.');
   const result={};for(const [key,value] of Object.entries(data.sections)){if(!keys.includes(key)||typeof value!=='string'||value.length>(key==='name'?120:2500))throw Error('Invalid draft section.');result[key]=value;}return result;
 }
+export function validateDraftExtras(data){
+ if(data.source!==undefined&&(typeof data.source!=='string'||data.source.length>6000)||data.improve!==undefined&&typeof data.improve!=='boolean')throw Error('Invalid draft source.');
+ return {source:data.source||'',improve:data.improve===true};
+}
 export function parseResume(text){
   if(typeof text!=='string'||!text.trim()||text.length>6000||/[\x00-\x08\x0b\x0c\x0e-\x1f]/.test(text))throw Error('Paste plain résumé text under 6,000 characters.');
   const headings={'summary':'summary','professional summary':'summary','profile':'summary','experience':'experience','work experience':'experience','employment history':'experience','education':'education','education and training':'education','skills':'skills','projects':'projects','projects and other experience':'projects','contact':'contact','contact details':'contact'};

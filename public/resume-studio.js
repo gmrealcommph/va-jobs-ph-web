@@ -1,9 +1,10 @@
+import {encodeRecovery,decodeRecovery,RECOVERY_KEY} from './resume-recovery.js';
 import {compose,showPages,pdfBytes} from './resume-export.js';
 import {readPhoto,cropPhoto,validateDesignDraft} from './resume-photo.js';
 import {styles,renderResume} from './resume-layouts.js';
-import {parseResume,validateDraft,checklist,readiness} from './resume-tools.js';
+import {parseResume,validateDraft,validateDraftExtras,checklist,readiness} from './resume-tools.js';
 const $=s=>document.querySelector(s),form=$('#resume-form'),status=$('#studio-status');
-let reviewing=false,version=0,reviewController,importRevision=0;
+let reviewing=false,version=0,reviewController,importRevision=0,pageClosing=false;
 const values=()=>Object.fromEntries(new FormData(form));
 function notice(text){status.textContent=text;}
 let selectedStyle='classic',photo=null,photoRevision=0,renderRevision=0,latestPlan=null;
@@ -18,6 +19,7 @@ function render(){
  version++;const d=values();paginate(d);
  for(const el of document.querySelectorAll('.section-control'))el.querySelector('.section-state').textContent=d[el.dataset.field].trim()?'Added':'Optional';
  document.querySelector('[data-field="name"] .section-state').textContent=d.name.trim()?'Added':'Required for export';
+ const issues=readiness(d);$('#readiness-summary').textContent=Object.values(d).some(x=>x.trim())?(issues.length?issues.length+' things to review. Your draft is yours to refine.':'No common issues found. Proofread every page before sharing.'):'Start with your details. We’ll help you spot common omissions.';
  $('#resume-progress').textContent=Object.values(d).filter(x=>x.trim()).length+' of 8 sections filled · Only your name is required';
 }
 const sample={name:'Alex Morgan',headline:'Customer Success Specialist',contact:'alex@example.com · Manila',summary:'Thoughtful service. Clear communication.',experience:'Customer Support · 2023–present\nResolved requests and maintained helpful documentation.',education:'Business Administration',skills:'Customer care · CRM · Writing',projects:'Created a support resource library.'};
@@ -35,16 +37,16 @@ function workspaceView(view){$('.studio-grid').dataset.view=view;$('#view-edit')
 $('#view-edit').onclick=()=>workspaceView('edit');$('#view-preview').onclick=()=>workspaceView('preview');
 function setDraft(d){for(const input of form.elements)if(input.name)input.value=d[input.name]||'';render();$('#suggestions').replaceChildren();}
 function mode(improve){$('#build-panel').hidden=improve;$('#improve-panel').hidden=!improve;$('#build-mode').setAttribute('aria-pressed',String(!improve));$('#improve-mode').setAttribute('aria-pressed',String(improve));}
-$('#build-mode').onclick=()=>mode(false);$('#improve-mode').onclick=()=>mode(true);form.addEventListener('input',()=>{importRevision++;$('#suggestions').replaceChildren();render();});
-$('#resume-source').addEventListener('input',()=>{version++;});
-$('#parse').onclick=()=>{if(Object.values(values()).some(x=>x.trim())&&!window.confirm('Replace this draft with the pasted text? Duplicate or download this draft first to keep it.'))return;try{setDraft(parseResume($('#resume-source').value));mode(false);notice('Text copied into editable sections. Check every section before export.');}catch(e){notice(e.message);}};
+$('#build-mode').onclick=()=>{mode(false);setStep('personal',true);};$('#improve-mode').onclick=()=>{setStep('personal',false);mode(true);workspaceView('edit');$('#resume-source').focus();};form.addEventListener('input',()=>{importRevision++;$('#suggestions').replaceChildren();render();});
+$('#resume-source').addEventListener('input',()=>{version++;importRevision++;});
+$('#parse').onclick=()=>{if(Object.values(values()).some(x=>x.trim())&&!window.confirm('Replace this draft with the pasted text? Duplicate or download this draft first to keep it.'))return;try{setDraft(parseResume($('#resume-source').value));setStep('personal',true);mode(false);notice('Text copied into editable sections. Check every section before export.');}catch(e){notice(e.message);}};
 $('#resume-file').onchange=async e=>{
   const file=e.target.files?.[0];if(!file)return;const importing=++importRevision;
-  if(Object.values(values()).some(x=>x.trim())&&!window.confirm('Replace this draft with the imported file? Download or duplicate this draft first to keep it.')){e.target.value='';return;}
+  if((Object.values(values()).some(x=>x.trim())||$('#resume-source').value.trim())&&!window.confirm('Replace this draft with the imported file? Download or duplicate this draft first to keep it.')){e.target.value='';return;}
   try{
     if(file.size>(/\.json$/i.test(file.name)?1700000:24000)||!(/\.(txt|json)$/i.test(file.name)))throw Error('Choose a .txt file under 24 KB or résumé draft .json under 1.7 MB.');
     const text=new TextDecoder('utf-8',{fatal:true}).decode(await file.arrayBuffer());if(importing!==importRevision)return;
-    if(/\.json$/i.test(file.name)){const data=JSON.parse(text);const sections=validateDraft({...data,version:data.version===2?1:data.version});let restoredPhoto=null;if(data.version===2){validateDesignDraft(data,styles);if(data.photo){await cropPhoto(data.photo.src,data.photo.x,data.photo.y,data.photo.zoom);restoredPhoto=data.photo;}}if(importing!==importRevision)return;photoRevision++;photo=restoredPhoto;if(data.version===2){selectStyle(data.style);$('#resume-accent').value=data.accent;}for(const [id,key]of [['photo-x','x'],['photo-y','y'],['photo-zoom','zoom']])$('#'+id).value=photo?.[key]??(key==='zoom'?1:50);$('#photo-status').textContent=photo?'Draft photo restored locally.':'No photo added.';setDraft(sections);mode(false);notice('Draft restored. Check your details.');}
+    if(/\.json$/i.test(file.name)){const data=JSON.parse(text);const extra=validateDraftExtras(data);const sections=validateDraft({...data,version:data.version===2?1:data.version});let restoredPhoto=null;if(data.version===2){validateDesignDraft(data,styles);if(data.photo){await cropPhoto(data.photo.src,data.photo.x,data.photo.y,data.photo.zoom);restoredPhoto=data.photo;}}if(importing!==importRevision)return;photoRevision++;photo=restoredPhoto;if(data.version===2){selectStyle(data.style);$('#resume-accent').value=data.accent;}for(const [id,key]of [['photo-x','x'],['photo-y','y'],['photo-zoom','zoom']])$('#'+id).value=photo?.[key]??(key==='zoom'?1:50);$('#photo-status').textContent=photo?'Draft photo restored locally.':'No photo added.';setDraft(sections);$('#resume-source').value=extra.source;setStep('personal',true);mode(extra.improve);notice('Draft restored. Check your details.');}
     else {if(text.length>6000||/[\x00-\x08\x0b\x0c\x0e-\x1f]/.test(text))throw Error('Use plain text under 6,000 characters.');$('#resume-source').value=text;notice('File read locally. Select “Use text in editable preview” to review it.');}
   }catch(error){notice(error.message);}finally{e.target.value='';}
 };
@@ -67,14 +69,13 @@ $('#ai-review').onclick=async()=>{
   try{const r=await fetch('/api/resume/review',{method:'POST',headers:{'content-type':'application/json'},signal:reviewController.signal,body:JSON.stringify({text,consent:true})});const data=await r.json();if(!r.ok)throw Error(data.error||'Review unavailable.');if(start!==version){notice('Your draft changed. The old review was discarded.');return;}suggestions(data.suggestions,'AI review · edit your sections to apply');notice('Review each suggestion and edit only facts you can stand behind.');}
   catch(e){notice(e.message);}finally{reviewing=false;$('#ai-review').disabled=false;}
 };
-$('#download-draft').onclick=()=>{saveBlob(JSON.stringify({version:2,sections:values(),style:selectedStyle,accent:$('#resume-accent').value,photo},null,2),'application/json','my-resume-draft.json');notice('Draft downloaded with design and optional photo. It contains personal information; store it securely.');};
+$('#download-draft').onclick=()=>{saveBlob(JSON.stringify({version:2,source:$('#resume-source').value,improve:!$('#improve-panel').hidden,sections:values(),style:selectedStyle,accent:$('#resume-accent').value,photo},null,2),'application/json','my-resume-draft.json');notice('Draft downloaded with design and optional photo. It contains personal information; store it securely.');};
 $('#clear').onclick=()=>{if(!window.confirm('Clear this draft? Download it first if you want to keep it. Other drafts in this tab stay intact.'))return;importRevision++;reviewController?.abort();photoRevision++;photo=null;$('#photo-status').textContent='No photo added.';setDraft({});$('#resume-source').value='';$('#resume-file').value='';$('#ai-consent').checked=false;notice('Résumé text and suggestions cleared from this tab. Downloaded files are yours to delete.');};
-function validName(){if(values().name.trim())return true;notice('Add your name before exporting.');mode(false);workspaceView('edit');$('#r-name').focus();return false;}
+function validName(){if(values().name.trim())return true;notice('Add your name before exporting.');openSection('name');return false;}
 $('#export').onclick=async()=>{if(!validName())return;const plan=latestPlan;if(!plan){notice('Wait for the page preview to finish.');return;}try{saveBlob(await pdfBytes(plan),'application/pdf','my-resume.pdf');notice('PDF downloaded. Review every page before sharing.');}catch(e){notice('PDF could not be created: '+e.message);}};
 $('#export-word').onclick=async()=>{if(!validName())return;const button=$('#export-word');button.disabled=true;try{const {wordBlob}=await import('./resume-word.js');const blob=await wordBlob(values(),selectedStyle,$('#resume-accent').value,photo?await cropPhoto(photo.src,photo.x,photo.y,photo.zoom):null);saveBlob(blob,blob.type,'my-resume.docx');notice('Editable Word document downloaded in a simple single-column layout. Review pagination in Word before sharing.');}catch(e){notice('Word export failed: '+e.message);}finally{button.disabled=false;}};
 $('#print-resume').onclick=()=>{if(!validName())return;if(!latestPlan){notice('Wait for the page preview to finish before printing.');return;}window.print();};
-window.addEventListener('pagehide',()=>{drafts.length=0;importRevision++;photoRevision++;photo=null;setDraft({});$('#resume-source').value='';$('#ai-consent').checked=false;});
-render();
+window.addEventListener('pagehide',()=>{persistRecovery();pageClosing=true;drafts.splice(0,drafts.length,{label:'Draft 1',data:null});activeDraft=0;refreshDrafts();importRevision++;photoRevision++;photo=null;setDraft({});$('#resume-source').value='';$('#ai-consent').checked=false;});
 
 // Drafts are deliberately kept only in this tab's memory.
 const drafts=[{label:'Draft 1',data:null}];let activeDraft=0;
@@ -85,7 +86,46 @@ $('#draft-select').onchange=e=>activateDraft(Number(e.target.value));
 function addDraft(copy){if(drafts.length>=10){notice('Up to 10 drafts per tab. Download your drafts to keep them.');return;}drafts.push({label:'Draft '+(drafts.length+1),data:copy?snapshot():null});activateDraft(drafts.length-1);}
 $('#new-draft').onclick=()=>addDraft(false);$('#copy-draft').onclick=()=>addDraft(true);refreshDrafts();
 const sections=[...document.querySelectorAll('.section-control')];
-function openSection(key){mode(false);workspaceView('edit');for(const section of sections)section.open=section.dataset.field===key;$('#r-'+key).focus();}
+
+const stepFields={design:[],personal:['name','contact','headline','summary'],experience:['experience','projects'],education:['education','skills'],review:[]};
+const stepKeys=Object.keys(stepFields);let currentStep='design';
+function setStep(key,focus=false){
+ currentStep=key;$('.studio-grid').dataset.step=key;workspaceView('edit');mode(false);
+ for(const button of document.querySelectorAll('[data-step]')){if(button.dataset.step===key)button.setAttribute('aria-current','step');else button.removeAttribute('aria-current');}
+ for(const section of sections)section.hidden=!stepFields[key].includes(section.dataset.field);
+ $('.design-options').open=true;$('#editing-title').textContent={personal:'2. Personal information',experience:'3. Experience & projects',education:'4. Education & skills'}[key]||'Tell your story';
+ $('#previous-section').disabled=key==='design';$('#next-section').textContent=key==='education'?'Review & download':'Next step';
+ if(key==='review')$('#check').click();
+ if(focus){if(key==='design')$('.design-options summary').focus();else if(key==='review')$('#check').focus();else openFirstField(key);}
+}
+function openFirstField(key){const field=stepFields[key][0];for(const section of sections)section.open=section.dataset.field===field;$('#r-'+field).focus();}
+function openSection(key){const step=stepKeys.find(k=>stepFields[k].includes(key));setStep(step);for(const section of sections)section.open=section.dataset.field===key;$('#r-'+key).focus();}
 for(const section of sections)section.addEventListener('toggle',()=>{if(section.open)for(const other of sections)if(other!==section)other.open=false;});
-for(const [id,direction] of [['previous-section',-1],['next-section',1]])$('#'+id).onclick=()=>{const current=sections.findIndex(s=>s.open);openSection(sections[Math.max(0,Math.min(sections.length-1,current+direction))].dataset.field);};
-for(const button of document.querySelectorAll('[data-step]'))button.onclick=()=>{workspaceView('edit');mode(false);if(button.dataset.step==='write')openSection('name');else if(button.dataset.step==='design'){$('.design-options').open=true;$('.design-options summary').focus();}else{$('#check').click();$('#check').focus();}};
+$('#previous-section').onclick=()=>setStep(stepKeys[Math.max(0,stepKeys.indexOf(currentStep)-1)],true);
+$('#next-section').onclick=()=>setStep(stepKeys[Math.min(4,stepKeys.indexOf(currentStep)+1)],true);
+for(const button of document.querySelectorAll('[data-step]'))button.onclick=()=>setStep(button.dataset.step,true);
+$('#design-next').onclick=()=>setStep('personal',true);
+$('#review-shortcut').onclick=()=>setStep('review',true);
+
+// Optional tab-session recovery. No persistent storage or server requests.
+let recoveryEnabled=false,recoveryTimer;
+function recoveryMessage(text){$('#recovery-status').textContent=text;}
+function persistRecovery(){
+ if(!recoveryEnabled||pageClosing)return;clearTimeout(recoveryTimer);
+ try{drafts[activeDraft].data=snapshot();sessionStorage.setItem(RECOVERY_KEY,encodeRecovery(drafts,activeDraft));$('#recovery-indicator').textContent='Recovery saved';recoveryMessage('Recovery saved in this tab at '+new Date().toLocaleTimeString()+'. Download a draft for a lasting backup.');$('#forget-recovery').hidden=false;}
+ catch{ $('#recovery-indicator').textContent='Backup needed';recoveryMessage('Recovery could not be saved. Your open drafts are intact. Download a draft now; an older recovery copy may still exist.');}
+}
+function scheduleRecovery(){if(recoveryEnabled){clearTimeout(recoveryTimer);recoveryTimer=setTimeout(persistRecovery,400);}}
+$('#recovery-enabled').onchange=e=>{recoveryEnabled=e.target.checked;if(recoveryEnabled)persistRecovery();else{clearTimeout(recoveryTimer);try{sessionStorage.removeItem(RECOVERY_KEY);$('#restore-recovery').hidden=true;$('#forget-recovery').hidden=true;$('#recovery-indicator').textContent='Memory only';recoveryMessage('Recovery is off and the saved copy was removed. Download your drafts before leaving.');}catch{recoveryMessage('The browser blocked access to recovery storage. Close this tab to clear its session.');}}};
+$('#forget-recovery').onclick=()=>{if(!confirm('Remove the saved recovery copy? Your open drafts will stay intact.'))return;$('#recovery-enabled').checked=false;$('#recovery-enabled').onchange({target:$('#recovery-enabled')});};
+$('#restore-recovery').onclick=()=>{try{const saved=decodeRecovery(sessionStorage.getItem(RECOVERY_KEY));if(drafts.some(d=>Object.values(d.data?.sections||{}).some(Boolean))||Object.values(values()).some(Boolean)||$('#resume-source').value){if(!confirm('Replace open drafts with the recovery copy? Download current drafts first to keep them.'))return;}importRevision++;photoRevision++;reviewController?.abort();drafts.splice(0,drafts.length,...saved.drafts);activeDraft=saved.active;activateDraftFromRecovery();recoveryEnabled=true;$('#recovery-enabled').checked=true;$('#restore-recovery').hidden=true;persistRecovery();notice('Recovery restored. Review your details before downloading.');}catch{recoveryMessage('This recovery copy could not be restored. Open drafts are unchanged; import a downloaded draft instead.');}};
+function activateDraftFromRecovery(){const d=drafts[activeDraft].data;photo=d.photo?{...d.photo}:null;selectStyle(d.style);$('#resume-accent').value=d.accent;$('#resume-source').value=d.source;for(const [id,key] of [['photo-x','x'],['photo-y','y'],['photo-zoom','zoom']])$('#'+id).value=photo?.[key]??(key==='zoom'?1:50);$('#photo-status').textContent=photo?'Photo restored locally.':'No photo added.';$('#ai-consent').checked=false;setDraft(d.sections);setStep('personal');mode(d.improve);refreshDrafts();}
+document.querySelector('.studio').addEventListener('input',scheduleRecovery);
+document.querySelector('.studio').addEventListener('change',scheduleRecovery);
+document.querySelector('.studio').addEventListener('click',scheduleRecovery);
+window.addEventListener('beforeunload',e=>{persistRecovery();if(!recoveryEnabled&&(Object.values(values()).some(Boolean)||$('#resume-source').value||drafts.some(d=>Object.values(d.data?.sections||{}).some(Boolean)))){e.preventDefault();e.returnValue='';}});
+document.addEventListener('visibilitychange',()=>{if(document.hidden)persistRecovery();});
+function offerRecovery(){try{const saved=sessionStorage.getItem(RECOVERY_KEY);if(saved){decodeRecovery(saved);$('#restore-recovery').hidden=false;$('#forget-recovery').hidden=false;$('#recovery-indicator').textContent='Recovery available';recoveryMessage('A recovery copy is available from this tab. Restore it when you are ready.');$('.recovery-tools').open=true;}}catch{recoveryMessage('Recovery storage is unavailable or invalid. Download drafts to protect your work.');}}
+window.addEventListener('pageshow',e=>{pageClosing=false;if(e.persisted){recoveryEnabled=false;$('#recovery-enabled').checked=false;offerRecovery();}});
+offerRecovery();
+setStep('design');render();
