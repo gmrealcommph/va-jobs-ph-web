@@ -1,3 +1,4 @@
+import {renderGalaxy,bindGalaxy} from '../public/admin-traffic-galaxy.js';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import vm from 'node:vm';
@@ -8,7 +9,7 @@ import {renderProviderBalances} from '../public/admin-balances.js';
 import {renderTraffic} from '../public/admin-traffic.js';
 const script=(await readFile(new URL('../public/admin.js',import.meta.url),'utf8')).replace(/^import[^\n]+\n/gm,'');
 function element(){
- return {value:'',innerHTML:'',textContent:'',children:[],listeners:{},attributes:{},
+ return {dataset:{},value:'',innerHTML:'',textContent:'',children:[],listeners:{},attributes:{},
   addEventListener(name,fn){this.listeners[name]=fn;},setAttribute(name,value){this.attributes[name]=value;},
   querySelector(){return this.button??=(element());},querySelectorAll(){return [];},
   append(...items){for(const item of items){item.parent=this;this.children.push(item);}},
@@ -30,7 +31,7 @@ async function page(){
   addEventListener(name,fn){this.listeners[name]=fn;}};
  document.getElementById('period').value='7';document.getElementById('signup-notifications');
  const state={calls:[],responses};
- const context=vm.createContext({RegistrationTracker,PaymentTracker,refreshDelay,playRegistrationChime,playPaymentCelebration,renderEmailUsage,renderProviderBalances,renderTraffic,document,Intl,Date,Number,String,URLSearchParams,AbortSignal:{},AbortController,
+ const context=vm.createContext({RegistrationTracker,PaymentTracker,refreshDelay,playRegistrationChime,playPaymentCelebration,renderEmailUsage,renderProviderBalances,renderTraffic,renderGalaxy,bindGalaxy,document,Intl,Date,Number,String,URLSearchParams,AbortSignal:{},AbortController,
   setTimeout(fn,delay){timers.set(++nextTimer,{fn,delay});return nextTimer;},clearTimeout(id){timers.delete(id);},
   async fetch(url){state.calls.push(url);const r=responses.shift();if(r instanceof Error)throw r;if(!r)throw new Error('Unexpected request');return {status:r.status,ok:r.status===200,json:async()=>r.body};}});
  vm.runInContext("'use strict';\n"+script,context);await new Promise(setImmediate);
@@ -63,20 +64,22 @@ test('sound defaults on, unlocks only after interaction, and can be muted',async
 test('compact insights preserve measured zero, unavailable states and escaped sources',async()=>{
  const p=await page();
  const unknown=vm.runInContext('renderOverviewInsights({})',p.context);
- assert.match(unknown,/Member details unavailable/);assert.match(unknown,/Source attribution unavailable/);assert.match(unknown,/Email quota unavailable/);
+ assert.match(unknown,/Member details unavailable/);assert.match(unknown,/Traffic data temporarily unavailable/);assert.match(unknown,/Email quota unavailable/);
  const report=data();report.extended={available:true,members:{verified:0,unverified:0,cohort_registered:0,cohort_verified_now:0,cohort_purchased_now:0}};
  report.visitors={attribution:{available:true,sources:[{source:'<script>bad</script>',visits:0}]}};
+ report.traffic={available:true,sessions:0,sources:[]};
  p.state.responses.push({status:200,body:report});await p.poll();
- const html=p.nodes['overview-insights'].innerHTML;assert.match(html,/Verified · now/);assert.match(html,/>0<\/strong>/);assert.match(html,/&lt;script&gt;/);assert.doesNotMatch(html,/<script>|NaN|undefined/);
+ const html=p.nodes['overview-insights'].innerHTML;assert.match(html,/Verified · now/);assert.match(html,/>0<\/strong>/);assert.doesNotMatch(html,/&lt;script&gt;/);assert.doesNotMatch(html,/<script>|NaN|undefined/);
  assert.match(html,/0 registrations/);assert.match(html,/Cohort verified<\/span><strong>—/);
 });
 
 test('traffic includes all sources in its total; quota distinguishes exhausted, uncapped and unknown',async()=>{
  const p=await page(),report=data();
  report.visitors={attribution:{available:true,sources:[{source:'A',visits:9},{source:'B',visits:4},{source:'C',visits:2},{source:'<D>',visits:1},{source:'E',visits:1}]}};
+ report.traffic={available:true,sessions:17,sources:[{channel:'Google organic',sessions:9},{channel:'Direct / unknown',sessions:4},{channel:'Referrals',sessions:2},{channel:'Facebook',sessions:1},{channel:'<D>',sessions:1}]};
  report.email_health={usage:{available:true,daily:{used:135,limit:100,level:'critical'},monthly:{used:135,limit:null,level:'normal'}}};
  p.context.report=report;let html=vm.runInContext('renderOverviewInsights(report)',p.context);
- assert.match(html,/aria-label="17 recorded visits by source/);assert.match(html,/Other sources/);assert.match(html,/>135%/);assert.match(html,/Daily quota exhausted/);assert.match(html,/135 \/ uncapped/);assert.match(html,/stroke-dasharray="100.00 100"/);assert.doesNotMatch(html,/NaN|undefined|<D>/);
+ assert.ok(html.includes('>17</strong>'));assert.match(html,/Other: 1 sessions/);assert.match(html,/>135%/);assert.match(html,/Daily quota exhausted/);assert.match(html,/135 \/ uncapped/);assert.match(html,/stroke-dasharray="100.00 100"/);assert.doesNotMatch(html,/NaN|undefined|<D>/);
  report.email_health.usage.daily={used:10,limit:null,level:'normal'};html=vm.runInContext('renderOverviewInsights(report)',p.context);assert.match(html,/>Uncapped<\/strong>/);assert.doesNotMatch(html,/left today/);
  report.email_health.usage.available=false;html=vm.runInContext('renderOverviewInsights(report)',p.context);assert.match(html,/Email quota unavailable/);assert.doesNotMatch(html,/left today/);
 });

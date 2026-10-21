@@ -1,3 +1,4 @@
+import {renderGalaxy,bindGalaxy} from './admin-traffic-galaxy.js';
 import {renderTraffic} from './admin-traffic.js';
 import {RegistrationTracker,PaymentTracker,refreshDelay,playRegistrationChime,playPaymentCelebration} from './admin-live.js';
 import {renderEmailUsage} from './admin-email-health.js';
@@ -103,15 +104,6 @@ function renderOverviewInsights(d){
   const field=(label,value,share,tone="")=>'<div class="member-metric '+tone+'"><span>'+esc(label)+'</span><strong>'+esc(value)+'</strong>'+(Number.isFinite(share)?'<svg viewBox="0 0 100 4" preserveAspectRatio="none" aria-hidden="true"><rect width="100" height="4" rx="2" class="member-bar-track"/><rect width="'+Math.max(0,Math.min(100,share)).toFixed(2)+'" height="4" rx="2" class="member-bar-fill"/></svg>':'')+'</div>';
   const rate=(n,total)=>total>0?(100*n/total).toFixed(1)+'%':'—';
   const members=m?'<div class="insight-values">'+field('Verified · now',num(m.verified))+field('Unverified · now',num(m.unverified))+field('Cohort verified',rate(m.cohort_verified_now,m.cohort_registered),m.cohort_registered>0?100*m.cohort_verified_now/m.cohort_registered:null,'verified')+field('Cohort purchased',rate(m.cohort_purchased_now,m.cohort_registered),m.cohort_registered>0?100*m.cohort_purchased_now/m.cohort_registered:null,'purchased')+'</div>':'<p>Member details unavailable.</p>';
-  const attribution=d.visitors?.attribution;
-  const sources=attribution?.available?(attribution.sources||[]).filter(s=>Number.isFinite(s.visits)&&s.visits>=0).slice().sort((a,b)=>b.visits-a.visits):[];
-  const total=sources.reduce((sum,s)=>sum+s.visits,0),top=sources.slice(0,3);
-  const other=sources.slice(3).reduce((sum,s)=>sum+s.visits,0);if(other)top.push({source:'Other sources',visits:other});
-  let offset=0;
-  const arcs=top.map((s,i)=>{const share=total?100*s.visits/total:0;const arc='<circle class="mix-segment mix-tone-'+i+'" cx="50" cy="50" r="42" pathLength="100" stroke-dasharray="'+share.toFixed(3)+' 100" stroke-dashoffset="'+(-offset).toFixed(3)+'"/>';offset+=share;return arc;}).join('');
-  let trafficOffset=0;
-  const trafficSegments=top.map((s,i)=>{const width=total?100*s.visits/total:0;const rect='<rect class="mix-tone-'+i+' traffic-strip-segment" x="'+trafficOffset.toFixed(4)+'" width="'+width.toFixed(4)+'" height="14"><title>'+esc(s.source+': '+num(s.visits)+' visits')+'</title></rect>';trafficOffset+=width;return rect;}).join('');
-  const traffic=attribution?.available?'<div class="traffic-strip-body"><div class="traffic-strip-total"><strong>'+num(total)+'</strong><span>recorded visits</span></div><svg class="traffic-strip" viewBox="0 0 100 14" preserveAspectRatio="none" role="img" aria-label="'+esc(num(total)+' recorded visits by source; selected period; not unique people')+'"><defs><pattern id="traffic-strip-ticks" width="4" height="14" patternUnits="userSpaceOnUse"><path d="M0 0v14" class="traffic-strip-tick"/></pattern></defs><rect class="mix-bar-track" width="100" height="14"/>'+trafficSegments+'<rect width="100" height="14" fill="url(#traffic-strip-ticks)"/></svg><ul class="traffic-strip-legend">'+(top.length?top.map((s,i)=>'<li class="mix-tone-'+i+'"><i aria-hidden="true"></i><span>'+esc(s.source)+'</span><strong>'+num(s.visits)+'</strong></li>').join(''):'<li>No referrer sources reported.</li>')+'</ul></div>':'<div class="insight-empty"><span aria-hidden="true">↗</span><p>Source attribution unavailable.</p></div>';
   const usage=d.email_health?.usage;
   const quota=q=>q.limit===null?num(q.used)+' / uncapped':num(q.used)+' / '+num(q.limit);
   const utilization=q=>Number.isFinite(q.limit)&&q.limit>0&&Number.isFinite(q.used)?Math.max(0,100*q.used/q.limit):null;
@@ -124,7 +116,7 @@ function renderOverviewInsights(d){
   }
   const percent=m&&m.cohort_registered>0?100*m.cohort_verified_now/m.cohort_registered:null;
   const ring='<div class="reference-ring" role="img" aria-label="'+esc('Signup cohort verified: '+(percent===null?'unavailable':percent.toFixed(1)+'%')+'; '+num(m?.cohort_registered??0)+' registrations')+'"><svg viewBox="0 0 100 100" aria-hidden="true"><circle class="ring-track" cx="50" cy="50" r="42"/><circle class="member-ring-rest" cx="50" cy="50" r="42" pathLength="100" stroke-dasharray="'+(percent===null?0:100).toFixed(2)+' 100"/><circle class="ring-value" cx="50" cy="50" r="42" pathLength="100" stroke-dasharray="'+(percent===null?0:Math.max(0,Math.min(100,percent))).toFixed(2)+' 100"/></svg><div><strong>'+(percent===null?'—':percent.toFixed(1)+'%')+'</strong></div></div>';
-  return '<section class="insight-tile member-health-tile"><h3>Member health <a href="#members" aria-label="View member details">↗</a></h3>'+ring+members+'</section><section class="insight-tile traffic-mix-tile"><h3>Traffic mix <a href="#marketing" aria-label="View traffic details">↗</a></h3>'+traffic+'</section><section class="insight-tile email-allowance-tile"><h3><span class="allowance-title"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18v13H3zM3 6l9 7 9-7"/></svg>Email allowance</span> <a href="#email-health" aria-label="View email quota details">↗</a></h3>'+email+'</section>';
+  return '<section class="insight-tile member-health-tile"><h3>Member health <a href="#members" aria-label="View member details">↗</a></h3>'+ring+members+'</section><section class="insight-tile traffic-mix-tile">'+renderGalaxy(d)+'</section><section class="insight-tile email-allowance-tile"><h3><span class="allowance-title"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18v13H3zM3 6l9 7 9-7"/></svg>Email allowance</span> <a href="#email-health" aria-label="View email quota details">↗</a></h3>'+email+'</section>';
 }
 function render(d){
   $('report-day').textContent=new Intl.DateTimeFormat('en-PH',{timeZone:'Asia/Manila',day:'numeric'}).format(new Date(d.generated_at));
@@ -155,6 +147,7 @@ function render(d){
  return html.replace('class="value">Unavailable','class="value value-unknown">Unavailable').replace('class="card ','class="card operational-tile op-tone-'+i+' ').replace(/<span class="kpi-icon"[\s\S]*?<\/span>/,'<span class="op-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="'+icons[i]+'"/></svg></span>');
  }).join('');
   $('overview-insights').innerHTML=renderOverviewInsights(d);
+  bindGalaxy($('overview-insights'));
   $('collection-health').innerHTML=renderCollectionHealth(d);
   $('platform-status').textContent='Updated '+date(d.generated_at);
   // The initial bulk-import spike is excluded only from this trend, not totals.

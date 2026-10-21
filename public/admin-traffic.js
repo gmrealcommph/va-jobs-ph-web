@@ -1,3 +1,4 @@
+import {renderDailyTraffic} from './admin-traffic-galaxy.js';
 const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const n=v=>Number(v).toLocaleString('en-PH');
 const ratio=(value,total)=>total>0?(100*value/total).toFixed(1)+'%':'—';
@@ -28,18 +29,8 @@ export function renderTraffic(d){
  html+=foot('Public paths only. Private pages and query strings are excluded.')+'</section></div>';
  // Daily channel counts use the consented-session dataset, not Cloudflare visits.
  if(t?.available){
-  const days=Array.isArray(t.daily)?t.daily:[];
-  const rows=days.map(d=>{
-   const total=Number(d.sessions)||0;
-   const google=Number(d.google_organic)||0;
-   const direct=Number(d.direct_unknown)||0;
-   const referrals=Number(d.referrals)||0;
-   const facebook=Number(d.facebook)||0;
-   const other=Math.max(0,total-google-direct-referrals-facebook);
-   return [d.day,n(total),n(google),n(direct),n(referrals),n(facebook),n(other)];
-  });
-  html+='<section class="tf-panel tf-daily"><div class="tf-panel-head"><div><h3>Daily traffic by source</h3><p>Daily consented sessions · Asia/Manila timezone</p></div><span class="tf-label">DAILY COUNTS</span></div>';
-  html+=rows.length?table(['Date (PH)','Total','Google organic¹','Direct / unknown','Referrals','Facebook','Other²'],rows):empty('No daily sessions','No consented sessions were recorded during this period.');
+  html+='<section class="tf-panel tf-daily">'+head('Daily sessions by source','Consented sessions · Asia/Manila · today is partial','SUPABASE');
+  html+=renderDailyTraffic(d);
   html+=foot('¹ Google organic combines tagged organic Google visits and Google referrer-inferred visits. ² Other includes LinkedIn, paid campaigns, and other campaigns. Today is partial until midnight PH. These session counts are not Cloudflare visit totals and do not represent unique visitors.');
   html+='</section>';
  }
