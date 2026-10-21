@@ -22,6 +22,7 @@ import { scheduledDailyDigest, DIGEST_CRON } from './daily-digest.js';
 import { emailPreferences } from './email-preferences.js';
 import { categoryPage } from './category-page.js';
 import { legalPage } from './legal-pages.js';
+import { learningPage, resourcePaths } from './learning-hub.js';
 import { companyPage } from './company-pages.js';
 import { layout, listing, detail, esc, jobPath, categoryPath, authPage, checkEmailPage, authCallbackPage, onboardingPage, matchesPage, proPage, myJobsPage } from './render.js';
 import { signUp, signIn, getUser, sessionForRequest, setSessionCookies, clearSessionCookies, authError, getJobPreferences, saveJobPreferences, completeOnboarding, getMyProfile, getMyJobMatches, getMyMatchSummary, getSavedJobs, saveJobForUser, unsaveJobForUser, getJobApplications, markJobApplied, updateJobApplication, deleteJobApplication } from './auth.js';
@@ -650,6 +651,14 @@ if (
       return render('Set up your account', onboardingPage({ user: authState.user, preferences, error: (url.searchParams.get('error') || '').slice(0, 240) }) + '<link rel="stylesheet" href="/account/deletion.css?v=20261012-fun">' + deletionDanger, { noindex: true });
     }
 
+    if (url.pathname.endsWith('/') && resourcePaths.includes(url.pathname.slice(0,-1))) {
+      return Response.redirect(url.origin + url.pathname.slice(0,-1) + url.search, 308);
+    }
+    const learning = learningPage(url.pathname);
+    if (learning) return render(learning.title, learning.body, { description: learning.description });
+    // Unknown resource URLs should never fall through to job-data queries.
+    if (url.pathname.startsWith('/resources/')) return missing();
+
     const company = companyPage(url.pathname);
     if (company) return render(company.title, company.body, { description: company.description });
 
@@ -813,6 +822,7 @@ if (
         `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${[
           '/',
           '/categories',
+          ...resourcePaths,
           ...names.map(
             categoryPath
           )

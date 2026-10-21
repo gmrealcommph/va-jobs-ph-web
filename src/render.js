@@ -20,7 +20,7 @@ export function layout({ title, description, canonical, body, noindex = false, u
   try { currentPath = new URL(canonical).pathname; } catch {}
   const navLink = (href, label, cls = '') => '<a class="' + cls + '" href="' + href + '"' + ((href === '/' ? currentPath === '/' || currentPath.startsWith('/jobs') : currentPath === href || currentPath.startsWith(href + '/')) ? ' aria-current="page"' : '') + '>' + label + '</a>';
   const accountLinks = navLink('/onboarding', 'My account') + navLink('/saved-searches', 'Saved searches') + navLink('/job-alerts', 'My Job Alerts') + navLink('/pro', isPro ? 'Your Pro membership' : 'Explore VeeAys Pro', 'member-plan-link') + '<a class="member-logout" href="/logout">Log out <span aria-hidden="true">↗</span></a>';
-  const discoveryLinks = navLink('/', 'Find a job') + navLink('/categories', 'Categories') + navLink('/resume-studio', 'Résumé Studio') + navLink('/employers', 'For Employers');
+  const discoveryLinks = navLink('/', 'Find a job') + navLink('/categories', 'Categories') + navLink('/resume-studio', 'Résumé Studio') + navLink('/resources', 'Resources') + navLink('/employers', 'For Employers');
   return `<!doctype html>
 <html lang="en-PH">
 <head>
@@ -71,7 +71,7 @@ export function layout({ title, description, canonical, body, noindex = false, u
   >
 
   <link rel="stylesheet" href="/styles.css?v=20261020-manrope">
-<link rel="stylesheet" href="/navigation.css?v=20261020-gold-menu">
+<link rel="stylesheet" href="/navigation.css?v=20261021-resources">
 <link rel="stylesheet" href="/traffic.css?v=20261012-dismiss">
 <script src="/traffic.js?v=20261012-dismiss" type="module"></script>
 </head>
