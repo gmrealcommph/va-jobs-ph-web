@@ -5,12 +5,12 @@ const props={title:'Test',body:'',canonical:'https://veeays.com/jobs',user:{id:'
 test('members can reach Pro without opening desktop or mobile account menus',()=>{
  for(const profile of [null,{plan:'free'},{plan:'pro',plan_status:'inactive'},{plan:'pro',plan_status:'active',pro_expires_at:'2020-01-01'}]){
   const html=layout({...props,profile});
-  assert.match(html,/<nav class="discovery-nav"[^>]*>[^]*?href="\/pro"[^>]*>VeeAys Pro<\/a><\/nav>/);
-  assert.match(html,/<a class="mobile-pro-link" href="\/pro">Explore Pro<\/a>\s*<details class="mobile-menu/);
+  assert.match(html,/<nav class="discovery-nav"[^>]*>[^]*?href="\/pro"[^>]*>[^]*?VeeAys Pro<\/a><\/nav>/);
+  assert.match(html,/<nav aria-label="Mobile explore">[^]*?href="\/pro"[^>]*>[^]*?VeeAys Pro<\/a>/);
   assert.doesNotMatch(html,/class="member-pro"/);
  }
  const pro=layout({...props,profile:{plan:'pro',plan_status:'active'}});
- assert.match(pro,/<a class="mobile-pro-link" href="\/pro">Your Pro<\/a>/);
+ assert.match(pro,/<nav aria-label="Mobile explore">[^]*?href="\/pro"[^>]*>[^]*?Your Pro<\/a>/);
  assert.doesNotMatch(pro,/Explore Pro|Explore VeeAys Pro/);
  assert.doesNotMatch(layout({...props,user:null}),/class="mobile-pro-link"/);
 });

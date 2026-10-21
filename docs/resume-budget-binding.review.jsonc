@@ -1,0 +1,13 @@
+// REVIEW ONLY. Do not deploy or apply without separate explicit approval.
+// Merge into a separate staging Worker config, never the production config.
+{
+  "durable_objects":{"bindings":[{"name":"RESUME_BUDGET","class_name":"ResumeBudget"}]},
+  "migrations":[{"tag":"resume-budget-v1","new_sqlite_classes":["ResumeBudget"]}],
+  "vars":{
+    "RESUME_STUDIO_ENABLED":"true",
+    "RESUME_AI_ENABLED":"false",
+    "RESUME_AI_MODEL":"gpt-5-mini",
+    "RESUME_MAX_CALL_MICRO_USD":"100000",
+    "RESUME_SPEND_CEILING_MICRO_USD":"1000000"
+  }
+}
