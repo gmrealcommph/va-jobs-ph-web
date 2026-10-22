@@ -39,8 +39,6 @@ as $function$
 declare
   v_actual numeric(12,8);
   v_held numeric(12,8);
-  v_delta numeric(12,8);
-  v_release numeric(12,8);
   h record;
 begin
   if p_job_id is null or p_job_id !~ '^[1-9][0-9]{0,18}$' or p_token is null
