@@ -1,3 +1,4 @@
+import {purchaseReceipt} from './analytics.js';
 import { sessionForRequest, setSessionCookies } from './auth.js';
 import { layout, esc } from './render.js';
 
@@ -197,7 +198,7 @@ export async function proCheckoutEndpoint(request, env) {
       'content-security-policy': "default-src 'none'; style-src 'self'; img-src 'self'; script-src 'self'; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-ancestors 'none'" });
     if (state.refreshed) setSessionCookies(h, state.refreshed);
     return new Response(layout({ title: c.live ? 'Pro payment' : 'Pro test payment', canonical: c.site + '/pro/return', description: 'Check the status of your VeeAys Pro test payment.', user: state.user, noindex: true,
-      body: `<section class="wrap"><div class="kicker">VEEAYS PRO${c.live ? '' : ' · TEST MODE'}</div><h1>${confirmed ? 'Payment confirmed' : 'Checking your payment'}</h1><p role="status">${esc(c.live ? text.replaceAll('Test payment', 'Payment').replaceAll('test checkout', 'checkout').replaceAll('test payment', 'payment') : text)}</p><p>${c.live ? 'One-time ₱499 purchase for 30 days. No automatic renewal.' : 'No real money is charged. This is a one-time 30-day test purchase.'}</p><a class="button" href="/pro/return?payment=${id}">Refresh payment status</a> <a href="/pro">Back to Pro</a></section>` }), { headers: h });
+      body: `${await purchaseReceipt(record,c.live)}<section class="wrap"><div class="kicker">VEEAYS PRO${c.live ? '' : ' · TEST MODE'}</div><h1>${confirmed ? 'Payment confirmed' : 'Checking your payment'}</h1><p role="status">${esc(c.live ? text.replaceAll('Test payment', 'Payment').replaceAll('test checkout', 'checkout').replaceAll('test payment', 'payment') : text)}</p><p>${c.live ? 'One-time ₱499 purchase for 30 days. No automatic renewal.' : 'No real money is charged. This is a one-time 30-day test purchase.'}</p><a class="button" href="/pro/return?payment=${id}">Refresh payment status</a> <a href="/pro">Back to Pro</a></section>` }), { headers: h });
   } catch (error) {
     // Log only a safe error classification, never messages or raw payloads.
     const errorName = /^[A-Za-z]{1,40}$/.test(String(error?.name || '')) ? error.name : 'UnknownError';

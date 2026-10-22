@@ -37,5 +37,21 @@
     "RESUME_STUDIO_ENABLED": "true",
     "RESUME_AI_ENABLED": "false"
   },
-  "compatibility_flags": []
+  "compatibility_flags": [],
+  "durable_objects": {
+    "bindings": [
+      {
+        "name": "ACTIVE_VISITORS",
+        "class_name": "ActiveVisitors"
+      }
+    ]
+  },
+  "migrations": [
+    {
+      "tag": "active-visitors-v1",
+      "new_sqlite_classes": [
+        "ActiveVisitors"
+      ]
+    }
+  ]
 }

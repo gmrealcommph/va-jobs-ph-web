@@ -1,6 +1,7 @@
+import {activeVisitorCount} from './active-visitors.js';
 import { sessionForRequest, setSessionCookies, clearSessionCookies } from './auth.js';
 import { config } from './data.js';
-import { visitorAnalytics, recentVisitorActivity } from './admin-visitors.js';
+import { visitorAnalytics } from './admin-visitors.js';
 import { cachedEmailUsage, actionCenter } from './admin-health.js';
 import {providerBalances} from './admin-balances.js';
 import {QUICK_READ_CRON} from './quick-read-scheduled.js';
@@ -46,7 +47,7 @@ async function rpc(env, token, name, body) {
   if(!response.ok) throw Object.assign(new Error('Analytics unavailable'),{status:response.status});
   return response.json();
 }
-export async function adminEndpoint(request, env, {session=sessionForRequest, call=rpc, visitors=visitorAnalytics, liveVisitors=recentVisitorActivity, usage=cachedEmailUsage, balances=providerBalances}={}) {
+export async function adminEndpoint(request, env, {session=sessionForRequest, call=rpc, visitors=visitorAnalytics, liveVisitors=activeVisitorCount, usage=cachedEmailUsage, balances=providerBalances}={}) {
   const url=new URL(request.url), monitor=url.pathname==='/admin/api/quick-reads', api=monitor||url.pathname==='/admin/api/analytics';
   const headers=new Headers(privateHeaders);
   const reply=(body,status,type='text/html; charset=utf-8')=>{

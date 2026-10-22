@@ -72,7 +72,8 @@ export function layout({ title, description, canonical, body, noindex = false, u
   <link rel="stylesheet" href="/styles.css?v=20261020-manrope">
 <link rel="stylesheet" href="/navigation.css?v=20261021-resources">
 <link rel="stylesheet" href="/traffic.css?v=20261012-dismiss">
-<script src="/traffic.js?v=20261012-dismiss" type="module"></script>
+<script src="/traffic.js?v=20261023-ga4" type="module"></script>
+<script src="/analytics.js?v=20261023-ga4" type="module"></script>
 </head>
 
 <body>
