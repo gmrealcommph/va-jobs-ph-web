@@ -87,9 +87,9 @@ export async function quickReadEndpoint(request, env, id, deps={}) {
     const results=[];
     for(const job of jobs) {
       const result=await generateJob(env,job.id,deps); results.push(result);
-      if(result.status==='rate_limited' || result.status==='busy') break;
+      if(['rate_limited','busy','spending_stopped','spend_unavailable','rollout_disabled','credit_paused','rollout_exhausted'].includes(result.status)) break;
     }
-    const completed=results.filter(r=>!['rate_limited','busy'].includes(r.status));
+    const completed=results.filter(r=>!['rate_limited','busy','spending_stopped','spend_unavailable','rollout_disabled','credit_paused','rollout_exhausted'].includes(r.status));
     return json({results,next_after_id:completed.at(-1)?.job_id || String(args.after_id || '0')});
   } catch { return json({error:'quick_read_service_unavailable'},503); }
 }
