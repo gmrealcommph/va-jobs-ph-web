@@ -1,12 +1,13 @@
 // Editorial content: static, public, and independent of accounts or paid services.
 export const learningCategories = [
-  {id:'career-guides', title:'Career Guides', description:'Find your direction. Show what you can do.'},
-  {id:'interview-preparation', title:'Interview Preparation', description:'Prepare your stories, setup, and questions.'},
+  {id:'getting-started', title:'Getting Started', description:'Explore remote work, choose a direction, and take your first practical steps.'},
+  {id:'resumes-applications', title:'Résumés & Applications', description:'Show your real strengths in a clear résumé and a thoughtful application.'},
+  {id:'interview-preparation', title:'Interviews', description:'Prepare your stories, setup, and questions.'},
   {id:'job-safety', title:'Job Safety', description:'Spot red flags. Protect your time and information.'}
 ];
 export const learningGuides = [
   {
-    slug:'getting-started-with-remote-work', category:'career-guides', title:'Your first steps into remote work',
+    slug:'getting-started-with-remote-work', category:'getting-started', title:'Your first steps into remote work',
     description:'A realistic starting plan for Filipino beginners: check your setup, choose suitable roles, and build one useful work sample.',
     intro:'New to remote work? Hindi kailangang sabay-sabay. Start with what you have, learn what a role needs, and take one useful step at a time. Working from home changes where you work; it still asks for reliability, communication, and practice.',
     takeaway:'Leave with a simple seven-day plan and a realistic setup checklist.',
@@ -18,7 +19,7 @@ export const learningGuides = [
     ], exercise:'Write your available hours, the device you can use, and one task you will practise this week. Keep the plan small enough to finish.', next:'finding-your-remote-work-niche'
   },
   {
-    slug:'finding-your-remote-work-niche', category:'career-guides', title:'Find a niche without boxing yourself in',
+    slug:'finding-your-remote-work-niche', category:'getting-started', title:'Find a niche without boxing yourself in',
     description:'Compare remote roles using your strengths, real job requirements, and small practice projects before choosing a starting focus.',
     intro:'You do not need a forever niche before you begin. A starting focus simply helps you decide what to practise and which jobs deserve your attention. Start with tasks you can learn and demonstrate, not a “highest-paying niche” headline.',
     takeaway:'Choose one starting role and one backup using evidence from real listings.',
@@ -30,7 +31,7 @@ export const learningGuides = [
     ], exercise:'Compare three listings for one role. Circle one repeated skill, then create a small practice task that demonstrates it.', next:'honest-beginner-resume'
   },
   {
-    slug:'honest-beginner-resume', category:'career-guides', title:'Build a beginner résumé you can stand behind',
+    slug:'honest-beginner-resume', category:'resumes-applications', title:'Build a beginner résumé you can stand behind',
     description:'Turn school, volunteer, and transferable experience into a clear beginner résumé without inventing clients, skills, or results.',
     intro:'Wala pang remote client? You can still explain what you know and what you have done. A strong beginner résumé makes your real experience easy to understand. It does not disguise practice work as paid employment.',
     takeaway:'Build a focused first draft with truthful examples and a final privacy check.',
@@ -42,7 +43,7 @@ export const learningGuides = [
     ], exercise:'Write two bullets about a real school, volunteer, or work task. Check that each claim is something you could explain in an interview.', next:'remote-job-applications'
   },
   {
-    slug:'remote-job-applications', category:'career-guides', title:'Send a thoughtful remote job application',
+    slug:'remote-job-applications', category:'resumes-applications', title:'Send a thoughtful remote job application',
     description:'Check role fit, tailor a short application, follow instructions, and track your next step without mass-applying blindly.',
     intro:'You do not need a perfect cover letter for every opening. You need a relevant application that follows the instructions and shows why your real skills fit the work. Konti pero pinag-isipan is a useful starting habit.',
     takeaway:'Prepare one tailored application and a simple follow-up record.',
