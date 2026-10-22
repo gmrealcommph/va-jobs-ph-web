@@ -1,6 +1,6 @@
 import {generateJob, rpc} from './quick-read-service.js';
 
-export const QUICK_READ_CRON = '0-59 * * * *';
+export const QUICK_READ_CRON = '* * * * *';
 // Bounded invocation work; the database serializes claims and provider cooldowns.
 export async function scheduledQuickReads(controller, env, {call=rpc, run=generateJob, log=console.log}={}) {
   if(controller.cron!==QUICK_READ_CRON || env.QUICK_READ_AUTO_ENABLED!=='true') return;
