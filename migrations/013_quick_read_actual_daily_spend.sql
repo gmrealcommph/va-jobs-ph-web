@@ -24,6 +24,18 @@ alter table quick_read_ops.quick_read_actual_spend_holds enable row level securi
 revoke all on quick_read_ops.quick_read_actual_daily_spend from public, anon, authenticated;
 revoke all on quick_read_ops.quick_read_actual_spend_holds from public, anon, authenticated;
 
+-- The candidate RPC still calls this legacy routine; it no longer changes the
+-- rollout gate because the actual-spend ledger is now the spending control.
+create or replace function quick_read_ops.prepare_monthly_budget()
+returns void
+language plpgsql
+set search_path to ''
+as $function$
+begin
+  null;
+end
+$function$;
+
 create or replace function public.quick_read_actual_spend_reserve(
   p_job_id text,
   p_token uuid,
