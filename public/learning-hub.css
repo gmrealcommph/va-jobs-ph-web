@@ -128,19 +128,47 @@
  .career-hero .learn-hero-text{padding-inline:16px}.career-hero h1{font-size:34px}.learn-main{padding-inline:15px}.career-portrait{height:225px}.career-portrait>img{width:205px}.career-portrait figcaption{width:77px;font-size:10px;left:10px;padding:10px 7px}.career-pathway{grid-template-columns:55px 1fr;column-gap:10px;padding:10px}.career-pathway-icon img{width:65px;max-width:65px}.career-pathway h3{font-size:16px}.career-pathway-action{font-size:9px}.learn-main .learn-section-heading h2{font-size:21px}.learn-main .learn-featured-grid{gap:9px}.learn-main .learn-card h3{font-size:14px}.learn-main .learn-card-content{padding-inline:9px}.learn-main .learn-card-category{font-size:7px}.learn-main .career-read{padding-inline:9px;font-size:9px}.learn-main .learn-library-row{grid-template-columns:52px minmax(0,1fr) 30px;gap:8px}.learn-library-row .learn-card-image{width:52px;height:48px}.learn-main .learn-library-row h3{font-size:12px}
 }
 @media(prefers-reduced-motion:reduce){.career-pathway{transition:none}}
-/* Keep the approved full workspace composition; the single tagline covers its old step panel. */
-.career-hero .learn-hero-grid{grid-template-columns:1fr 1fr;gap:24px}
-.career-portrait{max-width:none;border-radius:0;box-shadow:none}
-.career-portrait>img{object-fit:fill;object-position:center}
-.career-portrait figcaption{inset:6% auto auto 11.5%;width:37%;height:75%;box-sizing:border-box;border-radius:13px;padding:24px 14px;display:flex;flex-direction:column;justify-content:center;gap:16px;background:#fffefa;backdrop-filter:none;box-shadow:0 6px 22px #0f3d2e12;text-align:left;align-items:flex-start}
-.career-portrait figcaption>span{color:#eab42a;font-size:31px}
-.career-portrait figcaption strong{font-size:25px;line-height:1.2;letter-spacing:-.04em}
-.career-portrait figcaption small{font-size:11px;line-height:1.5;color:#52675d;font-weight:500}
-@media(max-width:1000px) and (min-width:651px){.career-hero .learn-hero-grid{grid-template-columns:1.1fr 1fr;gap:20px}.career-portrait figcaption{padding:17px 10px}.career-portrait figcaption strong{font-size:20px}.career-portrait figcaption small{font-size:9px}}
-@media(max-width:650px){.career-hero .learn-hero-grid{display:flex;gap:0}.career-portrait{height:auto;aspect-ratio:420/295;max-width:500px}.career-portrait>img{width:100%;height:100%;left:0;right:0}.career-portrait:before{display:none}.career-portrait figcaption{inset:6% auto auto 11.5%;width:37%;height:75%;padding:15px 10px;gap:9px;text-align:left}.career-portrait figcaption strong{font-size:21px}.career-portrait figcaption small{font-size:9px}.career-portrait figcaption>span{font-size:26px}}
-@media(max-width:350px){.career-portrait figcaption{padding:12px 8px;gap:8px}.career-portrait figcaption strong{font-size:17px}.career-portrait figcaption small{font-size:8px}}
-@media(min-width:1001px){
- .learn-main .learn-section-heading h2{font-size:30px}.career-pathway h3{font-size:24px}.career-pathway p{font-size:14px}.career-pathway-icon{height:96px}.career-pathway-icon img{height:92px}
+/* Full-page approved reference: compact desktop hierarchy and usable mobile reflow. */
+.career-hero .learn-hero-grid{grid-template-columns:1fr 1.15fr;gap:0;min-height:350px}
+.career-hero .learn-hero-text{padding-block:28px;position:relative;z-index:1}
+.career-hero h1{font-size:clamp(38px,3.8vw,58px)}
+.career-portrait{max-width:none;border-radius:0;box-shadow:none;background:transparent;margin-right:calc((min(100vw,1240px) - 100vw)/2);width:auto;justify-self:stretch}
+.career-portrait>img{object-fit:cover;object-position:62% center;width:100%;height:100%}
+.career-portrait:after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,#faf8f0,transparent 17%);pointer-events:none}
+.learn-main .learn-section-heading h2{font-size:28px}
+.career-pathway{padding:12px 16px 15px;border-radius:13px}
+.career-pathway-icon{height:65px;margin-bottom:6px}
+.career-pathway-icon img{height:64px;mask-image:none;mix-blend-mode:multiply}
+.career-pathway h3{font-size:19px;line-height:1.2;letter-spacing:-.035em;max-width:none;margin-bottom:6px}
+.career-pathway p{font-size:13px;line-height:1.4;margin-bottom:12px}
+.career-pathway-action{min-height:44px;font-size:11px}
+.career-journey{padding-top:24px}
+.career-journey-grid a{padding-bottom:13px}
+.career-journey-cta{display:none}
+.career-tools{margin-inline:-18px;padding:17px 16px;border:0;border-radius:15px}
+.career-tools-grid a{min-height:92px;box-sizing:border-box;border:0;padding:12px;gap:11px}
+.career-tools-grid a:nth-child(1){background:#f5faf1}.career-tools-grid a:nth-child(2){background:#fff0e7}.career-tools-grid a:nth-child(3){background:#fff7df}.career-tools-grid a:nth-child(4){background:#f5faf1}
+.career-tool-icon{width:52px;height:54px;border-radius:16px;background:#d9efdf}.career-tool-icon svg{width:38px;height:38px}
+.career-tools-grid a:nth-child(2) .career-tool-icon{background:#ffdac8}.career-tools-grid a:nth-child(4) .career-tool-icon{background:#d9efdf}
+.career-tools-grid strong{font-size:14px}.career-tools-grid small{font-size:12px;line-height:1.4}
+.learn-main .learn-featured,.learn-main .learn-browse{padding-top:24px}
+.learn-main .learn-browse{display:grid;grid-template-columns:minmax(230px,1fr) minmax(0,1.4fr);gap:0 16px}
+.learn-browse>.learn-section-heading{grid-column:1;grid-row:1;margin-bottom:4px}.learn-main .learn-browse-search{grid-column:2;grid-row:1;align-self:center;margin:0;border:0;padding:0;background:transparent;box-shadow:none}
+.learn-browse-search input,.learn-browse-search select{border:1px solid #c8d9ce;background:#fff;border-radius:11px}
+.learn-main .learn-browse-search input{font-size:12px;padding-inline:12px}.learn-main .learn-browse-search button{font-size:11px;padding-inline:15px;white-space:nowrap}
+.learn-browse>.learn-result-bar,.learn-browse>.learn-browse-grid,.learn-browse>.learn-empty,.learn-browse>noscript{grid-column:1/-1}
+.learn-result-bar{margin:0 0 4px;font-size:11px}.learn-result-bar p{margin:0}.learn-result-bar a{min-height:32px}
+.learn-main .learn-browse-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 14px;border:0;background:transparent;padding:0}
+.learn-main .learn-library-row{grid-template-columns:46px minmax(0,1fr) 44px;gap:12px;background:#fffefa;border:1px solid #e5ebe1;border-radius:0;padding:9px 12px}
+.learn-main .learn-library-row:nth-child(-n+2){border-radius:13px 13px 0 0}.learn-main .learn-library-row:nth-last-child(-n+2){border-radius:0 0 13px 13px}
+.learn-main .learn-library-row .learn-category-icon{width:44px;height:44px;border-radius:13px;display:grid;place-items:center;margin:0;aspect-ratio:1}
+.learn-category-icon svg{width:31px;height:31px}.learn-main .learn-library-row h3{font-size:14px;margin:0 0 3px}.learn-main .learn-library-row .learn-card-content{display:flex;flex-direction:row;flex-wrap:wrap;align-items:center;gap:4px 10px;padding:0}
+.learn-main .learn-library-row h3{order:-1;flex:0 0 100%}.learn-main .learn-library-row .learn-card-category{margin:0;padding:2px 7px;font-size:9px}.learn-main .learn-library-row .learn-card-meta{margin:0;font-size:10px}.learn-library-row .learn-card-meta>span:nth-child(2){display:none}
+@media(min-width:651px) and (max-width:1100px){.career-hero .learn-hero-grid{grid-template-columns:1.1fr 1fr;min-height:340px}.career-hero h1{font-size:43px}.career-tools-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.career-pathway h3{font-size:17px}.career-pathway-action{font-size:10px}.learn-main .learn-browse{display:block}.learn-browse>.learn-section-heading{margin-bottom:12px}.learn-main .learn-browse-search{margin-bottom:8px}}
+@media(max-width:650px){
+.career-hero .learn-hero-grid{display:flex;min-height:0;gap:0}.career-hero .learn-hero-text{padding:25px 22px 20px;max-width:500px}.career-hero h1{font-size:clamp(28px,8.7vw,34px)}
+.career-portrait{width:100%;max-width:none;margin:0;height:auto;aspect-ratio:568/277;align-self:stretch}.career-portrait>img{position:static;width:100%;height:100%;object-fit:cover}.career-portrait:before,.career-portrait:after{display:none}
+.learn-main .learn-section-heading h2{font-size:23px}.career-pathway{grid-template-columns:60px minmax(0,1fr);padding:12px}.career-pathway-icon{height:60px}.career-pathway-icon img{width:66px;height:auto;max-width:66px}.career-pathway h3{font-size:17px}.career-pathway-action{font-size:11px;margin-top:2px}
+.career-tools{margin-inline:0;padding:15px 12px}.career-tools-grid a{display:grid;grid-template-columns:36px minmax(0,1fr);gap:8px;min-height:105px;padding:11px 9px}.career-tool-icon{width:36px;height:42px;border-radius:12px}.career-tool-icon svg{width:28px;height:28px}.career-tools-grid strong{font-size:12px}.career-tools-grid small{font-size:11px}.career-tools-grid a>span:last-child{display:none}
+.learn-main .learn-browse{display:block}.learn-browse>.learn-section-heading{margin-bottom:12px}.learn-main .learn-browse-search{margin-bottom:7px;display:grid;grid-template-columns:minmax(0,1fr) auto}.learn-main .learn-browse-search input{grid-column:1/-1}.learn-main .learn-browse-grid{grid-template-columns:1fr;padding:0}.learn-main .learn-library-row{grid-template-columns:40px minmax(0,1fr) 33px;padding:10px;gap:10px}.learn-main .learn-library-row .learn-category-icon{width:40px;height:42px}.learn-main .learn-library-row h3{font-size:13px}.learn-main .learn-library-row .learn-card-category{font-size:8px}.learn-main .learn-library-row:nth-child(n){border-radius:0}.learn-main .learn-library-row:first-child{border-radius:12px 12px 0 0}.learn-main .learn-library-row:last-child{border-radius:0 0 12px 12px}
 }
-@media(max-width:650px){.career-hero h1{font-size:clamp(28px,8.7vw,34px);max-width:none}.career-portrait figcaption strong{font-size:18px}}
-@media(max-width:350px){.career-portrait figcaption strong{font-size:15px}}

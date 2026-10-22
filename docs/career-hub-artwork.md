@@ -1,24 +1,15 @@
 # Career Hub artwork provenance
 
-Source supplied by the user: VeeAys Remote Career Hub Mockup.png (1536×1024). Reused for this user's VeeAys correction. This file is not a claim of an independently licensed stock collection.
+Primary source: user attachment `VeeAys Career Hub_ Remote Work Resources.png`, 1024×1536, supplied in this chat on 22 October 2026.
+SHA256: 3a5906ea55b38b790c725c9ba3f7473d233de87499295e492236d062f168d3f9
 
-No image generation or paid AI calls. Crops encoded as WebP at quality 92. Decorative thumbnails have empty alt text next to equivalent live guide titles. The hero has descriptive alt text. The official /veeays-logo.png is unchanged; no logo was extracted for use as a site logo.
+Nine WebP crops reuse the supplied artwork directly, quality 94. No image generation, paid AI, stock downloads or logo recreation. Header and footer use the unchanged official logo asset. The laptop lettering is baked into the supplied artwork.
 
-The hero's original repeated step panel is hidden by the live tagline panel. Preserve their relative positions when changing this component. The supplied laptop lettering remains part of the reference crop, not a replacement for the official logo.
+Crop rectangles (left, top, right, bottom):
+- Hero: (456,62,1024,339)
+- Starting points: (137,410,216,463), (371,410,445,463), (575,410,657,463), (800,410,877,463)
+- Featured: (81,965,286,1063), (301,965,505,1063), (520,965,726,1063), (741,965,945,1063)
 
-Source SHA256: f06e44596396713a1852c50586d4ebd58b76aee28b881530f92e8f79127ce259
+Library category graphics use existing SVG icons, not photographic thumbnails. The two old unused library crops remain for compatibility.
 
-Crop boxes use (left, top, right, bottom) source pixels:
-- hero-man-shih-tzu: (422,59,842,354)
-- start-discover: (91,430,203,505)
-- start-resume: (287,431,367,502)
-- start-interview: (472,431,559,503)
-- start-safety: (669,431,747,504)
-- guide-discover: (877,81,1070,174)
-- guide-resume: (1089,81,1280,174)
-- guide-interview: (877,360,1070,452)
-- guide-safety: (1089,360,1280,452)
-- library-niche: (880,750,949,795)
-- library-application: (880,813,949,858)
-
-Limitations: source is a small composite and the dog has warm highlights, preserved as supplied. Replace with higher-resolution approved source art when available. No additional public attribution or original-art claims have been invented.
+Limits: the composite provides a 568×277 hero and approximately 205×98 featured images, so desktop enlargement is soft. The supplied black Shih Tzu has warm highlights on its coat; it has not been recolored to uniformly pure black. No new image-generation call was authorized or made. The hero has no tagline overlay; the framed lettering within the reference photo remains part of that photo.
