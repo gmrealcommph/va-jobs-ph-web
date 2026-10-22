@@ -68,17 +68,19 @@ begin
     return jsonb_build_object('status','reserved','actual_usd',v_actual,'held_usd',v_held);
   end if;
 
-  v_delta:=greatest(0,p_actual_usd-v_actual);
-  for h in
-    select token,hold_usd from quick_read_ops.quick_read_actual_spend_holds
-    where spend_day=p_day and hold_usd>0 order by created_at,token for update
-  loop
-    exit when v_delta<=0;
-    v_release:=least(h.hold_usd,v_delta);
-    update quick_read_ops.quick_read_actual_spend_holds set hold_usd=hold_usd-v_release where token=h.token;
-    v_held:=greatest(0,v_held-v_release);
-    v_delta:=v_delta-v_release;
-  end loop;
+  -- Costs are daily aggregates. A positive change proves at least one earlier
+  -- Quick Read call has appeared in actual spend; release one matching hold.
+  -- If several calls land in the same aggregate update, extra holds remain safe.
+  if p_actual_usd>v_actual then
+    select token,hold_usd into h
+    from quick_read_ops.quick_read_actual_spend_holds
+    where spend_day=p_day and hold_usd>0
+    order by created_at,token limit 1 for update;
+    if found then
+      update quick_read_ops.quick_read_actual_spend_holds set hold_usd=0 where token=h.token;
+      v_held:=greatest(0,v_held-h.hold_usd);
+    end if;
+  end if;
 
   v_actual:=greatest(v_actual,p_actual_usd);
   update quick_read_ops.quick_read_actual_daily_spend
