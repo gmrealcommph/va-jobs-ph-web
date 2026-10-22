@@ -6437,6 +6437,7 @@ body:has(.employer-page)>.site-footer .footer-bottom{padding-top:15px;padding-bo
 }
 body:has(.green-room-hero) .site-header{background:transparent;border-bottom:0}
 body:has(.green-room-hero) .site-header nav a,body:has(.green-room-hero) .site-header .header-actions a{color:#fff}
+body:has(.green-room-hero) .site-header.veeays-navigation .workspace-nav a{color:#103c2d}
 body:has(.green-room-hero) .site-header .header-actions .signup,body:has(.green-room-hero) .site-header .header-actions a[href*="signup"]{color:#103c2d}
 body:has(.green-room-hero) .veeays-logo-img{filter:grayscale(1) brightness(0) invert(1)}
 /* Keep the official logo asset; temporary white treatment until official light variant is supplied. */
