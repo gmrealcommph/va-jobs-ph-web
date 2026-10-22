@@ -53,13 +53,13 @@ export function layout({ title, description, canonical, body, noindex = false, u
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
   <meta property="og:image:type" content="image/png">
-  <meta property="og:image:alt" content="VeeAys — Better Jobs. From Home.">
+  <meta property="og:image:alt" content="VeeAys — Remote jobs for Filipino talent. Filipino talent. Global possibilities.">
 
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="${esc(title)}">
   <meta name="twitter:description" content="${esc(description)}">
   <meta name="twitter:image" content="https://veeays.com/images/veeays-social-v1.png">
-  <meta name="twitter:image:alt" content="VeeAys — Better Jobs. From Home.">
+  <meta name="twitter:image:alt" content="VeeAys — Remote jobs for Filipino talent. Filipino talent. Global possibilities.">
 
   <meta name="theme-color" content="#123e30">
 

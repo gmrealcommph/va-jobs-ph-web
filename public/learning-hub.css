@@ -172,3 +172,32 @@
 .career-tools{margin-inline:0;padding:15px 12px}.career-tools-grid a{display:grid;grid-template-columns:36px minmax(0,1fr);gap:8px;min-height:105px;padding:11px 9px}.career-tool-icon{width:36px;height:42px;border-radius:12px}.career-tool-icon svg{width:28px;height:28px}.career-tools-grid strong{font-size:12px}.career-tools-grid small{font-size:11px}.career-tools-grid a>span:last-child{display:none}
 .learn-main .learn-browse{display:block}.learn-browse>.learn-section-heading{margin-bottom:12px}.learn-main .learn-browse-search{margin-bottom:7px;display:grid;grid-template-columns:minmax(0,1fr) auto}.learn-main .learn-browse-search input{grid-column:1/-1}.learn-main .learn-browse-grid{grid-template-columns:1fr;padding:0}.learn-main .learn-library-row{grid-template-columns:40px minmax(0,1fr) 33px;padding:10px;gap:10px}.learn-main .learn-library-row .learn-category-icon{width:40px;height:42px}.learn-main .learn-library-row h3{font-size:13px}.learn-main .learn-library-row .learn-card-category{font-size:8px}.learn-main .learn-library-row:nth-child(n){border-radius:0}.learn-main .learn-library-row:first-child{border-radius:12px 12px 0 0}.learn-main .learn-library-row:last-child{border-radius:0 0 12px 12px}
 }
+/* Resources hero: shared cream, mint and illustrated visual language. */
+.career-hero-illustrated{background:linear-gradient(110deg,#faf8f0 35%,#eff7ec 76%,#f5f8ed);overflow:hidden}
+.career-hero-illustrated .learn-hero-grid{grid-template-columns:1.05fr 1fr;min-height:410px;gap:0;position:relative}
+.career-hero-illustrated .learn-hero-text{padding:32px 0;z-index:2}
+.career-hero-illustrated .learn-eyebrow{color:#517968;letter-spacing:.2em;font-size:11px;margin-bottom:16px}
+.career-hero-illustrated h1{font-size:clamp(38px,3.8vw,56px);line-height:1.07;letter-spacing:-.045em;max-width:650px;margin-bottom:18px}
+.career-hero-illustrated h1 span:after{height:4px;bottom:-5px;border-radius:100%}
+.career-hero-illustrated .learn-hero-copy{font-size:15px;line-height:1.65;max-width:580px;color:#3f6555;margin-bottom:20px}
+.career-hero-illustrated .career-hero-actions{display:grid;grid-template-columns:1fr 1fr;gap:12px;max-width:585px}
+.career-hero-illustrated .learn-button{border-radius:15px;background:#ffcc3e;color:#103f31;border:1px solid #f5bd2e;min-height:76px;padding:14px 16px;gap:12px;justify-content:flex-start;font-size:15px;line-height:1.25;box-sizing:border-box;box-shadow:0 3px 9px #315c2410;text-align:left;max-width:none}
+.career-hero-illustrated .career-secondary{background:#edf8f0;border-color:#99d7b6}
+.career-hero-illustrated .learn-button small{display:block;font-size:10px;font-weight:400;margin-top:6px}
+.career-hero-illustrated .learn-button>span:last-child{margin-left:auto}
+.career-hero-illustrated .career-action-icon{font-size:25px;flex-shrink:0}
+.career-hero-illustrated .learn-button:hover{filter:brightness(.97);transform:translateY(-1px)}
+.career-benefits{display:flex;gap:20px;list-style:none;padding:0;margin:23px 0 0;color:#174d3a}
+.career-benefits li{display:flex;align-items:center;gap:9px}
+.career-benefits li>span{display:grid;place-items:center;background:#c6ead8;border-radius:50%;width:34px;height:34px;flex-shrink:0;font-size:20px}
+.career-benefits strong{display:block;font-size:11px;font-weight:600}.career-benefits small{display:block;font-size:9px;margin-top:5px}
+.career-hero-illustrated .career-portrait{position:relative;align-self:center;margin:0 -25px 0 -20px;width:calc(100% + 45px);height:auto;aspect-ratio:3/2;overflow:visible;min-height:0;background:transparent}
+.career-hero-illustrated .career-portrait>img{position:static;display:block;width:100%;height:auto;object-fit:contain;mask-image:linear-gradient(90deg,transparent,#000 8%,#000 94%,transparent),linear-gradient(0deg,transparent,#000 7%,#000 94%,transparent);mask-composite:intersect}
+.career-hero-illustrated .career-portrait:before,.career-hero-illustrated .career-portrait:after{display:none}
+@media(min-width:651px) and (max-width:1000px){.career-hero-illustrated .learn-hero-grid{grid-template-columns:1.15fr 1fr}.career-hero-illustrated h1{font-size:40px}.career-hero-illustrated .learn-button{font-size:12px;padding:12px 10px;gap:7px}.career-benefits{gap:10px;flex-wrap:wrap}.career-benefits li>span{width:28px;height:28px}.career-hero-illustrated .career-action-icon{font-size:21px}}
+@media(max-width:650px){.career-hero-illustrated .learn-hero-grid{display:flex;flex-direction:column;min-height:0;padding:0}.career-hero-illustrated .learn-hero-text{padding:25px 22px 0;width:100%;box-sizing:border-box;max-width:560px}.career-hero-illustrated h1{font-size:clamp(31px,8.5vw,43px);line-height:1.08;margin-bottom:15px}.career-hero-illustrated .learn-eyebrow{font-size:9px;margin-bottom:12px}.career-hero-illustrated .learn-hero-copy{font-size:13px;line-height:1.6;margin-bottom:16px}.career-hero-illustrated .career-hero-actions{gap:9px}.career-hero-illustrated .learn-button{min-height:75px;font-size:12px;padding:12px 10px;gap:7px}.career-hero-illustrated .learn-button small{font-size:9px;line-height:1.35}.career-hero-illustrated .learn-button>span:last-child{display:none}.career-hero-illustrated .career-action-icon{font-size:21px}.career-benefits{gap:9px;justify-content:space-between;margin-top:18px}.career-benefits li{gap:5px;flex:1;align-items:flex-start}.career-benefits li>span{width:25px;height:25px;font-size:16px}.career-benefits strong{font-size:9px;line-height:1.3}.career-benefits small{font-size:8px;line-height:1.4;margin-top:3px}.career-hero-illustrated .career-portrait{width:100%;max-width:500px;margin:0 auto;aspect-ratio:3/2;height:auto;align-self:center}.career-hero-illustrated .career-portrait>img{height:auto}}
+@media(prefers-reduced-motion:reduce){.career-hero-illustrated .learn-button:hover{transform:none}}
+.career-hero-illustrated .career-hero-actions{grid-template-columns:repeat(2,minmax(0,1fr))}.career-hero-illustrated .learn-button{min-width:0;white-space:normal}
+@media(max-width:350px){.career-hero-illustrated .career-hero-actions{grid-template-columns:1fr}.career-hero-illustrated .learn-button{min-height:64px}.career-benefits{flex-wrap:wrap}.career-benefits li{min-width:70px}}
+/* Blend starting-point artwork into its card without rectangular image backplates. */
+.career-pathways .career-pathway-icon img{mix-blend-mode:multiply;mask-image:radial-gradient(ellipse at center,#000 42%,#000 52%,transparent 72%);-webkit-mask-image:radial-gradient(ellipse at center,#000 42%,#000 52%,transparent 72%)}

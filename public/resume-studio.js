@@ -37,7 +37,10 @@ function workspaceView(view){$('.studio-grid').dataset.view=view;$('#view-edit')
 $('#view-edit').onclick=()=>workspaceView('edit');$('#view-preview').onclick=()=>workspaceView('preview');
 function setDraft(d){for(const input of form.elements)if(input.name)input.value=d[input.name]||'';render();$('#suggestions').replaceChildren();}
 function mode(improve){$('#build-panel').hidden=improve;$('#improve-panel').hidden=!improve;$('#build-mode').setAttribute('aria-pressed',String(!improve));$('#improve-mode').setAttribute('aria-pressed',String(improve));}
-$('#build-mode').onclick=()=>{mode(false);setStep('personal',true);};$('#improve-mode').onclick=()=>{setStep('personal',false);mode(true);workspaceView('edit');$('#resume-source').focus();};form.addEventListener('input',()=>{importRevision++;$('#suggestions').replaceChildren();render();});
+$('#build-mode').onclick=()=>{mode(false);setStep('personal',true);};$('#improve-mode').onclick=()=>{setStep('personal',false);mode(true);workspaceView('edit');$('#resume-source').focus();};
+form.addEventListener('pointerdown',event=>{const field=event.target;if(!(field instanceof HTMLTextAreaElement))return;const section=field.closest('.section-control');if(!section||section.hidden)return;section.open=true;requestAnimationFrame(()=>{if(field.isConnected&&document.activeElement!==field)field.focus({preventScroll:true});}},true);
+form.addEventListener('focusin',event=>{const field=event.target;if(field instanceof HTMLTextAreaElement)field.closest('.section-control')?.toggleAttribute('open',true);});
+form.addEventListener('input',event=>{const field=event.target;const selection=typeof field.selectionStart==='number'?{start:field.selectionStart,end:field.selectionEnd,direction:field.selectionDirection}:null;importRevision++;$('#suggestions').replaceChildren();render();if(field instanceof HTMLTextAreaElement&&document.activeElement!==field){field.focus({preventScroll:true});if(selection)field.setSelectionRange(selection.start,selection.end,selection.direction);}});
 $('#resume-source').addEventListener('input',()=>{version++;importRevision++;});
 $('#parse').onclick=()=>{if(Object.values(values()).some(x=>x.trim())&&!window.confirm('Replace this draft with the pasted text? Duplicate or download this draft first to keep it.'))return;try{setDraft(parseResume($('#resume-source').value));setStep('personal',true);mode(false);notice('Text copied into editable sections. Check every section before export.');}catch(e){notice(e.message);}};
 $('#resume-file').onchange=async e=>{
@@ -100,7 +103,6 @@ function setStep(key,focus=false){
 }
 function openFirstField(key){const field=stepFields[key][0];for(const section of sections)section.open=section.dataset.field===field;$('#r-'+field).focus();}
 function openSection(key){const step=stepKeys.find(k=>stepFields[k].includes(key));setStep(step);for(const section of sections)section.open=section.dataset.field===key;$('#r-'+key).focus();}
-for(const section of sections)section.addEventListener('toggle',()=>{if(section.open)for(const other of sections)if(other!==section)other.open=false;});
 $('#previous-section').onclick=()=>setStep(stepKeys[Math.max(0,stepKeys.indexOf(currentStep)-1)],true);
 $('#next-section').onclick=()=>setStep(stepKeys[Math.min(4,stepKeys.indexOf(currentStep)+1)],true);
 for(const button of document.querySelectorAll('[data-step]'))button.onclick=()=>setStep(button.dataset.step,true);

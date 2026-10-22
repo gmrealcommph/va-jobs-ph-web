@@ -1,5 +1,6 @@
 const account='e3383856f0658ad90cee219395f6e91e';
 const cache=new Map();
+let rumSiteCache={siteTag:null,expires:0};
 export function referrerSource(host){
   host=String(host||'').toLowerCase().replace(/\.$/,'');
   const domain=d=>host===d||host.endsWith('.'+d);
@@ -58,6 +59,35 @@ async function fetchVisitors(env,dates,{request}){
       report.attribution={available:true,sources:[...groups].map(([source,visits])=>({source,visits})).sort((a,b)=>b.visits-a.visits),landings:[...pages].map(([path,visits])=>({path,visits})).sort((a,b)=>b.visits-a.visits).slice(0,20),truncated:a.referrers.length===1000||a.landings.length===1000,utm_available:false,conversions_available:false};
     }catch{report.attribution={available:false,reason:'dimensions_unavailable'};}
     return report;
+  }catch{return {available:false,reason:'provider_error'};}
+}
+// Cloudflare Web Analytics is an aggregate feed, not a connection tracker. This
+// short rolling window is the closest available live signal and must be labeled
+// as recent visits rather than exact people currently online.
+export async function recentVisitorActivity(env,{request=fetch,now=Date.now()}={}){
+  if(!env.CLOUDFLARE_ANALYTICS_TOKEN)return {available:false,reason:'not_connected'};
+  const headers={Authorization:'Bearer '+env.CLOUDFLARE_ANALYTICS_TOKEN,'content-type':'application/json'};
+  try{
+    let siteTag=rumSiteCache.expires>Date.now()?rumSiteCache.siteTag:null;
+    if(!siteTag){
+      const sitesResponse=await request('https://api.cloudflare.com/client/v4/accounts/'+account+'/rum/site_info/list?per_page=100',{headers,signal:AbortSignal.timeout(5000)});
+      if(!sitesResponse.ok)return {available:false,reason:sitesResponse.status===403||sitesResponse.status===401?'access_denied':'provider_error'};
+      const sites=await sitesResponse.json();
+      if(!sites.success||!Array.isArray(sites.result))return {available:false,reason:'provider_error'};
+      const matches=sites.result.filter(s=>s.ruleset?.zone_name==='veeays.com'&&/^[a-f0-9]{32}$/.test(s.site_tag||''));
+      if(matches.length!==1)return {available:false,reason:'site_not_found'};
+      siteTag=matches[0].site_tag;rumSiteCache={siteTag,expires:Date.now()+6*60*60*1000};
+    }
+    const end=new Date(now),start=new Date(now-5*60*1000);
+    const fields=Object.entries({datetime_geq:start.toISOString(),datetime_lt:end.toISOString(),siteTag,requestHost:'veeays.com',bot:0}).map(([key,value])=>key+':'+JSON.stringify(value)).join(',');
+    const query='{viewer{accounts(filter:{accountTag:'+JSON.stringify(account)+'}){recent:rumPageloadEventsAdaptiveGroups(limit:1000,filter:{'+fields+'},orderBy:[datetimeMinute_DESC]){count sum{visits} dimensions{datetimeMinute}}}}}';
+    const response=await request('https://api.cloudflare.com/client/v4/graphql',{method:'POST',headers,body:JSON.stringify({query}),signal:AbortSignal.timeout(5000)});
+    if(!response.ok)return {available:false,reason:'provider_error'};
+    const payload=await response.json(),accounts=payload.data?.viewer?.accounts;
+    if(payload.errors?.length||!Array.isArray(accounts)||accounts.length!==1||!Array.isArray(accounts[0].recent))return {available:false,reason:'query_error'};
+    const rows=accounts[0].recent;
+    if(rows.length>1000||!rows.every(row=>Number.isFinite(row.sum?.visits)&&row.sum.visits>=0))return {available:false,reason:'query_error'};
+    return {available:true,visits:rows.reduce((total,row)=>total+row.sum.visits,0),window_minutes:5,source:'Cloudflare Web Analytics',sampled_or_delayed:true,fetched_at:new Date().toISOString()};
   }catch{return {available:false,reason:'provider_error'};}
 }
 // Only known public landing paths; discard query strings, private paths and arbitrary strings.

@@ -1,6 +1,6 @@
 import { sessionForRequest, setSessionCookies, clearSessionCookies } from './auth.js';
 import { config } from './data.js';
-import { visitorAnalytics } from './admin-visitors.js';
+import { visitorAnalytics, recentVisitorActivity } from './admin-visitors.js';
 import { cachedEmailUsage, actionCenter } from './admin-health.js';
 import {providerBalances} from './admin-balances.js';
 import {QUICK_READ_CRON} from './quick-read-scheduled.js';
@@ -46,7 +46,7 @@ async function rpc(env, token, name, body) {
   if(!response.ok) throw Object.assign(new Error('Analytics unavailable'),{status:response.status});
   return response.json();
 }
-export async function adminEndpoint(request, env, {session=sessionForRequest, call=rpc, visitors=visitorAnalytics, usage=cachedEmailUsage, balances=providerBalances}={}) {
+export async function adminEndpoint(request, env, {session=sessionForRequest, call=rpc, visitors=visitorAnalytics, liveVisitors=recentVisitorActivity, usage=cachedEmailUsage, balances=providerBalances}={}) {
   const url=new URL(request.url), monitor=url.pathname==='/admin/api/quick-reads', api=monitor||url.pathname==='/admin/api/analytics';
   const headers=new Headers(privateHeaders);
   const reply=(body,status,type='text/html; charset=utf-8')=>{
@@ -97,11 +97,13 @@ export async function adminEndpoint(request, env, {session=sessionForRequest, ca
       for(const result of secured)if(result.status==='rejected'&&[401,403].includes(result.reason?.status))throw result.reason;
       const providers=await Promise.allSettled([
         Promise.resolve().then(()=>visitors(env,dates)),
+        Promise.resolve().then(()=>liveVisitors(env)),
         Promise.resolve().then(()=>usage(env)),Promise.resolve().then(()=>balances(env))
       ]);
-      const optional=[providers[0],secured[0],secured[1],providers[1],providers[2],secured[2],secured[3]];
+      const optional=[providers[0],secured[0],secured[1],providers[2],providers[3],secured[2],secured[3]];
       const value=(index,fallback)=>optional[index].status==='fulfilled'?optional[index].value:fallback;
       data.visitors=value(0,{available:false,reason:'provider_error'});
+      data.live_visitors=providers[1].status==='fulfilled'?providers[1].value:{available:false,reason:'provider_error'};
       data.traffic=value(1,{available:false,reason:'not_connected'});
       data.extended=value(2,{available:false});
       if(call===rpc&&data.extended?.available&&snapshots.has(cacheKey))snapshots.get(cacheKey).extended=structuredClone(data.extended);
@@ -134,7 +136,7 @@ export function adminPage() {
 <div class="reference-board">
 <section id="overview" class="cards"></section>
 <section id="action-center"><div class="section-heading"><h2>Action Center</h2><p>Read-only issues · follow links to inspect</p></div><article id="actions"></article></section>
-<div class="growth-row"><section id="collection-panel" class="growth-panel"><div class="section-heading"><h2>Collection Health</h2><p>Job boards · latest arrivals</p></div><div id="collection-health"></div></section><section class="quick-stats-panel"><div class="section-heading"><h2>Operational snapshot</h2><p>Queue, access and delivery</p></div><div id="quick-stats" class="cards"></div></section><div id="overview-insights" class="overview-insights" aria-label="Member, traffic and email summaries"></div></div>
+<div class="growth-row"><section id="collection-panel" class="growth-panel"><div class="section-heading"><h2>Collection Health</h2><p>Job boards · latest arrivals</p></div><div id="collection-health"></div></section><section class="quick-stats-panel"><div class="section-heading"><h2>Operational snapshot</h2><p>Queue, access and delivery</p></div><div id="quick-stats" class="cards"></div></section><div id="overview-insights" class="overview-insights" aria-label="Member, traffic and live visitor summaries"></div></div>
 </div>
 <section id="members"><div class="section-heading"><h2>Member Analytics</h2><p>Current access and registration cohorts</p></div><article id="member-detail"></article></section>
 <section id="marketing"><link rel="stylesheet" href="/admin-traffic.css"><div class="section-heading"><h2>Site Visitors &amp; Traffic Sources</h2><p>Measured traffic · attribution coverage</p></div><article id="marketing-detail"></article></section>
