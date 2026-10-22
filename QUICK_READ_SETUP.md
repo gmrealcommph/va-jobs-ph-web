@@ -30,11 +30,18 @@ Cloudflare Dashboard → Workers & Pages → the existing `va-jobs-ph-web` Worke
 
 Secret names:
 
-- `OPENAI_API_KEY` — NEW, OpenAI project API key with the chosen model enabled.
-- `QUICK_READ_ADMIN_TOKEN` — NEW, random operator token at least 32 characters; store securely for the one-job operator command.
+- `OPENAI_QUICKREADS` — dedicated OpenAI project API key used only by Quick Reads; keep the existing `OPENAI_API_KEY` for other features.
+- `OPENAI_QUICKREADS_ADMIN` — OpenAI Admin API key with read access to organization costs.
+- `QUICK_READ_ADMIN_TOKEN` — random operator token at least 32 characters; store securely for the one-job operator command.
 - `SUPABASE_SERVICE_ROLE_KEY` — EXISTING server convention; ensure it is already present for this Worker. Supports `sb_secret_` or legacy service-role JWT. Do not duplicate/replace it if already configured.
 
+Worker variable:
+
+- `OPENAI_QUICK_READS_API_KEY_ID` — the ID of the dedicated `OPENAI_QUICKREADS` key. It is used to filter Costs API data and is not a secret.
+
 Existing `SUPABASE_URL` and `SUPABASE_PUBLISHABLE_KEY` remain as configured.
+
+The Worker reads the current UTC day's aggregate from OpenAI's Costs API before each provider claim. A database ledger reserves up to $0.14 for each in-flight call until the aggregate reflects that spend. Generation stops when reported spend plus outstanding holds plus the next hold would exceed $0.50, or if the Costs API, key configuration or database guard is unavailable. Costs are daily UTC buckets, so the reset occurs at 8:00 AM Manila time. Apply `migrations/013_quick_read_actual_daily_spend.sql` before enabling the production rollout gate. This migration leaves that gate disabled; only enable it after the Worker code is deployed and its three cost settings have been saved.
 
 Plain runtime variable names and values:
 

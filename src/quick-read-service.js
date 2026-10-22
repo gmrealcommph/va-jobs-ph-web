@@ -1,6 +1,7 @@
 import { rest } from './notifications.js';
 import { FORMATTER_VERSION, SCHEMA_VERSION, SOURCE_RULES_VERSION, sourceFingerprint, sourceUnits, validateStored, generateWithProvider } from './quick-read-generation.js';
 import {failureDiagnostics,storedSelection} from './quick-read-diagnostics.js';
+import {readQuickReadDailyCost} from './quick-read-spend.js';
 
 function serverConfig(env) {
   const url=new URL(env.SUPABASE_URL);
@@ -13,8 +14,23 @@ export async function rpc(env, name, args) {
 }
 export async function generateJob(env, id, {call=rpc,generate=generateWithProvider}={}) {
   const token=crypto.randomUUID();
+  if(call===rpc) {
+    try {
+      const spend=await readQuickReadDailyCost(env);
+      const guard=await call(env,'quick_read_actual_spend_reserve',{
+        p_job_id:String(id),p_token:token,p_day:spend.day,p_api_key_id:env.OPENAI_QUICK_READS_API_KEY_ID,
+        p_actual_usd:spend.actualUsd,p_hold_usd:spend.holdUsd
+      });
+      if(guard.status!=='reserved') return {job_id:String(id),status:guard.status==='spending_stopped'?'spending_stopped':'spend_unavailable'};
+    } catch {
+      return {job_id:String(id),status:'spend_unavailable'};
+    }
+  }
   const claim=await call(env,'claim_job_quick_read_auto',{p_job_id:String(id),p_formatter:FORMATTER_VERSION,p_token:token,p_source_rules:SOURCE_RULES_VERSION});
-  if(claim.status!=='claimed') return {job_id:String(id),status:claim.status};
+  if(claim.status!=='claimed') {
+    if(call===rpc) await call(env,'quick_read_actual_spend_release',{p_token:token});
+    return {job_id:String(id),status:claim.status};
+  }
   let generated;
   try {
     sourceUnits(claim.description);
@@ -49,7 +65,7 @@ export async function quickReadEndpoint(request, env, id, deps={}) {
   const expected=env.QUICK_READ_ADMIN_TOKEN;
   const actual=(request.headers.get('authorization') || '').replace(/^Bearer /,'');
   if(!expected || expected.length<32 || !actual || actual.length>512 || !await tokenMatches(actual,expected)) return json({error:'unauthorized'},401);
-  if(!env.OPENAI_API_KEY || !env.QUICK_READ_MODEL || (env.QUICK_READ_PROVIDER || 'openai')!=='openai') return json({error:'provider_not_configured'},503);
+  if(!env.OPENAI_QUICKREADS || !env.OPENAI_QUICKREADS_ADMIN || !env.OPENAI_QUICK_READS_API_KEY_ID || !env.QUICK_READ_MODEL || (env.QUICK_READ_PROVIDER || 'openai')!=='openai') return json({error:'provider_not_configured'},503);
   const call=deps.call || rpc;
   try {
     if(id) return json(await generateJob(env,id,deps));
@@ -71,9 +87,9 @@ export async function quickReadEndpoint(request, env, id, deps={}) {
     const results=[];
     for(const job of jobs) {
       const result=await generateJob(env,job.id,deps); results.push(result);
-      if(result.status==='rate_limited' || result.status==='busy') break;
+      if(['rate_limited','busy','spending_stopped','spend_unavailable','rollout_disabled','credit_paused','rollout_exhausted'].includes(result.status)) break;
     }
-    const completed=results.filter(r=>!['rate_limited','busy'].includes(r.status));
+    const completed=results.filter(r=>!['rate_limited','busy','spending_stopped','spend_unavailable','rollout_disabled','credit_paused','rollout_exhausted'].includes(r.status));
     return json({results,next_after_id:completed.at(-1)?.job_id || String(args.after_id || '0')});
   } catch { return json({error:'quick_read_service_unavailable'},503); }
 }
