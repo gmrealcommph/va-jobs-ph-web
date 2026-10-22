@@ -36,11 +36,12 @@ test('all original editorial sections and exercises remain, with checklists and 
 test('Career Hub uses lightweight pathways, preserves all guides and corrects shared branding',()=>{
  parse(readFileSync(new URL('../public/learning-hub.js',import.meta.url),'utf8'),{ecmaVersion:'latest',sourceType:'module'});
  const html=learningPage('/resources').body;
- assert.match(html,/Your Remote<br><span>Career Starts Here/);
+ assert.match(html,/Your remote<br><span>career<\/span> starts here\./);
  assert.match(html,/Start My Journey/);assert.match(html,/Build My Résumé/);
  assert.match(html,/Your Path to Remote Work/);assert.match(html,/Put Your Learning Into Action/);
- assert.doesNotMatch(html,/<img|resources-hero|course complete|progress saved|localStorage/);
- assert.equal((html.match(/class="career-road-link"/g)||[]).length,4);
+ assert.doesNotMatch(html,/career-dashboard|career-road-link|course complete|progress saved|localStorage/);
+ assert.match(html,/alt="A friendly man working from home beside a black Shih Tzu"/);
+ assert.equal((html.match(/class="career-journey-title"/g)||[]).length,4);
  for(const guide of learningGuides)assert.ok(html.includes('/resources/'+guide.slug));
  const render=readFileSync(new URL('../src/render.js',import.meta.url),'utf8');
  assert.doesNotMatch(render,/Global possibilities\./);
