@@ -64,24 +64,24 @@ test('sound defaults on, unlocks only after interaction, and can be muted',async
 test('compact insights preserve measured zero, unavailable states and escaped sources',async()=>{
  const p=await page();
  const unknown=vm.runInContext('renderOverviewInsights({})',p.context);
- assert.match(unknown,/Member details unavailable/);assert.match(unknown,/Traffic data temporarily unavailable/);assert.match(unknown,/Email quota unavailable/);
+ assert.match(unknown,/Member details unavailable/);assert.match(unknown,/Traffic data temporarily unavailable/);assert.match(unknown,/First-party activity tracking is not connected/);assert.match(unknown,/flip-unavailable/);
  const report=data();report.extended={available:true,members:{verified:0,unverified:0,cohort_registered:0,cohort_verified_now:0,cohort_purchased_now:0}};
  report.visitors={attribution:{available:true,sources:[{source:'<script>bad</script>',visits:0}]}};
- report.traffic={available:true,sessions:0,sources:[]};
+ report.traffic={available:true,sessions:0,sources:[]};report.live_visitors={available:true,visits:0};
  p.state.responses.push({status:200,body:report});await p.poll();
  const html=p.nodes['overview-insights'].innerHTML;assert.match(html,/Verified · now/);assert.match(html,/>0<\/strong>/);assert.doesNotMatch(html,/&lt;script&gt;/);assert.doesNotMatch(html,/<script>|NaN|undefined/);
  assert.match(html,/0 registrations/);assert.match(html,/Cohort verified<\/span><strong>—/);
 });
 
-test('traffic includes all sources in its total; quota distinguishes exhausted, uncapped and unknown',async()=>{
+test('traffic totals include all sources; email section preserves exhausted, uncapped and unknown quota',async()=>{
  const p=await page(),report=data();
  report.visitors={attribution:{available:true,sources:[{source:'A',visits:9},{source:'B',visits:4},{source:'C',visits:2},{source:'<D>',visits:1},{source:'E',visits:1}]}};
  report.traffic={available:true,sessions:17,sources:[{channel:'Google organic',sessions:9},{channel:'Direct / unknown',sessions:4},{channel:'Referrals',sessions:2},{channel:'Facebook',sessions:1},{channel:'<D>',sessions:1}]};
  report.email_health={usage:{available:true,daily:{used:135,limit:100,level:'critical'},monthly:{used:135,limit:null,level:'normal'}}};
  p.context.report=report;let html=vm.runInContext('renderOverviewInsights(report)',p.context);
- assert.ok(html.includes('>17</strong>'));assert.match(html,/Other: 1 sessions/);assert.match(html,/>135%/);assert.match(html,/Daily quota exhausted/);assert.match(html,/135 \/ uncapped/);assert.match(html,/stroke-dasharray="100.00 100"/);assert.doesNotMatch(html,/NaN|undefined|<D>/);
- report.email_health.usage.daily={used:10,limit:null,level:'normal'};html=vm.runInContext('renderOverviewInsights(report)',p.context);assert.match(html,/>Uncapped<\/strong>/);assert.doesNotMatch(html,/left today/);
- report.email_health.usage.available=false;html=vm.runInContext('renderOverviewInsights(report)',p.context);assert.match(html,/Email quota unavailable/);assert.doesNotMatch(html,/left today/);
+ assert.ok(html.includes('>17</strong>'));assert.match(html,/Other: 1 sessions/);p.state.responses.push({status:200,body:report});await p.poll();assert.match(p.nodes.email.innerHTML,/135.0%/);assert.match(p.nodes.email.innerHTML,/Quota exhausted/);assert.match(p.nodes.email.innerHTML,/135 \/ Uncapped/);assert.doesNotMatch(html,/NaN|undefined|<D>/);
+ report.email_health.usage.daily={used:10,limit:null,level:'normal'};p.state.responses.push({status:200,body:report});await p.poll();assert.match(p.nodes.email.innerHTML,/10 \/ Uncapped/);assert.doesNotMatch(p.nodes.email.innerHTML,/daily remaining/);
+ report.email_health.usage.available=false;p.state.responses.push({status:200,body:report});await p.poll();assert.match(p.nodes.email.innerHTML,/Quota unknown/);assert.doesNotMatch(p.nodes.email.innerHTML,/daily remaining/);
 });
 
 test('Action Center prioritizes urgent issues and keeps inspection links read-only and escaped',async()=>{

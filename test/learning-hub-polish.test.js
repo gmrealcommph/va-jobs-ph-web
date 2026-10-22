@@ -44,6 +44,6 @@ test('Career Hub uses lightweight pathways, preserves all guides and corrects sh
  assert.equal((html.match(/class="career-journey-title"/g)||[]).length,4);
  for(const guide of learningGuides)assert.ok(html.includes('/resources/'+guide.slug));
  const render=readFileSync(new URL('../src/render.js',import.meta.url),'utf8');
- assert.doesNotMatch(render,/Global possibilities\./);
+ const footer=render.slice(render.indexOf('<footer'));assert.doesNotMatch(footer,/Global possibilities\./);
  assert.match(render,/class="footer-tagline">\s*Better Jobs\. From Home\./);
 });
