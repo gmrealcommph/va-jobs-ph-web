@@ -25,3 +25,15 @@ The implementation follows the reference's section hierarchy, warm palette, four
 Artwork is extracted from the attached composite, so it is softer at desktop enlargement than a standalone high-resolution export. The supplied black dog has warm coat highlights and is not uniformly pure black; no recoloring or new generated artwork was performed. The framed text within the supplied hero photo remains baked into that image; there is no live tagline overlay.
 
 User-facing review includes staging desktop/mobile screenshots, a normalized side-by-side reference comparison, visual-review.html and verification evidence. Stop for user approval; production publication requires a separate explicit instruction.
+
+## Approved production publication — 22 October 2026, 10:41 AM Asia/Manila
+
+The user approved the staging screenshots and explicitly requested live deployment. Published https://veeays.com/resources at 100% traffic.
+Production version: 807b632d-031e-44cc-a537-d91b6c9be7c6.
+Rollback version: b11795ea-2c80-42bf-b7c5-51abefca601a.
+
+A concurrent résumé focus release was detected before activation. The final release uses that release's saved verified backend module and preserves its contact-click-focus script reference. Exactly three scoped replacements were made: the Career Hub guide/rendering module, passing URL search parameters to its route, and the already approved footer tagline. Every byte outside those replacements matches the active baseline module. All 110 non-Career-Hub static assets were fetched from the live site and preserved. Version upload alone does not imply publication; only the final verified version was activated for this task.
+
+All 53 bindings, runtime settings and four schedules were verified unchanged. Existing payment/background settings were preserved from production rather than copied from staging; résumé AI remains disabled. The PR branch was not merged over newer unrelated code.
+
+Live browser review passed at five landing widths and all six guides at desktop/mobile, with functional search/filter/reset/history and JavaScript-free GET search, no page errors or horizontal overflow. Public homepage, Résumé Studio, jobs, categories and Pro return 200. Logo/navigation/résumé asset hashes match the preserved baseline, and the live résumé page keeps its latest focus-fix script URL. Live desktop/mobile screenshots and production-release.json are delivered in outputs.
