@@ -10,8 +10,9 @@ function utcDay(now) {
 
 export async function readQuickReadDailyCost(env, { fetcher = fetch, now = Date.now() } = {}) {
   const adminKey = env.OPENAI_QUICKREADS_ADMIN;
+  const projectId = env.OPENAI_QUICK_READS_PROJECT_ID;
   const apiKeyId = env.OPENAI_QUICK_READS_API_KEY_ID;
-  if (!adminKey || !apiKeyId) throw new Error('spend_guard_not_configured');
+  if (!adminKey || !projectId || !apiKeyId) throw new Error('spend_guard_not_configured');
 
   const { start, end } = utcDay(now);
   let page = null;
@@ -25,8 +26,8 @@ export async function readQuickReadDailyCost(env, { fetcher = fetch, now = Date.
       bucket_width: '1d',
       limit: '180'
     });
-    params.append('group_by', 'api_key_id');
-    params.append('api_key_ids', apiKeyId);
+    params.append('group_by', 'project_id');
+    params.append('project_ids', projectId);
     if (page) params.set('page', page);
 
     const response = await fetcher(`https://api.openai.com/v1/organization/costs?${params}`, {
@@ -39,7 +40,7 @@ export async function readQuickReadDailyCost(env, { fetcher = fetch, now = Date.
     for (const bucket of data.data) {
       if (!Array.isArray(bucket.results)) throw new Error('spend_data_unavailable');
       for (const row of bucket.results) {
-        if (row.api_key_id !== apiKeyId) continue;
+        if (row.project_id !== projectId) continue;
         const value = row.amount?.value;
         if (row.amount?.currency !== 'usd' || typeof value !== 'number' || !Number.isFinite(value) || value < 0) {
           throw new Error('spend_data_unavailable');

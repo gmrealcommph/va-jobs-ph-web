@@ -4,7 +4,7 @@ export const QUICK_READ_CRON = '* * * * *';
 // Bounded invocation work; the database serializes claims and provider cooldowns.
 export async function scheduledQuickReads(controller, env, {call=rpc, run=generateJob, log=console.log}={}) {
   if(controller.cron!==QUICK_READ_CRON || env.QUICK_READ_AUTO_ENABLED!=='true') return;
-  if(!env.OPENAI_QUICKREADS || !env.OPENAI_QUICKREADS_ADMIN || !env.OPENAI_QUICK_READS_API_KEY_ID || env.QUICK_READ_MODEL!=='gpt-5-mini' || (env.QUICK_READ_PROVIDER || 'openai')!=='openai') {
+  if(!env.OPENAI_QUICKREADS || !env.OPENAI_QUICKREADS_ADMIN || !env.OPENAI_QUICK_READS_PROJECT_ID || !env.OPENAI_QUICK_READS_API_KEY_ID || env.QUICK_READ_MODEL!=='gpt-5-mini' || (env.QUICK_READ_PROVIDER || 'openai')!=='openai') {
     log(JSON.stringify({event:'quick_read_auto',status:'provider_not_configured'})); return;
   }
   try {
