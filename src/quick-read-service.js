@@ -65,7 +65,7 @@ export async function quickReadEndpoint(request, env, id, deps={}) {
   const expected=env.QUICK_READ_ADMIN_TOKEN;
   const actual=(request.headers.get('authorization') || '').replace(/^Bearer /,'');
   if(!expected || expected.length<32 || !actual || actual.length>512 || !await tokenMatches(actual,expected)) return json({error:'unauthorized'},401);
-  if(!env.OPENAI_QUICKREADS || !env.OPENAI_QUICKREADS_ADMIN || !env.OPENAI_QUICK_READS_API_KEY_ID || !env.QUICK_READ_MODEL || (env.QUICK_READ_PROVIDER || 'openai')!=='openai') return json({error:'provider_not_configured'},503);
+  if(!env.OPENAI_QUICKREADS || !env.OPENAI_QUICKREADS_ADMIN || !env.OPENAI_QUICK_READS_PROJECT_ID || !env.OPENAI_QUICK_READS_API_KEY_ID || !env.QUICK_READ_MODEL || (env.QUICK_READ_PROVIDER || 'openai')!=='openai') return json({error:'provider_not_configured'},503);
   const call=deps.call || rpc;
   try {
     if(id) return json(await generateJob(env,id,deps));
