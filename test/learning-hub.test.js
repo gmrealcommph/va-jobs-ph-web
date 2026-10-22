@@ -23,7 +23,7 @@ test('hub and six guides are public GET/HEAD pages, independent of upstream serv
   }
 });
 test('all guide and category links resolve; no placeholder categories or fragment links',()=>{
-  const allowed=new Set([...resourcePaths,'/jobs','/resume-studio','/contact']);
+  const allowed=new Set([...resourcePaths,'/jobs','/resume-studio','/contact','/categories']);
   for(const path of resourcePaths){
     const html=learningPage(path).body;
     for(const [,href] of html.matchAll(/href="([^"]+)"/g)){
