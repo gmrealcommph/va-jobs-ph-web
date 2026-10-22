@@ -654,7 +654,7 @@ if (
     if (url.pathname.endsWith('/') && resourcePaths.includes(url.pathname.slice(0,-1))) {
       return Response.redirect(url.origin + url.pathname.slice(0,-1) + url.search, 308);
     }
-    const learning = learningPage(url.pathname);
+    const learning = learningPage(url.pathname, url.searchParams);
     if (learning) return render(learning.title, learning.body, { description: learning.description });
     // Unknown resource URLs should never fall through to job-data queries.
     if (url.pathname.startsWith('/resources/')) return missing();

@@ -27,10 +27,10 @@ test('all guide and category links resolve; no placeholder categories or fragmen
   for(const path of resourcePaths){
     const html=learningPage(path).body;
     for(const [,href] of html.matchAll(/href="([^"]+)"/g)){
-      const [route,fragment]=href.split('#');
-      if(route.endsWith('.css?v=20261021')) continue;
-      assert.ok(!route||allowed.has(route),href);
-      if(fragment){const target=learningPage(route||path).body;assert.ok(target.includes(`id="${fragment}"`),href);}
+      const url=new URL(href,env.SITE_URL+path),route=url.pathname,fragment=url.hash.slice(1);
+      if(route.endsWith('.css')) continue;
+      assert.ok(allowed.has(route),href);
+      if(fragment){const target=learningPage(route,url.searchParams).body;assert.ok(target.includes(`id="${fragment}"`),href);}
     }
   }
   for(const c of learningCategories)assert.ok(learningGuides.some(g=>g.category===c.id));
