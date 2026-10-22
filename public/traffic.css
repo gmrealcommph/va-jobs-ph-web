@@ -1,2 +1,12 @@
-.traffic-choice{position:fixed;z-index:50;right:16px;bottom:16px;width:min(390px,calc(100vw - 32px));padding:12px;background:#102239;color:#f2f6fc;border:1px solid #63829f;border-radius:18px;box-shadow:0 12px 32px #0005;font:14px/1.6 system-ui}.traffic-choice p{color:#e0eaf5;margin:6px 0}.traffic-choice a{color:#a6deff}.traffic-choice button{min-height:44px;padding:8px 14px;margin:4px;background:#204c6c;border:1px solid #839caf;border-radius:10px;color:#fff;cursor:pointer}.traffic-choice button:focus-visible{outline:3px solid #a6deff;outline-offset:2px}.traffic-choice [hidden]{display:none}.traffic-choice [role=status]:empty{display:none}
-.traffic-choice[hidden]{display:none}
+.traffic-choice{box-sizing:border-box;position:fixed;z-index:50;right:16px;bottom:16px;width:min(340px,calc(100vw - 32px));max-height:calc(100vh - 32px);overflow:auto;padding:16px;background:#f8f6ee;color:#0f3d2e;border:1px solid #d3dfd3;border-radius:16px;box-shadow:0 6px 24px #06291d1a;font:13px/1.5 Manrope,system-ui,sans-serif}
+.traffic-choice>button{display:block;min-height:28px;padding:0;margin:0 0 4px;background:transparent;color:#0f3d2e;border:0;font:inherit;font-weight:750;cursor:pointer;text-align:left}
+.traffic-choice>div{display:flex;flex-wrap:wrap;gap:8px}
+.traffic-choice p{flex-basis:100%;color:#365749;margin:4px 0 10px}
+.traffic-choice a{color:#0f3d2e;text-decoration:underline;text-underline-offset:3px}
+.traffic-choice>div>button{flex:1;min-height:44px;padding:9px 12px;margin:0;background:#f8f6ee;border:1px solid #73917e;border-radius:10px;color:#0f3d2e;font:inherit;font-weight:700;cursor:pointer}
+.traffic-choice>div>.traffic-allow{background:#e4efdf}
+.traffic-choice>div>button:hover{background:#d4e7cf}
+.traffic-choice button:focus-visible,.traffic-choice a:focus-visible{outline:2px solid #0f3d2e;outline-offset:3px}
+.traffic-choice [hidden],.traffic-choice[hidden],.traffic-choice [role=status]:empty{display:none}
+.traffic-choice>[role=status]{margin-bottom:0}
+@media(max-width:480px){.traffic-choice{right:12px;bottom:12px;width:calc(100vw - 24px);padding:14px}}

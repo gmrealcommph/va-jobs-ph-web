@@ -27,9 +27,9 @@ if(!/^\/(?:admin|api|auth|webhooks|account\/delete)(?:\/|$)/.test(location.pathn
  }
  const box=document.createElement('aside');box.className='traffic-choice';box.setAttribute('aria-label','Optional analytics');
  const button=document.createElement('button');button.type='button';button.textContent='Analytics choices';
- const panel=document.createElement('div');panel.hidden=true;panel.innerHTML='<p>Help improve VeeAys? Optional analytics uses Google Analytics 4 for page views, registrations and confirmed Pro purchases, plus a first-party active-browser counter. It remembers a 30-minute visit and its campaign. If you register during it, we link that visit to registration and confirmed Pro purchases for up to 90 days. We do not send names, emails, form contents, query strings or account IDs to Google. Google receives network information when you allow analytics. Withdraw at any time through Privacy → Analytics choices. <a href="/privacy">Privacy details</a></p>';
- const accept=document.createElement('button');accept.type='button';accept.textContent='Allow analytics';
- const decline=document.createElement('button');decline.type='button';decline.textContent='Decline / withdraw';
+ const panel=document.createElement('div');panel.hidden=true;panel.innerHTML='<p>Help us improve VeeAys. Allow optional Google Analytics to measure visits, sign-ups and Pro purchases. Your choice won’t affect browsing. <a href="/privacy">Privacy details</a></p>';
+ const accept=document.createElement('button');accept.type='button';accept.className='traffic-allow';accept.textContent='Allow analytics';
+ const decline=document.createElement('button');decline.type='button';decline.className='traffic-decline';decline.textContent=privacy?'Decline / withdraw':'Decline';
  const status=document.createElement('p');status.setAttribute('role','status');
  button.onclick=()=>{panel.hidden=!panel.hidden;};
  accept.onclick=()=>{if(blocked()){status.textContent='Your browser privacy preference blocks optional analytics.';return;}set('yes');window.dispatchEvent(new Event('veeays:consent'));status.textContent='Optional analytics allowed.';panel.hidden=true;box.hidden=!privacy;track();};
