@@ -6275,6 +6275,7 @@ body:has(.employer-page)>.site-footer .footer-bottom{padding-top:15px;padding-bo
 .category-jobs-page .listings .category-panel .filter-chevron{display:none}
 .category-jobs-page .opportunity-heading{display:flex;align-items:center;gap:16px;min-height:0;margin-bottom:20px}
 .category-jobs-page .discovery-card .opportunity-meta span{display:inline-flex;align-items:center}
+:is(.home-page,.category-jobs-page) .discovery-card .opportunity-meta{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:3;overflow:hidden}
 .category-jobs-page .opportunity-heading .eyebrow{display:none}
 .category-jobs-page .opportunity-heading h2{margin:0;font-size:25px;line-height:1.2}
 .category-results-count{font-size:12px;color:var(--muted);margin:7px 0 0}
