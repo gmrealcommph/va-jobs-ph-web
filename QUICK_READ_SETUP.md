@@ -43,6 +43,8 @@ Existing `SUPABASE_URL` and `SUPABASE_PUBLISHABLE_KEY` remain as configured.
 
 The Worker reads the current UTC day's aggregate from OpenAI's Costs API before each provider claim. A database ledger reserves up to $0.14 for each in-flight call until the aggregate reflects that spend. Generation stops when reported spend plus outstanding holds plus the next hold would exceed $0.50, or if the Costs API, key configuration or database guard is unavailable. Costs are daily UTC buckets, so the reset occurs at 8:00 AM Manila time. Apply `migrations/013_quick_read_actual_daily_spend.sql` before enabling the production rollout gate. This migration leaves that gate disabled; only enable it after the Worker code is deployed and its three cost settings have been saved.
 
+Production rollout note (October 22, 2026): migration 013 is applied. The new Worker code is merged to main. Cloudflare builds were re-enabled to deploy this revision; keep the Quick Reads rollout gate disabled until the deployment is Ready and the Costs API/key filter is verified.
+
 Plain runtime variable names and values:
 
 - `QUICK_READ_MODE` = `manual` to enable the protected generation endpoint. Absent/other value disables generation.
