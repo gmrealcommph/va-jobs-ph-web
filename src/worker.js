@@ -10,10 +10,9 @@ import {scheduledJobAlerts} from './job-alerts.js';
 import { adminEndpoint } from './admin.js';
 import { jobHealthEndpoint } from './job-health.js';
 import { scheduledJobHealth, JOB_HEALTH_CRON } from './job-health-scheduled.js';
-import {trafficEndpoint,linkTrafficRegistration} from './traffic.js';
+import {trafficEndpoint} from './traffic.js';
 import {activityEndpoint} from './active-visitors.js';
 export {ActiveVisitors} from './active-visitors.js';
-import {analyticsCsp,registrationCookie} from './analytics.js';
 import {scheduledQuickReads, QUICK_READ_CRON} from './quick-read-scheduled.js';
 import { proCheckoutEndpoint, testUserAllowed, checkoutUserAllowed } from './pro-checkout.js';
 import {scheduledAdminHealth} from './admin-monitor.js';
@@ -203,17 +202,13 @@ export async function handle(request, env) {
       const signupReturn = returnTo || '/niche-finder';
       const { response, data } = await signUp(env, { email, password, fullName, captchaToken, redirectTo: `${siteOrigin}/auth/callback?return=${encodeURIComponent(signupReturn)}` });
       if (!response.ok) return Response.redirect(`${url.origin}/signup?error=${encodeURIComponent(authError(data, 'We could not create your account.'))}&email=${encodeURIComponent(email)}${returnTo ? `&return=${encodeURIComponent(returnTo)}` : ''}`, 303);
-      await linkTrafficRegistration(request,env,data?.user);
-      const signupMarker=registrationCookie(request,data?.user);
       if (data?.access_token && data?.refresh_token) {
         const target = signupReturn;
         const h = new Headers({ location: target, 'cache-control': 'no-store' });
         setSessionCookies(h, data);
-        if(signupMarker)h.append('Set-Cookie',signupMarker);
         return new Response(null, { status: 303, headers: h });
       }
       const h=new Headers({location:`${url.origin}/check-email?email=${encodeURIComponent(email)}&return=${encodeURIComponent(signupReturn)}`,'cache-control':'no-store'});
-      if(signupMarker)h.append('Set-Cookie',signupMarker);
       return new Response(null,{status:303,headers:h});
     }
 
@@ -1170,14 +1165,8 @@ if (
     return response;
   }
 }
-export default { fetch: async(request,env,ctx)=>{
- const response=await handle(request,env,ctx);
- const path=new URL(request.url).pathname;
- if(response.headers.get('content-type')?.includes('text/html')&&!/^\/(?:admin|api|auth|webhooks|account\/delete)(?:\/|$)/.test(path)){
-  const h=new Headers(response.headers),policy=h.get('content-security-policy');if(policy)h.set('content-security-policy',analyticsCsp(policy));
-  h.set('referrer-policy','no-referrer');return new Response(response.body,{status:response.status,statusText:response.statusText,headers:h});
- }return response;
-}, scheduled(controller,env,ctx) {
+// Preserve each route’s security headers; optional analytics is disabled.
+export default { fetch: handle, scheduled(controller,env,ctx) {
   if(controller.cron===JOB_HEALTH_CRON)return scheduledJobHealth(controller,env);
   // Independent observer cannot delay or replace operational schedules.
   if(env.ADMIN_HEALTH_MONITOR_ENABLED==='true'&&controller.cron==='*/15 * * * *')ctx.waitUntil(scheduledAdminHealth(controller,env));
