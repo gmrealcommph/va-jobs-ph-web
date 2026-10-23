@@ -1,3 +1,4 @@
+import {reminderPanel} from './application-reminders.js';
 import { siteHeader } from './site-header.js';
 import {jobLocation} from './job-location.js';
 import {quickReadMarker} from './quick-read-availability.js';
@@ -1402,7 +1403,7 @@ export function proPage({ isPro = false, user = null, profile = null, testChecko
   </section></div>`;
 }
 
-export function myJobsPage({ saved = [], applications = [], message = '', error = '', loadFailed = false } = {}) {
+export function myJobsPage({ saved = [], applications = [], reminders = null, proTools = false, message = '', error = '', loadFailed = false } = {}) {
   if (loadFailed) return recovery({title:'Your job search is still yours.',copy:'We couldn’t load your saved jobs and applications right now. Try again to see your latest shortlist and progress.',href:'/my-jobs',label:'Reload My Jobs'});
   const statusLabel = value => ({ applied: 'Applied', interview: 'Interview', offer: 'Offer', hired: 'Hired', rejected: 'Rejected', withdrawn: 'Withdrawn' }[value] || value);
   const formatAppliedDate = value => {
@@ -1419,6 +1420,8 @@ export function myJobsPage({ saved = [], applications = [], message = '', error 
         <div class="tracker-card-main"><div class="my-job-company">${esc(item.job?.company || 'Company')}</div><h3><a class="workspace-title-swipe" href="${item.job ? jobPath(item.job) : '#'}">${esc(item.job?.title || 'Job opportunity')}</a></h3><div class="tracker-meta"><span class="tracker-status tracker-status-${esc(item.status)}">${statusLabel(item.status)}</span>${appliedDate ? `<span>Applied ${esc(appliedDate)}</span>` : ''}${item.job?.location ? `<span>${esc(jobLocation(item.job).summary)}</span>` : ''}</div></div>
         <div class="tracker-card-links">${item.job ? `<a class="my-job-view" href="${jobPath(item.job)}">View job →</a>` : ''}<button class="tracker-edit-toggle" type="button" aria-expanded="false">Edit application</button></div>
       </div>
+      ${reminders?reminderPanel(item,reminders):''}
+      ${proTools&&item.job?`<p><a class="my-job-view" href="/resume-studio?job=${esc(item.job_id)}#pro-tools">Prepare résumé &amp; cover letter →</a></p>`:''}
       <div class="tracker-edit-panel" hidden>
         <form class="tracker-form" method="post" action="/update-application">
           <input type="hidden" name="job_id" value="${esc(item.job_id)}">

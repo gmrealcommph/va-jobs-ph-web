@@ -1,3 +1,4 @@
+import {purgeProAiCache} from './pro-ai-budget.js';
 import {layout} from './render.js';
 import {sessionForRequest,getMyProfile,clearSessionCookies,signIn,authFetch} from './auth.js';
 import {pages} from './legal-pages.js';
@@ -72,6 +73,7 @@ async function accountDeletionEndpoint(request,env) {
     if(state.user.factors?.some(f=>f.status==='verified'))return deletionPage('<h1>Additional verification needed</h1><p>This account has multi-factor authentication. Contact support for verified account deletion.</p><a href="/onboarding">Back to my account</a>',state,409);
     const fresh=await signIn(env,{email:state.user.email,password});freshToken=fresh.data?.access_token;
     if(!fresh.response.ok||fresh.data?.user?.id!==state.user.id||!freshToken)return deletionPage('<h1>Password could not be verified</h1><p>Your account was not deleted.</p><a href="/account/delete">Try again</a>',state,403);
+    await purgeProAiCache(env,state.user.id);
     const prepared=await deletionRpc(env,'prepare_account_deletion',state.user.id);
     for(const row of prepared.checkouts||[])await closeDeletionCheckout(env,row);
     const result=await deletionRpc(env,'finish_account_deletion',state.user.id);

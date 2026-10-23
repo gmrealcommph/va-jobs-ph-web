@@ -1,0 +1,53 @@
+{
+  "name": "veeays-pro-phase1-stage-20261023",
+  "main": "src/pro-staging-worker.js",
+  "compatibility_date": "2026-10-01",
+  "workers_dev": true,
+  "assets": {
+    "directory": "public",
+    "binding": "ASSETS"
+  },
+  "vars": {
+    "SITE_URL": "https://veeays-pro-phase1-stage-20261023.gm-realcommph.workers.dev",
+    "SUPABASE_URL": "https://megedmsfdwtjxjejrxaq.supabase.co",
+    "SUPABASE_PUBLISHABLE_KEY": "sb_publishable_UAWnh_Fmghz2Iu5TvTmE2w_xCINYJCK",
+    "PRO_TOOLS_ENABLED": "true",
+    "PRO_TOOLS_DEMO": "true",
+    "PRO_TRACKER_ENABLED": "true",
+    "PRO_AI_ENABLED": "false",
+    "PRO_AI_SPENDING_AUTHORIZED": "false",
+    "RESUME_STUDIO_ENABLED": "true",
+    "RESUME_AI_ENABLED": "false",
+    "PAYMONGO_LIVE_CHECKOUT_ENABLED": "false",
+    "JOB_ALERTS_MODE": "disabled",
+    "DAILY_DIGEST_MODE": "disabled",
+    "STRONG_MATCH_MODE": "disabled",
+    "QUICK_READ_AUTO_ENABLED": "false",
+    "QUICK_READ_BATCH_ENABLED": "false",
+    "JOB_HEALTH_VERIFY_ENABLED": "false"
+  },
+  "durable_objects": {
+    "bindings": [
+      {
+        "name": "ACTIVE_VISITORS",
+        "class_name": "ActiveVisitors"
+      },
+      {
+        "name": "PRO_AI_BUDGET",
+        "class_name": "ProAiBudget"
+      }
+    ]
+  },
+  "migrations": [
+    {
+      "tag": "pro-phase1-stage-v1",
+      "new_sqlite_classes": [
+        "ActiveVisitors",
+        "ProAiBudget"
+      ]
+    }
+  ],
+  "triggers": {
+    "crons": []
+  }
+}

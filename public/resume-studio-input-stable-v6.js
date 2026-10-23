@@ -1,3 +1,4 @@
+import {bindProTools} from './pro-tools.js';
 import {completionReporter} from './resume-completion.js';
 const reportCompletedDraft=completionReporter();
 import {encodeRecovery,decodeRecovery,RECOVERY_KEY} from './resume-recovery.js';
@@ -6,6 +7,7 @@ import {readPhoto,cropPhoto,validateDesignDraft} from './resume-photo.js';
 import {styles,renderResume} from './resume-layouts.js';
 import {parseResume,validateDraft,validateDraftExtras,checklist,readiness} from './resume-tools.js';
 const $=s=>document.querySelector(s),form=$('#resume-form'),status=$('#studio-status');
+let proController;
 let reviewing=false,version=0,reviewController,importRevision=0,pageClosing=false;
 const values=()=>Object.fromEntries(new FormData(form));
 function notice(text){status.textContent=text;}
@@ -73,19 +75,19 @@ $('#ai-review').onclick=async()=>{
   catch(e){notice(e.message);}finally{reviewing=false;$('#ai-review').disabled=false;}
 };
 $('#download-draft').onclick=()=>{saveBlob(JSON.stringify({version:2,source:$('#resume-source').value,improve:!$('#improve-panel').hidden,sections:values(),style:selectedStyle,accent:$('#resume-accent').value,photo},null,2),'application/json','my-resume-draft.json');notice('Draft downloaded with design and optional photo. It contains personal information; store it securely.');};
-$('#clear').onclick=()=>{if(!window.confirm('Clear this draft? Download it first if you want to keep it. Other drafts in this tab stay intact.'))return;importRevision++;reviewController?.abort();photoRevision++;photo=null;$('#photo-status').textContent='No photo added.';setDraft({});$('#resume-source').value='';$('#resume-file').value='';$('#ai-consent').checked=false;notice('Résumé text and suggestions cleared from this tab. Downloaded files are yours to delete.');};
+$('#clear').onclick=()=>{if(!window.confirm('Clear this draft? Download it first if you want to keep it. Other drafts in this tab stay intact.'))return;proController?.reset();importRevision++;reviewController?.abort();photoRevision++;photo=null;$('#photo-status').textContent='No photo added.';setDraft({});$('#resume-source').value='';$('#resume-file').value='';$('#ai-consent').checked=false;notice('Résumé text and suggestions cleared from this tab. Downloaded files are yours to delete.');};
 function markResumeComplete(){if(values().name.trim()&&form.checkValidity())void reportCompletedDraft(drafts[activeDraft]);}
 function validName(){if(values().name.trim())return true;notice('Add your name before exporting.');openSection('name');return false;}
 $('#export').onclick=async()=>{if(!validName())return;const plan=latestPlan;if(!plan){notice('Wait for the page preview to finish.');return;}try{saveBlob(await pdfBytes(plan),'application/pdf','my-resume.pdf');markResumeComplete();notice('PDF downloaded. Review every page before sharing.');}catch(e){notice('PDF could not be created: '+e.message);}};
 $('#export-word').onclick=async()=>{if(!validName())return;const button=$('#export-word');button.disabled=true;try{const {wordBlob}=await import('./resume-word.js');const blob=await wordBlob(values(),selectedStyle,$('#resume-accent').value,photo?await cropPhoto(photo.src,photo.x,photo.y,photo.zoom):null);saveBlob(blob,blob.type,'my-resume.docx');markResumeComplete();notice('Editable Word document downloaded in a simple single-column layout. Review pagination in Word before sharing.');}catch(e){notice('Word export failed: '+e.message);}finally{button.disabled=false;}};
 $('#print-resume').onclick=()=>{if(!validName())return;if(!latestPlan){notice('Wait for the page preview to finish before printing.');return;}window.print();};
-window.addEventListener('pagehide',()=>{persistRecovery();pageClosing=true;drafts.splice(0,drafts.length,{label:'Draft 1',data:null});activeDraft=0;refreshDrafts();importRevision++;photoRevision++;photo=null;setDraft({});$('#resume-source').value='';$('#ai-consent').checked=false;});
+window.addEventListener('pagehide',()=>{proController?.reset();persistRecovery();pageClosing=true;drafts.splice(0,drafts.length,{label:'Draft 1',data:null});activeDraft=0;refreshDrafts();importRevision++;photoRevision++;photo=null;setDraft({});$('#resume-source').value='';$('#ai-consent').checked=false;});
 
 // Drafts are deliberately kept only in this tab's memory.
 const drafts=[{label:'Draft 1',data:null}];let activeDraft=0;
 function snapshot(){return {source:$('#resume-source').value,improve:!$('#improve-panel').hidden,sections:values(),style:selectedStyle,accent:$('#resume-accent').value,photo:photo?{...photo}:null};}
 function refreshDrafts(){const select=$('#draft-select');select.replaceChildren();drafts.forEach((d,i)=>{const option=document.createElement('option');option.value=i;option.textContent=d.label;select.append(option);});select.value=activeDraft;}
-function activateDraft(index){importRevision++;reviewController?.abort();drafts[activeDraft].data=snapshot();activeDraft=index;const d=drafts[index].data||{sections:{},style:'classic',accent:'forest',photo:null};photoRevision++;photo=d.photo?{...d.photo}:null;selectStyle(d.style);$('#resume-accent').value=d.accent;for(const [id,key] of [['photo-x','x'],['photo-y','y'],['photo-zoom','zoom']])$('#'+id).value=photo?.[key]??(key==='zoom'?1:50);$('#photo-status').textContent=photo?'Draft photo restored locally.':'No photo added.';$('#resume-source').value=d.source||'';$('#ai-consent').checked=false;setDraft(d.sections);mode(Boolean(d.improve));refreshDrafts();notice('Switched to '+drafts[index].label+'. Download a draft to keep it before leaving.');}
+function activateDraft(index){proController?.reset();importRevision++;reviewController?.abort();drafts[activeDraft].data=snapshot();activeDraft=index;const d=drafts[index].data||{sections:{},style:'classic',accent:'forest',photo:null};photoRevision++;photo=d.photo?{...d.photo}:null;selectStyle(d.style);$('#resume-accent').value=d.accent;for(const [id,key] of [['photo-x','x'],['photo-y','y'],['photo-zoom','zoom']])$('#'+id).value=photo?.[key]??(key==='zoom'?1:50);$('#photo-status').textContent=photo?'Draft photo restored locally.':'No photo added.';$('#resume-source').value=d.source||'';$('#ai-consent').checked=false;setDraft(d.sections);mode(Boolean(d.improve));refreshDrafts();notice('Switched to '+drafts[index].label+'. Download a draft to keep it before leaving.');}
 $('#draft-select').onchange=e=>activateDraft(Number(e.target.value));
 function addDraft(copy){if(drafts.length>=10){notice('Up to 10 drafts per tab. Download your drafts to keep them.');return;}drafts.push({label:'Draft '+(drafts.length+1),data:copy?snapshot():null});activateDraft(drafts.length-1);}
 $('#new-draft').onclick=()=>addDraft(false);$('#copy-draft').onclick=()=>addDraft(true);refreshDrafts();
@@ -132,3 +134,5 @@ function offerRecovery(){try{const saved=sessionStorage.getItem(RECOVERY_KEY);if
 window.addEventListener('pageshow',e=>{pageClosing=false;if(e.persisted){recoveryEnabled=false;$('#recovery-enabled').checked=false;offerRecovery();}});
 offerRecovery();
 setStep('design');render();
+
+proController=bindProTools({values,setField:(key,value)=>{$('#r-'+key).value=value;},changed:()=>{render();persistRecovery();}});
