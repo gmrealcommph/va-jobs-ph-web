@@ -9,10 +9,12 @@ test('reminder RLS enforces ownership, active Pro, existing applications, suspen
   create table auth.users(id uuid primary key);create table profiles(id uuid primary key,plan text,plan_status text,pro_expires_at timestamptz);
   create table job_applications(user_id uuid references auth.users(id) on delete cascade,job_id bigint,primary key(user_id,job_id));
   grant select on profiles to authenticated;
+  alter default privileges in schema public grant all on tables to authenticated;
   insert into auth.users values('${uid}'),('${other}');insert into profiles values('${uid}','pro','active',now()+interval '1 day'),('${other}','free','active',null);
   insert into job_applications values('${uid}',1),('${other}',2);`);
   await db.exec(await readFile(new URL('../supabase/migrations/20261023091543_pro_application_reminders.sql',import.meta.url),'utf8'));
   await db.exec(`set role authenticated;select set_config('request.uid','${uid}',false)`);
+  await assert.rejects(db.exec('truncate public.job_application_reminders'));
   await db.query('insert into job_application_reminders values($1,1,$2,$3)',[uid,'2099-01-01','Follow up']);
   await assert.rejects(db.query('insert into job_application_reminders values($1,2,$2,$3)',[uid,'2099-01-01','No application']));
   await assert.rejects(db.query('update job_application_reminders set user_id=$1',[other]));

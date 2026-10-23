@@ -8,7 +8,9 @@ create table public.job_application_reminders (
  foreign key (user_id,job_id) references public.job_applications(user_id,job_id) on delete cascade
 );
 alter table public.job_application_reminders enable row level security;
-revoke all on public.job_application_reminders from public,anon;
+-- Supabase default privileges may include TRUNCATE, which bypasses row-level security.
+-- Clear defaults before granting only the intended row operations.
+revoke all on public.job_application_reminders from public,anon,authenticated;
 grant select,insert,update,delete on public.job_application_reminders to authenticated;
 create policy reminder_read on public.job_application_reminders for select to authenticated using ((select auth.uid())=user_id);
 create policy reminder_delete on public.job_application_reminders for delete to authenticated using ((select auth.uid())=user_id);

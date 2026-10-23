@@ -1454,32 +1454,7 @@ export function myJobsPage({ saved = [], applications = [], reminders = null, pr
       <div class="tracker-cards">${cards || '<div class="my-jobs-empty tracker-all-empty"><span class="workspace-empty-mark" aria-hidden="true">✓</span><h3>Your next chapter starts with a role.</h3><p>Once you’ve applied to an employer, mark the job as applied to track it here.</p><a class="my-job-view" href="/jobs">Explore jobs →</a></div>'}<div class="my-jobs-empty tracker-filter-empty" hidden><span class="workspace-empty-mark" aria-hidden="true">○</span><h3>A little room for what’s next.</h3><p>No applications in this stage. Choose another status to see your progress.</p><a class="my-job-view" href="/jobs">Discover more roles →</a></div></div>
     </section>
   </section>
-  <script>
-  (() => {
-    const root = document.querySelector('.application-tracker');
-    if (!root) return;
-    const tabs = [...root.querySelectorAll('.tracker-tab')];
-    const cards = [...root.querySelectorAll('.tracker-card')];
-    const empty = root.querySelector('.tracker-filter-empty');
-    const matches = (status, filter) => filter === 'all' || status === filter || (filter === 'closed' && (status === 'rejected' || status === 'withdrawn'));
-    tabs.forEach(tab => tab.addEventListener('click', () => {
-      const filter = tab.dataset.filter || 'all';
-      tabs.forEach(t => { const active=t===tab; t.classList.toggle('active',active); t.setAttribute('aria-pressed',String(active)); });
-      let visible=0;
-      cards.forEach(card => { const show=matches(card.dataset.status,filter); card.hidden=!show; if(show) visible++; });
-      if (empty) empty.hidden = visible !== 0 || cards.length === 0;
-    }));
-    root.querySelectorAll('.tracker-edit-toggle').forEach(button => button.addEventListener('click', () => {
-      const card = button.closest('.tracker-card');
-      const panel = card?.querySelector('.tracker-edit-panel');
-      if (!panel) return;
-      const open = panel.hidden;
-      panel.hidden = !open;
-      button.setAttribute('aria-expanded', String(open));
-      button.textContent = open ? 'Close editor' : 'Edit application';
-    }));
-  })();
-  </script>`;
+  <script src="/application-tracker.js?v=20261023" defer></script>`;
 }
 
 export function authSupportPage(title, body, pathname) {
