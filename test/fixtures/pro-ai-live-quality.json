@@ -1,0 +1,16 @@
+{
+  "allInputsSynthetic": true,
+  "model": "gpt-5-mini-2025-08-07",
+  "evaluatedAt": "2026-10-23T09:57:12.351Z",
+  "optimizer": {
+    "sourceProject": "Created a shared checklist for a school event.",
+    "unsupportedRewrite": "Created and maintained a shared checklist for a school event.",
+    "issue": "Introduces ongoing maintenance not supported by source"
+  },
+  "coverLetter": {
+    "sourceProject": "Created a shared checklist for a school event.",
+    "unsupportedAssociation": "In that volunteer role I also created a shared checklist for a school event",
+    "issue": "Associates an independently listed project with the volunteer role without source evidence"
+  },
+  "status": "production-quality-blocker"
+}

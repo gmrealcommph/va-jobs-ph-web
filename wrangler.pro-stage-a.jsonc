@@ -1,0 +1,62 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "va-jobs-ph-web",
+  "main": "src/worker.js",
+  "compatibility_date": "2026-10-01",
+  "assets": {
+    "directory": "./public",
+    "binding": "ASSETS"
+  },
+  "keep_vars": true,
+  "triggers": {
+    "crons": [
+      "* * * * *",
+      "0-59 * * * *",
+      "*/15 * * * *",
+      "17 */6 * * *"
+    ]
+  },
+  "vars": {
+    "JOB_ALERTS_MODE": "disabled",
+    "JOB_REPORTS_ENABLED": "true",
+    "JOB_HEALTH_VERIFY_ENABLED": "false",
+    "DAILY_DIGEST_MODE": "enabled",
+    "DAILY_DIGEST_START_AT": "2026-10-04T00:00:00Z",
+    "PAYMONGO_LIVE_CHECKOUT_ENABLED": "true",
+    "PAYMONGO_MODE": "live",
+    "QUICK_READ_AUTO_ENABLED": "true",
+    "QUICK_READ_BATCH_ENABLED": "true",
+    "QUICK_READ_MODE": "manual",
+    "QUICK_READ_MODEL": "gpt-5-mini",
+    "QUICK_READ_PROVIDER": "openai",
+    "SITE_URL": "https://veeays.com",
+    "STRONG_MATCH_MODE": "enabled",
+    "STRONG_MATCH_START_AT": "2026-10-03T04:15:00Z",
+    "SUPABASE_PUBLISHABLE_KEY": "sb_publishable_ZRWxrn1CiYzfRSsJgFGUNg_m5iFhPi_",
+    "SUPABASE_URL": "https://nwqmhqiymtqkdihjadrp.supabase.co",
+    "RESUME_STUDIO_ENABLED": "true",
+    "RESUME_AI_ENABLED": "false",
+    "PRO_TRACKER_ENABLED": "true",
+    "PRO_TOOLS_ENABLED": "false",
+    "PRO_TOOLS_DEMO": "false",
+    "PRO_AI_ENABLED": "false",
+    "PRO_AI_SPENDING_AUTHORIZED": "false"
+  },
+  "compatibility_flags": [],
+  "durable_objects": {
+    "bindings": [
+      {
+        "name": "ACTIVE_VISITORS",
+        "class_name": "ActiveVisitors"
+      }
+    ]
+  },
+  "migrations": [
+    {
+      "tag": "active-visitors-v1",
+      "new_sqlite_classes": [
+        "ActiveVisitors"
+      ]
+    }
+  ]
+}

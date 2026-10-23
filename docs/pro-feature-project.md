@@ -1,3 +1,7 @@
+# Current business rule — 23 October 2026
+
+The owner has superseded the older Pro+AI proposal below: one Pro tier only, ₱499 for 30 days, no automatic renewal. All new Pro tools use existing active entitlements. Paid AI requires separate spending authorization, never another membership tier. See pro-phase-one.md for current work.
+
 # VeeAys Pro project — 19 October 2026
 
 ## Focused inventory

@@ -1,3 +1,7 @@
+import {remindersEndpoint,reminderRest} from './application-reminders.js';
+import {activePro} from './saved-searches.js';
+import {proAiEndpoint} from './pro-ai.js';
+export {ProAiBudget} from './pro-ai-budget.js';
 import {resumeCompletionEndpoint} from './tool-completions.js';
 import {resumeEndpoint} from './resume-studio.js';
 import {nicheEndpoint} from './niche-finder.js';
@@ -65,6 +69,8 @@ function hasCookie(request, name, expected = '1') {
 function xml(body) { return new Response(`<?xml version="1.0" encoding="UTF-8"?>${body}`, { headers: { 'content-type': 'application/xml; charset=utf-8', 'cache-control': 'public, max-age=300' } }); }
 export async function handle(request, env) {
   const url = new URL(request.url);
+  if(url.pathname==='/application-reminders')return remindersEndpoint(request,env);
+  if(url.pathname.startsWith('/api/pro-tools/'))return proAiEndpoint(request,env);
   if(url.pathname==='/tools/resume-completed')return resumeCompletionEndpoint(request,env);
   if(['/niche-finder','/niche-finder/preferences'].includes(url.pathname))return nicheEndpoint(request,env);
   if(url.pathname==='/activity')return activityEndpoint(request,env);
@@ -704,8 +710,9 @@ if (
         savedRows = savedRows.map(r => byId.get(String(r.job_id))).filter(Boolean);
         applications = applications.map(a => ({ ...a, job: byId.get(String(a.job_id)) || null }));
       } catch (e) { loadFailed = true; console.error('My jobs load failed:', e); error = 'We could not load your jobs right now. Please try again.'; }
+      let reminders=null;if(env.PRO_TRACKER_ENABLED==='true'){reminders={available:false,rows:[],pro:false};try{const [rows,p]=await Promise.all([reminderRest(env,authState.accessToken,authState.user.id),getMyProfile(env,authState.accessToken,authState.user.id)]);reminders={available:true,rows,pro:activePro(p)};}catch{}}
       const message = url.searchParams.get('message') || '';
-      return render('My jobs', myJobsPage({ saved: savedRows, applications, loadFailed, message: message.slice(0,160), error: (url.searchParams.get('error') || error).slice(0,240) }), { noindex: true });
+      return render('My jobs', (env.PRO_TRACKER_ENABLED==='true'?'<link rel="stylesheet" href="/pro-tools.css">':'')+myJobsPage({ saved: savedRows, applications, reminders, proTools:env.PRO_TOOLS_ENABLED==='true', loadFailed, message: message.slice(0,160), error: (url.searchParams.get('error') || error).slice(0,240) }), { noindex: true });
     }
 
     if (url.pathname === '/matches') {

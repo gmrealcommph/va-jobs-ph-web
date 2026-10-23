@@ -1,3 +1,4 @@
+import {reminderPanel} from './application-reminders.js';
 import { siteHeader } from './site-header.js';
 import {jobLocation} from './job-location.js';
 import {quickReadMarker} from './quick-read-availability.js';
@@ -1402,7 +1403,7 @@ export function proPage({ isPro = false, user = null, profile = null, testChecko
   </section></div>`;
 }
 
-export function myJobsPage({ saved = [], applications = [], message = '', error = '', loadFailed = false } = {}) {
+export function myJobsPage({ saved = [], applications = [], reminders = null, proTools = false, message = '', error = '', loadFailed = false } = {}) {
   if (loadFailed) return recovery({title:'Your job search is still yours.',copy:'We couldn’t load your saved jobs and applications right now. Try again to see your latest shortlist and progress.',href:'/my-jobs',label:'Reload My Jobs'});
   const statusLabel = value => ({ applied: 'Applied', interview: 'Interview', offer: 'Offer', hired: 'Hired', rejected: 'Rejected', withdrawn: 'Withdrawn' }[value] || value);
   const formatAppliedDate = value => {
@@ -1419,6 +1420,8 @@ export function myJobsPage({ saved = [], applications = [], message = '', error 
         <div class="tracker-card-main"><div class="my-job-company">${esc(item.job?.company || 'Company')}</div><h3><a class="workspace-title-swipe" href="${item.job ? jobPath(item.job) : '#'}">${esc(item.job?.title || 'Job opportunity')}</a></h3><div class="tracker-meta"><span class="tracker-status tracker-status-${esc(item.status)}">${statusLabel(item.status)}</span>${appliedDate ? `<span>Applied ${esc(appliedDate)}</span>` : ''}${item.job?.location ? `<span>${esc(jobLocation(item.job).summary)}</span>` : ''}</div></div>
         <div class="tracker-card-links">${item.job ? `<a class="my-job-view" href="${jobPath(item.job)}">View job →</a>` : ''}<button class="tracker-edit-toggle" type="button" aria-expanded="false">Edit application</button></div>
       </div>
+      ${reminders?reminderPanel(item,reminders):''}
+      ${proTools&&item.job?`<p><a class="my-job-view" href="/resume-studio?job=${esc(item.job_id)}#pro-tools">Prepare résumé &amp; cover letter →</a></p>`:''}
       <div class="tracker-edit-panel" hidden>
         <form class="tracker-form" method="post" action="/update-application">
           <input type="hidden" name="job_id" value="${esc(item.job_id)}">
@@ -1451,32 +1454,7 @@ export function myJobsPage({ saved = [], applications = [], message = '', error 
       <div class="tracker-cards">${cards || '<div class="my-jobs-empty tracker-all-empty"><span class="workspace-empty-mark" aria-hidden="true">✓</span><h3>Your next chapter starts with a role.</h3><p>Once you’ve applied to an employer, mark the job as applied to track it here.</p><a class="my-job-view" href="/jobs">Explore jobs →</a></div>'}<div class="my-jobs-empty tracker-filter-empty" hidden><span class="workspace-empty-mark" aria-hidden="true">○</span><h3>A little room for what’s next.</h3><p>No applications in this stage. Choose another status to see your progress.</p><a class="my-job-view" href="/jobs">Discover more roles →</a></div></div>
     </section>
   </section>
-  <script>
-  (() => {
-    const root = document.querySelector('.application-tracker');
-    if (!root) return;
-    const tabs = [...root.querySelectorAll('.tracker-tab')];
-    const cards = [...root.querySelectorAll('.tracker-card')];
-    const empty = root.querySelector('.tracker-filter-empty');
-    const matches = (status, filter) => filter === 'all' || status === filter || (filter === 'closed' && (status === 'rejected' || status === 'withdrawn'));
-    tabs.forEach(tab => tab.addEventListener('click', () => {
-      const filter = tab.dataset.filter || 'all';
-      tabs.forEach(t => { const active=t===tab; t.classList.toggle('active',active); t.setAttribute('aria-pressed',String(active)); });
-      let visible=0;
-      cards.forEach(card => { const show=matches(card.dataset.status,filter); card.hidden=!show; if(show) visible++; });
-      if (empty) empty.hidden = visible !== 0 || cards.length === 0;
-    }));
-    root.querySelectorAll('.tracker-edit-toggle').forEach(button => button.addEventListener('click', () => {
-      const card = button.closest('.tracker-card');
-      const panel = card?.querySelector('.tracker-edit-panel');
-      if (!panel) return;
-      const open = panel.hidden;
-      panel.hidden = !open;
-      button.setAttribute('aria-expanded', String(open));
-      button.textContent = open ? 'Close editor' : 'Edit application';
-    }));
-  })();
-  </script>`;
+  <script src="/application-tracker.js?v=20261023" defer></script>`;
 }
 
 export function authSupportPage(title, body, pathname) {
