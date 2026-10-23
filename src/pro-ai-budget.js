@@ -18,8 +18,14 @@ export class ProAiBudget{
    await this.ctx.storage.transaction(async tx=>{await tx.put('deleted:'+b.uid,true);for(const prefix of ['cache:'+b.uid+':','lease:'])for(const[key,value]of await tx.list({prefix})){if(prefix.startsWith('cache:')||value.uid===b.uid){await tx.delete(key);if(value.hash)await tx.delete('pending:'+value.hash);}}await tx.delete('user:'+b.uid);});return Response.json({purged:true});
   }
   const cfg=spendingConfig(this.env);if(!cfg)return Response.json({error:'Spending authorization unavailable'},{status:503});
+  if(new URL(request.url).pathname==='/status')return Response.json({global:await this.ctx.storage.get('global')||{total:0,daily:0},limits:cfg,receipts:[...await this.ctx.storage.list({prefix:'receipt:'})].map(([,v])=>v)});
   if(!/^[a-f0-9]{64}$/.test(b.uid||'')||!/^[a-f0-9]{64}$/.test(b.hash||''))return new Response('',{status:400});
   const now=Date.now(),path=new URL(request.url).pathname,key='cache:'+b.uid+':'+b.hash;
+  if(path==='/settle'){
+   const usage=b.usage;
+   if(!usage||!['input_tokens','output_tokens','cached_tokens'].every(k=>Number.isSafeInteger(usage[k])&&usage[k]>=0)||usage.cached_tokens>usage.input_tokens||usage.input_tokens>100000||usage.output_tokens>1800||typeof b.response_id!=='string'||b.response_id.length>160)return new Response('',{status:400});
+   const saved=await this.ctx.storage.transaction(async tx=>{const lease=await tx.get('lease:'+b.reservation);if(!lease||lease.uid!==b.uid||lease.hash!==b.hash||lease.until<now)return false;await tx.put('receipt:'+b.reservation,{at:now,response_id:b.response_id,request_id:String(b.request_id||'').slice(0,160),status:String(b.status||'unknown').slice(0,40),model:String(b.model||'').slice(0,100),usage});return true;});return Response.json({saved},{status:saved?200:409});
+  }
   if(path==='/result'){
    if(!/^[a-f0-9-]{36}$/.test(b.reservation||'')||(!b.value||JSON.stringify(b.value).length>18000))return new Response('',{status:400});
    const sealed=await seal(this.env,b.value);

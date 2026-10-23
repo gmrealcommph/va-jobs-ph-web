@@ -1,3 +1,5 @@
+> Update: the later owner-authorized live evaluation is documented in [pro-phase-one-live-evaluation.md](pro-phase-one-live-evaluation.md). Two calls cost US$0.00192425 from metered usage and exposed factual-grounding blockers; AI remains unsuitable for launch. The initial staging report below is retained for provenance.
+
 # VeeAys Pro Phase 1 — staging release report
 
 Production remains unchanged. No production database mutation, payment action, customer email or paid AI request was performed.

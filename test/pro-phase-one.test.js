@@ -44,6 +44,18 @@ test('account deletion purges private cache even when AI is paused and prevents 
  assert.equal(s.data.has('cache:'+uid+':'+hash),false);assert.equal(s.data.has('cache:'+other+':'+hash),true);assert.equal(s.data.has('lease:'+reservation),false);assert.equal(s.data.get('global').total,100000);
  const active=new ProAiBudget({storage:s},config);assert.equal((await active.fetch(new Request('https://b/reserve',{method:'POST',body:JSON.stringify({uid,hash})}))).status,403);
 });
+test('approved fifty-cent cumulative cap admits five ten-cent reservations and rejects a sixth across members',async()=>{
+ const s=storage(),b=new ProAiBudget({storage:s},{...config,PRO_AI_DAILY_MICRO_USD:'500000',PRO_AI_TOTAL_MICRO_USD:'500000'});
+ for(let i=0;i<6;i++){const uid=await digest('cap-member-'+i),hash=await digest('cap-input-'+i),r=await b.fetch(new Request('https://budget/reserve',{method:'POST',body:JSON.stringify({uid,hash})}));assert.equal(r.status,i<5?200:503);}
+ assert.equal(s.data.get('global').total,500000);
+ const state=await(await b.fetch(new Request('https://budget/status',{method:'POST',body:'{}'}))).json();assert.equal(state.limits.total,500000);assert.equal(state.global.total,500000);
+});
+test('provider usage receipts are recorded once per reservation without changing reserved spending',async()=>{
+ const s=storage(),b=new ProAiBudget({storage:s},config),uid=await digest('meter-member'),hash=await digest('meter-input');
+ const r=await b.fetch(new Request('https://budget/reserve',{method:'POST',body:JSON.stringify({uid,hash})})),lease=await r.json();
+ const settle=()=>b.fetch(new Request('https://budget/settle',{method:'POST',body:JSON.stringify({uid,hash,reservation:lease.reservation,response_id:'resp_test',request_id:'req_test',model:'gpt-5-mini',status:'completed',usage:{input_tokens:1000,cached_tokens:0,output_tokens:500}})}));
+ assert.equal((await settle()).status,200);assert.equal((await settle()).status,200);assert.equal([...s.data.keys()].filter(k=>k.startsWith('receipt:')).length,1);assert.equal(s.data.get('global').total,100000);
+});
 test('review validates source quotes and numeric claims; selected job rejects external URLs',()=>{
  assert.throws(()=>validateAiResult({suggestions:[{field:'skills',quote:'Invented',rewrite:'Expert',reason:'bad'}]},sections,'optimize'));
  assert.throws(()=>validateAiResult({suggestions:[{field:'experience',quote:'Answered customer questions',rewrite:'Increased revenue by 30%',reason:'bad'}]},sections,'optimize'));
