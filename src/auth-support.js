@@ -41,7 +41,7 @@ export async function authSupportEndpoint(request, env, siteOrigin, baseHeaders)
   }
   const email=String(form.get('email') || url.searchParams.get('email') || '').trim().toLowerCase().slice(0,254);
   const rawReturn=String(form.get('return') || url.searchParams.get('return') || '');
-  const returnTo=/^\/apply\/[A-Za-z0-9%._~-]{1,240}$/.test(rawReturn) ? rawReturn : '';
+  const returnTo=/^\/apply\/[A-Za-z0-9%._~-]{1,240}$/.test(rawReturn) || rawReturn==='/niche-finder' ? rawReturn : '';
   const widget=env.TURNSTILE_SITE_KEY ? `<div class="cf-turnstile" data-sitekey="${esc(env.TURNSTILE_SITE_KEY)}" data-action="${resend?'resend':'recovery'}"></div><script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>` : '';
   const emailForm=(error='')=>`${error?`<div class="auth-alert error" role="alert">${esc(error)}</div>`:''}<form class="auth-form" method="post" action="${url.pathname}"><div class="auth-field"><label for="recovery-email">Email address</label><input id="recovery-email" name="email" type="email" maxlength="254" autocomplete="email" value="${esc(email)}" required></div><input type="hidden" name="return" value="${esc(returnTo)}">${widget}<button type="submit">${resend?'Resend verification':'Send reset link'}</button></form><p class="auth-switch"><a href="/login">Back to log in</a></p>`;
   if(reset){

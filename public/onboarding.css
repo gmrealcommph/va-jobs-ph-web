@@ -67,3 +67,5 @@
 @media(prefers-reduced-motion:reduce){.onboard-choice .onboard-choice-face{transition:none}}
 
 .onboard-skip{font-size:14px;line-height:1.7;margin-top:24px}.onboard-skip a{display:inline-block;padding-block:10px}.onboard-actions{flex-wrap:wrap}.onboard-actions #onboard-finish{white-space:normal}
+
+.nf-welcome{padding:22px;border:1px solid #cbd8c8;border-radius:16px;background:#edf2df;margin:0 0 24px}.nf-welcome strong{display:block;font-size:23px}.nf-welcome p{line-height:1.6}.nf-welcome a{font-weight:700;color:#0f3d2e}

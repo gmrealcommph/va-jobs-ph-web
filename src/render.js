@@ -19,7 +19,7 @@ export function layout({ title, description, canonical, body, noindex = false, u
   let currentPath = '/';
   try { currentPath = new URL(canonical).pathname; } catch {}
   const navLink = (href, label, cls = '') => '<a class="' + cls + '" href="' + href + '"' + ((href === '/' ? currentPath === '/' || currentPath.startsWith('/jobs') : currentPath === href || currentPath.startsWith(href + '/')) ? ' aria-current="page"' : '') + '>' + label + '</a>';
-  const accountLinks = navLink('/onboarding', 'My account') + navLink('/saved-searches', 'Saved searches') + navLink('/job-alerts', 'My Job Alerts') + navLink('/pro', isPro ? 'Your Pro membership' : 'Explore VeeAys Pro', 'member-plan-link') + '<a class="member-logout" href="/logout">Log out <span aria-hidden="true">↗</span></a>';
+  const accountLinks = navLink('/onboarding', 'My account') + navLink('/niche-finder', 'Niche Finder · Free') + navLink('/saved-searches', 'Saved searches') + navLink('/job-alerts', 'My Job Alerts') + navLink('/pro', isPro ? 'Your Pro membership' : 'Explore VeeAys Pro', 'member-plan-link') + '<a class="member-logout" href="/logout">Log out <span aria-hidden="true">↗</span></a>';
   return `<!doctype html>
 <html lang="en-PH">
 <head>
@@ -92,10 +92,11 @@ ${user && profile?.onboarding_completed === false && showPreferencesPrompt && cu
   <div class="wrap preferences-reminder" data-preferences-reminder>
     <aside class="preferences-card" aria-label="Finish your job preferences">
       <div class="preferences-card-copy">
-        <strong>Find jobs that fit you</strong>
-        <span>Finish your job preferences in 3 short steps for more relevant matches. Browse freely and return anytime through My account.</span>
+        <strong>Don’t know your niche? Let’s find it together.</strong>
+        <span>Explore possible roles with the free, optional Niche Finder, or finish your job preferences in 3 short steps. Browse freely and return anytime through My account.</span>
       </div>
       <div class="preferences-card-actions">
+        <a class="preferences-card-primary" href="/niche-finder">Find my niche</a>
         <a class="preferences-card-primary" href="/onboarding">Finish my preferences</a>
         <a class="preferences-card-dismiss" href="/dismiss-preferences-prompt">Not now</a>
       </div>
@@ -1119,6 +1120,7 @@ export function onboardingPage({ user, preferences = null, error = '' } = {}) {
   return `
   <link rel="stylesheet" href="/onboarding.css?v=20261019">
   <section class="onboard-shell">
+    <aside class="nf-welcome"><strong>Don’t know your niche? Let’s find it together.</strong><p>New to remote work? Answer 14 everyday questions to explore three possible paths. It’s free and optional.</p><a href="/niche-finder">Try the Niche Finder →</a></aside>
     <div class="onboard-top">
       <div><div class="kicker">LET’S FIND YOUR FIT</div><h1>Tell VeeAys what you’re <em>looking for.</em></h1><p>Choose your roles, work preferences and experience to see more relevant job matches. Pay and skills are optional. You can change everything later.</p></div><div class="onboard-profile-note" aria-hidden="true"><span>MADE AROUND YOU</span><strong>Your next chapter<br>starts here.</strong><svg viewBox="0 0 130 12"><path d="M3 8Q60 1 126 5M14 10Q68 5 112 8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></div>
       

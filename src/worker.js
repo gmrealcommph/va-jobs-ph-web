@@ -1,4 +1,5 @@
 import {resumeEndpoint} from './resume-studio.js';
+import {nicheEndpoint} from './niche-finder.js';
 export {ResumeBudget} from './resume-studio.js';
 import {authCaptchaToken} from './signup-protection.js';
 import {savedSearchesEndpoint} from './saved-searches.js';
@@ -44,7 +45,7 @@ function safeReturnPath(value) {
   if (/^\/apply\/[A-Za-z0-9%._~-]{1,240}$/.test(v)) return v;
   if (/^\/jobs\/[A-Za-z0-9%._~-]{1,240}(?:\?save=1)?$/.test(v)) return v;
   if (v === '/admin' || v === '/saved-searches' || v === '/my-jobs' || v === '/matches' || v === '/jobs' || v === '/email-preferences' || v === '/job-alerts') return v;
-  if (v === '/pro' || v === '/onboarding' || v === '/') return v;
+  if (v === '/pro' || v === '/onboarding' || v === '/niche-finder' || v === '/') return v;
   return '';
 }
 async function defaultPostAuthPath(env, state) {
@@ -64,6 +65,7 @@ function hasCookie(request, name, expected = '1') {
 function xml(body) { return new Response(`<?xml version="1.0" encoding="UTF-8"?>${body}`, { headers: { 'content-type': 'application/xml; charset=utf-8', 'cache-control': 'public, max-age=300' } }); }
 export async function handle(request, env) {
   const url = new URL(request.url);
+  if(['/niche-finder','/niche-finder/preferences'].includes(url.pathname))return nicheEndpoint(request,env);
   if(url.pathname==='/activity')return activityEndpoint(request,env);
   if(['/resume-studio','/api/resume/review'].includes(url.pathname))return resumeEndpoint(request,env);
   if(url.pathname==='/saved-searches')return savedSearchesEndpoint(request,env);
@@ -198,18 +200,19 @@ export async function handle(request, env) {
     }
     if (url.pathname === '/signup') {
       if (!fullName) return Response.redirect(`${url.origin}/signup?error=${encodeURIComponent('Enter your full name.')}&email=${encodeURIComponent(email)}${returnTo ? `&return=${encodeURIComponent(returnTo)}` : ''}`, 303);
-      const { response, data } = await signUp(env, { email, password, fullName, captchaToken, redirectTo: `${siteOrigin}/auth/callback${returnTo ? `?return=${encodeURIComponent(returnTo)}` : ''}` });
+      const signupReturn = returnTo || '/niche-finder';
+      const { response, data } = await signUp(env, { email, password, fullName, captchaToken, redirectTo: `${siteOrigin}/auth/callback?return=${encodeURIComponent(signupReturn)}` });
       if (!response.ok) return Response.redirect(`${url.origin}/signup?error=${encodeURIComponent(authError(data, 'We could not create your account.'))}&email=${encodeURIComponent(email)}${returnTo ? `&return=${encodeURIComponent(returnTo)}` : ''}`, 303);
       await linkTrafficRegistration(request,env,data?.user);
       const signupMarker=registrationCookie(request,data?.user);
       if (data?.access_token && data?.refresh_token) {
-        const target = returnTo || '/';
+        const target = signupReturn;
         const h = new Headers({ location: target, 'cache-control': 'no-store' });
         setSessionCookies(h, data);
         if(signupMarker)h.append('Set-Cookie',signupMarker);
         return new Response(null, { status: 303, headers: h });
       }
-      const h=new Headers({location:`${url.origin}/check-email?email=${encodeURIComponent(email)}${returnTo ? `&return=${encodeURIComponent(returnTo)}` : ''}`,'cache-control':'no-store'});
+      const h=new Headers({location:`${url.origin}/check-email?email=${encodeURIComponent(email)}&return=${encodeURIComponent(signupReturn)}`,'cache-control':'no-store'});
       if(signupMarker)h.append('Set-Cookie',signupMarker);
       return new Response(null,{status:303,headers:h});
     }
