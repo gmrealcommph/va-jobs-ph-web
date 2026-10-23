@@ -65,7 +65,7 @@ test('sound defaults on, unlocks only after interaction, and can be muted',async
 test('compact insights preserve measured zero, unavailable states and escaped sources',async()=>{
  const p=await page();
  const unknown=vm.runInContext('renderOverviewInsights({})',p.context);
- assert.match(unknown,/Member details unavailable/);assert.match(unknown,/Traffic data temporarily unavailable/);assert.match(unknown,/Completed tools/);assert.match(unknown,/Unavailable/);assert.doesNotMatch(unknown,/Live visitors|flip-clock/);
+ assert.match(unknown,/Member details unavailable/);assert.match(unknown,/Traffic data temporarily unavailable/);assert.match(unknown,/Tools completed/);assert.match(unknown,/Unavailable/);assert.doesNotMatch(unknown,/Live visitors|flip-clock/);
  const report=data();report.extended={available:true,members:{verified:0,unverified:0,cohort_registered:0,cohort_verified_now:0,cohort_purchased_now:0}};
  report.visitors={attribution:{available:true,sources:[{source:'<script>bad</script>',visits:0}]}};
  report.traffic={available:true,sessions:0,sources:[]};report.tool_completions={available:true,niche_finder:0,resume_studio:0};

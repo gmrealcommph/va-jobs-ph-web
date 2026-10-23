@@ -31,3 +31,10 @@ test('counts are queried only after admin authorization, and render zero separat
  let queries=0;const options={session:async()=>({user:{id:'completion-admin'},accessToken:'verified'}),call:async(e,t,name)=>name==='veeays_admin_access'?false:{},completions:async()=>{queries++;return {available:true,niche_finder:2,resume_studio:3};}};
  const req=new Request('https://veeays.test/admin/api/analytics');assert.equal((await adminEndpoint(req,{},options)).status,403);assert.equal(queries,0);options.call=async(e,t,name)=>name==='veeays_admin_access'?true:{};const r=await adminEndpoint(req,{},options);assert.equal(r.status,200);assert.equal((await r.json()).tool_completions.niche_finder,2);assert.equal(queries,1);assert.match(completionCards({available:true,niche_finder:0,resume_studio:0}),/>0</);assert.match(completionCards({available:false}),/Unavailable/);
 });
+
+test('daily series uses Manila midnight and dedupes within the same atomic transaction',async()=>{
+ const f=storage(),old=Date.now;let now=Date.parse('2026-10-23T15:59:00Z');Date.now=()=>now;
+ try{const id=crypto.randomUUID();await recordCompletion(f.env,'niche_finder',id);await recordCompletion(f.env,'niche_finder',id);now+=120000;await recordCompletion(f.env,'resume_studio',crypto.randomUUID());const result=await toolCompletionCounts(f.env);assert.deepEqual(result.daily,[{day:'2026-10-23',tool:'niche_finder',total:1},{day:'2026-10-24',tool:'resume_studio',total:1}]);now+=86400001;await f.object.alarm();assert.equal((await toolCompletionCounts(f.env)).daily.length,2);
+ const html=completionCards(result);assert.match(html,/completion-chart/);assert.match(html,/niche-series/);assert.match(html,/resume-series/);assert.match(html,/Date \(Manila\)/);assert.doesNotMatch(html,/NaN|undefined/);
+ }finally{Date.now=old;f.db.close();}
+});

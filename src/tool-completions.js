@@ -6,6 +6,9 @@ const json=(body,status=200)=>Response.json(body,{status,headers:{'cache-control
 function schema(sql,now){
  sql.exec('CREATE TABLE IF NOT EXISTS tool_receipts (tool TEXT NOT NULL, id TEXT NOT NULL, created INTEGER NOT NULL, PRIMARY KEY(tool,id))');
  sql.exec('CREATE INDEX IF NOT EXISTS tool_receipts_created ON tool_receipts(created)');
+ sql.exec('CREATE TABLE IF NOT EXISTS tool_daily_meta (id INTEGER PRIMARY KEY CHECK(id=1), started INTEGER NOT NULL)');
+ sql.exec('INSERT OR IGNORE INTO tool_daily_meta (id,started) VALUES (1,?)',now);
+ sql.exec('CREATE TABLE IF NOT EXISTS tool_daily (day TEXT NOT NULL, tool TEXT NOT NULL, total INTEGER NOT NULL, PRIMARY KEY(day,tool))');
  sql.exec('CREATE TABLE IF NOT EXISTS tool_totals (tool TEXT PRIMARY KEY, total INTEGER NOT NULL)');
  sql.exec('CREATE TABLE IF NOT EXISTS tool_meta (id INTEGER PRIMARY KEY CHECK(id=1), started INTEGER NOT NULL)');
  sql.exec('INSERT OR IGNORE INTO tool_meta (id,started) VALUES (1,?)',now);
@@ -21,7 +24,8 @@ export async function completionObjectRequest(ctx,request){
  const now=Date.now(),sql=ctx.storage.sql,path=new URL(request.url).pathname;schema(sql,now);
  if(path==='/tool-completions/count'&&request.method==='GET'){
   const rows=sql.exec('SELECT tool,total FROM tool_totals').toArray(),counts=Object.fromEntries(rows.map(r=>[r.tool,r.total]));
-  return json({available:true,niche_finder:counts.niche_finder||0,resume_studio:counts.resume_studio||0,started_at:new Date(sql.exec('SELECT started FROM tool_meta WHERE id=1').one().started).toISOString(),count_type:'completed_forms'});
+  const daily=sql.exec('SELECT day,tool,total FROM tool_daily WHERE day >= ? ORDER BY day,tool',new Date(now+28800000-29*TTL).toISOString().slice(0,10)).toArray();
+  return json({available:true,daily_started_at:new Date(sql.exec('SELECT started FROM tool_daily_meta WHERE id=1').one().started).toISOString(),daily,timezone:'Asia/Manila',as_of:new Date(now).toISOString(),niche_finder:counts.niche_finder||0,resume_studio:counts.resume_studio||0,started_at:new Date(sql.exec('SELECT started FROM tool_meta WHERE id=1').one().started).toISOString(),count_type:'completed_forms'});
  }
  if(path!=='/tool-completions/record'||request.method!=='POST')return json({error:'Not found'},404);
  let body;try{const raw=await request.text();if(raw.length>160)return json({error:'Too large'},413);body=JSON.parse(raw);}catch{return json({error:'Invalid request'},400);}
@@ -30,6 +34,7 @@ export async function completionObjectRequest(ctx,request){
   if(sql.exec('SELECT id FROM tool_receipts WHERE tool=? AND id=?',body.tool,body.id).toArray().length)return false;
   sql.exec('INSERT INTO tool_receipts (tool,id,created) VALUES (?,?,?)',body.tool,body.id,now);
   sql.exec('INSERT INTO tool_totals (tool,total) VALUES (?,1) ON CONFLICT(tool) DO UPDATE SET total=tool_totals.total+1',body.tool);
+  sql.exec('INSERT INTO tool_daily (day,tool,total) VALUES (?,?,1) ON CONFLICT(day,tool) DO UPDATE SET total=tool_daily.total+1',new Date(now+28800000).toISOString().slice(0,10),body.tool);
   return true;
  });
  const alarm=await ctx.storage.getAlarm();if(alarm===null||alarm>now+TTL)await ctx.storage.setAlarm(now+TTL);
