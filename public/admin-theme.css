@@ -289,15 +289,17 @@ html{scroll-behavior:smooth;scrollbar-width:thin;scrollbar-color:var(--line) tra
 @media(max-width:700px){.live-counter{min-height:90px}.flip-clock{font-size:clamp(42px,14vw,58px)}}
 @media(prefers-reduced-motion:reduce){.live-title i,.flip-flap{animation:none}}
 
-/* Completion totals replace the Live Visitors overview tile. */
-.reference-board .tool-completions-tile h3{font-size:15px!important;margin:0 0 16px!important;font-weight:550}
-.tool-completion-metrics{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px}
-.tool-completion-metric{display:flex;flex-direction:column;gap:8px;min-width:0}
-.tool-completion-metric+.tool-completion-metric{border-left:1px solid var(--line);padding-left:16px}
-.tool-completion-metric>span{font-size:12px;font-weight:550;color:var(--muted)}
-.tool-completion-metric>strong{font-size:32px;line-height:1.15;font-weight:650;letter-spacing:-1px;overflow-wrap:anywhere;font-variant-numeric:tabular-nums}
-.tool-completion-metric>strong.completion-unavailable{font-size:14px;letter-spacing:0}
-.reference-board .tool-completion-note{font-size:11px!important;color:var(--muted);margin:16px 0 0!important;line-height:1.4}
 
-.reference-board .tool-completions-tile{min-height:240px}.tool-completions-tile h3{display:flex;justify-content:space-between;align-items:center}.completion-period{font-size:10px;font-weight:400;border:1px solid var(--line);padding:4px 9px;border-radius:20px}.completion-legend{display:flex;gap:16px;flex-wrap:wrap;font-size:11px}.completion-legend>span:before{content:'';display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:5px}.niche-key:before{background:#8956e8}.resume-key:before{background:#ed69ac}.completion-legend strong{margin-left:4px;color:var(--ink)}.completion-chart{width:100%;display:block;overflow:visible;margin-top:12px}.completion-chart text{font:10px system-ui;fill:var(--muted)}.completion-grid{stroke:var(--line);stroke-width:1}.completion-series path{fill:none;stroke-width:2;stroke-linejoin:round;stroke-linecap:round}.niche-series{stroke:#8956e8;fill:#8956e8}.resume-series{stroke:#ed69ac;fill:#ed69ac}.completion-series circle{opacity:0;stroke-width:5;stroke:transparent;paint-order:stroke;cursor:help}.completion-series circle:hover,.completion-series circle:focus{opacity:1;outline:none}.reference-board .tool-completion-note{margin-top:8px!important}
-.completion-series circle:last-child{opacity:1}.resume-series path{stroke-dasharray:5 3}
+/* Completed forms: two black flip counters on one white overview card. */
+.reference-board .tool-completions-tile,:root[data-theme=dark] .reference-board .tool-completions-tile{--ink:#181818;--muted:#686868;--line:#e5e5e5;background:#fff!important;color:#181818;border:1px solid #e5e5e5!important;min-height:190px;box-shadow:0 2px 8px #00000006}
+.reference-board .tool-completions-tile h3{font-size:15px!important;font-weight:550;margin:0 0 20px!important;color:#181818}
+.completion-counter-row{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px;align-items:start}
+.completion-counter{display:flex;flex-direction:column;align-items:center;gap:12px;min-width:0}
+.tool-completions-tile .flip-clock{color:#fff;font-size:clamp(24px,3vw,42px);gap:3px;max-width:100%;flex-wrap:wrap;justify-content:center}
+.tool-completions-tile .flip-digit{background:linear-gradient(#292929 49.5%,#101010 50%);box-shadow:0 2px 3px #0003,inset 0 1px #ffffff22;border-radius:4px}
+.tool-completions-tile .flip-digit:after{content:'';position:absolute;left:0;right:0;top:50%;height:1px;background:#0009;z-index:2}
+.tool-completions-tile .flip-flap{background:linear-gradient(#303030,#1a1a1a);animation:flip-digit .62s cubic-bezier(.2,.65,.25,1) both}
+.completion-label{font-size:12px;font-weight:550;color:#333}.completion-missing{color:#686868;font-size:12px;font-weight:400}
+.reference-board .tool-completion-note{font-size:10px!important;text-align:center;color:#777!important;margin:18px 0 0!important;line-height:1.4}
+@media(max-width:700px){.tool-completions-tile .flip-clock{font-size:40px}}
+@media(prefers-reduced-motion:reduce){.tool-completions-tile .flip-flap{animation:none}}

@@ -65,13 +65,13 @@ test('sound defaults on, unlocks only after interaction, and can be muted',async
 test('compact insights preserve measured zero, unavailable states and escaped sources',async()=>{
  const p=await page();
  const unknown=vm.runInContext('renderOverviewInsights({})',p.context);
- assert.match(unknown,/Member details unavailable/);assert.match(unknown,/Traffic data temporarily unavailable/);assert.match(unknown,/Tools completed/);assert.match(unknown,/Unavailable/);assert.doesNotMatch(unknown,/Live visitors|flip-clock/);
+ assert.match(unknown,/Member details unavailable/);assert.match(unknown,/Traffic data temporarily unavailable/);assert.match(unknown,/Tools completed/);assert.match(unknown,/Unavailable/);assert.doesNotMatch(unknown,/Live visitors/);
  const report=data();report.extended={available:true,members:{verified:0,unverified:0,cohort_registered:0,cohort_verified_now:0,cohort_purchased_now:0}};
  report.visitors={attribution:{available:true,sources:[{source:'<script>bad</script>',visits:0}]}};
  report.traffic={available:true,sessions:0,sources:[]};report.tool_completions={available:true,niche_finder:0,resume_studio:0};
  p.state.responses.push({status:200,body:report});await p.poll();
  const html=p.nodes['overview-insights'].innerHTML;assert.match(html,/Verified · now/);assert.match(html,/>0<\/strong>/);assert.doesNotMatch(html,/&lt;script&gt;/);assert.doesNotMatch(html,/<script>|NaN|undefined/);
- assert.match(html,/Niche Finder/);assert.match(html,/Resume Studio/);assert.equal((html.match(/class="insight-tile /g)||[]).length,3);assert.doesNotMatch(html,/Live visitors/);assert.match(html,/0 registrations/);assert.match(html,/Cohort verified<\/span><strong>—/);
+ assert.match(html,/Niches/);assert.match(html,/Resumes/);assert.equal((html.match(/class="insight-tile /g)||[]).length,3);assert.doesNotMatch(html,/Live visitors/);assert.match(html,/0 registrations/);assert.match(html,/Cohort verified<\/span><strong>—/);
 });
 
 test('traffic totals include all sources; email section preserves exhausted, uncapped and unknown quota',async()=>{
@@ -133,4 +133,13 @@ test('verified payment notification uses its own sound once and survives period 
  p.state.responses.push({status:200,body:next});await p.poll();
  assert.equal(celebrations,1);assert.equal(registrations,0);assert.equal(p.nodes['signup-notifications'].children[0].children[0].textContent,'Payment confirmed!');
  p.nodes.period.value='30';p.state.responses.push({status:200,body:next});await p.poll();assert.equal(celebrations,1);
+});
+
+test('tool counters flip on the 30 second refresh and show the latest completion totals',async()=>{
+ const p=await page();let flips=0;
+ p.nodes['overview-insights'].querySelectorAll=selector=>selector.includes('flip-flap')?[{animate(){flips++;}}]:[];
+ const timer=[...p.timers.values()].find(t=>t.delay>=15000);assert.equal(timer.delay,30000);
+ const report=data();report.tool_completions={available:true,niche_finder:12,resume_studio:34};p.state.responses.push({status:200,body:report});await p.poll();
+ assert.equal(flips,1);assert.match(p.nodes['overview-insights'].innerHTML,/Niches: 12/);assert.match(p.nodes['overview-insights'].innerHTML,/Resumes: 34/);
+ assert.doesNotMatch(p.nodes['overview-insights'].innerHTML,/completion-chart/);
 });

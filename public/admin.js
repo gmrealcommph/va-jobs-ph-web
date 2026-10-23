@@ -204,6 +204,7 @@ async function load({automatic=false}={}){
     $('status').className='error';$('status').textContent='Choose valid dates, up to 91 days, ending today or earlier.';schedule();return;
   }
   inFlight=true;
+  if(typeof window==='undefined'||!window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches)for(const flap of $('overview-insights').querySelectorAll('.tool-completions-tile .flip-flap'))flap.animate?.([{transform:'rotateX(0)'},{transform:'rotateX(-92deg)',offset:.48},{transform:'rotateX(0)'}],{duration:620,easing:'ease-in-out'});
   $('filters').querySelector('button').disabled=true;
   if(!automatic || !lastSuccess){
     $('dashboard').setAttribute('aria-busy','true');
