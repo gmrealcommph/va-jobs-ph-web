@@ -15,7 +15,7 @@ export default{async fetch(request,env,ctx){
  if(path.startsWith('/api/pro-tools/')){
   response=await proAiEndpoint(request,fixtureEnv(env),{send:async(url,init)=>{
    const data=JSON.parse(JSON.parse(init.body).input),source=data.resume,field=['experience','summary','projects','skills'].find(k=>source[k]?.trim()),quote=(source[field]||'').split('\n')[0].slice(0,400);
-   const value=path.endsWith('cover-letter')?{letter:'Dear hiring team,\n\nI am interested in the '+data.selected_job.title+' role at '+data.selected_job.company+'. '+source.summary+'\n\n'+source.experience+'\n\nI would welcome the opportunity to discuss how my experience could support your team. Thank you for considering my application.'}:{suggestions:[{field,quote,rewrite:quote.replace(/^Answered customer questions/,'Responded to customer questions'),reason:'Example review: use a clear action and a specific responsibility. This staging response preserves your wording; no AI request was made.'}]};
+   const value=path.endsWith('cover-letter')?{evidence:['experience','projects'].filter(k=>source[k]?.trim()).map(source_id=>({source_id}))}:{suggestions:[{source_id:field,operation:'bullet_lines',topic:'clarity'}]};
    return Response.json({status:'completed',output:[{content:[{type:'output_text',text:JSON.stringify(value)}]}]});
   }});
   if(response.ok){const value=await response.json();response=Response.json({...value,demo:true},{headers:response.headers});}

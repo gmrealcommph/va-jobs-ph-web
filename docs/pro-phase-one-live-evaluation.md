@@ -1,3 +1,5 @@
+> Follow-up: source-grounded fixes and paused credential/budget verification are in [pro-phase-one-grounding-fixes.md](pro-phase-one-grounding-fixes.md). No paid retest has been run.
+
 # Phase 1 live-provider evaluation — 23 October 2026
 
 ## Recommendation

@@ -24,10 +24,18 @@ test('AI routes enforce identity, protected Pro status, consent, bounds, origin 
 });
 test('one global reservation precedes provider; cache reuse avoids another request and data never contains name/contact/photo',async()=>{
  const s=storage(),budget=new ProAiBudget({storage:s},config),env={...config,PRO_AI_BUDGET:{idFromName:()=>1,get:()=>({fetch:(url,init)=>budget.fetch(new Request(url,init))})}};let calls=0;
- const value={suggestions:[{field:'experience',quote:'Answered customer questions',rewrite:'Responded to customer questions',reason:'Lead with a clear action.'}]};
+ const value={suggestions:[{source_id:'experience',operation:'bullet_lines',topic:'structure'}]};
  const send=async(url,init)=>{calls++;assert.equal(url,'https://api.openai.com/v1/responses');const b=JSON.parse(init.body);assert.equal(b.store,false);assert.equal(b.max_output_tokens,1800);assert.equal(b.text.format.strict,true);assert.equal(s.data.get('global').total,100000);assert.doesNotMatch(b.input,/"name"|"contact"|"photo"/);return Response.json({status:'completed',output:[{content:[{type:'output_text',text:JSON.stringify(value)}]}]});};
  const a=await proAiEndpoint(req(),env,{...deps,send});assert.equal(a.status,200);assert.equal((await a.json()).remaining,9);
  const b=await proAiEndpoint(req(),env,{...deps,send});assert.equal((await b.json()).cached,true);assert.equal(calls,1);assert.doesNotMatch(JSON.stringify([...s.data]),/Answered customer|Responded to customer/);
+});
+test('provider-authored factual expansions are rejected without retry, cache write or returning unvalidated claims',async()=>{
+ for(const tool of ['optimize','cover-letter']){
+  const s=storage(),budget=new ProAiBudget({storage:s},config),env={...config,PRO_AI_BUDGET:{idFromName:()=>1,get:()=>({fetch:(url,init)=>budget.fetch(new Request(url,init))})}};let calls=0;
+  const bad=tool==='optimize'?{suggestions:[{field:'projects',quote:'Created a checklist.',rewrite:'Created and maintained a checklist.',reason:'Relevant'}]}:{letter:'In that volunteer role I also created and maintained the school project, with 10 years of expertise.'};
+  const r=await proAiEndpoint(req(tool,{sections,consent:true,job_id:1}),env,{...deps,send:async()=>{calls++;return Response.json({status:'completed',output:[{content:[{type:'output_text',text:JSON.stringify(bad)}]}]});}});
+  assert.equal(r.status,503);assert.equal(calls,1);assert.equal(s.data.get('global').total,100000);assert.equal([...s.data.keys()].some(k=>k.startsWith('cache:')),false);assert.doesNotMatch(JSON.stringify(await r.json()),/maintained|10 years|volunteer role/);
+ }
 });
 test('durable budget serializes concurrency, enforces cooldown/daily/member/global caps and cleans private cache',async()=>{
  const old=Date.now;let now=1800000000000;Date.now=()=>now;const s=storage(),b=new ProAiBudget({storage:s},config),uid=await digest('one');const reserve=async (who,hash)=>b.fetch(new Request('https://b/reserve',{method:'POST',body:JSON.stringify({uid:who,hash:await digest(hash)})}));
