@@ -29,7 +29,9 @@
     "PRO_AI_MAX_CALL_MICRO_USD": "100000",
     "PRO_AI_DAILY_MICRO_USD": "500000",
     "PRO_AI_TOTAL_MICRO_USD": "500000",
-    "PRO_TEST_USER_ID": "179bbbaa-2575-4390-a4f8-b3612c70ec10"
+    "PRO_TEST_USER_ID": "179bbbaa-2575-4390-a4f8-b3612c70ec10",
+    "PRO_RETEST_USER_ID": "c58d2e38-782d-4c81-8ba1-96bc7df63b88",
+    "PRO_RETEST_UNTIL": "0"
   },
   "durable_objects": {
     "bindings": [

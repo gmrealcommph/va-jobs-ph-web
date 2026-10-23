@@ -11,3 +11,10 @@ test('carry-forward refuses reduced values, existing unimported spending and any
  const f=fixture();const b=body();b.global.total=0;assert.equal((await f.budget.fetch(req(b))).status,400);f.data.set('global',{total:100000});assert.equal((await f.budget.fetch(req(body()))).status,409);
  assert.equal((await fixture({PRO_AI_ENABLED:'true'}).budget.fetch(req(body()))).status,409);
 });
+test('approved staging retests are exactly one per tool and refuse expired or over-reserved authorization',async()=>{
+ const f=fixture({PRO_AI_ENABLED:'true',PRO_AI_SPENDING_AUTHORIZED:'true',PRO_RETEST_UNTIL:String(Date.now()+60000)});
+ f.data.set('global',{total:200000});const claim=tool=>f.budget.fetch(new Request('https://budget/retest-claim',{method:'POST',body:JSON.stringify({tool})}));
+ assert.equal((await claim('optimize')).status,200);assert.equal((await claim('optimize')).status,409);
+ f.data.set('global',{total:300000});assert.equal((await claim('cover-letter')).status,200);assert.equal((await claim('cover-letter')).status,409);
+ const expired=fixture({PRO_AI_ENABLED:'true',PRO_AI_SPENDING_AUTHORIZED:'true',PRO_RETEST_UNTIL:'0'});assert.equal((await expired.budget.fetch(new Request('https://budget/retest-claim',{method:'POST',body:'{"tool":"optimize"}'}))).status,403);
+});

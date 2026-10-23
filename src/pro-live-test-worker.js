@@ -7,10 +7,18 @@ import {ProAiBudget as Budget,digest} from './pro-ai-budget.js';
 export class ProAiBudget extends Budget{
  async fetch(request){
   const path=new URL(request.url).pathname;
+  if(path==='/retest-claim'){
+   if(this.env.PRO_AI_ENABLED!=='true'||this.env.PRO_AI_SPENDING_AUTHORIZED!=='true'||Date.now()>Number(this.env.PRO_RETEST_UNTIL))return new Response('',{status:403});
+   const b=await request.json();if(!['optimize','cover-letter'].includes(b.tool))return new Response('',{status:400});
+   const ok=await this.ctx.storage.transaction(async tx=>{
+    if(await tx.get('approved-retest-v2:'+b.tool)||(await tx.get('global'))?.total>300000)return false;
+    await tx.put('approved-retest-v2:'+b.tool,{at:Date.now()});return true;
+   });return Response.json({claimed:ok},{status:ok?200:409});
+  }
   if(path!=='/carry-forward'&&path!=='/paused-status')return super.fetch(request);
   if(this.env.PRO_AI_ENABLED!=='false'||this.env.PRO_AI_SPENDING_AUTHORIZED!=='false')return new Response('',{status:409});
   const key='user:'+await digest(this.env.PRO_TEST_USER_ID);
-  if(path==='/paused-status')return Response.json({global:await this.ctx.storage.get('global')||null,user:await this.ctx.storage.get(key)||null,carried:!!await this.ctx.storage.get('local-tests-carried-v1')});
+  if(path==='/paused-status')return Response.json({global:await this.ctx.storage.get('global')||null,user:await this.ctx.storage.get(key)||null,carried:!!await this.ctx.storage.get('local-tests-carried-v1'),retests:[await this.ctx.storage.get('approved-retest-v2:optimize')||null,await this.ctx.storage.get('approved-retest-v2:cover-letter')||null]});
   let b;try{b=await request.json();}catch{return new Response('',{status:400});}
   if(b?.global?.total!==200000||b.global.daily!==200000||b?.user?.count!==2||b.user.daily!==2||![b.global.day,b.user.day,b.user.start,b.user.last].every(Number.isSafeInteger)||b.user.start>b.user.last||b.user.last>Date.now())return new Response('',{status:400});
   const result=await this.ctx.storage.transaction(async tx=>{
@@ -27,11 +35,17 @@ export default {async fetch(request,env,ctx){
  const path=new URL(request.url).pathname;
  if(['/__qa/budget','/__qa/carry-forward','/__qa/paused-status'].includes(path)||path.startsWith('/api/pro-tools/')){
   if(request.method==='POST'&&request.headers.get('origin')!==new URL(request.url).origin)return new Response('Same-origin test request required',{status:403});
-  const state=await sessionForRequest(request,env);if(state.user?.id!==env.PRO_TEST_USER_ID)return new Response('Test account required',{status:403});
+  const state=await sessionForRequest(request,env);if(!state.user?.id||![env.PRO_TEST_USER_ID,env.PRO_RETEST_USER_ID].includes(state.user.id))return new Response('Test account required',{status:403});
   if(env.PRO_TEST_TOKEN&&request.headers.get('x-pro-test-token')!==env.PRO_TEST_TOKEN)return new Response('Test access required',{status:403});
   if(path==='/__qa/budget')return env.PRO_AI_BUDGET.get(env.PRO_AI_BUDGET.idFromName('pro-ai-v1')).fetch('https://budget/status',{method:'POST',body:'{}'});
   if(path==='/__qa/carry-forward'){if(request.method!=='POST')return new Response('',{status:405});return env.PRO_AI_BUDGET.get(env.PRO_AI_BUDGET.idFromName('pro-ai-v1')).fetch('https://budget/carry-forward',{method:'POST',body:await request.text()});}
   if(path==='/__qa/paused-status')return env.PRO_AI_BUDGET.get(env.PRO_AI_BUDGET.idFromName('pro-ai-v1')).fetch('https://budget/paused-status',{method:'POST',body:'{}'});
+  if(env.PRO_AI_ENABLED==='true'){
+   const tool=path.split('/').pop(),expected=tool==='optimize'?env.PRO_TEST_USER_ID:env.PRO_RETEST_USER_ID;
+   if(state.user.id!==expected)return new Response('Assigned staging case only',{status:403});
+   const claimed=await env.PRO_AI_BUDGET.get(env.PRO_AI_BUDGET.idFromName('pro-ai-v1')).fetch('https://budget/retest-claim',{method:'POST',body:JSON.stringify({tool})});
+   if(!claimed.ok)return new Response('Approved one-shot test already used or closed',{status:409});
+  }
   return proAiEndpoint(request,env);
  }
  if(!['GET','HEAD'].includes(request.method)||path.startsWith('/auth/')||path.startsWith('/pro/checkout')||path.startsWith('/admin')||path.startsWith('/internal/')||path.startsWith('/webhooks/'))return new Response('Staging read-only',{status:403});
