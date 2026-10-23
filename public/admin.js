@@ -1,3 +1,4 @@
+import {completionCards} from './admin-tool-completions.js';
 import {renderGalaxy,bindGalaxy} from './admin-traffic-galaxy.js';
 import {renderTraffic} from './admin-traffic.js';
 import {RegistrationTracker,PaymentTracker,refreshDelay,playRegistrationChime,playPaymentCelebration} from './admin-live.js';
@@ -116,6 +117,7 @@ function renderOverviewInsights(d){
   return '<section class="insight-tile member-health-tile"><h3>Member health <a href="#members" aria-label="View member details">↗</a></h3>'+ring+members+'</section><section class="insight-tile traffic-mix-tile">'+renderGalaxy(d)+'</section>'+liveTile;
 }
 function render(d){
+  if($('tool-completions'))$('tool-completions').innerHTML=completionCards(d.tool_completions);
   $('report-day').textContent=new Intl.DateTimeFormat('en-PH',{timeZone:'Asia/Manila',day:'numeric'}).format(new Date(d.generated_at));
   $('report-month').textContent=new Intl.DateTimeFormat('en-PH',{timeZone:'Asia/Manila',weekday:'short'}).format(new Date(d.generated_at))+', '+new Intl.DateTimeFormat('en-PH',{timeZone:'Asia/Manila',month:'long'}).format(new Date(d.generated_at));
   const rev=d.revenue.length?d.revenue.map(r=>money(r.amount,r.currency)).join(' · '):money(0,'PHP');
@@ -236,7 +238,7 @@ async function load({automatic=false}={}){
     if([401,403].includes(error.status)){
       accessExpired=true;lastSuccess=null;signupQueue.length=0;
       clearTimeout(toastTimer);activeToast?.remove();activeToast=null;
-      for(const id of ['overview','quick-stats','collection-health','charts','quick','errors','import-table','payment-table','actions','email','provider-balances','member-detail','marketing-detail','system'])$(id).replaceChildren();
+      for(const id of ['tool-completions','overview','quick-stats','collection-health','charts','quick','errors','import-table','payment-table','actions','email','provider-balances','member-detail','marketing-detail','system'])$(id).replaceChildren();
       $('platform-status').textContent='Admin access expired';
     }
     else $('platform-status').textContent=lastSuccess?'Refresh failed · previous snapshot':'Analytics unavailable';

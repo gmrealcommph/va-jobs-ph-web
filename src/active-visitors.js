@@ -1,3 +1,4 @@
+import {completionObjectRequest,completionAlarm} from './tool-completions.js';
 const UUID=/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const json=(body,status=200)=>Response.json(body,{status,headers:{'cache-control':'no-store'}});
 export const publicActivityPath=path=>!/^\/(?:admin|api|webhooks|traffic|activity|auth|logout|account\/delete)(?:\/|$)/.test(path);
@@ -29,6 +30,7 @@ export class ActiveVisitors{
  constructor(ctx){this.ctx=ctx;this.sql=ctx.storage.sql;this.sql.exec('CREATE TABLE IF NOT EXISTS active (id TEXT PRIMARY KEY, seen INTEGER NOT NULL)');this.sql.exec('CREATE INDEX IF NOT EXISTS active_seen ON active(seen)');}
  async fetch(request){
   const now=Date.now(),path=new URL(request.url).pathname;
+  if(path.startsWith('/tool-completions/'))return completionObjectRequest(this.ctx,request);
   this.sql.exec('DELETE FROM active WHERE seen <= ?',now-300000);
   if(path==='/count')return json({visits:this.sql.exec('SELECT count(*) AS n FROM active').one().n,fetched_at:new Date(now).toISOString()});
   const b=await request.json();if(!UUID.test(b.id||''))return json({error:'Invalid session'},400);
@@ -39,5 +41,5 @@ export class ActiveVisitors{
   if(await this.ctx.storage.getAlarm()===null)await this.ctx.storage.setAlarm(now+300000);
   return json({recorded:true});
  }
- async alarm(){this.sql.exec('DELETE FROM active WHERE seen <= ?',Date.now()-300000);if(this.sql.exec('SELECT count(*) AS n FROM active').one().n)await this.ctx.storage.setAlarm(Date.now()+300000);}
+ async alarm(){const now=Date.now();this.sql.exec('DELETE FROM active WHERE seen <= ?',now-300000);let next=this.sql.exec('SELECT count(*) AS n FROM active').one().n?now+300000:null;const completionNext=completionAlarm(this.sql,now);if(completionNext!==null)next=next===null?completionNext:Math.min(next,completionNext);if(next!==null)await this.ctx.storage.setAlarm(next);}
 }

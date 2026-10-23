@@ -62,3 +62,9 @@ test('signup email carries the finder return path and verification session accep
 test('account metadata dates and selected ids are sanitized and never become authorization claims',()=>{
  const value=savedFinder({user_metadata:{niche_finder:{...saved,updatedAt:'invalid',selected:['va','va','admin'],plan:'pro'}}});assert.equal(value.updatedAt,null);assert.deepEqual(value.selected,['va']);assert.equal(value.plan,undefined);
 });
+test('completion count follows successful save only; visits, edits and failed saves never count',async()=>{
+ let count=0;const counted=new Set(),countEnv={...env,ACTIVE_VISITORS:{getByName:()=>({fetch:async(url,init)=>{const {id}=JSON.parse(init.body);if(!counted.has(id)){counted.add(id);count++;}return Response.json({recorded:true});}})}};
+ fixture();await nicheEndpoint(req(),countEnv);assert.equal(count,0);const completion_id=crypto.randomUUID(),payload={answers:JSON.stringify(saved.answers),completion_id};await nicheEndpoint(req('',payload),countEnv);await nicheEndpoint(req('',payload),countEnv);assert.equal(count,1);
+ fixture({saved});await nicheEndpoint(req('?edit=1'),countEnv);await nicheEndpoint(req('/preferences',{selected:'va'}),countEnv);assert.equal(count,1);
+ fixture({failSave:true});assert.equal((await nicheEndpoint(req('',{...payload,completion_id:crypto.randomUUID()}),countEnv)).status,502);assert.equal(count,1);
+});

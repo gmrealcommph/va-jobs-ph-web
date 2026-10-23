@@ -1,3 +1,4 @@
+import {toolCompletionCounts} from './tool-completions.js';
 import {activeVisitorCount} from './active-visitors.js';
 import { sessionForRequest, setSessionCookies, clearSessionCookies } from './auth.js';
 import { config } from './data.js';
@@ -47,7 +48,7 @@ async function rpc(env, token, name, body) {
   if(!response.ok) throw Object.assign(new Error('Analytics unavailable'),{status:response.status});
   return response.json();
 }
-export async function adminEndpoint(request, env, {session=sessionForRequest, call=rpc, visitors=visitorAnalytics, liveVisitors=activeVisitorCount, usage=cachedEmailUsage, balances=providerBalances}={}) {
+export async function adminEndpoint(request, env, {session=sessionForRequest, call=rpc, visitors=visitorAnalytics, liveVisitors=activeVisitorCount, usage=cachedEmailUsage, balances=providerBalances, completions=toolCompletionCounts}={}) {
   const url=new URL(request.url), monitor=url.pathname==='/admin/api/quick-reads', api=monitor||url.pathname==='/admin/api/analytics';
   const headers=new Headers(privateHeaders);
   const reply=(body,status,type='text/html; charset=utf-8')=>{
@@ -99,10 +100,11 @@ export async function adminEndpoint(request, env, {session=sessionForRequest, ca
       const providers=await Promise.allSettled([
         Promise.resolve().then(()=>visitors(env,dates)),
         Promise.resolve().then(()=>liveVisitors(env)),
-        Promise.resolve().then(()=>usage(env)),Promise.resolve().then(()=>balances(env))
+        Promise.resolve().then(()=>usage(env)),Promise.resolve().then(()=>balances(env)),Promise.resolve().then(()=>completions(env))
       ]);
       const optional=[providers[0],secured[0],secured[1],providers[2],providers[3],secured[2],secured[3]];
       const value=(index,fallback)=>optional[index].status==='fulfilled'?optional[index].value:fallback;
+      data.tool_completions=providers[4].status==='fulfilled'?providers[4].value:{available:false};
       data.visitors=value(0,{available:false,reason:'provider_error'});
       data.live_visitors=providers[1].status==='fulfilled'?providers[1].value:{available:false,reason:'provider_error'};
       data.traffic=value(1,{available:false,reason:'not_connected'});
@@ -126,7 +128,7 @@ export function adminPage() {
   const navigation=[['overview','Overview','M3 3h7v7H3zM14 3h7v7h-7zM3 14h7v7H3zM14 14h7v7h-7z'],['action-center','Action Center','M12 3 2 21h20ZM12 9v5m0 3v1'],['email-health','Email Health','M3 5h18v14H3zM3 5l9 7 9-7'],['provider-usage','Provider Usage &amp; Balances','M3 6h18v14H3zM3 10h18m-6 5h3'],['members','Members','M16 21v-3a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v3M9 3a4 4 0 1 0 0 8 4 4 0 0 0 0-8m9 11a4 4 0 0 1 4 4v3'],['marketing','Traffic Sources','M3 10v4h4l10 5V5L7 10ZM7 14l2 7'],['system-health','System Health','M2 12h4l3-8 6 16 3-8h4'],['trends','Trends','M3 3v18h18M6 16l5-6 4 3 6-8'],['operations','Quick Reads','M13 2 4 14h7l-1 8 10-12h-7z'],['imports','Import health','M12 3v12m-5-5 5 5 5-5M3 16v5h18v-5'],['payments','Payments','M3 5h18v14H3zM3 9h18M6 15h4']];
   const priority=["overview","action-center","members","marketing","payments","operations","imports","email-health","provider-usage","trends","system-health"];
   navigation.sort((a,b)=>priority.indexOf(a[0])-priority.indexOf(b[0]));
-  return `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>VeeAys · Admin</title><link rel="icon" href="/favicon.svg"><link rel="stylesheet" href="/admin.css"><link rel="stylesheet" href="/admin-theme.css"><script src="/admin-theme.js" type="module"></script><script type="module" src="/admin-interactions.js"></script><script src="/admin.js" type="module"></script><link rel="stylesheet" href="/admin-quick-reads.css"><script src="/admin-quick-reads.js" type="module"></script></head>
+  return `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>VeeAys · Admin</title><link rel="icon" href="/favicon.svg"><link rel="stylesheet" href="/admin.css"><link rel="stylesheet" href="/admin-theme.css"><script src="/admin-theme.js" type="module"></script><script type="module" src="/admin-interactions.js"></script><script src="/admin.js?v=20261023-completions" type="module"></script><link rel="stylesheet" href="/admin-quick-reads.css"><script src="/admin-quick-reads.js" type="module"></script></head>
 <body><a class="skip-link" href="#main-content">Skip to dashboard</a><div class="reference-topbar"><div class="reference-brand"><a href="/"><img src="/veeays-logo.png" alt="VeeAys" width="150"></a><span>VeeAys<strong>Dashboard</strong></span></div><div class="reference-tools"><label>Appearance<select id="theme-mode"><option value="system">System</option><option value="light">Light</option><option value="dark">Dark</option></select></label></div></div><aside aria-label="Dashboard navigation"><nav aria-label="Dashboard sections">${navigation.map(([id,label,path])=>`<a href="#${id}"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="${path}"/></svg><span>${label}</span></a>`).join('')}</nav></aside>
 <main id="main-content"><header class="dashboard-header"><div class="reference-date"><span id="report-day">—</span><div><strong id="report-month">Manila time</strong><small>Production overview</small></div><a href="#action-center">Review activity <span aria-hidden="true">↗</span></a></div><div class="dashboard-title"><span>VEEAYS ADMIN</span><h1>Overview</h1></div><span id="platform-status" class="platform-status" role="status">Analytics awaiting refresh</span></header>
 <div class="dashboard-toolbar"><form id="filters"><label>Timezone<select disabled aria-describedby="timezone-note"><option>Asia/Manila</option></select></label><span id="timezone-note" class="sr-only">Reporting dates are fixed to Manila time.</span><label>Period · Manila<select id="period" name="period"><option value="1">Today</option><option value="7" selected>Last 7 days</option><option value="30">Last 30 days</option><option value="90">Last 90 days</option><option value="custom">Custom dates</option></select></label><label>From<input type="date" id="start" required></label><label>Through<input type="date" id="end" required></label><button type="submit">Refresh data</button></form></div>
@@ -135,7 +137,7 @@ export function adminPage() {
 <div id="signup-notifications" role="status" aria-live="polite" aria-atomic="false"></div>
 <p id="status" role="status" aria-live="polite">Loading production metrics…</p><div id="dashboard" aria-busy="true">
 <div class="reference-board">
-<section id="overview" class="cards"></section>
+<section id="overview" class="cards"></section><section aria-label="Completed career tools"><div class="section-heading"><h2>Completed career tools</h2><p>Completed forms only · counting begins with this release · not unique people</p></div><div id="tool-completions" class="cards"></div></section>
 <section id="action-center"><div class="section-heading"><h2>Action Center</h2><p>Read-only issues · follow links to inspect</p></div><article id="actions"></article></section>
 <div class="growth-row"><section id="collection-panel" class="growth-panel"><div class="section-heading"><h2>Collection Health</h2><p>Job boards · latest arrivals</p></div><div id="collection-health"></div></section><section class="quick-stats-panel"><div class="section-heading"><h2>Operational snapshot</h2><p>Queue, access and delivery</p></div><div id="quick-stats" class="cards"></div></section><div id="overview-insights" class="overview-insights" aria-label="Member, traffic and live visitor summaries"></div></div>
 </div>

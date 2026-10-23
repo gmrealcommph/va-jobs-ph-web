@@ -1,3 +1,5 @@
+import {completionReporter} from './resume-completion.js';
+const reportCompletedDraft=completionReporter();
 import {encodeRecovery,decodeRecovery,RECOVERY_KEY} from './resume-recovery.js';
 import {compose,showPages,pdfBytes} from './resume-export.js';
 import {readPhoto,cropPhoto,validateDesignDraft} from './resume-photo.js';
@@ -72,9 +74,10 @@ $('#ai-review').onclick=async()=>{
 };
 $('#download-draft').onclick=()=>{saveBlob(JSON.stringify({version:2,source:$('#resume-source').value,improve:!$('#improve-panel').hidden,sections:values(),style:selectedStyle,accent:$('#resume-accent').value,photo},null,2),'application/json','my-resume-draft.json');notice('Draft downloaded with design and optional photo. It contains personal information; store it securely.');};
 $('#clear').onclick=()=>{if(!window.confirm('Clear this draft? Download it first if you want to keep it. Other drafts in this tab stay intact.'))return;importRevision++;reviewController?.abort();photoRevision++;photo=null;$('#photo-status').textContent='No photo added.';setDraft({});$('#resume-source').value='';$('#resume-file').value='';$('#ai-consent').checked=false;notice('Résumé text and suggestions cleared from this tab. Downloaded files are yours to delete.');};
+function markResumeComplete(){if(values().name.trim()&&form.checkValidity())void reportCompletedDraft(drafts[activeDraft]);}
 function validName(){if(values().name.trim())return true;notice('Add your name before exporting.');openSection('name');return false;}
-$('#export').onclick=async()=>{if(!validName())return;const plan=latestPlan;if(!plan){notice('Wait for the page preview to finish.');return;}try{saveBlob(await pdfBytes(plan),'application/pdf','my-resume.pdf');notice('PDF downloaded. Review every page before sharing.');}catch(e){notice('PDF could not be created: '+e.message);}};
-$('#export-word').onclick=async()=>{if(!validName())return;const button=$('#export-word');button.disabled=true;try{const {wordBlob}=await import('./resume-word.js');const blob=await wordBlob(values(),selectedStyle,$('#resume-accent').value,photo?await cropPhoto(photo.src,photo.x,photo.y,photo.zoom):null);saveBlob(blob,blob.type,'my-resume.docx');notice('Editable Word document downloaded in a simple single-column layout. Review pagination in Word before sharing.');}catch(e){notice('Word export failed: '+e.message);}finally{button.disabled=false;}};
+$('#export').onclick=async()=>{if(!validName())return;const plan=latestPlan;if(!plan){notice('Wait for the page preview to finish.');return;}try{saveBlob(await pdfBytes(plan),'application/pdf','my-resume.pdf');markResumeComplete();notice('PDF downloaded. Review every page before sharing.');}catch(e){notice('PDF could not be created: '+e.message);}};
+$('#export-word').onclick=async()=>{if(!validName())return;const button=$('#export-word');button.disabled=true;try{const {wordBlob}=await import('./resume-word.js');const blob=await wordBlob(values(),selectedStyle,$('#resume-accent').value,photo?await cropPhoto(photo.src,photo.x,photo.y,photo.zoom):null);saveBlob(blob,blob.type,'my-resume.docx');markResumeComplete();notice('Editable Word document downloaded in a simple single-column layout. Review pagination in Word before sharing.');}catch(e){notice('Word export failed: '+e.message);}finally{button.disabled=false;}};
 $('#print-resume').onclick=()=>{if(!validName())return;if(!latestPlan){notice('Wait for the page preview to finish before printing.');return;}window.print();};
 window.addEventListener('pagehide',()=>{persistRecovery();pageClosing=true;drafts.splice(0,drafts.length,{label:'Draft 1',data:null});activeDraft=0;refreshDrafts();importRevision++;photoRevision++;photo=null;setDraft({});$('#resume-source').value='';$('#ai-consent').checked=false;});
 
@@ -96,7 +99,7 @@ function setStep(key,focus=false){
  for(const section of sections)section.hidden=!stepFields[key].includes(section.dataset.field);
  $('.design-options').open=true;$('#editing-title').textContent={personal:'2. Personal information',experience:'3. Experience & projects',education:'4. Education & skills'}[key]||'Tell your story';
  $('#previous-section').disabled=key==='design';$('#next-section').textContent=key==='education'?'Review & download':'Next step';
- if(key==='review')$('#check').click();
+ if(key==='review'){$('#check').click();markResumeComplete();}
  if(focus){if(key==='design')$('.design-options summary').focus();else if(key==='review')$('#check').focus();else openFirstField(key);}
 }
 function openFirstField(key){openSection(stepFields[key][0]);}

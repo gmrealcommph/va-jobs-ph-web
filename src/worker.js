@@ -1,3 +1,4 @@
+import {resumeCompletionEndpoint} from './tool-completions.js';
 import {resumeEndpoint} from './resume-studio.js';
 import {nicheEndpoint} from './niche-finder.js';
 export {ResumeBudget} from './resume-studio.js';
@@ -64,6 +65,7 @@ function hasCookie(request, name, expected = '1') {
 function xml(body) { return new Response(`<?xml version="1.0" encoding="UTF-8"?>${body}`, { headers: { 'content-type': 'application/xml; charset=utf-8', 'cache-control': 'public, max-age=300' } }); }
 export async function handle(request, env) {
   const url = new URL(request.url);
+  if(url.pathname==='/tools/resume-completed')return resumeCompletionEndpoint(request,env);
   if(['/niche-finder','/niche-finder/preferences'].includes(url.pathname))return nicheEndpoint(request,env);
   if(url.pathname==='/activity')return activityEndpoint(request,env);
   if(['/resume-studio','/api/resume/review'].includes(url.pathname))return resumeEndpoint(request,env);
