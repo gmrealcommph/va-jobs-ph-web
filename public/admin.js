@@ -105,19 +105,12 @@ function renderOverviewInsights(d){
   const field=(label,value,share,tone="")=>'<div class="member-metric '+tone+'"><span>'+esc(label)+'</span><strong>'+esc(value)+'</strong>'+(Number.isFinite(share)?'<svg viewBox="0 0 100 4" preserveAspectRatio="none" aria-hidden="true"><rect width="100" height="4" rx="2" class="member-bar-track"/><rect width="'+Math.max(0,Math.min(100,share)).toFixed(2)+'" height="4" rx="2" class="member-bar-fill"/></svg>':'')+'</div>';
   const rate=(n,total)=>total>0?(100*n/total).toFixed(1)+'%':'—';
   const members=m?'<div class="insight-values">'+field('Verified · now',num(m.verified))+field('Unverified · now',num(m.unverified))+field('Cohort verified',rate(m.cohort_verified_now,m.cohort_registered),m.cohort_registered>0?100*m.cohort_verified_now/m.cohort_registered:null,'verified')+field('Cohort purchased',rate(m.cohort_purchased_now,m.cohort_registered),m.cohort_registered>0?100*m.cohort_purchased_now/m.cohort_registered:null,'purchased')+'</div>':'<p>Member details unavailable.</p>';
-  const live=d.live_visitors;
-  const validLive=live?.available&&Number.isSafeInteger(live.visits)&&live.visits>=0;
-  const liveDigits=validLive?String(live.visits).replace(/\B(?=(\d{3})+(?!\d))/g,','):'—';
-  const clock=validLive?liveDigits.split('').map(char=>char===','?'<span class="flip-separator" aria-hidden="true">,</span>':'<span class="flip-digit" aria-hidden="true"><span class="flip-static">'+char+'</span><span class="flip-flap">'+char+'</span></span>').join(''):'<span class="flip-unavailable">—</span>';
-  const liveLabel=validLive?num(live.visits)+' consenting active browsers in the last 5 minutes':'Live visitor data unavailable';
-  const liveNote=!live||live.reason==='not_connected'?'First-party activity tracking is not connected':live.reason==='access_denied'?'Cloudflare analytics token needs read access':live.reason==='site_not_found'?'Cloudflare analytics site could not be identified':validLive?'Consenting browsers · last 5 min · refreshes every 30 sec':'Activity data unavailable · retrying automatically';
-  const liveTile='<section class="insight-tile live-visitors-tile"><h3><span class="live-title"><i aria-hidden="true"></i>Live visitors</span><a href="#marketing" aria-label="View traffic details">↗</a></h3><div class="live-counter" role="img" aria-label="'+esc(liveLabel)+'"><span class="flip-clock">'+clock+'</span><span class="live-unit">browsers</span></div><p class="live-note">'+esc(liveNote)+'</p></section>';
+  const liveTile=completionCards(d.tool_completions);
   const percent=m&&m.cohort_registered>0?100*m.cohort_verified_now/m.cohort_registered:null;
   const ring='<div class="reference-ring" role="img" aria-label="'+esc('Signup cohort verified: '+(percent===null?'unavailable':percent.toFixed(1)+'%')+'; '+num(m?.cohort_registered??0)+' registrations')+'"><svg viewBox="0 0 100 100" aria-hidden="true"><circle class="ring-track" cx="50" cy="50" r="42"/><circle class="member-ring-rest" cx="50" cy="50" r="42" pathLength="100" stroke-dasharray="'+(percent===null?0:100).toFixed(2)+' 100"/><circle class="ring-value" cx="50" cy="50" r="42" pathLength="100" stroke-dasharray="'+(percent===null?0:Math.max(0,Math.min(100,percent))).toFixed(2)+' 100"/></svg><div><strong>'+(percent===null?'—':percent.toFixed(1)+'%')+'</strong></div></div>';
   return '<section class="insight-tile member-health-tile"><h3>Member health <a href="#members" aria-label="View member details">↗</a></h3>'+ring+members+'</section><section class="insight-tile traffic-mix-tile">'+renderGalaxy(d)+'</section>'+liveTile;
 }
 function render(d){
-  if($('tool-completions'))$('tool-completions').innerHTML=completionCards(d.tool_completions);
   $('report-day').textContent=new Intl.DateTimeFormat('en-PH',{timeZone:'Asia/Manila',day:'numeric'}).format(new Date(d.generated_at));
   $('report-month').textContent=new Intl.DateTimeFormat('en-PH',{timeZone:'Asia/Manila',weekday:'short'}).format(new Date(d.generated_at))+', '+new Intl.DateTimeFormat('en-PH',{timeZone:'Asia/Manila',month:'long'}).format(new Date(d.generated_at));
   const rev=d.revenue.length?d.revenue.map(r=>money(r.amount,r.currency)).join(' · '):money(0,'PHP');
@@ -238,7 +231,7 @@ async function load({automatic=false}={}){
     if([401,403].includes(error.status)){
       accessExpired=true;lastSuccess=null;signupQueue.length=0;
       clearTimeout(toastTimer);activeToast?.remove();activeToast=null;
-      for(const id of ['tool-completions','overview','quick-stats','collection-health','charts','quick','errors','import-table','payment-table','actions','email','provider-balances','member-detail','marketing-detail','system'])$(id).replaceChildren();
+      for(const id of ['overview','quick-stats','collection-health','charts','quick','errors','import-table','payment-table','actions','email','provider-balances','member-detail','marketing-detail','system'])$(id).replaceChildren();
       $('platform-status').textContent='Admin access expired';
     }
     else $('platform-status').textContent=lastSuccess?'Refresh failed · previous snapshot':'Analytics unavailable';

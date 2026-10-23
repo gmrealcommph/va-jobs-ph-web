@@ -65,13 +65,13 @@ test('sound defaults on, unlocks only after interaction, and can be muted',async
 test('compact insights preserve measured zero, unavailable states and escaped sources',async()=>{
  const p=await page();
  const unknown=vm.runInContext('renderOverviewInsights({})',p.context);
- assert.match(unknown,/Member details unavailable/);assert.match(unknown,/Traffic data temporarily unavailable/);assert.match(unknown,/First-party activity tracking is not connected/);assert.match(unknown,/flip-unavailable/);
+ assert.match(unknown,/Member details unavailable/);assert.match(unknown,/Traffic data temporarily unavailable/);assert.match(unknown,/Completed tools/);assert.match(unknown,/Unavailable/);assert.doesNotMatch(unknown,/Live visitors|flip-clock/);
  const report=data();report.extended={available:true,members:{verified:0,unverified:0,cohort_registered:0,cohort_verified_now:0,cohort_purchased_now:0}};
  report.visitors={attribution:{available:true,sources:[{source:'<script>bad</script>',visits:0}]}};
- report.traffic={available:true,sessions:0,sources:[]};report.live_visitors={available:true,visits:0};
+ report.traffic={available:true,sessions:0,sources:[]};report.tool_completions={available:true,niche_finder:0,resume_studio:0};
  p.state.responses.push({status:200,body:report});await p.poll();
  const html=p.nodes['overview-insights'].innerHTML;assert.match(html,/Verified · now/);assert.match(html,/>0<\/strong>/);assert.doesNotMatch(html,/&lt;script&gt;/);assert.doesNotMatch(html,/<script>|NaN|undefined/);
- assert.match(html,/0 registrations/);assert.match(html,/Cohort verified<\/span><strong>—/);
+ assert.match(html,/Niche Finder/);assert.match(html,/Resume Studio/);assert.equal((html.match(/class="insight-tile /g)||[]).length,3);assert.doesNotMatch(html,/Live visitors/);assert.match(html,/0 registrations/);assert.match(html,/Cohort verified<\/span><strong>—/);
 });
 
 test('traffic totals include all sources; email section preserves exhausted, uncapped and unknown quota',async()=>{

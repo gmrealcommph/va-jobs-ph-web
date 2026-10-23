@@ -31,3 +31,5 @@ Only the authenticated, existing admin-authorized analytics endpoint returns pro
 ## Release
 
 Requires production approval. Recheck the active version and source immediately before deploying; preserve all bindings, runtime, secrets, schedules, pricing, payments, verification and signup security. Use production src/worker.js, never the staging entry. Retain a1533d26-caae-4936-80bf-f5f7a3c11396 as the current rollback candidate, subject to the fresh audit.
+
+Dashboard placement update: completion totals replace the Live Visitors tile in the existing admin overview, using its theme and responsive grid. No separate counter section or member-facing counter. Dashboard/counter tests: 15 passed. Auth safety: 28 passed. Mobile preview: 390px, no horizontal overflow. Staging version: 7f028032-9ce3-4650-8cd3-3d2a46d9fcb3. Production not deployed.

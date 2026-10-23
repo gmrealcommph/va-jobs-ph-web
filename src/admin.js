@@ -137,7 +137,7 @@ export function adminPage() {
 <div id="signup-notifications" role="status" aria-live="polite" aria-atomic="false"></div>
 <p id="status" role="status" aria-live="polite">Loading production metrics…</p><div id="dashboard" aria-busy="true">
 <div class="reference-board">
-<section id="overview" class="cards"></section><section aria-label="Completed career tools"><div class="section-heading"><h2>Completed career tools</h2><p>Completed forms only · counting begins with this release · not unique people</p></div><div id="tool-completions" class="cards"></div></section>
+<section id="overview" class="cards"></section>
 <section id="action-center"><div class="section-heading"><h2>Action Center</h2><p>Read-only issues · follow links to inspect</p></div><article id="actions"></article></section>
 <div class="growth-row"><section id="collection-panel" class="growth-panel"><div class="section-heading"><h2>Collection Health</h2><p>Job boards · latest arrivals</p></div><div id="collection-health"></div></section><section class="quick-stats-panel"><div class="section-heading"><h2>Operational snapshot</h2><p>Queue, access and delivery</p></div><div id="quick-stats" class="cards"></div></section><div id="overview-insights" class="overview-insights" aria-label="Member, traffic and live visitor summaries"></div></div>
 </div>

@@ -288,3 +288,13 @@ html{scroll-behavior:smooth;scrollbar-width:thin;scrollbar-color:var(--line) tra
 @keyframes flip-digit{0%{transform:rotateX(0)}48%{transform:rotateX(-92deg)}100%{transform:rotateX(0)}}@keyframes live-dot-pulse{0%{box-shadow:0 0 0 0 #17875b55}75%,100%{box-shadow:0 0 0 7px #17875b00}}
 @media(max-width:700px){.live-counter{min-height:90px}.flip-clock{font-size:clamp(42px,14vw,58px)}}
 @media(prefers-reduced-motion:reduce){.live-title i,.flip-flap{animation:none}}
+
+/* Completion totals replace the Live Visitors overview tile. */
+.reference-board .tool-completions-tile h3{font-size:15px!important;margin:0 0 16px!important;font-weight:550}
+.tool-completion-metrics{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px}
+.tool-completion-metric{display:flex;flex-direction:column;gap:8px;min-width:0}
+.tool-completion-metric+.tool-completion-metric{border-left:1px solid var(--line);padding-left:16px}
+.tool-completion-metric>span{font-size:12px;font-weight:550;color:var(--muted)}
+.tool-completion-metric>strong{font-size:32px;line-height:1.15;font-weight:650;letter-spacing:-1px;overflow-wrap:anywhere;font-variant-numeric:tabular-nums}
+.tool-completion-metric>strong.completion-unavailable{font-size:14px;letter-spacing:0}
+.reference-board .tool-completion-note{font-size:11px!important;color:var(--muted);margin:16px 0 0!important;line-height:1.4}
