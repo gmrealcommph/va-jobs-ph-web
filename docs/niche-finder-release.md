@@ -1,9 +1,9 @@
 # Niche Finder — staged, not approved for production
 
-Base: `gmrealcommph/va-jobs-ph-web`, commit `f5e49dc840658ad2834342b11301065942ae9827`.
-Verified live production version: `1968bf7d-2dfe-4ff0-910c-5b63cd1f47ac`, 100%, deployed 2026-10-23 00:01:20.934951 UTC (08:01:20.934951 Asia/Manila).
-Production deployment ID: `0fe4143d-d94c-45b0-aad1-decb62e8a1e2`. Cloudflare custom domain `veeays.com` explicitly maps to service `va-jobs-ph-web`, environment `production`.
-The live downloaded Worker exactly matches the release build. All 136 tracked public assets match base-commit content (23 have only CRLF/LF differences). Direct GETs for `/`, `/resources`, `/resume-studio`, `/pro` are 200. This supersedes version `1cae4c4f-b90e-4f0f-87e0-461b07c88b25`.
+Current production baseline: `gmrealcommph/va-jobs-ph-web`, source `6078a91996c66765914b9ccfb253fb5692f90038`.
+Verified production version: `9f6399cc-06cc-47fb-b412-38f7abee3b5a`, 100%, deployed October 23, 2026 at 08:36:37 Manila (00:36:37.956115 UTC). Deployment ID `4ad52de3-6174-42d7-b4fe-52c66db052dd`.
+The signup hotfix is incorporated: optional browser analytics and its conflicting response wrapper remain disabled. The live Worker annotation names this source commit. Original feature development used f5e49dc; never promote that older base over the signup fix.
+This revision adds the auth-safety workflow on every push/PR and an explicit `npm run test:auth` release gate. GitHub branch protection is not configured by this package; the workflow must be made required in repository rules to enforce merges. Maintenance-page changes remain separate and are not included.
 
 ## Behavior
 
@@ -24,7 +24,7 @@ Preview: https://veeays-niche-stage-20261023.gm-realcommph.workers.dev/niche-fin
 
 The staging-only entry uses a labelled sample member with browser-cookie saves. No real user credentials or production account writes are forwarded. It reads eligible public jobs. Authentication, payments, non-finder writes, AI and scheduled work are disabled. No production routes or cron triggers are attached. Do not deploy `src/niche-staging-worker.js` to production.
 
-Automated full suite: 517 passed, 4 skipped, 0 failed (521 total). After final refinements, focused account/navigation tests passed (26/26), and the expanded Niche Finder suite passed 10/10. Production-config dry-run bundle succeeds. Whitespace checks pass.
+Automated full suite: 521 passed, 4 skipped, 0 failed (525 total). After final refinements, dedicated auth-safety gate passed (27/27), and the expanded Niche Finder suite passed 10/10. Production-config dry-run bundle succeeds. Whitespace checks pass.
 
 Browser checks at desktop 1440×1000 and mobile 390×844: validation, forward/back with preserved choice, 14-question completion, distinct adaptive branches, neutral and creative results, live jobs, choice save/reload, edit, retake, skip with saved results retained, no horizontal overflow, and readable action contrast. Fixed staging `no-referrer` suppressing form Origin; staging and production finder responses use `same-origin` while mutations still require exact Origin.
 
