@@ -8,3 +8,8 @@
 evidence/production-20261012/worker.reference.mjs -whitespace
 public/admin-quick-reads.css -whitespace
 public/admin.js -whitespace
+
+# Preserve exact deployed source and approved review bytes.
+src/production-baseline/** -text
+src/resume-release/browser/* -text
+review/resume-templates-20261025/*.zip -text

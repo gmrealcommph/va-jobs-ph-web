@@ -1,0 +1,47 @@
+[
+  {
+    "path": "/resume-tools.js",
+    "bytes": 4975,
+    "sha256": "a7693060a31f7262602fa043508d264e2b8fb3c62976d630e401f672d20100ef"
+  },
+  {
+    "path": "/resume-photo.js",
+    "bytes": 2812,
+    "sha256": "843fd206358b583daf8240083b9f77a1f092a70e44dad5733e99ca78025251ad"
+  },
+  {
+    "path": "/resume-layouts.js",
+    "bytes": 2807,
+    "sha256": "6581951779a735b535d635428a28193db67850bc1bcc6569b753e63b730b7918"
+  },
+  {
+    "path": "/resume-recovery.js",
+    "bytes": 1641,
+    "sha256": "b123abd83333477a0b426e57e8137fa81abce0817f53bc30c25baa33f6bb127e"
+  },
+  {
+    "path": "/resume-completion.js",
+    "bytes": 773,
+    "sha256": "2f907b0766e1013c8c3154cc476dbd9f43d8c393d985e02d830223c326fde226"
+  },
+  {
+    "path": "/vendor/pdf-lib.esm.min.js",
+    "bytes": 523417,
+    "sha256": "72c052d97b4d5d9fa6cdbdcb7ad709f03d4ddb1122390cb3afeba4d88651d969"
+  },
+  {
+    "path": "/vendor/docx.mjs",
+    "bytes": 803970,
+    "sha256": "21a9b418075bf88ba388dff7776cd4449d90f3f63f7788e92427fe01a933b7c5"
+  },
+  {
+    "path": "/pro-tools-polished-v1.js",
+    "bytes": 9229,
+    "sha256": "a4c74d9a6b64fd5c16684eeaf44f65bd2423d085bbb4724bc060b9ff61f7069e"
+  },
+  {
+    "path": "/resume-export.js",
+    "bytes": 22261,
+    "sha256": "823ddf851741e2abbae8abfb41840de7cbd523a022c5905cb64de01b1b6820e9"
+  }
+]

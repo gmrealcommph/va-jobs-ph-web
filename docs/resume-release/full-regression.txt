@@ -1,0 +1,1217 @@
+PASS database: authorization, confirmation ordering, checkout lock, active-email rollback, atomic deletion, repeat requests, receipts, other account and shared jobs, admin safeguard
+✔ test\account-deletion-db.test.js (2348.3276ms)
+PASS HTTP: password, identity, MFA safeguard, CSRF, typed confirmation, forged target ignored, checkout failure stops deletion, SQL failure retry, cookie clearing, temporary-session cleanup, provider closure and repeat closure, test/live key isolation
+✔ test\account-deletion.test.js (670.3467ms)
+✔ OpenAI uses only dedicated Admin key, sums complete cost pages, and never invents credit (76.9083ms)
+✔ OpenAI incomplete, malformed, and forbidden reports stay unavailable rather than reporting zero (1.8764ms)
+✔ PayMongo uses only GET, filters active live wallets and reports cents as PHP without identifiers (2.7344ms)
+✔ provider cache coalesces requests, expires at 15 minutes and resets with key identity (2.1291ms)
+✔ balances never execute before anonymous/member authorization succeeds (4.36ms)
+✔ provider overview distinguishes unknown quotas, actual spend, merchant funds and reservations (1.3667ms)
+✔ display preference persists locally and always provides an exit control (1.2074ms)
+✔ extended aggregates distinguish verification, access and unique purchased members; duplicate candidates and acceptance are honest (2049.3119ms)
+✔ anonymous and regular members cannot retrieve metrics, write alerts or read outbox (1414.1224ms)
+✔ durable alert lease prevents duplicate claims, rejects stale acknowledgements and allows bounded retries (1211.1396ms)
+✔ full screen requires a tap, hides navigation, and tracks browser exit (2.4101ms)
+✔ unsupported and denied requests do not claim success (0.8889ms)
+✔ left menu and display-mode controls stay synchronized (0.496ms)
+✔ quota boundaries include exact 70, 90 and 100 percent and uncapped/unknown (1.396ms)
+✔ usage reads actual provider quota and rejects malformed/error data without exposing key (39.9673ms)
+✔ Action Center deduplicates sources, ranks severity, uses only internal links (0.6126ms)
+✔ background monitor stays disabled and never depends on sending email (0.641ms)
+✔ monitor respects durable lease dedup and acknowledges only successful delivery (1.5509ms)
+✔ theme persists, follows system changes, and survives blocked storage (0.6647ms)
+✔ reference design defaults to cream when no appearance preference is saved (0.3097ms)
+✔ extended data authorization denial fails closed and no integration credentials enter responses (68.1776ms)
+✔ authorized refresh flooding is bounded and throttled calls do not retrieve metrics (29.4319ms)
+✔ glide decays consistently by elapsed time and preserves direction (1.3458ms)
+✔ drag ignores touch and controls; reduced motion prevents inertia (3.0212ms)
+✔ first successful snapshot establishes a baseline without old-account notifications (2.759ms)
+✔ each fresh account alerts once, even when totals could be offset by deletion (0.5319ms)
+✔ failures do not reset seen events or replay notifications after recovery (0.2604ms)
+✔ old rows newly entering a bounded snapshot do not announce as new signups (0.206ms)
+✔ late-committing registrations within overlap are detected without invalid event data (0.2009ms)
+✔ refresh settings include pause and bounded retry backoff (0.2641ms)
+✔ desk bell requires activated audio and schedules one sharp strike with fading partials (0.5755ms)
+✔ payment alerts baseline silently, deduplicate, and recover without replaying history (1.9538ms)
+✔ celebration requires enabled audio and plays an ascending major arpeggio under one second (0.4885ms)
+✔ payment snapshot protects live verified records and leaves the ledger unchanged (1873.7788ms)
+✔ overview preserves three measured charts and an illustrative collection card and uses existing records for compact operations and collection health (96.7347ms)
+✔ sound defaults on, unlocks only after interaction, and can be muted (4.853ms)
+✔ compact insights preserve measured zero, unavailable states and escaped sources (8.0955ms)
+✔ traffic includes all sources in its total; quota distinguishes exhausted, uncapped and unknown (4.9549ms)
+✔ Action Center prioritizes urgent issues and keeps inspection links read-only and escaped (3.521ms)
+✔ automatic refresh detects each signup once and leaves existing accounts quiet (8.5032ms)
+✔ polling preserves custom periods and refreshes every 30 seconds (5.6879ms)
+✔ hidden tabs suspend polling and regain current data on return (5.7238ms)
+✔ temporary failure retains prior data and backs off; expired access clears it and stops polling (5.7153ms)
+✔ verified payment notification uses its own sound once and survives period changes without replay (11.2556ms)
+✔ job balls use measured counts with static visible positions and no inline styles or funnel labels (22.0327ms)
+✔ waiting-ball positions move in paused queues without inline styling, and stop for reduced motion or hidden tabs (0.9078ms)
+✖ next check follows the worker cron, including exact ticks and hour/day rollover (1.8388ms)
+✖ waiting countdown never implies activity and disappears when paused or stale (1.154ms)
+✔ animation requires a recent claim and valid lease, and expires without another poll (0.2364ms)
+✔ paused, idle, stale queue, failure and unavailable states are distinct (0.1902ms)
+✔ job titles and failure codes are escaped; missing counts do not render false zeros (0.6706ms)
+✔ monitor uses verified admin access, user JWT, no analytics integrations, GET only and no-store (47.3345ms)
+✔ database snapshots reconcile queue scope and deny anonymous/member access without mutating jobs (1610.5105ms)
+✔ polling supports older browsers and skewed tablet clocks, rejects stale server data, and clears on denied access (8.2976ms)
+✔ foreground acquires once; switching apps releases and returning reacquires (4.3774ms)
+✔ pending acquisition is released if dashboard becomes hidden (1.3282ms)
+✔ OS release does not trigger retry loop; user can retry after denial (1.5889ms)
+✔ unsupported browser displays an honest status (0.4457ms)
+✔ idle foreground recovers a revoked lock without a tap; hidden app stays paused (1.957ms)
+✔ provider-only aggregates include sent and received and never echo secrets or raw error bodies (31.7451ms)
+✔ invalid counts and expired resets cannot be represented as healthy quota (1.9598ms)
+✔ five-minute cache coalesces requests, clones results, expires, and never falls back to sending key (1.9144ms)
+✔ failure retains bounded stale snapshot without claiming current health; Retry-After is honored (1.0604ms)
+✔ cache refreshes at provider reset even within five-minute cadence (0.5614ms)
+✔ anonymous and ordinary member cannot invoke provider usage (2.0198ms)
+✔ UI distinguishes quota exhaustion, timestamps, stale quota and safe failure messages (0.5069ms)
+✔ missing configuration does not send requests or invent zero traffic (2.1537ms)
+✔ visitor query uses Manila boundaries, exact site and hostname, excludes bots, and returns only aggregates (38.1631ms)
+✔ Cloudflare failures, ambiguous sites and malformed data stay unavailable (2.28ms)
+✔ Cloudflare successful empty aggregate means zero recorded visits (1.6631ms)
+✔ anonymous and non-admin requests never contact Cloudflare (3.7971ms)
+✔ dashboard puts business totals and actions before details and preserves section destinations (1.5668ms)
+✔ anonymous page redirects to login without querying metrics (27.6336ms)
+✔ anonymous API is 401 and never queries metrics (0.9111ms)
+✔ regular member cannot retrieve the page or analytics (2.0228ms)
+✔ verified admin gets page and no credentials enter HTML (1.5505ms)
+✔ analytics uses user token and validated date inputs (34.9682ms)
+✔ methods and unknown admin routes cannot invoke mutations (0.9423ms)
+✔ registration snapshot uses the same verified session and outage does not break metrics (1.2776ms)
+✔ registration authorization failure cannot be downgraded to an integration outage (0.8026ms)
+✔ auth and database outages fail closed without raw errors (0.7655ms)
+✔ Manila period switches dates at UTC 16:00 (0.3938ms)
+✔ invalid dates, future dates and unbounded ranges are rejected (1.0543ms)
+✔ Worker routes admin before public rendering (2.6377ms)
+✔ continuous polling expires core and extended snapshots instead of keeping stale totals alive (5.0097ms)
+✔ independent analytics integrations start together and provider failure preserves core totals (6.1302ms)
+✔ reference field order and leaked enums are normalized without changing data (2.9209ms)
+✔ snapshot normalizes display only and keeps four authoritative tile values (0.3627ms)
+✔ checked schedule conventions and unknown employer wording survive safely (0.3905ms)
+✔ absent data is omitted and only an explicit true remote flag supplies fallback (0.2705ms)
+✔ experience and optional facts share the grid without mutation or omitted values (16.877ms)
+✔ saved refresh cookie restores login after access cookie expires; redirects persist rotated cookies (35.1833ms)
+✔ temporary refresh failure preserves saved session instead of declaring it invalid (1.2884ms)
+✔ invalid refresh credentials still fail closed (0.6779ms)
+✔ billing combines per-day costs, never cumulative costs, preserves distinct cycles/currencies/units, and strips private identifiers (44.9144ms)
+✔ billing missing permissions, no coverage, empty or malformed responses never invent zero bills (3.2819ms)
+✔ OpenAI billing breakdown reconciles all pages to the monthly total (1.1704ms)
+✔ billing presentation distinguishes reported costs and consumption from final invoices and remaining credit (1.804ms)
+{"event":"quick_read_availability","status":"server_key_unavailable"}
+{"event":"quick_read_availability","status":"server_key_unavailable"}
+✔ category destination separates full category count from searched totals and preserves pagination/search links (24.9653ms)
+✔ category cards retain native authenticated save/unsave destinations and anonymous intent (1.0824ms)
+✔ category editorial fallback is safe for new categories and escaped search/category text (0.3946ms)
+✔ category route retains data query, canonical, index/noindex and page identity with no added queries (35.9036ms)
+✔ category polish uses dynamic counts, neutral copy, separate ranges and accessible native arrows (1.4147ms)
+{"event":"quick_read_availability","status":"server_key_unavailable"}
+✔ category cards omit descriptions while retaining metadata and native actions (21.2948ms)
+✔ oldest sort reaches database, preserves search/page links and leaves default canonical (36.9332ms)
+✔ multiple categories retain real headings, notes, and omit unsupported filters (0.4851ms)
+✔ sort uses immediate native submission and no Apply button (0.3349ms)
+✔ optional live counts reuse capped category scan and preserve default names and sorting (37.3418ms)
+✔ directory has sixteen distinct local illustrations, intact links and whole-card anchors (0.7396ms)
+✔ categories route uses live counts with no additional queries and retains shared layout (4.8129ms)
+{"event":"quick_read_availability","status":"server_key_unavailable"}
+✔ sidebar counts reuse the public scan including uncategorized jobs; navigation retains search (49.3231ms)
+✔ Cloudflare requires dedicated configuration and requests a bounded aggregate without exposing credentials (25.921ms)
+✔ Cloudflare denied, empty, partial and malformed reports never appear as healthy zero usage (1.6533ms)
+Jobs frontend: Configure a Supabase publishable key.
+✔ /employers responds to GET and HEAD without upstream services (31.932ms)
+✔ /about responds to GET and HEAD without upstream services (4.7947ms)
+✔ guest/member shared header/footer route every company link to a live destination (4.7433ms)
+✔ employer CTA reflects availability and uses established support address (0.2717ms)
+﹣ actual frozen Matching V2: digest intersects fresh public jobs and preserves engine ordering; no notification rows required (1.0658ms) # SKIP
+﹣ ten maximum, unique per-user/day, leases, stale-token fencing, frozen payload and accepted finality (0.3338ms) # SKIP
+﹣ send-time eligibility, changed jobs and email prevent attempts; uncertain attempts expire safely (0.0921ms) # SKIP
+﹣ top-100 limitation, empty digest, created/collected/posted fallbacks and half-open 24-hour bounds (0.0895ms) # SKIP
+strong_match_run {"status":"disabled"}
+✔ digest window is fixed at 08:00 Manila, including late-day and midnight boundaries (3.6512ms)
+✔ default disabled, wrong cron, and before activation never access network (14.1252ms)
+✔ digest email matches brand, escapes content, and includes all required links (17.4237ms)
+✔ durable attempt precedes provider and accepted receipt (29.7538ms)
+✔ timeout and receipt commit failure replay identical frozen payload and deterministic daily key (5.2745ms)
+✔ empty, invalid, ineligible, unconfirmed, banned, deleted, nonpublic or changed digests never send (4.5283ms)
+✔ retry classification handles rate limit, conflict, server, rejection and unknown outcomes (4.5585ms)
+✔ live preflight is read-only, ignores Strong Match opt-in, checks Auth and public key access, and does not expose addresses (2.4111ms)
+✔ confirmed live schema: discovered_at controls cutoff, collection age and oldest-five ordering without created_at (1886.1394ms)
+✔ real SQL migrations: five-item claim, lease fencing, frozen payload and atomic acceptance (1831.4145ms)
+✔ real SQL retries retain membership; expired unknown outcome is held and blocks further user sends (1438.2562ms)
+✔ real SQL selection excludes manual ledger, digest, inactive job, opt-out and recent matches; private permissions (2569.3845ms)
+✔ login and same-origin guards reject missing or foreign origins before any network (30.7405ms)
+✔ settings page has native accessible switches, one save action and no trailing My Matches link (4.087ms)
+✔ all four combined boolean states persist in one authenticated-user PATCH without touching other fields (5.5646ms)
+✔ native no-JavaScript hidden/checkbox submissions persist both on and off states (2.1902ms)
+✔ enhanced save returns success JSON without redirect and retains all unrelated fields (2.2952ms)
+✔ reject unrelated property injection, missing fields, ambiguous duplicates and non-boolean values without writes (5.1947ms)
+✔ write helper independently rejects extra fields and non-boolean inputs (0.6841ms)
+✔ unsupported forms and oversized bodies cannot write; save failures do not report success (1.5253ms)
+✔ saved confirmation is accessible; accounts without preferences see onboarding instead of a form (1.4416ms)
+✔ test\helpers\deny-network.mjs (85.9044ms)
+✔ hero uses five available categories by inventory, never claims search trends, and excludes empty categories (18.8458ms)
+✔ homepage relocates the single live counter below hero and links to listings (28.7733ms)
+{"event":"quick_read_availability","status":"server_key_unavailable"}
+✔ homepage discovery remains server-rendered, search/category links compose and other listings stay unchanged (32.519ms)
+✔ cards preserve native job/category destinations, saved form fields and anonymous save intent; escape all content (1.634ms)
+✔ salary uses only supplied positive integer USD enrichment and known period; missing or inconsistent data is omitted (2.7582ms)
+✔ homepage query still searches existing public job fields and combines category constraints without additional data calls (35.5613ms)
+✔ save and unsave reuse existing persistence; JSON has no navigation, native form retains redirect (47.0018ms)
+✔ native button and links remain independent and keyboard accessible (1.4721ms)
+✔ click and keyboard propagation stop; submit toggles twice without navigation and keeps state on error (31.5391ms)
+✔ SQL matcher excludes hidden, ineligible, old employer date, closed source and repeats; salary period is exact (2403.0405ms)
+✔ lease, immutable retry payload, retry horizon, accepted ledger and repeated claim (1422.2447ms)
+✔ consent, downgrade, deletion preparation, quota and unsubscribe send barrier (1380.2067ms)
+✔ private tables and sender RPCs deny members and anonymous users (1201.1175ms)
+✔ uncertain sends stay reserved after retry horizon, suppression races and deletion cascade are safe (1122.2033ms)
+✔ delivery evidence is logged only after signature verification (42.7961ms)
+✔ settings require sign in, same origin, valid form and preserve explicit consent (3.5344ms)
+✔ unsubscribe GET never mutates; POST works without login and handles an in-flight barrier (2.5086ms)
+✔ sample emails escape source data, omit unknown salary, and include both unsubscribe formats (3.9526ms)
+✔ delivery is inert by default and requires legacy handoff (0.5829ms)
+✔ provider retries use frozen payload and stable key; unknown outcomes never log member information (2.2692ms)
+✔ changed eligibility prevents provider call (0.3214ms)
+✔ signed webhook rejects tampering, expired events and invalid secrets (3.911ms)
+✔ webhook is routed without requiring member authentication (48.7071ms)
+✔ application panel uses exact escaped identity and safe apply route, retaining attribution (3.9755ms)
+✔ save and unsave forms keep return intent and independent saved state (0.5537ms)
+✔ all application statuses render current state and leave later stages incomplete (0.9252ms)
+✔ anonymous panel never claims saved or tracked state and preserves signup intent (0.3929ms)
+✔ mark applied and status changes preserve persistence and detail redirects (35.0292ms)
+✔ apply requires auth, accepts only stored HTTP URLs and ignores supplied redirect (5.0165ms)
+✔ header preserves employer text, escapes unsafe fields and does not mutate job data (21.112ms)
+✔ category visuals are static with an unknown-category fallback (0.9436ms)
+✔ dedicated artwork accepts category variants without matching unrelated support (0.2009ms)
+✔ support artwork is decorative and leaves all employer information in HTML (10.0906ms)
+✔ each canonical category receives its own valid transparent artwork (136.7738ms)
+✔ exact normalized prose duplicates only; first wording and source are preserved (1.4449ms)
+✔ similar, case-different paragraphs and reordered content remain (0.2698ms)
+✔ exact immediately repeated leading sentence is removed and remainder retained (0.211ms)
+✔ sentence comparisons preserve near matches, intervening headings and lists (0.262ms)
+✔ repeated headings, list items and ambiguous short text are retained (0.2037ms)
+✔ absent and ready reads only dedupe source display; unsafe HTML is escaped (0.4282ms)
+✔ heading family has one unique flight and enum chip display is local (2.1865ms)
+✔ ready Quick Read stays ready while its original description display dedupes (2.8108ms)
+✔ freshness warning covers whole days 31 through 45 on listings and detail (20.4749ms)
+✔ public freshness preserves undated, evergreen and matching open evidence without changing records (1902.9259ms)
+✔ job health enforces private data, duplicate/rate limits, revisions and retains visibility (2095.5574ms)
+✔ reports require authentication, explicit enablement and strict same origin (31.6792ms)
+✔ report form escapes job details and valid submission redirects without changing jobs (2.5176ms)
+✔ invalid, oversized and honeypot reports never call database (2.2759ms)
+✔ admin routes authorize every action and reject hide operations (2.3689ms)
+✔ report throttling and stale review conflicts surface useful status codes (1.1703ms)
+✔ generic HTTP 200, malformed boards, missing jobs and updates alone are never date proof (0.6301ms)
+✔ verification blocks arbitrary URLs and redirects; outages preserve unknown (1.888ms)
+✔ date boundaries, missing dates, evergreen and open evidence cannot hide jobs (4.3671ms)
+✔ scheduled verification is opt-in, isolated from other crons and records evidence only (1.0926ms)
+✔ rate limits stop further requests to the same host, without calling jobs closed (0.8846ms)
+{"event":"job_health_verification","checked":0,"visibility_changes":0}
+✔ six-hour pilot is registered, disabled by default and routed by the worker (8.1478ms)
+✔ scheduled verification rejects batches over eight before reading or recording (0.9232ms)
+✔ known source job geography is eligibility, never employer headquarters (1.4433ms)
+✔ ambiguous, missing, city-specific and multi-country geography is not broadened (0.2972ms)
+✔ hybrid and onsite override contradictory legacy remote flags; remote is not presumed (0.2098ms)
+✔ cards and details share evidence-aware labels, preserve sparkles and escape source text (3.7954ms)
+✔ /terms is public with route-specific indexing and independent of job data (37.3921ms)
+✔ /privacy is public with route-specific indexing and independent of job data (1.4649ms)
+✔ /refund-policy is public with route-specific indexing and independent of job data (1.1441ms)
+✔ /contact is public with route-specific indexing and independent of job data (1.2582ms)
+✔ every shared layout has the four visible footer links (1.3889ms)
+✔ copy distinguishes job tracking from applying and protects statutory rights (1.4086ms)
+✔ compact feed keeps score, confidence, all explanations, metadata and exact Save/Unsave payloads (2.6481ms)
+✔ free, empty, error and unknown-factor states retain existing entitlement and fallback behavior (0.6071ms)
+✔ external filter asset is local and retains filtering, stable ties and clear behavior (22.3325ms)
+✔ factor presentation distinguishes confirmed true, explicit false and unknown without inventing mismatches (0.6828ms)
+✔ member destinations, current state, escaped identity and integrated active Pro status (1.5956ms)
+✔ logout retains redirect and clears session cookies (29.0654ms)
+✔ Pro eligibility matches confirmed DB rules and rejects invalid expiry or non-boolean opt-in (3.1997ms)
+✔ unauthorized, disabled, browser, wrong ID, wrong email and missing confirmation never fetch or send (45.8746ms)
+✔ preview produces branded email with no ledger writes, notification updates or Resend calls (31.6244ms)
+✔ acceptance is persisted before notified_at, and repeated send is a no-op (4.3423ms)
+✔ free, inactive, expired, opted out, wrong recipient and removed job do not send (6.2227ms)
+✔ expiry is rechecked at send time after reservation (2.618ms)
+✔ daily digest and already-notified records are skipped (1.4233ms)
+✔ Resend rejection leaves notification pending and response hides provider details (3.4722ms)
+✔ unknown timeout retries frozen payload with identical idempotency key (6.3999ms)
+✔ acknowledgement failure recovers using durable receipt without resending (3.1486ms)
+✔ receipt write failure recovers by replaying frozen provider request (4.0779ms)
+✔ unresolved attempts beyond 23 hours and payload changes require manual review (3.9379ms)
+✔ concurrent ledger reservation loser sends nothing (2.5554ms)
+✔ general processor can handle another explicitly allowlisted ID (3.8869ms)
+✔ email escapes database text and omits absent fields (0.3345ms)
+✔ three-step navigation validates both work groups, pay and final experience without losing choices (46.6839ms)
+Onboarding save failed: Error: raw SQL error
+    at saveJobPreferences (file:///C:/Users/gmrea/Documents/Codex/2026-10-24/referenced-chatgpt-conversation-this-is-an-14/work/verified-veeays-source/src/auth.js:119:27)
+    at async handle (file:///C:/Users/gmrea/Documents/Codex/2026-10-24/referenced-chatgpt-conversation-this-is-an-14/work/verified-veeays-source/src/worker.js:166:9)
+    at async TestContext.<anonymous> (file:///C:/Users/gmrea/Documents/Codex/2026-10-24/referenced-chatgpt-conversation-this-is-an-14/work/verified-veeays-source/test/onboarding.test.js:14:137)
+    at async Test.run (node:internal/test_runner/test:1409:7)
+    at async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+✔ onboarding keeps every canonical choice, field constraint and saved value (1.7502ms)
+✔ completion preserves exact preference payload, RPC and matching jobs destination (31.3659ms)
+✔ missing required group still rejects without writes (1.5768ms)
+✔ save failure never marks onboarding complete or exposes raw backend detail (1.9948ms)
+✔ saved preferences reload through the existing authenticated route (2.4578ms)
+✔ shorter onboarding explains matches and lets members skip and return (0.3794ms)
+✔ server fallback retains real comma-free count and accessible label; enhancement only loads beside the count (15.911ms)
+✔ load animation settles to the supplied count across different digit lengths, without separators (3.6305ms)
+✔ zero, reduced motion and background loads display the real count immediately (1.9899ms)
+✔ motion preference change or page exit cancels pending flips and restores final count (1.9579ms)
+✔ invalid supplied values leave server fallback untouched (1.7001ms)
+✔ shared reminder appears only for incomplete signed-in members outside onboarding (1.8081ms)
+✔ authenticated route gates reminder using actual profile and dismissal cookie, without writes (39.5031ms)
+✔ Not now hides immediately, survives same-session navigation and records existing dismissal (25.9012ms)
+✔ existing dismissal endpoint retains seven-day suppression (1.4405ms)
+✔ actual migration: successful activation, renewal and duplicate event idempotency (1775.6039ms)
+✔ expired, inactive and unlimited existing Pro entitlement outcomes (1373.841ms)
+✔ wrong amount/currency/state/mode/reference/time rejected without granting (1215.5473ms)
+✔ atomic rollback when profile or payment ledger write fails; payment IDs cannot credit two purchases (1174.7549ms)
+✔ RLS/service boundary and profile trigger deny browser writes even through security-definer RPC (1114.2603ms)
+✔ overlapping duplicate deliveries have one entitlement outcome (1135.3729ms)
+TEST PayMongo request started {"method":"POST"}
+TEST PayMongo response received {"status":200}
+TEST PayMongo response shape {"hasData":true,"hasAttributes":true,"hasCheckoutUrl":true}
+TEST PayMongo request started {"method":"POST"}
+TEST PayMongo response received {"status":200}
+TEST PayMongo response shape {"hasData":true,"hasAttributes":true,"hasCheckoutUrl":true}
+TEST checkout failed {"type":"Error","category":"unclassified","status":503}
+✔ worker checkout route requires authenticated user and rejects unsupported methods (31.7554ms)
+✔ unique server-created reference and authenticated ownership; ignores browser fields (8.8102ms)
+✔ CSRF, allowlist, disabled mode and live key fail before provider calls (4.2249ms)
+✔ signature verifies exact raw payload and rejects tampering, live and stale signatures (7.2826ms)
+✔ authoritative payment rejects wrong ownership, amount, currency, state, mode and timestamp (1.197ms)
+TEST PayMongo request started {"method":"GET"}
+TEST PayMongo response received {"status":200}
+TEST PayMongo response shape {"hasData":true,"hasAttributes":true,"hasCheckoutUrl":true}
+TEST PayMongo request started {"method":"GET"}
+TEST PayMongo response received {"status":200}
+TEST PayMongo response shape {"hasData":true,"hasAttributes":true,"hasCheckoutUrl":true}
+✔ signed webhook retrieves merchant checkout and invokes atomic acceptance for both envelopes (5.0041ms)
+TEST PayMongo request started {"method":"GET"}
+TEST PayMongo response received {"status":200}
+TEST PayMongo response shape {"hasData":true,"hasAttributes":true,"hasCheckoutUrl":true}
+TEST checkout failed {"type":"Error","category":"unclassified","status":422}
+✔ signed synthetic event cannot activate when provider reports unpaid (3.132ms)
+TEST checkout failed {"type":"Error","category":"unclassified","status":422}
+TEST checkout failed {"type":"Error","category":"unclassified","status":422}
+TEST PayMongo request started {"method":"GET"}
+TEST PayMongo response received {"status":503}
+TEST PayMongo request failed {"status":503,"codes":[]}
+TEST checkout failed {"type":"Error","category":"unclassified","status":503}
+TEST checkout failed {"type":"Error","category":"unclassified","status":422}
+TEST PayMongo request started {"method":"POST"}
+TEST PayMongo response received {"status":200}
+TEST PayMongo response shape {"hasData":true,"hasAttributes":true,"hasCheckoutUrl":true}
+✔ webhook rejects forged/live/unknown-checkout events and retries transient provider failure without a write (6.2049ms)
+✔ return page never writes or contacts provider; ownership and confirmed/pending states (3.1441ms)
+✔ Pro keeps established classes and only exposes test form to permitted account (0.9483ms)
+✔ Pro form redirect is allowed only for the test account; private response is not cached (4.5238ms)
+✔ checkout accepts empty 201 insert response and empty 204 update response (1.5587ms)
+✔ public Pro page makes free access and pre-payment state explicit with working auth links (2.058ms)
+✔ navigation distinguishes Free and active Pro without changing plan (1.0162ms)
+✔ locked panel uses only summary count and stays absent for unknown, zero, Pro or error (1.0946ms)
+✔ homepage discovery follows job content and does not appear on categories or browse-only (19.931ms)
+✔ Free email discovery has no writable controls and keeps saved preferences unchanged (31.2129ms)
+✔ Pro comparison uses ordered accessible paper cards and preserves free access (0.6731ms)
+✔ Match filter claim follows existing Pro-only controls (0.8483ms)
+✔ public Pro allows same-origin fonts while retaining restrictive resource and form policies (36.5158ms)
+✔ actual migration: successful activation, renewal and duplicate event idempotency (1847.7529ms)
+✔ expired, inactive and unlimited existing Pro entitlement outcomes (1219.0081ms)
+✔ wrong amount/currency/state/mode/reference/time rejected without granting (1223.6491ms)
+✔ atomic rollback when profile or payment ledger write fails; payment IDs cannot credit two purchases (1143.5018ms)
+✔ RLS/service boundary and profile trigger deny browser writes even through security-definer RPC (1132.1167ms)
+✔ overlapping duplicate deliveries have one entitlement outcome (1013.053ms)
+✔ production defaults: service ledger permissions are narrowed without changing existing profile grants (1046.8905ms)
+✔ production signup and existing authenticated onboarding RPC survive the guard (1147.7896ms)
+✔ account deletion preserves receipts in every checkout state and never affects other members (4672.2296ms)
+✔ verified payment after deletion is recorded once without granting or reattaching to a recreated account (1151.5091ms)
+✔ confirmation before deletion retains original audit outcome on replay after deletion (1089.5939ms)
+TEST PayMongo request started {"method":"POST"}
+TEST PayMongo response received {"status":200}
+TEST PayMongo response shape {"hasData":true,"hasAttributes":true,"hasCheckoutUrl":true}
+TEST checkout failed {"type":"Error","category":"unclassified","status":503}
+TEST checkout failed {"type":"Error","category":"unclassified","status":503}
+TEST checkout failed {"type":"Error","category":"unclassified","status":503}
+TEST checkout failed {"type":"Error","category":"unclassified","status":503}
+TEST checkout failed {"type":"Error","category":"unclassified","status":503}
+TEST checkout failed {"type":"Error","category":"unclassified","status":503}
+✔ Live checkout uses Live credentials, private live ledger and fixed price (30.1748ms)
+✔ Live activation flag, staging targets, test keys/allowlist and wrong JWT project fail closed (4.032ms)
+✔ Live signature is isolated and authoritative payment rejects wrong modes and amounts (7.5484ms)
+TEST PayMongo request started {"method":"GET"}
+TEST PayMongo response received {"status":200}
+TEST PayMongo response shape {"hasData":true,"hasAttributes":true,"hasCheckoutUrl":true}
+✔ Live webhook uses Live acceptance RPC, remains active while new checkout disabled (2.5719ms)
+✔ Live purchase copy states real price and removes test/coming-soon claims (0.6396ms)
+TEST PayMongo request started {"method":"GET"}
+TEST PayMongo response received {"status":200}
+TEST PayMongo response shape {"hasData":true,"hasAttributes":true,"hasCheckoutUrl":true}
+✔ signed Live webhook for a deleted account is acknowledged only after authoritative payment validation (2.9168ms)
+TEST PayMongo request started {"method":"GET"}
+TEST PayMongo response received {"status":200}
+TEST PayMongo response shape {"hasData":true,"hasAttributes":true,"hasCheckoutUrl":true}
+TEST checkout failed {"type":"Error","category":"unclassified","status":422}
+✔ deleted-account receipt still rejects an unpaid authoritative checkout without invoking acceptance (2.2235ms)
+✔ receipt return uses authenticated ownership filter and cannot expose a deleted-account receipt (1.0936ms)
+✔ Pro redesign preserves purchase and fallback destinations for every account state (2.1501ms)
+✔ Pro value claims match shipped functionality and illustration is identified (15.0044ms)
+✔ members can reach Pro without opening desktop or mobile account menus (1.4751ms)
+✔ free match-limit context explains shipped benefits without locking public jobs (0.5422ms)
+✔ Pro purchase page ties the price to existing benefits and keeps free access clear (0.4877ms)
+✔ 41638: captured source checksum and exact qualification block, without metadata leakage (5.7305ms)
+✖ 41638: corrected hints reach mocked provider and validated persistence (0.7182ms)
+✖ 41638: unsupported duties/tail, omitted IDs and invented references still fail closed (1.3861ms)
+✔ 41638: preference safeguards remain under recognized heading (synthetic mutation) (1.4517ms)
+✔ 41638: presentation hides only the heading, retains conditions, payload and complete original (3.6251ms)
+✔ 41645: exact headings support ten qualifications and end before duties (7.1144ms)
+✔ 41645: genuine duties, benefits, preferences, application and metadata cannot upgrade (37.1433ms)
+✔ 41645: synthetic preference, mixed obligation and application probes stay fail closed (2.2282ms)
+✖ 41645: mocked provider receives hints; presentation retains substantive source and original (0.6739ms)
+✖ 432: negated required reproduces mixed_obligation; whole source and thresholds stay intact (13.15ms)
+✖ general mixed guard guidance includes mandatory/preferred and optional-section mandatory wording; stays fail closed (1.4974ms)
+✔ 43635: genuine source boundaries and safe complete selection (4.4368ms)
+✔ 43635: genuine material matches reproduce failure; allowed sections retain safeguards (18.1029ms)
+✖ 43635: guidance exposes exact guard matches and preference/application precedence (local mocks) (0.6366ms)
+✖ 43635: provider correction preserves all units and rejects unrelated corruption (0.3548ms)
+✔ 43635: synthetic material/preference/mixed/application probes remain fail closed (1.3237ms)
+✔ 43635: presentation keeps material prose and entire Original, without mutation (2.7063ms)
+{"event":"quick_read_availability","status":"checked","jobs":4,"ready":1}
+{"event":"quick_read_availability","status":"unavailable","stage":"cache_request"}
+{"event":"quick_read_availability","status":"checked","jobs":1,"ready":0}
+{"event":"quick_read_availability","status":"server_key_unavailable"}
+✔ one bounded server lookup marks only current valid ready payloads, never copies private fields (29.803ms)
+✔ missing credentials and status failures retain usable listings without a false marker (0.5596ms)
+✔ all title surfaces show accessible sparkle only for ready reads and retain escaped original title (3.2227ms)
+✖ 386: real section boundaries, complete source and explicit provider guard guidance (11.6119ms)
+✖ 387: real section boundaries, complete source and explicit provider guard guidance (3.2379ms)
+✖ 388: real section boundaries, complete source and explicit provider guard guidance (1.3302ms)
+✔ optional boundary with no explicit preference words stays optional; later unknown text is not invented as a requirement (0.9619ms)
+✔ accepted 37688/41638/43639/41645/43635/41641 retain baseline units and every permitted/rejected section placement (369.9749ms)
+✔ evidence excerpts preserve preference and isolate contradictory metadata (10.1452ms)
+✔ exact headings establish context; prose does not (synthetic context probes) (0.6764ms)
+✔ qualification context still rejects upgrades, mixed clauses, omitted units and misplaced applications (synthetic probes) (1.9115ms)
+✔ heading noise suppressed, substantive duties preserved, unknown concatenations retained (0.6682ms)
+✔ salary differences and qualifiers survive (synthetic adversarial probes) (1.7327ms)
+✔ separate exact source heading permits concatenation cleanup; original stays intact (synthetic probe) (0.6953ms)
+✖ credit exhaustion is distinct from rate limits and excludes provider messages (1.9832ms)
+{"event":"quick_read_availability","status":"server_key_unavailable"}
+✔ detail consumes only whitelist with source binding; homepage stays on unchanged public_jobs query (35.2016ms)
+✔ undeployed migration, invalid output and changed public source safely retain original job (2.9706ms)
+✔ migration and privileges: only public display fields, dedupe/inactive gate, no public cache or writes (1898.4636ms)
+✔ claim lease, cross-job rate limit, finish revision binding, unchanged skip and changed regeneration (1483.154ms)
+✔ failed unchanged source has cooldown and candidates bounded; only eligible visible jobs (1339.3156ms)
+✔ TechnologyAdvice acceptance facts survive source organization, exact duplicate intro removed (4.0157ms)
+✔ real live job 37688: source coverage, duplicated introduction, benefits and material conditions (2.0575ms)
+✖ 37688 provider routing cues identify real application conditions, not ordinary finding answers (1.5112ms)
+✔ strict schema rejects malformed, empty, additional keys, invented source IDs, duplicate and missing material (1.0044ms)
+✔ preferences cannot become requirements and mixed required/preferred stays visibly mixed (0.8308ms)
+✔ material eligibility and application conditions cannot be hidden under ordinary duties (0.3803ms)
+✔ stored corruption or invented facts falls back without partially displaying output (1.35ms)
+✔ original text remains byte-for-byte equivalent after HTML escaping (1.7334ms)
+✔ HTML source normalization affects organizer input only (0.4491ms)
+✔ no invention of salary/country from timezone; contradictions and source taxonomy persist (1.9801ms)
+✖ Responses adapter uses server key, strict schema, no remote storage and validates completed output (0.3508ms)
+✔ fingerprint unchanged skips provider, changed source fingerprint differs (13.1008ms)
+✔ generation persists validated payload; malformed provider writes only failure metadata (1.8598ms)
+✖ manual endpoint disabled, unauthorized, GET and batch gate never generate (25.1406ms)
+✖ bounded batch stops at rate gate without advancing cursor past unprocessed job (2.1326ms)
+✔ At a glance uses authoritative values, omits absent ones and never assumes converted USD/currency/period (19.323ms)
+✔ logo load/error/decode failure keeps accessible decorative fallback and never reveals broken image (1.222ms)
+✔ 37688 cleanup removes labels and SEO only after full validation, preserving material facts and original (12.532ms)
+✔ At a glance humanizes known codes without adding hours or transforming unknown labels (0.3619ms)
+✔ missing and conflicting structured metadata remains; corruption and omissions still fail closed (9.7168ms)
+✔ source taxonomy, substantive label-prefixed prose and salary without explicit currency/period remain conservative (1.3356ms)
+✔ category/function metadata outside identified aggregator tail and meaningful timezone text survive (1.7581ms)
+✔ monetary benefits retain their section and qualifiers (0.1844ms)
+✖ unfinished empty response (1.976ms)
+✖ unfinished response with text (0.2457ms)
+✖ completed response missing output (0.2102ms)
+✖ completed response with non-array output (0.1794ms)
+✖ missing status with empty text (0.1805ms)
+✖ unfinished missing content (0.2169ms)
+✖ completed empty/missing-content output retains existing provider_invalid_output classification (0.8997ms)
+✖ unknown statuses/reasons, bodies, model IDs, headers and reasoning cannot enter metadata (0.2526ms)
+✔ counts and structural scan are bounded; known reason and missing HTTP remain safe (50.3959ms)
+✖ ordinary rate limit retains a safe classification without retaining provider messages (0.6125ms)
+✖ service forwards only structural incomplete metadata; null payload and error stay unchanged (31.2272ms)
+✔ 008 accepts bounded v2 and v1/null, rejects payload leakage, and preserves function ACL and ready row (1808.0277ms)
+✔ additive migration preserves an existing successful cache byte-for-byte and its public projection (1649.0608ms)
+✔ null recovery deadlines fail open for reclaimability, with state counters partitioning all missing jobs (1321.5121ms)
+✔ expired running with matching hash/formatter/schema is selected; live lease waits; ready remains untouched (1275.1254ms)
+✔ legacy deterministic failures are blocked without row rewrites; changed source/rules can recover (1245.5051ms)
+✔ recovery snapshot sees lower-ID cooldown/new jobs and never retries this run's unchanged failure (1465.3872ms)
+✔ diagnostics are private, bounded, source-bound and cleared after success; invalid secrets never persist (1241.6137ms)
+✔ wrong token/source change cannot attach diagnostics or overwrite a newer result (1398.2467ms)
+✖ provider unsupported_requirement preserves offending integer selection without provider internals (7.3191ms)
+✖ provider invalid_source_reference preserves offending integer selection without provider internals (2.0136ms)
+✖ provider preference_upgraded preserves offending integer selection without provider internals (0.9972ms)
+✖ provider source_omitted preserves offending integer selection without provider internals (0.9749ms)
+✔ unsafe reference strings are redacted and oversized selections are explicitly truncated (0.5667ms)
+✖ diagnostics retain original provider IDs even when material routing was corrected before another guard failed (0.2944ms)
+✔ unsupported sources never call provider; uncommitted failures return actual finish state (2.7875ms)
+✖ recovery endpoint checks auth/protocol, only queries state and passes the run cutoff to candidates (22.4596ms)
+✖ minute schedule drains five jobs per invocation, stays separate from digest, and keeps pause checks (5.6509ms)
+✖ credit and rate-limit responses stop the invocation immediately without more provider attempts (0.9565ms)
+✔ only a complete standalone aggregator list is omitted (1.9253ms)
+✔ narrow timezone metadata does not inherit preferred qualification context (1.087ms)
+✔ old caches drop redundant metadata while retaining explicit schedules (0.5025ms)
+✔ meaningful schedules cannot be omitted and invalid references remain blocked (0.5822ms)
+✖ provider receives filtered units and strict selection still succeeds (0.662ms)
+✔ exact duplicate removal, preferences and mandatory requirements retain their meaning (2.2868ms)
+✔ missing salary/location never invented; source taxonomy conflicts stay visible (1.2017ms)
+✔ mixed required and preferred clauses are never reclassified or split (0.2108ms)
+✔ unknown sections and all source conditions retained; duplicate company intro removed (0.1801ms)
+✔ original is untouched text, safely escaped, with a native keyboard-accessible toggle (2.5724ms)
+✔ short, unstructured, malformed and HTML descriptions use original fallback (0.4848ms)
+✔ responsive styles scoped to job details and source toggle has focus affordance (10.2722ms)
+✔ job detail keeps authenticated actions, tracked state, anonymous intent and Apply route (1.4111ms)
+Jobs frontend: private database detail
+✔ missing page and listing retain 404/noindex with accurate context (43.2421ms)
+✔ temporary failure preserves safe GET retry query and Retry-After (2.2376ms)
+✔ email load/native save failures retain no-store/503 without switches or false success (3.6248ms)
+✔ failed member loading does not claim saved data is absent (0.8695ms)
+✔ recovery URLs and copy escape untrusted request text (0.3212ms)
+✔ reset GET, HEAD and POST reject ordinary, malformed, stale and mismatched sessions (50.1222ms)
+✔ forged recovery claims cannot bypass Supabase token validation (0.5934ms)
+✔ validated recent recovery session renders form and updates password with the same token (1.92ms)
+✔ refreshed sessions must still carry a recent recovery claim and persist rotated cookies (1.3701ms)
+✔ recovery password submission still rejects cross-origin requests and upstream failure (0.8307ms)
+✔ twelve distinct compositions keep every character and paginate within printable bounds (213.8912ms)
+✔ unsupported PDF characters fail explicitly without changing data (0.7942ms)
+✔ single-page examples remain one page and optional photos use only supported designs (2.92ms)
+✔ safe photos reject SVG, missing dimensions, oversize pixels and untrusted draft data (0.6608ms)
+✔ artwork stays behind readable continuation columns and role headings keep a following line (27.5671ms)
+✔ every exported page is portrait ISO A4 (121.4135ms)
+✔ classic: all eight profiles preserve source, create A4 PDFs and editable Word files (389.6665ms)
+✔ editorial: all eight profiles preserve source, create A4 PDFs and editable Word files (242.4043ms)
+✔ executive: all eight profiles preserve source, create A4 PDFs and editable Word files (199.7794ms)
+✔ modern: all eight profiles preserve source, create A4 PDFs and editable Word files (194.8242ms)
+✔ minimalist: all eight profiles preserve source, create A4 PDFs and editable Word files (198.9265ms)
+✔ creative: all eight profiles preserve source, create A4 PDFs and editable Word files (196.0055ms)
+✔ tech: all eight profiles preserve source, create A4 PDFs and editable Word files (187.1988ms)
+✔ corporate: all eight profiles preserve source, create A4 PDFs and editable Word files (165.5538ms)
+✔ fresh: all eight profiles preserve source, create A4 PDFs and editable Word files (175.9356ms)
+✔ bold: all eight profiles preserve source, create A4 PDFs and editable Word files (201.6207ms)
+✔ contemporary: all eight profiles preserve source, create A4 PDFs and editable Word files (189.0531ms)
+✔ signature: all eight profiles preserve source, create A4 PDFs and editable Word files (179.5405ms)
+✔ all twelve design identifiers survive draft recovery without changing fields (1.0346ms)
+✔ all seven vendored production modules match the deployed source hashes (8.3321ms)
+✔ the candidate preserves six live modules exactly and changes only the studio import in the seventh (12.0816ms)
+✔ all approved template browser assets are byte-identical to the staging candidate (4.1473ms)
+✔ scheduled behavior and Durable Object exports are retained (0.2824ms)
+Jobs frontend: Configure a Supabase publishable key.
+Jobs frontend: Configure a Supabase publishable key.
+✔ release metadata retains existing bindings/assets and makes no migrations or schedule changes (1.3576ms)
+✔ the studio view retains the exact live Pro panel and consent controls for every option combination (0.7921ms)
+✔ unrelated routes return identical live/candidate responses without any external call (41.4355ms)
+✔ reviewed assets support GET/HEAD and reject mutation; unrelated assets fall through (2.7013ms)
+✔ automatic deployment remains blocked independently of shell environment (83.2268ms)
+✔ the existing Cloudflare main build command is wired to the review gate (1.4703ms)
+✔ public launch serves the full free editor without login or database access (28.2977ms)
+✔ disabled AI rejects even a direct request without account/provider access (0.6854ms)
+✔ shared navigation exposes the public editor and marks it current (0.2418ms)
+✔ launch config enables editor while keeping AI off and migration-free (0.6007ms)
+✔ parser preserves unknown text without guessing credentials (1.3694ms)
+✔ draft validation rejects executable or oversized structures (0.2887ms)
+✔ output cannot introduce generated claims or unmatched source (0.2777ms)
+✔ streaming body bound rejects oversized UTF-8 bodies (23.1862ms)
+✔ disabled feature, CSRF, free/expired users and missing budget never call AI (7.335ms)
+✔ budget reservation precedes single bounded mocked provider call (12.5697ms)
+✔ durable budget enforces dedupe, cooldown, quota and global ceiling (3.9801ms)
+✔ invalid spend config fails closed and expired metadata cleans up without resetting spend (0.7084ms)
+✔ all six layouts preserve every field verbatim across repeated switching without mutating the draft (3.6453ms)
+✔ layout renderer uses text nodes, omits empty sections and moves skills before experience only in Tech (0.2369ms)
+✔ each design has structural CSS differences shared by thumbnails and print (43.8985ms)
+✔ desktop scrolling, mobile mode and print overrides have explicit contracts (0.8099ms)
+✔ design switching has no provider calls and local AI stays disabled (11.2202ms)
+✔ database enforces ownership, Pro expiry, five slots, replacement, deletion and account cascade (1711.7432ms)
+✔ entitlement includes expiry, status and permanent Pro (1.0781ms)
+✔ links encode keywords and category and preserve actual board sort behavior (0.5238ms)
+✔ anonymous requests return to saved searches after login (28.7408ms)
+✔ CSRF, invalid slots and duplicate fields cannot write (2.7987ms)
+✔ save uses authenticated atomic slot upsert and never sends email (1.1598ms)
+✔ expired Pro cannot save but may delete own presets (1.6586ms)
+✔ storage failures are visible and never report success (0.9422ms)
+CAPTCHA signup/login integration checks passed; no live network calls
+✔ test\signup-captcha-integration.test.js (204.7343ms)
+✔ social cards retain page-specific SEO and escape supplied values (1.5216ms)
+✔ declared social dimensions and type match the published PNG asset (9.107ms)
+✔ disabled/missing mode, wrong cron and retired manual endpoint never fetch (26.8788ms)
+✔ batch email uses brand, compact metadata, escaped job cards, supported scores and preferences link (15.3772ms)
+✔ provider acceptance precedes atomic DB receipt and acknowledgement (7.1397ms)
+✔ timeout and DB failure after acceptance replay identical frozen payload and key (8.5431ms)
+✔ recipient eligibility, public job availability, notification identity and confirmed email fail closed (8.9579ms)
+✔ expired unknown outcome never retries provider (0.6521ms)
+✔ rate limits/server errors retry; permanent rejection is quarantined; no claims send nothing (8.5763ms)
+✔ per-run bound is three batch claims (5.6469ms)
+✔ allow and decline dismiss the entire banner immediately and on later pages (4.1618ms)
+✔ privacy page retains a way to reopen and withdraw a saved choice (0.7294ms)
+✔ cross-tab confirmation dismisses the banner and browser privacy preferences prevent tracking (1.1942ms)
+✔ attribution deduplicates sessions, registrations and Pro buyers; access and dates enforced (1777.9468ms)
+✔ every session belongs to exactly one group, shares use session denominator (2.3695ms)
+✔ unavailable and inconsistent data never become a misleading zero (36.7805ms)
+✔ Manila midnight and current-day partial label (0.9601ms)
+✔ daily coverage distinguishes unavailable history, partial first day, zero days and retention (0.9174ms)
+✔ pointer, keyboard focus and touch click reveal details, listener binding deduplicated (0.345ms)
+✔ waves use reconciled daily session layers and accessible exact totals, ignoring Cloudflare (24.8381ms)
+✔ daily totals alone cannot conceal inconsistent source totals (1.5668ms)
+✔ duplicate, outside-period and invalid counts cannot create waves (0.2402ms)
+✔ changed date range plots only selected days; zero uses no artificial wave area (1.4023ms)
+✔ source classification uses domain boundaries and explicit paid media (2.0944ms)
+✔ tracking requires explicit consent, same origin and public route; opt-out sends no event (27.8036ms)
+✔ registration requires consent cookie and genuine new signup identities; failures never block auth (0.6078ms)
+✔ Cloudflare dimensions keep visits separate, filter private paths and preserve missing data (4.3327ms)
+✔ UI preserves missing-data distinctions and omits campaign reporting while testing (14.9336ms)
+✔ all public and member routes share one header, unchanged authentic logo and scoped styling (1.7717ms)
+✔ active discovery tab follows route families without highlighting unrelated tabs (0.3693ms)
+✔ account actions preserve signed-out, Free, active Pro and expired Pro behavior (0.4164ms)
+{"event":"quick_read_availability","status":"server_key_unavailable"}
+{"event":"quick_read_availability","status":"server_key_unavailable"}
+{"event":"quick_read_availability","status":"server_key_unavailable"}
+{"event":"quick_read_availability","status":"server_key_unavailable"}
+{"event":"quick_read_availability","status":"server_key_unavailable"}
+{"event":"quick_read_availability","status":"server_key_unavailable"}
+Jobs frontend: Public jobs request failed (503).
+Jobs frontend: Configure a Supabase publishable key.
+{"event":"quick_read_availability","status":"server_key_unavailable"}
+{"event":"quick_read_availability","status":"server_key_unavailable"}
+{"event":"quick_read_availability","status":"server_key_unavailable"}
+{"event":"quick_read_availability","status":"server_key_unavailable"}
+✔ home renders real job content with optional progressive enhancement (50.615ms)
+✔ category URL round-trips spaces and punctuation (2.0463ms)
+✔ search is quoted and pagination/filtering happen in Supabase (0.7103ms)
+✔ job detail escapes content and rejects script application URLs (3.4856ms)
+✔ missing jobs, unknown categories and invalid pages return 404 (4.1397ms)
+✔ search results are noindex; page two has its own canonical (4.9711ms)
+✔ upstream failure is 503 with retry header, never a false empty state (0.7771ms)
+✔ secret keys are rejected before any network request (0.5732ms)
+✔ category scan respects upstream caps (16.8799ms)
+✔ sitemaps contain canonical job URLs and index endpoints (1.6362ms)
+✔ preview indexing is disabled and HEAD has no body (1.2739ms)
+✔ safe application links and allowed methods (0.2576ms)
+✔ homepage branding is scoped away from category and detail content (3.4385ms)
+✔ search remains a GET form and category pagination retains the keyword (3.4792ms)
+✔ numeric job detail keeps the original application link and canonical (1.3539ms)
+ℹ tests 512
+ℹ suites 0
+ℹ pass 472
+ℹ fail 36
+ℹ cancelled 0
+ℹ skipped 4
+ℹ todo 0
+ℹ duration_ms 49622.1832
+
+✖ failing tests:
+
+test at test\admin-quick-reads.test.js:35:1
+✖ next check follows the worker cron, including exact ticks and hour/day rollover (1.8388ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + undefined
+  - '2026-10-10T09:01:00.000Z'
+  
+      at TestContext.<anonymous> (file:///C:/Users/gmrea/Documents/Codex/2026-10-24/referenced-chatgpt-conversation-this-is-an-14/work/verified-veeays-source/test/admin-quick-reads.test.js:36:242)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: '2026-10-10T09:01:00.000Z',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at test\admin-quick-reads.test.js:39:1
+✖ waiting countdown never implies activity and disappears when paused or stale (1.154ms)
+  AssertionError [ERR_ASSERTION]: The input did not match the regular expression /1m 0s/. Input:
+  
+  '<div class="qr-live idle"><div class="qr-live-heading"><div><h3>Live Processing Funnel</h3><p>Automatic queue · read-only · checks every 15 seconds</p></div><strong class="qr-live-badge" role="status">Waiting for next scheduled run</strong></div><p>No job is running right now. The worker checks for eligible jobs every minute.</p><p class="qr-live-note">Next scheduled check: unavailable.</p><div class="qr-visual-board"><div class="qr-flow-shape" aria-hidden="true"><svg viewBox="0 0 600 340"><defs><linearGradient id="qr-blue" x2="1" y2="1"><stop stop-color="#8edbff"/><stop offset=".48" stop-color="#6594f5"/><stop offset="1" stop-color="#6250c9"/></linearGradient><linearGradient id="qr-orange" x2="1" y2="1"><stop stop-color="#ffdca0"/><stop offset=".5" stop-color="#f8a04d"/><stop offset="1" stop-color="#df6730"/></linearGradient><linearGradient id="qr-green" x2="1" y2="1"><stop stop-color="#b0f4cb"/><stop offset=".5" stop-color="#4dc39b"/><stop offset="1" stop-color="#21856e"/></linearGradient><radialGradient id="qr-halo"><stop stop-color="#b7b2ff" stop-opacity=".32"/><stop offset="1" stop-color="#b7b2ff" stop-opacity="0"/></radialGradient><filter id="qr-depth" x="-30%" y="-30%" width="160%" height="180%"><feDropShadow dx="0" dy="12" stdDeviation="9" flood-color="#344779" flood-opacity=".18"/></filter></defs><ellipse cx="300" cy="160" rx="270" ry="140" fill="url(#qr-halo)"/><ellipse class="qr-orbit" cx="300" cy="245" rx="180" ry="27"/><ellipse class="qr-base" cx="300" cy="248" rx="94" ry="13"/><g class="qr-sculpture" filter="url(#qr-depth)"><g class="qr-tier qr-tier-top"><path d="M125 67 Q300 115 475 67 L410 135 Q300 180 190 135Z" fill="url(#qr-blue)"/><ellipse cx="300" cy="67" rx="175" ry="40" fill="url(#qr-blue)"/><ellipse cx="300" cy="67" rx="150" ry="28" fill="#273d8633"/><g class="qr-balls qr-balls-queue"><circle cx="310.18" cy="67.00" r="2.73" data-orbit-x="10.18" data-orbit-y="1.59" data-orbit-phase="0.0000"/><circle cx="286.99" cy="68.86" r="2.73" data-orbit-x="17.64" data-orbit-y="2.76" data-orbit-phase="2.4000"/><circle cx="301.99" cy="63.46" r="2.73" data-orbit-x="22.77" data-orbit-y="3.56" data-orbit-phase="4.7999"/><circle cx="316.39" cy="70.34" r="2.73" data-orbit-x="26.94" data-orbit-y="4.21" data-orbit-phase="7.1999"/><circle cx="269.92" cy="66.17" r="2.73" data-orbit-x="30.55" data-orbit-y="4.77" data-orbit-phase="9.5999"/><circle cx="328.50" cy="64.17" r="2.73" data-orbit-x="33.77" data-orbit-y="5.28" data-orbit-phase="11.9998"/><circle cx="290.47" cy="72.54" r="2.73" data-orbit-x="36.72" data-orbit-y="5.74" data-orbit-phase="14.3998"/><circle cx="281.82" cy="61.53" r="2.73" data-orbit-x="39.44" data-orbit-y="6.16" data-orbit-phase="16.7997"/><circle cx="339.44" cy="69.25" r="2.73" data-orbit-x="41.99" data-orbit-y="6.56" data-orbit-phase="19.1997"/><circle cx="258.97" cy="69.65" r="2.73" data-orbit-x="44.39" data-orbit-y="6.94" data-orbit-phase="21.5997"/><circle cx="319.78" cy="60.40" r="2.73" data-orbit-x="46.66" data-orbit-y="7.29" data-orbit-phase="23.9996"/><circle cx="314.62" cy="74.28" r="2.73" data-orbit-x="48.84" data-orbit-y="7.63" data-orbit-phase="26.3996"/><circle cx="255.95" cy="63.01" r="2.73" data-orbit-x="50.92" data-orbit-y="7.96" data-orbit-phase="28.7996"/><circle cx="351.68" cy="65.22" r="2.73" data-orbit-x="52.91" data-orbit-y="8.27" data-orbit-phase="31.1995"/><circle cx="268.46" cy="74.01" r="2.73" data-orbit-x="54.84" data-orbit-y="8.57" data-orbit-phase="33.5995"/><circle cx="292.71" cy="58.21" r="2.73" data-orbit-x="56.70" data-orbit-y="8.86" data-orbit-phase="35.9994"/><circle cx="344.73" cy="72.89" r="2.73" data-orbit-x="58.50" data-orbit-y="9.14" data-orbit-phase="38.3994"/><circle cx="239.81" cy="67.39" r="2.73" data-orbit-x="60.24" data-orbit-y="9.41" data-orbit-phase="40.7994"/><circle cx="343.91" cy="60.17" r="2.73" data-orbit-x="61.94" data-orbit-y="9.68" data-orbit-phase="43.1993"/><circle cx="297.06" cy="76.93" r="2.73" data-orbit-x="63.59" data-orbit-y="9.94" data-orbit-phase="45.5993"/><circle cx="258.22" cy="59.18" r="2.73" data-orbit-x="65.20" data-orbit-y="10.19" data-orbit-phase="47.9993"/><circle cx="366.18" cy="68.39" r="2.73" data-orbit-x="66.78" data-orbit-y="10.43" data-orbit-phase="50.3992"/><circle cx="243.93" cy="73.10" r="2.73" data-orbit-x="68.31" data-orbit-y="10.67" data-orbit-phase="52.7992"/><circle cx="315.32" cy="56.36" r="2.73" data-orbit-x="69.81" data-orbit-y="10.91" data-orbit-phase="55.1991"/><circle cx="335.44" cy="76.66" r="2.73" data-orbit-x="71.28" data-orbit-y="11.14" data-orbit-phase="57.5991"/><circle cx="230.72" cy="63.55" r="2.73" data-orbit-x="72.72" data-orbit-y="11.36" data-orbit-phase="59.9991"/><circle cx="367.30" cy="62.14" r="2.73" data-orbit-x="74.13" data-orbit-y="11.58" data-orbit-phase="62.3990"/><circle cx="270.85" cy="77.89" r="2.73" data-orbit-x="75.52" data-orbit-y="11.80" data-orbit-phase="64.7990"/><circle cx="273.98" cy="55.70" r="2.73" data-orbit-x="76.88" data-orbit-y="12.01" data-orbit-phase="67.1990"/><circle cx="369.24" cy="72.69" r="2.73" data-orbit-x="78.22" data-orbit-y="12.22" data-orbit-phase="69.5989"/><circle cx="223.09" cy="70.17" r="2.73" data-orbit-x="79.53" data-orbit-y="12.43" data-orbit-phase="71.9989"/><circle cx="343.71" cy="56.38" r="2.73" data-orbit-x="80.83" data-orbit-y="12.63" data-orbit-phase="74.3989"/><circle cx="313.91" cy="79.64" r="2.73" data-orbit-x="82.10" data-orbit-y="12.83" data-orbit-phase="76.7988"/><circle cx="234.10" cy="59.03" r="2.73" data-orbit-x="83.35" data-orbit-y="13.02" data-orbit-phase="79.1988"/><circle cx="384.30" cy="65.91" r="2.73" data-orbit-x="84.59" data-orbit-y="13.22" data-orbit-phase="81.5987"/><circle cx="241.73" cy="76.84" r="2.73" data-orbit-x="85.80" data-orbit-y="13.41" data-orbit-phase="83.9987"/><circle cx="300.42" cy="53.41" r="2.73" data-orbit-x="87.00" data-orbit-y="13.59" data-orbit-phase="86.3987"/><circle cx="359.25" cy="77.21" r="2.73" data-orbit-x="88.19" data-orbit-y="13.78" data-orbit-phase="88.7986"/><circle cx="211.02" cy="65.71" r="2.73" data-orbit-x="89.36" data-orbit-y="13.96" data-orbit-phase="91.1986"/><circle cx="372.10" cy="58.45" r="2.73" data-orbit-x="90.51" data-orbit-y="14.14" data-orbit-phase="93.5986"/><circle cx="283.60" cy="81.09" r="2.73" data-orbit-x="91.65" data-orbit-y="14.32" data-orbit-phase="95.9985"/><circle cx="250.59" cy="54.73" r="2.73" data-orbit-x="92.77" data-orbit-y="14.50" data-orbit-phase="98.3985"/><circle cx="390.55" cy="70.88" r="2.73" data-orbit-x="93.88" data-orbit-y="14.67" data-orbit-phase="100.7984"/><circle cx="215.50" cy="73.78" r="2.73" data-orbit-x="94.98" data-orbit-y="14.84" data-orbit-phase="103.1984"/><circle cx="333.39" cy="52.93" r="2.73" data-orbit-x="96.07" data-orbit-y="15.01" data-orbit-phase="105.5984"/><circle cx="336.63" cy="81.06" r="2.73" data-orbit-x="97.14" data-orbit-y="15.18" data-orbit-phase="107.9983"/><circle cx="211.26" cy="60.43" r="2.73" data-orbit-x="98.20" data-orbit-y="15.34" data-orbit-phase="110.3983"/><circle cx="394.85" cy="62.43" r="2.73" data-orbit-x="99.25" data-orbit-y="15.51" data-orbit-phase="112.7983"/><circle cx="249.29" cy="80.52" r="2.73" data-orbit-x="100.29" data-orbit-y="15.67" data-orbit-phase="115.1982"/><circle cx="278.73" cy="51.52" r="2.73" data-orbit-x="101.32" data-orbit-y="15.83" data-orbit-phase="117.5982"/><circle cx="383.43" cy="76.26" r="2.73" data-orbit-x="102.34" data-orbit-y="15.99" data-orbit-phase="119.9982"/><circle cx="197.45" cy="69.00" r="2.73" data-orbit-x="103.35" data-orbit-y="16.15" data-orbit-phase="122.3981"/><circle cx="367.63" cy="54.58" r="2.73" data-orbit-x="104.35" data-orbit-y="16.30" data-orbit-phase="124.7981"/><circle cx="303.84" cy="83.45" r="2.73" data-orbit-x="105.34" data-orbit-y="16.46" data-orbit-phase="127.1980"/><circle cx="225.38" cy="55.17" r="2.73" data-orbit-x="106.32" data-orbit-y="16.61" data-orbit-phase="129.5980"/><circle cx="407.15" cy="67.86" r="2.73" data-orbit-x="107.29" data-orbit-y="16.76" data-orbit-phase="131.9980"/><circle cx="216.55" cy="77.77" r="2.73" data-orbit-x="108.25" data-orbit-y="16.91" data-orbit-phase="134.3979"/><circle cx="315.09" cy="50.10" r="2.73" data-orbit-x="109.20" data-orbit-y="17.06" data-orbit-phase="136.7979"/><circle cx="362.47" cy="81.18" r="2.73" data-orbit-x="110.15" data-orbit-y="17.21" data-orbit-phase="139.1979"/><circle cx="191.74" cy="63.11" r="2.73" data-orbit-x="111.08" data-orbit-y="17.36" data-orbit-phase="141.5978"/><circle cx="397.46" cy="58.37" r="2.73" data-orbit-x="112.01" data-orbit-y="17.50" data-orbit-phase="143.9978"/><circle cx="265.15" cy="83.79" r="2.73" data-orbit-x="112.94" data-orbit-y="17.65" data-orbit-phase="146.3977"/><circle cx="252.75" cy="50.82" r="2.73" data-orbit-x="113.85" data-orbit-y="17.79" data-orbit-phase="148.7977"/><circle cx="405.64" cy="74.00" r="2.73" data-orbit-x="114.76" data-orbit-y="17.93" data-orbit-phase="151.1977"/><circle cx="190.98" cy="73.03" r="2.73" data-orbit-x="115.66" data-orbit-y="18.07" data-orbit-phase="153.5976"/><circle cx="354.72" cy="50.92" r="2.73" data-orbit-x="116.55" data-orbit-y="18.21" data-orbit-phase="155.9976"/><circle cx="329.38" cy="84.77" r="2.73" data-orbit-x="117.44" data-orbit-y="18.35" data-orbit-phase="158.3976"/><circle cx="200.79" cy="56.93" r="2.73" data-orbit-x="118.32" data-orbit-y="18.49" data-orbit-phase="160.7975"/><circle cx="417.57" cy="63.93" r="2.73" data-orbit-x="119.19" data-orbit-y="18.62" data-orbit-phase="163.1975"/><circle cx="226.03" cy="81.78" r="2.73" data-orbit-x="120.06" data-orbit-y="18.76" data-orbit-phase="165.5974"/><circle cx="290.60" cy="48.16" r="2.73" data-orbit-x="120.92" data-orbit-y="18.89" data-orbit-phase="167.9974"/><circle cx="388.99" cy="79.99" r="2.73" data-orbit-x="121.77" data-orbit-y="19.03" data-orbit-phase="170.3974"/><circle cx="177.38" cy="66.81" r="2.73" data-orbit-x="122.62" data-orbit-y="19.16" data-orbit-phase="172.7973"/><circle cx="391.85" cy="54.11" r="2.73" data-orbit-x="123.46" data-orbit-y="19.29" data-orbit-phase='... 8252 more characters
+  
+      at TestContext.<anonymous> (file:///C:/Users/gmrea/Documents/Codex/2026-10-24/referenced-chatgpt-conversation-this-is-an-14/work/verified-veeays-source/test/admin-quick-reads.test.js:41:92)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: '<div class="qr-live idle"><div class="qr-live-heading"><div><h3>Live Processing Funnel</h3><p>Automatic queue · read-only · checks every 15 seconds</p></div><strong class="qr-live-badge" role="status">Waiting for next scheduled run</strong></div><p>No job is running right now. The worker checks for eligible jobs every minute.</p><p class="qr-live-note">Next scheduled check: unavailable.</p><div class="qr-visual-board"><div class="qr-flow-shape" aria-hidden="true"><svg viewBox="0 0 600 340"><defs><linearGradient id="qr-blue" x2="1" y2="1"><stop stop-color="#8edbff"/><stop offset=".48" stop-color="#6594f5"/><stop offset="1" stop-color="#6250c9"/></linearGradient><linearGradient id="qr-orange" x2="1" y2="1"><stop stop-color="#ffdca0"/><stop offset=".5" stop-color="#f8a04d"/><stop offset="1" stop-color="#df6730"/></linearGradient><linearGradient id="qr-green" x2="1" y2="1"><stop stop-color="#b0f4cb"/><stop offset=".5" stop-color="#4dc39b"/><stop offset="1" stop-color="#21856e"/></linearGradient><radialGradient id="qr-halo"><stop stop-color="#b7b2ff" stop-opacity=".32"/><stop offset="1" stop-color="#b7b2ff" stop-opacity="0"/></radialGradient><filter id="qr-depth" x="-30%" y="-30%" width="160%" height="180%"><feDropShadow dx="0" dy="12" stdDeviation="9" flood-color="#344779" flood-opacity=".18"/></filter></defs><ellipse cx="300" cy="160" rx="270" ry="140" fill="url(#qr-halo)"/><ellipse class="qr-orbit" cx="300" cy="245" rx="180" ry="27"/><ellipse class="qr-base" cx="300" cy="248" rx="94" ry="13"/><g class="qr-sculpture" filter="url(#qr-depth)"><g class="qr-tier qr-tier-top"><path d="M125 67 Q300 115 475 67 L410 135 Q300 180 190 135Z" fill="url(#qr-blue)"/><ellipse cx="300" cy="67" rx="175" ry="40" fill="url(#qr-blue)"/><ellipse cx="300" cy="67" rx="150" ry="28" fill="#273d8633"/><g class="qr-balls qr-balls-queue"><circle cx="310.18" cy="67.00" r="2.73" data-orbit-x="10.18" data-orbit-y="1.59" data-orbit-phase="0.0000"/><circle cx="286.99" cy="68.86" r="2.73" data-orbit-x="17.64" data-orbit-y="2.76" data-orbit-phase="2.4000"/><circle cx="301.99" cy="63.46" r="2.73" data-orbit-x="22.77" data-orbit-y="3.56" data-orbit-phase="4.7999"/><circle cx="316.39" cy="70.34" r="2.73" data-orbit-x="26.94" data-orbit-y="4.21" data-orbit-phase="7.1999"/><circle cx="269.92" cy="66.17" r="2.73" data-orbit-x="30.55" data-orbit-y="4.77" data-orbit-phase="9.5999"/><circle cx="328.50" cy="64.17" r="2.73" data-orbit-x="33.77" data-orbit-y="5.28" data-orbit-phase="11.9998"/><circle cx="290.47" cy="72.54" r="2.73" data-orbit-x="36.72" data-orbit-y="5.74" data-orbit-phase="14.3998"/><circle cx="281.82" cy="61.53" r="2.73" data-orbit-x="39.44" data-orbit-y="6.16" data-orbit-phase="16.7997"/><circle cx="339.44" cy="69.25" r="2.73" data-orbit-x="41.99" data-orbit-y="6.56" data-orbit-phase="19.1997"/><circle cx="258.97" cy="69.65" r="2.73" data-orbit-x="44.39" data-orbit-y="6.94" data-orbit-phase="21.5997"/><circle cx="319.78" cy="60.40" r="2.73" data-orbit-x="46.66" data-orbit-y="7.29" data-orbit-phase="23.9996"/><circle cx="314.62" cy="74.28" r="2.73" data-orbit-x="48.84" data-orbit-y="7.63" data-orbit-phase="26.3996"/><circle cx="255.95" cy="63.01" r="2.73" data-orbit-x="50.92" data-orbit-y="7.96" data-orbit-phase="28.7996"/><circle cx="351.68" cy="65.22" r="2.73" data-orbit-x="52.91" data-orbit-y="8.27" data-orbit-phase="31.1995"/><circle cx="268.46" cy="74.01" r="2.73" data-orbit-x="54.84" data-orbit-y="8.57" data-orbit-phase="33.5995"/><circle cx="292.71" cy="58.21" r="2.73" data-orbit-x="56.70" data-orbit-y="8.86" data-orbit-phase="35.9994"/><circle cx="344.73" cy="72.89" r="2.73" data-orbit-x="58.50" data-orbit-y="9.14" data-orbit-phase="38.3994"/><circle cx="239.81" cy="67.39" r="2.73" data-orbit-x="60.24" data-orbit-y="9.41" data-orbit-phase="40.7994"/><circle cx="343.91" cy="60.17" r="2.73" data-orbit-x="61.94" data-orbit-y="9.68" data-orbit-phase="43.1993"/><circle cx="297.06" cy="76.93" r="2.73" data-orbit-x="63.59" data-orbit-y="9.94" data-orbit-phase="45.5993"/><circle cx="258.22" cy="59.18" r="2.73" data-orbit-x="65.20" data-orbit-y="10.19" data-orbit-phase="47.9993"/><circle cx="366.18" cy="68.39" r="2.73" data-orbit-x="66.78" data-orbit-y="10.43" data-orbit-phase="50.3992"/><circle cx="243.93" cy="73.10" r="2.73" data-orbit-x="68.31" data-orbit-y="10.67" data-orbit-phase="52.7992"/><circle cx="315.32" cy="56.36" r="2.73" data-orbit-x="69.81" data-orbit-y="10.91" data-orbit-phase="55.1991"/><circle cx="335.44" cy="76.66" r="2.73" data-orbit-x="71.28" data-orbit-y="11.14" data-orbit-phase="57.5991"/><circle cx="230.72" cy="63.55" r="2.73" data-orbit-x="72.72" data-orbit-y="11.36" data-orbit-phase="59.9991"/><circle cx="367.30" cy="62.14" r="2.73" data-orbit-x="74.13" data-orbit-y="11.58" data-orbit-phase="62.3990"/><circle cx="270.85" cy="77.89" r="2.73" data-orbit-x="75.52" data-orbit-y="11.80" data-orbit-phase="64.7990"/><circle cx="273.98" cy="55.70" r="2.73" data-orbit-x="76.88" data-orbit-y="12.01" data-orbit-phase="67.1990"/><circle cx="369.24" cy="72.69" r="2.73" data-orbit-x="78.22" data-orbit-y="12.22" data-orbit-phase="69.5989"/><circle cx="223.09" cy="70.17" r="2.73" data-orbit-x="79.53" data-orbit-y="12.43" data-orbit-phase="71.9989"/><circle cx="343.71" cy="56.38" r="2.73" data-orbit-x="80.83" data-orbit-y="12.63" data-orbit-phase="74.3989"/><circle cx="313.91" cy="79.64" r="2.73" data-orbit-x="82.10" data-orbit-y="12.83" data-orbit-phase="76.7988"/><circle cx="234.10" cy="59.03" r="2.73" data-orbit-x="83.35" data-orbit-y="13.02" data-orbit-phase="79.1988"/><circle cx="384.30" cy="65.91" r="2.73" data-orbit-x="84.59" data-orbit-y="13.22" data-orbit-phase="81.5987"/><circle cx="241.73" cy="76.84" r="2.73" data-orbit-x="85.80" data-orbit-y="13.41" data-orbit-phase="83.9987"/><circle cx="300.42" cy="53.41" r="2.73" data-orbit-x="87.00" data-orbit-y="13.59" data-orbit-phase="86.3987"/><circle cx="359.25" cy="77.21" r="2.73" data-orbit-x="88.19" data-orbit-y="13.78" data-orbit-phase="88.7986"/><circle cx="211.02" cy="65.71" r="2.73" data-orbit-x="89.36" data-orbit-y="13.96" data-orbit-phase="91.1986"/><circle cx="372.10" cy="58.45" r="2.73" data-orbit-x="90.51" data-orbit-y="14.14" data-orbit-phase="93.5986"/><circle cx="283.60" cy="81.09" r="2.73" data-orbit-x="91.65" data-orbit-y="14.32" data-orbit-phase="95.9985"/><circle cx="250.59" cy="54.73" r="2.73" data-orbit-x="92.77" data-orbit-y="14.50" data-orbit-phase="98.3985"/><circle cx="390.55" cy="70.88" r="2.73" data-orbit-x="93.88" data-orbit-y="14.67" data-orbit-phase="100.7984"/><circle cx="215.50" cy="73.78" r="2.73" data-orbit-x="94.98" data-orbit-y="14.84" data-orbit-phase="103.1984"/><circle cx="333.39" cy="52.93" r="2.73" data-orbit-x="96.07" data-orbit-y="15.01" data-orbit-phase="105.5984"/><circle cx="336.63" cy="81.06" r="2.73" data-orbit-x="97.14" data-orbit-y="15.18" data-orbit-phase="107.9983"/><circle cx="211.26" cy="60.43" r="2.73" data-orbit-x="98.20" data-orbit-y="15.34" data-orbit-phase="110.3983"/><circle cx="394.85" cy="62.43" r="2.73" data-orbit-x="99.25" data-orbit-y="15.51" data-orbit-phase="112.7983"/><circle cx="249.29" cy="80.52" r="2.73" data-orbit-x="100.29" data-orbit-y="15.67" data-orbit-phase="115.1982"/><circle cx="278.73" cy="51.52" r="2.73" data-orbit-x="101.32" data-orbit-y="15.83" data-orbit-phase="117.5982"/><circle cx="383.43" cy="76.26" r="2.73" data-orbit-x="102.34" data-orbit-y="15.99" data-orbit-phase="119.9982"/><circle cx="197.45" cy="69.00" r="2.73" data-orbit-x="103.35" data-orbit-y="16.15" data-orbit-phase="122.3981"/><circle cx="367.63" cy="54.58" r="2.73" data-orbit-x="104.35" data-orbit-y="16.30" data-orbit-phase="124.7981"/><circle cx="303.84" cy="83.45" r="2.73" data-orbit-x="105.34" data-orbit-y="16.46" data-orbit-phase="127.1980"/><circle cx="225.38" cy="55.17" r="2.73" data-orbit-x="106.32" data-orbit-y="16.61" data-orbit-phase="129.5980"/><circle cx="407.15" cy="67.86" r="2.73" data-orbit-x="107.29" data-orbit-y="16.76" data-orbit-phase="131.9980"/><circle cx="216.55" cy="77.77" r="2.73" data-orbit-x="108.25" data-orbit-y="16.91" data-orbit-phase="134.3979"/><circle cx="315.09" cy="50.10" r="2.73" data-orbit-x="109.20" data-orbit-y="17.06" data-orbit-phase="136.7979"/><circle cx="362.47" cy="81.18" r="2.73" data-orbit-x="110.15" data-orbit-y="17.21" data-orbit-phase="139.1979"/><circle cx="191.74" cy="63.11" r="2.73" data-orbit-x="111.08" data-orbit-y="17.36" data-orbit-phase="141.5978"/><circle cx="397.46" cy="58.37" r="2.73" data-orbit-x="112.01" data-orbit-y="17.50" data-orbit-phase="143.9978"/><circle cx="265.15" cy="83.79" r="2.73" data-orbit-x="112.94" data-orbit-y="17.65" data-orbit-phase="146.3977"/><circle cx="252.75" cy="50.82" r="2.73" data-orbit-x="113.85" data-orbit-y="17.79" data-orbit-phase="148.7977"/><circle cx="405.64" cy="74.00" r="2.73" data-orbit-x="114.76" data-orbit-y="17.93" data-orbit-phase="151.1977"/><circle cx="190.98" cy="73.03" r="2.73" data-orbit-x="115.66" data-orbit-y="18.07" data-orbit-phase="153.5976"/><circle cx="354.72" cy="50.92" r="2.73" data-orbit-x="116.55" data-orbit-y="18.21" data-orbit-phase="155.9976"/><circle cx="329.38" cy="84.77" r="2.73" data-orbit-x="117.44" data-orbit-y="18.35" data-orbit-phase="158.3976"/><circle cx="200.79" cy="56.93" r="2.73" data-orbit-x="118.32" data-orbit-y="18.49" data-orbit-phase="160.7975"/><circle cx="417.57" cy="63.93" r="2.73" data-orbit-x="119.19" data-orbit-y="18.62" data-orbit-phase="163.1975"/><circle cx="226.03" cy="81.78" r="2.73" data-orbit-x="120.06" data-orbit-y="18.76" data-orbit-phase="165.5974"/><circle cx="290.60" cy="48.16" r="2.73" data-orbit-x="120.92" data-orbit-y="18.89" data-orbit-phase="167.9974"/><circle cx="388.99" cy="79.99" r="2.73" data-orbit-x="121.77" data-orbit-y="19.03" data-orbit-phase="170.3974"/><circle cx="177.38" cy="66.81" r="2.73" data-orbit-x="122.62" data-orbit-y="19.16" data-orbit-phase="172.7973"/><circle cx="391.85" cy="54.11" r="2.73" data-orbit-x="123.46" data-orbit-y="19.29" data-orbit-phase='... 8252 more characters,
+    expected: /1m 0s/,
+    operator: 'match',
+    diff: 'simple'
+  }
+
+test at test\quick-read-41638.test.js:49:1
+✖ 41638: corrected hints reach mocked provider and validated persistence (0.7182ms)
+  Error: provider_not_configured
+      at generateWithProvider (file:///C:/Users/gmrea/Documents/Codex/2026-10-24/referenced-chatgpt-conversation-this-is-an-14/work/verified-veeays-source/src/quick-read-generation.js:135:114)
+      at TestContext.<anonymous> (file:///C:/Users/gmrea/Documents/Codex/2026-10-24/referenced-chatgpt-conversation-this-is-an-14/work/verified-veeays-source/test/quick-read-41638.test.js:50:37)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3)
+
+test at test\quick-read-41638.test.js:67:1
+✖ 41638: unsupported duties/tail, omitted IDs and invented references still fail closed (1.3861ms)
+  AssertionError [ERR_ASSERTION]: The input did not match the regular expression /unsupported_requirement/. Input:
+  
+  'Error: provider_not_configured'
+  
+      at async TestContext.<anonymous> (file:///C:/Users/gmrea/Documents/Codex/2026-10-24/referenced-chatgpt-conversation-this-is-an-14/work/verified-veeays-source/test/quick-read-41638.test.js:72:5)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: Error: provider_not_configured
+        at generateWithProvider (file:///C:/Users/gmrea/Documents/Codex/2026-10-24/referenced-chatgpt-conversation-this-is-an-14/work/verified-veeays-source/src/quick-read-generation.js:135:114)
+        at TestContext.<anonymous> (file:///C:/Users/gmrea/Documents/Codex/2026-10-24/referenced-chatgpt-conversation-this-is-an-14/work/verified-veeays-source/test/quick-read-41638.test.js:72:26)
+        at Test.runInAsyncScope (node:async_hooks:227:14)
+        at Test.run (node:internal/test_runner/test:1402:25)
+        at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+        at Test.postRun (node:internal/test_runner/test:1542:19)
+        at Test.run (node:internal/test_runner/test:1467:12)
+        at async Test.processPendingSubtests (node:internal/test_runner/test:974:7),
+    expected: /unsupported_requirement/,
+    operator: 'rejects',
+    diff: 'simple'
+  }
+
+test at test\quick-read-41645.test.js:72:1
+✖ 41645: mocked provider receives hints; presentation retains substantive source and original (0.6739ms)
+  Error: provider_not_configured
+      at generateWithProvider (file:///C:/Users/gmrea/Documents/Codex/2026-10-24/referenced-chatgpt-conversation-this-is-an-14/work/verified-veeays-source/src/quick-read-generation.js:135:114)
+      at TestContext.<anonymous> (file:///C:/Users/gmrea/Documents/Codex/2026-10-24/referenced-chatgpt-conversation-this-is-an-14/work/verified-veeays-source/test/quick-read-41645.test.js:73:23)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+
+test at test\quick-read-432.test.js:15:1
+✖ 432: negated required reproduces mixed_obligation; whole source and thresholds stay intact (13.15ms)
+  Error: provider_not_configured
+      at generateWithProvider (file:///C:/Users/gmrea/Documents/Codex/2026-10-24/referenced-chatgpt-conversation-this-is-an-14/work/verified-veeays-source/src/quick-read-generation.js:135:114)
+      at TestContext.<anonymous> (file:///C:/Users/gmrea/Documents/Codex/2026-10-24/referenced-chatgpt-conversation-this-is-an-14/work/verified-veeays-source/test/quick-read-432.test.js:22:21)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3)
+
+test at test\quick-read-432.test.js:40:1
+✖ general mixed guard guidance includes mandatory/preferred and optional-section mandatory wording; stays fail closed (1.4974ms)
+  Error: provider_not_configured
+      at generateWithProvider (file:///C:/Users/gmrea/Documents/Codex/2026-10-24/referenced-chatgpt-conversation-this-is-an-14/work/verified-veeays-source/src/quick-read-generation.js:135:114)
+      at TestContext.<anonymous> (file:///C:/Users/gmrea/Documents/Codex/2026-10-24/referenced-chatgpt-conversation-this-is-an-14/work/verified-veeays-source/test/quick-read-432.test.js:43:21)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3)
+
+test at test\quick-read-43635.test.js:60:1
+✖ 43635: guidance exposes exact guard matches and preference/application precedence (local mocks) (0.6366ms)
+  Error: provider_not_configured
+      at generateWithProvider (file:///C:/Users/gmrea/Documents/Codex/2026-10-24/referenced-chatgpt-conversation-this-is-an-14/work/verified-veeays-source/src/quick-read-generation.js:135:114)
+      at TestContext.<anonymous> (file:///C:/Users/gmrea/Documents/Codex/2026-10-24/referenced-chatgpt-conversation-this-is-an-14/work/verified-veeays-source/test/quick-read-43635.test.js:62:23)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+
+test at test\quick-read-43635.test.js:88:1
+✖ 43635: provider correction preserves all units and rejects unrelated corruption (0.3548ms)
+  Error: provider_not_configured
+      at generateWithProvider (file:///C:/Users/gmrea/Documents/Codex/2026-10-24/referenced-chatgpt-conversation-this-is-an-14/work/verified-veeays-source/src/quick-read-generation.js:135:114)
+      at TestContext.<anonymous> (file:///C:/Users/gmrea/Documents/Codex/2026-10-24/referenced-chatgpt-conversation-this-is-an-14/work/verified-veeays-source/test/quick-read-43635.test.js:92:22)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+
+test at test\quick-read-backfill.test.js:14:2
+✖ 386: real section boundaries, complete source and explicit provider guard guidance (11.6119ms)
+  Error: provider_not_configured
+      at generateWithProvider (file:///C:/Users/gmrea/Documents/Codex/2026-10-24/referenced-chatgpt-conversation-this-is-an-14/work/verified-veeays-source/src/quick-read-generation.js:135:114)
+      at TestContext.<anonymous> (file:///C:/Users/gmrea/Documents/Codex/2026-10-24/referenced-chatgpt-conversation-this-is-an-14/work/verified-veeays-source/test/quick-read-backfill.test.js:27:22)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3)
+
+test at test\quick-read-backfill.test.js:14:2
+✖ 387: real section boundaries, complete source and explicit provider guard guidance (3.2379ms)
+  Error: provider_not_configured
+      at generateWithProvider (file:///C:/Users/gmrea/Documents/Codex/2026-10-24/referenced-chatgpt-conversation-this-is-an-14/work/verified-veeays-source/src/quick-read-generation.js:135:114)
+      at TestContext.<anonymous> (file:///C:/Users/gmrea/Documents/Codex/2026-10-24/referenced-chatgpt-conversation-this-is-an-14/work/verified-veeays-source/test/quick-read-backfill.test.js:27:22)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+
+test at test\quick-read-backfill.test.js:14:2
+✖ 388: real section boundaries, complete source and explicit provider guard guidance (1.3302ms)
+  Error: provider_not_configured
+      at generateWithProvider (file:///C:/Users/gmrea/Documents/Codex/2026-10-24/referenced-chatgpt-conversation-this-is-an-14/work/verified-veeays-source/src/quick-read-generation.js:135:114)
+      at TestContext.<anonymous> (file:///C:/Users/gmrea/Documents/Codex/2026-10-24/referenced-chatgpt-conversation-this-is-an-14/work/verified-veeays-source/test/quick-read-backfill.test.js:27:22)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+
+test at test\quick-read-credit.test.js:6:1
+✖ credit exhaustion is distinct from rate limits and excludes provider messages (1.9832ms)
+  AssertionError [ERR_ASSERTION]: The validation function is expected to return "true". Received false
+  
+  Caught error:
+  
+  Error: provider_not_configured
+      at async TestContext.<anonymous> (file:///C:/Users/gmrea/Documents/Codex/2026-10-24/referenced-chatgpt-conversation-this-is-an-14/work/verified-veeays-source/test/quick-read-credit.test.js:8:3)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: Error: provider_not_configured
+        at generateWithProvider (file:///C:/Users/gmrea/Documents/Codex/2026-10-24/referenced-chatgpt-conversation-this-is-an-14/work/verified-veeays-source/src/quick-read-generation.js:135:114)
+        at TestContext.<anonymous> (file:///C:/Users/gmrea/Documents/Codex/2026-10-24/referenced-chatgpt-conversation-this-is-an-14/work/verified-veeays-source/test/quick-read-credit.test.js:8:24)
+        at Test.runInAsyncScope (node:async_hooks:227:14)
+        at Test.run (node:internal/test_runner/test:1402:25)
+        at Test.start (node:internal/test_runner/test:1262:17)
+        at startSubtestAfterBootstrap (node:internal/test_runner/harness:387:17),
+    operator: 'rejects',
+    diff: 'simple'
+  }
+
+test at test\quick-read-generation.test.js:67:1
+✖ 37688 provider routing cues identify real application conditions, not ordinary finding answers (1.5112ms)
+  Error: provider_not_configured
+      at generateWithProvider (file:///C:/Users/gmrea/Documents/Codex/2026-10-24/referenced-chatgpt-conversation-this-is-an-14/work/verified-veeays-source/src/quick-read-generation.js:135:114)
+      at TestContext.<anonymous> (file:///C:/Users/gmrea/Documents/Codex/2026-10-24/referenced-chatgpt-conversation-this-is-an-14/work/verified-veeays-source/test/quick-read-generation.test.js:74:22)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+
+test at test\quick-read-generation.test.js:150:1
+✖ Responses adapter uses server key, strict schema, no remote storage and validates completed output (0.3508ms)
+  Error: provider_not_configured
+      at generateWithProvider (file:///C:/Users/gmrea/Documents/Codex/2026-10-24/referenced-chatgpt-conversation-this-is-an-14/work/verified-veeays-source/src/quick-read-generation.js:135:114)
+      at TestContext.<anonymous> (file:///C:/Users/gmrea/Documents/Codex/2026-10-24/referenced-chatgpt-conversation-this-is-an-14/work/verified-veeays-source/test/quick-read-generation.test.js:153:17)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+
+test at test\quick-read-generation.test.js:180:1
+✖ manual endpoint disabled, unauthorized, GET and batch gate never generate (25.1406ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  503 !== 403
+  
+      at TestContext.<anonymous> (file:///C:/Users/gmrea/Documents/Codex/2026-10-24/referenced-chatgpt-conversation-this-is-an-14/work/verified-veeays-source/test/quick-read-generation.test.js:187:10)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 503,
+    expected: 403,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at test\quick-read-generation.test.js:191:1
+✖ bounded batch stops at rate gate without advancing cursor past unprocessed job (2.1326ms)
+  TypeError [Error]: Cannot read properties of undefined (reading 'length')
+      at TestContext.<anonymous> (file:///C:/Users/gmrea/Documents/Codex/2026-10-24/referenced-chatgpt-conversation-this-is-an-14/work/verified-veeays-source/test/quick-read-generation.test.js:201:31)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+
+test at test\quick-read-provider-diagnostics.test.js:33:4
+✖ unfinished empty response (1.976ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + 'provider_not_configured'
+  - 'provider_incomplete'
+              ^
+  
+      at failure (file:///C:/Users/gmrea/Documents/Codex/2026-10-24/referenced-chatgpt-conversation-this-is-an-14/work/verified-veeays-source/test/quick-read-provider-diagnostics.test.js:18:25)
+      at async TestContext.<anonymous> (file:///C:/Users/gmrea/Documents/Codex/2026-10-24/referenced-chatgpt-conversation-this-is-an-14/work/verified-veeays-source/test/quick-read-provider-diagnostics.test.js:34:15)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 'provider_not_configured',
+    expected: 'provider_incomplete',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at test\quick-read-provider-diagnostics.test.js:33:4
+✖ unfinished response with text (0.2457ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + 'provider_not_configured'
+  - 'provider_incomplete'
+              ^
+  
+      at failure (file:///C:/Users/gmrea/Documents/Codex/2026-10-24/referenced-chatgpt-conversation-this-is-an-14/work/verified-veeays-source/test/quick-read-provider-diagnostics.test.js:18:25)
+      at async TestContext.<anonymous> (file:///C:/Users/gmrea/Documents/Codex/2026-10-24/referenced-chatgpt-conversation-this-is-an-14/work/verified-veeays-source/test/quick-read-provider-diagnostics.test.js:34:15)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 'provider_not_configured',
+    expected: 'provider_incomplete',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at test\quick-read-provider-diagnostics.test.js:33:4
+✖ completed response missing output (0.2102ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + 'provider_not_configured'
+  - 'provider_incomplete'
+              ^
+  
+      at failure (file:///C:/Users/gmrea/Documents/Codex/2026-10-24/referenced-chatgpt-conversation-this-is-an-14/work/verified-veeays-source/test/quick-read-provider-diagnostics.test.js:18:25)
+      at async TestContext.<anonymous> (file:///C:/Users/gmrea/Documents/Codex/2026-10-24/referenced-chatgpt-conversation-this-is-an-14/work/verified-veeays-source/test/quick-read-provider-diagnostics.test.js:34:15)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 'provider_not_configured',
+    expected: 'provider_incomplete',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at test\quick-read-provider-diagnostics.test.js:33:4
+✖ completed response with non-array output (0.1794ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + 'provider_not_configured'
+  - 'provider_incomplete'
+              ^
+  
+      at failure (file:///C:/Users/gmrea/Documents/Codex/2026-10-24/referenced-chatgpt-conversation-this-is-an-14/work/verified-veeays-source/test/quick-read-provider-diagnostics.test.js:18:25)
+      at async TestContext.<anonymous> (file:///C:/Users/gmrea/Documents/Codex/2026-10-24/referenced-chatgpt-conversation-this-is-an-14/work/verified-veeays-source/test/quick-read-provider-diagnostics.test.js:34:15)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 'provider_not_configured',
+    expected: 'provider_incomplete',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at test\quick-read-provider-diagnostics.test.js:33:4
+✖ missing status with empty text (0.1805ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + 'provider_not_configured'
+  - 'provider_incomplete'
+              ^
+  
+      at failure (file:///C:/Users/gmrea/Documents/Codex/2026-10-24/referenced-chatgpt-conversation-this-is-an-14/work/verified-veeays-source/test/quick-read-provider-diagnostics.test.js:18:25)
+      at async TestContext.<anonymous> (file:///C:/Users/gmrea/Documents/Codex/2026-10-24/referenced-chatgpt-conversation-this-is-an-14/work/verified-veeays-source/test/quick-read-provider-diagnostics.test.js:34:15)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 'provider_not_configured',
+    expected: 'provider_incomplete',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at test\quick-read-provider-diagnostics.test.js:33:4
+✖ unfinished missing content (0.2169ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + 'provider_not_configured'
+  - 'provider_incomplete'
+              ^
+  
+      at failure (file:///C:/Users/gmrea/Documents/Codex/2026-10-24/referenced-chatgpt-conversation-this-is-an-14/work/verified-veeays-source/test/quick-read-provider-diagnostics.test.js:18:25)
+      at async TestContext.<anonymous> (file:///C:/Users/gmrea/Documents/Codex/2026-10-24/referenced-chatgpt-conversation-this-is-an-14/work/verified-veeays-source/test/quick-read-provider-diagnostics.test.js:34:15)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 'provider_not_configured',
+    expected: 'provider_incomplete',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at test\quick-read-provider-diagnostics.test.js:40:1
+✖ completed empty/missing-content output retains existing provider_invalid_output classification (0.8997ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + 'provider_not_configured'
+  - 'provider_invalid_output'
+              ^
+  
+      at Object.<anonymous> (file:///C:/Users/gmrea/Documents/Codex/2026-10-24/referenced-chatgpt-conversation-this-is-an-14/work/verified-veeays-source/test/quick-read-provider-diagnostics.test.js:43:14)
+      at expectedException (node:assert:578:17)
+      at expectsError (node:assert:703:21)
+      at strict.rejects (node:assert:769:3)
+      at async TestContext.<anonymous> (file:///C:/Users/gmrea/Documents/Codex/2026-10-24/referenced-chatgpt-conversation-this-is-an-14/work/verified-veeays-source/test/quick-read-provider-diagnostics.test.js:42:5)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 'provider_not_configured',
+    expected: 'provider_invalid_output',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at test\quick-read-provider-diagnostics.test.js:48:1
+✖ unknown statuses/reasons, bodies, model IDs, headers and reasoning cannot enter metadata (0.2526ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + 'provider_not_configured'
+  - 'provider_incomplete'
+              ^
+  
+      at failure (file:///C:/Users/gmrea/Documents/Codex/2026-10-24/referenced-chatgpt-conversation-this-is-an-14/work/verified-veeays-source/test/quick-read-provider-diagnostics.test.js:18:25)
+      at async TestContext.<anonymous> (file:///C:/Users/gmrea/Documents/Codex/2026-10-24/referenced-chatgpt-conversation-this-is-an-14/work/verified-veeays-source/test/quick-read-provider-diagnostics.test.js:49:15)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 'provider_not_configured',
+    expected: 'provider_incomplete',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at test\quick-read-provider-diagnostics.test.js:62:1
+✖ ordinary rate limit retains a safe classification without retaining provider messages (0.6125ms)
+  AssertionError [ERR_ASSERTION]: The validation function is expected to return "true". Received false
+  
+  Caught error:
+  
+  Error: provider_not_configured
+      at async TestContext.<anonymous> (file:///C:/Users/gmrea/Documents/Codex/2026-10-24/referenced-chatgpt-conversation-this-is-an-14/work/verified-veeays-source/test/quick-read-provider-diagnostics.test.js:63:3)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: Error: provider_not_configured
+        at generateWithProvider (file:///C:/Users/gmrea/Documents/Codex/2026-10-24/referenced-chatgpt-conversation-this-is-an-14/work/verified-veeays-source/src/quick-read-generation.js:135:114)
+        at TestContext.<anonymous> (file:///C:/Users/gmrea/Documents/Codex/2026-10-24/referenced-chatgpt-conversation-this-is-an-14/work/verified-veeays-source/test/quick-read-provider-diagnostics.test.js:63:24)
+        at Test.runInAsyncScope (node:async_hooks:227:14)
+        at Test.run (node:internal/test_runner/test:1402:25)
+        at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+        at Test.postRun (node:internal/test_runner/test:1542:19)
+        at Test.run (node:internal/test_runner/test:1467:12)
+        at async Test.processPendingSubtests (node:internal/test_runner/test:974:7),
+    operator: 'rejects',
+    diff: 'simple'
+  }
+
+test at test\quick-read-provider-diagnostics.test.js:65:1
+✖ service forwards only structural incomplete metadata; null payload and error stay unchanged (31.2272ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:
+  + actual - expected
+  
+    {
+  +   error: 'provider_not_configured',
+  -   error: 'provider_incomplete',
+      job_id: '1',
+      status: 'failed'
+    }
+  
+      at TestContext.<anonymous> (file:///C:/Users/gmrea/Documents/Codex/2026-10-24/referenced-chatgpt-conversation-this-is-an-14/work/verified-veeays-source/test/quick-read-provider-diagnostics.test.js:70:10)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: { job_id: '1', status: 'failed', error: 'provider_not_configured' },
+    expected: { job_id: '1', status: 'failed', error: 'provider_incomplete' },
+    operator: 'deepStrictEqual',
+    diff: 'simple'
+  }
+
+test at test\quick-read-recovery.test.js:147:2
+✖ provider unsupported_requirement preserves offending integer selection without provider internals (7.3191ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + 'provider_not_configured'
+  - 'unsupported_requirement'
+  
+      at TestContext.<anonymous> (file:///C:/Users/gmrea/Documents/Codex/2026-10-24/referenced-chatgpt-conversation-this-is-an-14/work/verified-veeays-source/test/quick-read-recovery.test.js:158:10)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 'provider_not_configured',
+    expected: 'unsupported_requirement',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at test\quick-read-recovery.test.js:147:2
+✖ provider invalid_source_reference preserves offending integer selection without provider internals (2.0136ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + 'provider_not_configured'
+  - 'invalid_source_reference'
+  
+      at TestContext.<anonymous> (file:///C:/Users/gmrea/Documents/Codex/2026-10-24/referenced-chatgpt-conversation-this-is-an-14/work/verified-veeays-source/test/quick-read-recovery.test.js:158:10)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 'provider_not_configured',
+    expected: 'invalid_source_reference',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at test\quick-read-recovery.test.js:147:2
+✖ provider preference_upgraded preserves offending integer selection without provider internals (0.9972ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + 'provider_not_configured'
+  - 'preference_upgraded'
+       ^
+  
+      at TestContext.<anonymous> (file:///C:/Users/gmrea/Documents/Codex/2026-10-24/referenced-chatgpt-conversation-this-is-an-14/work/verified-veeays-source/test/quick-read-recovery.test.js:158:10)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 'provider_not_configured',
+    expected: 'preference_upgraded',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at test\quick-read-recovery.test.js:147:2
+✖ provider source_omitted preserves offending integer selection without provider internals (0.9749ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + 'provider_not_configured'
+  - 'source_omitted'
+  
+      at TestContext.<anonymous> (file:///C:/Users/gmrea/Documents/Codex/2026-10-24/referenced-chatgpt-conversation-this-is-an-14/work/verified-veeays-source/test/quick-read-recovery.test.js:158:10)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 'provider_not_configured',
+    expected: 'source_omitted',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at test\quick-read-recovery.test.js:167:1
+✖ diagnostics retain original provider IDs even when material routing was corrected before another guard failed (0.2944ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + 'provider_not_configured'
+  - 'unsupported_requirement'
+  
+      at TestContext.<anonymous> (file:///C:/Users/gmrea/Documents/Codex/2026-10-24/referenced-chatgpt-conversation-this-is-an-14/work/verified-veeays-source/test/quick-read-recovery.test.js:173:9)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 'provider_not_configured',
+    expected: 'unsupported_requirement',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at test\quick-read-recovery.test.js:184:1
+✖ recovery endpoint checks auth/protocol, only queries state and passes the run cutoff to candidates (22.4596ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  503 !== 200
+  
+      at TestContext.<anonymous> (file:///C:/Users/gmrea/Documents/Codex/2026-10-24/referenced-chatgpt-conversation-this-is-an-14/work/verified-veeays-source/test/quick-read-recovery.test.js:190:9)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 503,
+    expected: 200,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at test\quick-read-schedule.test.js:6:1
+✖ minute schedule drains five jobs per invocation, stays separate from digest, and keeps pause checks (5.6509ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + '* * * * *'
+  - '0-59 * * * *'
+  
+      at TestContext.<anonymous> (file:///C:/Users/gmrea/Documents/Codex/2026-10-24/referenced-chatgpt-conversation-this-is-an-14/work/verified-veeays-source/test/quick-read-schedule.test.js:8:9)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: '* * * * *',
+    expected: '0-59 * * * *',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at test\quick-read-schedule.test.js:18:1
+✖ credit and rate-limit responses stop the invocation immediately without more provider attempts (0.9565ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  0 !== 1
+  
+      at TestContext.<anonymous> (file:///C:/Users/gmrea/Documents/Codex/2026-10-24/referenced-chatgpt-conversation-this-is-an-14/work/verified-veeays-source/test/quick-read-schedule.test.js:23:10)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 0,
+    expected: 1,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at test\quick-read-timezones.test.js:30:1
+✖ provider receives filtered units and strict selection still succeeds (0.662ms)
+  Error: provider_not_configured
+      at generateWithProvider (file:///C:/Users/gmrea/Documents/Codex/2026-10-24/referenced-chatgpt-conversation-this-is-an-14/work/verified-veeays-source/src/quick-read-generation.js:135:114)
+      at TestContext.<anonymous> (file:///C:/Users/gmrea/Documents/Codex/2026-10-24/referenced-chatgpt-conversation-this-is-an-14/work/verified-veeays-source/test/quick-read-timezones.test.js:32:21)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7)

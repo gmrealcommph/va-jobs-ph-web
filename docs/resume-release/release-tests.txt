@@ -1,0 +1,33 @@
+✔ classic: all eight profiles preserve source, create A4 PDFs and editable Word files (378.2129ms)
+✔ editorial: all eight profiles preserve source, create A4 PDFs and editable Word files (212.6988ms)
+✔ executive: all eight profiles preserve source, create A4 PDFs and editable Word files (187.7557ms)
+✔ modern: all eight profiles preserve source, create A4 PDFs and editable Word files (175.9694ms)
+✔ minimalist: all eight profiles preserve source, create A4 PDFs and editable Word files (168.8608ms)
+✔ creative: all eight profiles preserve source, create A4 PDFs and editable Word files (172.5186ms)
+✔ tech: all eight profiles preserve source, create A4 PDFs and editable Word files (163.2965ms)
+✔ corporate: all eight profiles preserve source, create A4 PDFs and editable Word files (163.4112ms)
+✔ fresh: all eight profiles preserve source, create A4 PDFs and editable Word files (170.7509ms)
+✔ bold: all eight profiles preserve source, create A4 PDFs and editable Word files (163.5153ms)
+✔ contemporary: all eight profiles preserve source, create A4 PDFs and editable Word files (155.9391ms)
+✔ signature: all eight profiles preserve source, create A4 PDFs and editable Word files (143.5982ms)
+✔ all twelve design identifiers survive draft recovery without changing fields (1.0871ms)
+✔ all seven vendored production modules match the deployed source hashes (8.1051ms)
+✔ the candidate preserves six live modules exactly and changes only the studio import in the seventh (11.8947ms)
+✔ all approved template browser assets are byte-identical to the staging candidate (1.8804ms)
+✔ scheduled behavior and Durable Object exports are retained (0.2458ms)
+Jobs frontend: Configure a Supabase publishable key.
+Jobs frontend: Configure a Supabase publishable key.
+✔ release metadata retains existing bindings/assets and makes no migrations or schedule changes (2.3505ms)
+✔ the studio view retains the exact live Pro panel and consent controls for every option combination (0.838ms)
+✔ unrelated routes return identical live/candidate responses without any external call (47.005ms)
+✔ reviewed assets support GET/HEAD and reject mutation; unrelated assets fall through (4.1319ms)
+✔ automatic deployment remains blocked independently of shell environment (65.6385ms)
+✔ the existing Cloudflare main build and npm deploy commands are wired to the review gate (1.6044ms)
+ℹ tests 23
+ℹ suites 0
+ℹ pass 23
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 2477.0145

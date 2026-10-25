@@ -1,0 +1,40 @@
+{
+  "productionVersion": "713c64bc-c3a6-41d5-91fc-b3f111d36268",
+  "configurationSha256": "7bf5a9a5b3ecf51aaa384a1cf58ca27b0c17fd108affd33c52a0381cdba999f0",
+  "modules": [
+    {
+      "name": "pro-tools-ui.js",
+      "sha256": "50fcabe47ed020be9504ed693ca9f1940363c746f51120bec699caf555f93a62"
+    },
+    {
+      "name": "production-entry.js",
+      "sha256": "1fcf57ec1ca862b654c7277ee7ed099924731b32c5d3657ae3a37d08320c6a0c"
+    },
+    {
+      "name": "reviewed-live.js",
+      "sha256": "8a1bbc63d77b23949939793786e35bc9f0434dfc12aa100beed49b3414750698"
+    },
+    {
+      "name": "your-pro.js",
+      "sha256": "c923599b537a4104dc0c39f08b03cd66ff07f88a1984fd5e1f0013b2f9e14c6a"
+    },
+    {
+      "name": "application-guide.js",
+      "sha256": "97bf6cc7ffece0df47e0b726c05b114108c6d518fae0d5d0e842c93f3711ff64"
+    },
+    {
+      "name": "improved-endpoint.js",
+      "sha256": "a4a51c1f9964a626c39d655b125707a3326a577a0b25e4d096a799cc2f974779"
+    },
+    {
+      "name": "polished-studio.js",
+      "sha256": "9a6cba420c0720fdf6b2047f9c90bae6473e053a9f401f6fe5077986d1d56231"
+    }
+  ],
+  "crons": [
+    "* * * * *",
+    "0-59 * * * *",
+    "*/15 * * * *",
+    "17 */6 * * *"
+  ]
+}

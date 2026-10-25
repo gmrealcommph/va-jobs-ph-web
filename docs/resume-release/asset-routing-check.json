@@ -1,0 +1,41 @@
+{
+  "assetsServeDirectly": true,
+  "reviewedPaths": [
+    {
+      "path": "/resume-export-v3.js",
+      "status": 404,
+      "noConflictingAsset": true
+    },
+    {
+      "path": "/resume-layouts-v3.js",
+      "status": 404,
+      "noConflictingAsset": true
+    },
+    {
+      "path": "/resume-refined-v3.js",
+      "status": 404,
+      "noConflictingAsset": true
+    },
+    {
+      "path": "/resume-refined-word-v3.js",
+      "status": 404,
+      "noConflictingAsset": true
+    },
+    {
+      "path": "/resume-studio-v3.css",
+      "status": 404,
+      "noConflictingAsset": true
+    },
+    {
+      "path": "/resume-studio-v3.js",
+      "status": 404,
+      "noConflictingAsset": true
+    },
+    {
+      "path": "/resume-word-v3.js",
+      "status": 404,
+      "noConflictingAsset": true
+    }
+  ],
+  "proPanelCssAliasesIdentical": true
+}
