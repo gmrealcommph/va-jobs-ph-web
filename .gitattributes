@@ -8,3 +8,13 @@
 evidence/production-20261012/worker.reference.mjs -whitespace
 public/admin-quick-reads.css -whitespace
 public/admin.js -whitespace
+
+# Preserve exact deployed source and approved review bytes.
+src/production-baseline/** -text -whitespace
+src/resume-release/browser/* -text -whitespace
+review/resume-templates-20261025/*.zip -text
+review/resume-templates-20261025/validation-report.md -text -whitespace
+docs/resume-release/*regression.txt -whitespace
+review/resume-templates-signature-professional-20261025/*.zip -text
+review/resume-templates-signature-professional-20261025/validation-report.md -text -whitespace
+docs/resume-release/signature-tests.txt -text -whitespace

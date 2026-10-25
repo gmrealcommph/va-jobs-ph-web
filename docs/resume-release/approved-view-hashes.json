@@ -1,0 +1,66 @@
+[
+  {
+    "options": {
+      "aiEnabled": false,
+      "proEnabled": false,
+      "proDemo": false
+    },
+    "sha256": "ac4590cac1f679eb5fbab23a16dcf8dc2736d9f2b9da50ef4b2d9a0a40e3740e"
+  },
+  {
+    "options": {
+      "aiEnabled": false,
+      "proEnabled": false,
+      "proDemo": true
+    },
+    "sha256": "ac4590cac1f679eb5fbab23a16dcf8dc2736d9f2b9da50ef4b2d9a0a40e3740e"
+  },
+  {
+    "options": {
+      "aiEnabled": false,
+      "proEnabled": true,
+      "proDemo": false
+    },
+    "sha256": "bfdc130136e944085ec6b8c0177fbd3697e32f42998f2fdc90326bc81c980dca"
+  },
+  {
+    "options": {
+      "aiEnabled": false,
+      "proEnabled": true,
+      "proDemo": true
+    },
+    "sha256": "6c90a26f3d36461891651294463d4e0a4f795019d5d5c655b0db129adbbde465"
+  },
+  {
+    "options": {
+      "aiEnabled": true,
+      "proEnabled": false,
+      "proDemo": false
+    },
+    "sha256": "776ee8bc14bde5207f358518471d92b80199dc7d39bf34f969c5d940f8d4b2f9"
+  },
+  {
+    "options": {
+      "aiEnabled": true,
+      "proEnabled": false,
+      "proDemo": true
+    },
+    "sha256": "776ee8bc14bde5207f358518471d92b80199dc7d39bf34f969c5d940f8d4b2f9"
+  },
+  {
+    "options": {
+      "aiEnabled": true,
+      "proEnabled": true,
+      "proDemo": false
+    },
+    "sha256": "3b7697c8d2d50932846de44988d71a9c361ed9cccc70f6977722b9fa8bf6ef20"
+  },
+  {
+    "options": {
+      "aiEnabled": true,
+      "proEnabled": true,
+      "proDemo": true
+    },
+    "sha256": "c972c952ee14ead87cbf247bd6e3010fb6ea788a03f62fc097fca7eb2a7e64f7"
+  }
+]

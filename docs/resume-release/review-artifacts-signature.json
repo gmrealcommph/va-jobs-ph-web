@@ -1,0 +1,32 @@
+{
+  "revision": "Signature Professional",
+  "productionChanged": false,
+  "productionVersion": "713c64bc-c3a6-41d5-91fc-b3f111d36268",
+  "stagingUrl": "https://veeays-signature-preview-20261025.gm-realcommph.workers.dev/template-review/#signature",
+  "unchangedDesigns": 11,
+  "principalDesigns": 12,
+  "additionalSignatureSamples": 3,
+  "pdfPages": 31,
+  "wordPages": 31,
+  "paidAiCalls": 0,
+  "files": {
+    "all-12-gallery.jpg": {
+      "bytes": 1000793,
+      "sha256": "83fd04b25751ed35c4fa2d016b8847fcff42cb7208a8167d385d00cf31ec6bf8"
+    },
+    "signature-professional-comparison.jpg": {
+      "bytes": 246282,
+      "sha256": "81e82ca6fd1376c534de14daa4131e2df0fb537c37307575049f72edf96331a9"
+    },
+    "validation-report.md": {
+      "bytes": 3947,
+      "sha256": "541c8c7891be573998c6b763a03a751d3fa5049fda5f36011e9da8f859615c35"
+    },
+    "veeays-resume-review-v5.zip": {
+      "bytes": 20530642,
+      "sha256": "bd13484af4d18ba241b6133ac40fb7d977c3ce8a89bbdeedaa8b4864ac4132be"
+    }
+  },
+  "stagingVersion": "9626595d-420f-405a-bfd6-32372835e33d",
+  "preservedPriorStagingVersion": "de50fbe1-7064-4580-9a12-0652cfa98b7a"
+}

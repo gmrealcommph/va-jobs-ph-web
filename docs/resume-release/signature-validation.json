@@ -1,0 +1,167 @@
+[
+  {
+    "id": "classic",
+    "pdfPages": 2,
+    "wordPages": 2,
+    "missingSource": {
+      "pdf": [],
+      "word": []
+    },
+    "a4": true,
+    "bounds": true
+  },
+  {
+    "id": "editorial",
+    "pdfPages": 2,
+    "wordPages": 2,
+    "missingSource": {
+      "pdf": [],
+      "word": []
+    },
+    "a4": true,
+    "bounds": true
+  },
+  {
+    "id": "executive",
+    "pdfPages": 2,
+    "wordPages": 2,
+    "missingSource": {
+      "pdf": [],
+      "word": []
+    },
+    "a4": true,
+    "bounds": true
+  },
+  {
+    "id": "modern",
+    "pdfPages": 2,
+    "wordPages": 2,
+    "missingSource": {
+      "pdf": [],
+      "word": []
+    },
+    "a4": true,
+    "bounds": true
+  },
+  {
+    "id": "minimalist",
+    "pdfPages": 2,
+    "wordPages": 2,
+    "missingSource": {
+      "pdf": [],
+      "word": []
+    },
+    "a4": true,
+    "bounds": true
+  },
+  {
+    "id": "creative",
+    "pdfPages": 2,
+    "wordPages": 2,
+    "missingSource": {
+      "pdf": [],
+      "word": []
+    },
+    "a4": true,
+    "bounds": true
+  },
+  {
+    "id": "tech",
+    "pdfPages": 2,
+    "wordPages": 2,
+    "missingSource": {
+      "pdf": [],
+      "word": []
+    },
+    "a4": true,
+    "bounds": true
+  },
+  {
+    "id": "corporate",
+    "pdfPages": 2,
+    "wordPages": 2,
+    "missingSource": {
+      "pdf": [],
+      "word": []
+    },
+    "a4": true,
+    "bounds": true
+  },
+  {
+    "id": "fresh",
+    "pdfPages": 1,
+    "wordPages": 1,
+    "missingSource": {
+      "pdf": [],
+      "word": []
+    },
+    "a4": true,
+    "bounds": true
+  },
+  {
+    "id": "bold",
+    "pdfPages": 2,
+    "wordPages": 2,
+    "missingSource": {
+      "pdf": [],
+      "word": []
+    },
+    "a4": true,
+    "bounds": true
+  },
+  {
+    "id": "contemporary",
+    "pdfPages": 2,
+    "wordPages": 2,
+    "missingSource": {
+      "pdf": [],
+      "word": []
+    },
+    "a4": true,
+    "bounds": true
+  },
+  {
+    "id": "signature",
+    "pdfPages": 2,
+    "wordPages": 2,
+    "missingSource": {
+      "pdf": [],
+      "word": []
+    },
+    "a4": true,
+    "bounds": true
+  },
+  {
+    "id": "signature-short",
+    "pdfPages": 1,
+    "wordPages": 1,
+    "missingSource": {
+      "pdf": [],
+      "word": []
+    },
+    "a4": true,
+    "bounds": true
+  },
+  {
+    "id": "signature-long",
+    "pdfPages": 6,
+    "wordPages": 6,
+    "missingSource": {
+      "pdf": [],
+      "word": []
+    },
+    "a4": true,
+    "bounds": true
+  },
+  {
+    "id": "signature-photo",
+    "pdfPages": 1,
+    "wordPages": 1,
+    "missingSource": {
+      "pdf": [],
+      "word": []
+    },
+    "a4": true,
+    "bounds": true
+  }
+]

@@ -1,0 +1,22 @@
+{
+  "approvedStagingVersion": "de50fbe1-7064-4580-9a12-0652cfa98b7a",
+  "approvedStagingDeployment": "15c9b88e-df9e-4379-bac0-4cf2bbe1ae0e",
+  "files": [
+    {
+      "file": "veeays-12-resume-review.zip",
+      "bytes": 15326349,
+      "sha256": "ba703f8539a680a8f41fefcb6e739256b6cd09d344c12d13eacb4f540a363c05"
+    },
+    {
+      "file": "validation-report.md",
+      "bytes": 10767,
+      "sha256": "bcf6cd506d37b61a3df06882411a2fbff1ce1d18009cc982855cfd2bcfad0fe3"
+    },
+    {
+      "file": "all-12-gallery.jpg",
+      "bytes": 943372,
+      "sha256": "a644620f4629e0e529827e66f9b35a560c890093d0b4a83f8547fcebcfb16dc8"
+    }
+  ],
+  "designChangesInReleasePreparation": false
+}

@@ -1,0 +1,433 @@
+{
+  "repository": "gmrealcommph/va-jobs-ph-web",
+  "gitBase": "f21a20de699ed7e96629cb828f3c9666029647cb",
+  "worker": "va-jobs-ph-web",
+  "productionVersion": "713c64bc-c3a6-41d5-91fc-b3f111d36268",
+  "productionDeployment": "caef3b8b-c790-40f2-91f3-977d6835f215",
+  "compatibilityDate": "2026-10-01",
+  "compatibilityFlags": [],
+  "modules": [
+    {
+      "name": "polished-studio.js",
+      "bytes": 15736,
+      "sha256": "9a6cba420c0720fdf6b2047f9c90bae6473e053a9f401f6fe5077986d1d56231"
+    },
+    {
+      "name": "pro-tools-ui.js",
+      "bytes": 2790,
+      "sha256": "50fcabe47ed020be9504ed693ca9f1940363c746f51120bec699caf555f93a62"
+    },
+    {
+      "name": "production-entry.js",
+      "bytes": 281064,
+      "sha256": "1fcf57ec1ca862b654c7277ee7ed099924731b32c5d3657ae3a37d08320c6a0c"
+    },
+    {
+      "name": "reviewed-live.js",
+      "bytes": 1061898,
+      "sha256": "8a1bbc63d77b23949939793786e35bc9f0434dfc12aa100beed49b3414750698"
+    },
+    {
+      "name": "your-pro.js",
+      "bytes": 18050,
+      "sha256": "c923599b537a4104dc0c39f08b03cd66ff07f88a1984fd5e1f0013b2f9e14c6a"
+    },
+    {
+      "name": "application-guide.js",
+      "bytes": 8808,
+      "sha256": "97bf6cc7ffece0df47e0b726c05b114108c6d518fae0d5d0e842c93f3711ff64"
+    },
+    {
+      "name": "improved-endpoint.js",
+      "bytes": 37319,
+      "sha256": "a4a51c1f9964a626c39d655b125707a3326a577a0b25e4d096a799cc2f974779"
+    }
+  ],
+  "bindings": [
+    {
+      "name": "ACTIVE_VISITORS",
+      "type": "durable_object_namespace",
+      "sha256": "3d35c37a715900d48dc0273f63a069e1e35d4e045da872bc6e4f918d796ed9ea"
+    },
+    {
+      "name": "ADMIN_MEMBER_ACTIONS_ENABLED",
+      "type": "plain_text",
+      "sha256": "9f64aa220a1abc3578af16a850154632d785b9c5eee3e9653d5cd8b7ca93e500"
+    },
+    {
+      "name": "ASSETS",
+      "type": "assets",
+      "sha256": "8fcf498813511a591cb5d595bc281fee2d45f7a27a87f124257a319b543d04c6"
+    },
+    {
+      "name": "AUTH_CAPTCHA_ENABLED",
+      "type": "plain_text",
+      "sha256": "ea5d80ee869ed18c3586e925cafbc592d9ae284ac1ffa0839385a6af5bc146e0"
+    },
+    {
+      "name": "CLOUDFLARE_ANALYTICS_TOKEN",
+      "type": "secret_text",
+      "sha256": "0a6e1ad89c18d519c4521cce00274e71633d82d1a336d888fcff07802df54884"
+    },
+    {
+      "name": "CLOUDFLARE_BILLING_TOKEN",
+      "type": "secret_text",
+      "sha256": "9ce76a0a30456aec2200f767572f373d9719887b74af6fa7ec119367b98273e7"
+    },
+    {
+      "name": "CLOUDFLARE_USAGE_ACCOUNT_ID",
+      "type": "secret_text",
+      "sha256": "85b92b5cb4504ce249560d1bea17ee89b9a86821d49100e55e44b953f739fa8c"
+    },
+    {
+      "name": "CLOUDFLARE_USAGE_TOKEN",
+      "type": "secret_text",
+      "sha256": "2b1fe051c3c35f31a33cf76a88f619702d2c8176aac4741351b767b3ae976ae7"
+    },
+    {
+      "name": "CLOUDFLARE_USAGE_WORKER_NAME",
+      "type": "secret_text",
+      "sha256": "2b965376e5edb459aab0dfed6e7b6c074be6682c5518d4a08537b7d1b9bd7956"
+    },
+    {
+      "name": "DAILY_DIGEST_MODE",
+      "type": "plain_text",
+      "sha256": "2f31ef9b7d991ac364b6f6f572dc4f8417c6b04c2ede0b6a962fc1c323568ed4"
+    },
+    {
+      "name": "DAILY_DIGEST_START_AT",
+      "type": "plain_text",
+      "sha256": "62ef6220f5989449bb635d736bd108a1d888d1c7765b26da2d9cc236c9e49185"
+    },
+    {
+      "name": "JOB_ALERTS_MODE",
+      "type": "plain_text",
+      "sha256": "1b22e1094b6723d0de26665839f93e0f2d08dd53ac955be0b2679999987ec6fe"
+    },
+    {
+      "name": "JOB_ALERTS_SENDER_ADDRESS",
+      "type": "secret_text",
+      "sha256": "b97536dac8b7fbd45f3261e581024b4ead98314ab32d7a1b4a5511a55e71ff89"
+    },
+    {
+      "name": "JOB_ALERTS_WEBHOOK_SECRET",
+      "type": "secret_text",
+      "sha256": "0e09ae36cbf84d37edca25ef4ca5a9c0fb20623cf8468dd957bfbb906b7e9159"
+    },
+    {
+      "name": "JOB_HEALTH_VERIFY_ENABLED",
+      "type": "plain_text",
+      "sha256": "af378dffe8ef293c4b85ba9cf0df15ffb4b584c2c7695be32e8eb4c1fc6ec149"
+    },
+    {
+      "name": "JOB_REPORTS_ENABLED",
+      "type": "plain_text",
+      "sha256": "7d2a32e1928387c891ef209ea16336319f8f8247a4ce271cf2c2eae6668a71c4"
+    },
+    {
+      "name": "LIFECYCLE_COORDINATION_ENABLED",
+      "type": "plain_text",
+      "sha256": "3216e9d683ea0941aff0d846ce330fbecae8a467afe421b9ca6654b03a2030fb"
+    },
+    {
+      "name": "LIFECYCLE_DAILY_CAP",
+      "type": "plain_text",
+      "sha256": "e1956a1c06c72c45244200a984e000e6e6f088fa4a945dc198e9900943c0f36d"
+    },
+    {
+      "name": "LIFECYCLE_MODE",
+      "type": "plain_text",
+      "sha256": "31cc0e1249aa307ae8e685285ebfdf7ca184dfbe8ad8902675bf672c2c03b021"
+    },
+    {
+      "name": "LIFECYCLE_MONTHLY_CAP",
+      "type": "plain_text",
+      "sha256": "e9f456ad9fe8eb1f98b0727ffa5f8ceca147f6c283f51d1e9c7831c64a9f589d"
+    },
+    {
+      "name": "LIFECYCLE_PRODUCTION_APPROVED",
+      "type": "plain_text",
+      "sha256": "8d2795473383949311048e965434d76a88d1990af92aa7641cb9caeaa1bed7c5"
+    },
+    {
+      "name": "LIFECYCLE_START_AT",
+      "type": "plain_text",
+      "sha256": "ffc1fd79f63e3a8e3d4e0abdd24a6ca78a0bd2a5c8ad0baddda23715184d3648"
+    },
+    {
+      "name": "LIFECYCLE_UI_ENABLED",
+      "type": "plain_text",
+      "sha256": "d8efc7dbd94be7749d0bd9cb0416ca4cbae0b06721033e97e9f42ba721ab17e5"
+    },
+    {
+      "name": "LIFECYCLE_WEBHOOK_ENABLED",
+      "type": "plain_text",
+      "sha256": "6a96693ec83567221285d9f2c2b758d8c7d86e0e7f871e2be6642550dff50023"
+    },
+    {
+      "name": "LIFECYCLE_WEBHOOK_SECRET",
+      "type": "secret_text",
+      "sha256": "c4f1f075e046e7e7143a47a73177edc214ee79f2080250eb536148f8535fe577"
+    },
+    {
+      "name": "LIFECYCLE_WEBHOOK_VERIFIED",
+      "type": "plain_text",
+      "sha256": "9cf85c73263cbd7ffc773c21ae0cb299f281a9e1cf3d086720af34e8cf2f1c04"
+    },
+    {
+      "name": "MANUAL_NOTIFICATION_TOKEN",
+      "type": "secret_text",
+      "sha256": "099fa2e8be23a8e3cb5af8d28e57986d2d97783506c49b736597ff24766c3819"
+    },
+    {
+      "name": "MANUAL_STRONG_MATCH_IDS",
+      "type": "plain_text",
+      "sha256": "de227d34727104e460141d2d149f5d7bbbfb858ad79abda86cf827d3fa699847"
+    },
+    {
+      "name": "OPENAI_API_KEY",
+      "type": "secret_text",
+      "sha256": "ee77277cc4fd8fe7b883cc2768e43d896d5c190fd84283943b5496158f014f19"
+    },
+    {
+      "name": "OPENAI_QUICKREADS",
+      "type": "secret_text",
+      "sha256": "578bcfe5ef0d15b3a6d26ba9ff60689e5cd31322ada64de25145d8aef8ccf21d"
+    },
+    {
+      "name": "OPENAI_QUICKREADS_ADMIN",
+      "type": "secret_text",
+      "sha256": "4a51884064652067bf90976bd3724bed370c73995d0bfdeb8815734e9d3ed9ba"
+    },
+    {
+      "name": "OPENAI_QUICK_READS_API_KEY_ID",
+      "type": "plain_text",
+      "sha256": "9010dfa37e8f38e27618c07865b5b8a48cd2b080f9fd298a02f1cce299f85dd0"
+    },
+    {
+      "name": "OPENAI_QUICK_READS_PROJECT_ID",
+      "type": "plain_text",
+      "sha256": "24e388f99ed6943a10e6e10e4363b165f1b39c3f0f243c6ac7a379e7129e4db2"
+    },
+    {
+      "name": "OPENAI_USAGE_ADMIN_KEY",
+      "type": "secret_text",
+      "sha256": "d66dd95c8f46ca5933880ea7899d9802fecdef13ef390b135dd2fc08fa08955b"
+    },
+    {
+      "name": "PAYMONGO_LIVE_CHECKOUT_ENABLED",
+      "type": "plain_text",
+      "sha256": "094a1080b8b809b44c89125ef72046bec1f4398f1ab95eb1813439130c98c865"
+    },
+    {
+      "name": "PAYMONGO_LIVE_SECRET_KEY",
+      "type": "secret_text",
+      "sha256": "6a807b2645ac6371642fbcbd5b4a17da8f730a3ec479df7203d878e10ee65ff0"
+    },
+    {
+      "name": "PAYMONGO_LIVE_WEBHOOK_SECRET",
+      "type": "secret_text",
+      "sha256": "b73739c74919f46c6fe33c0ca42c9af63d45dd81ca8991ec9db4cda10463bb64"
+    },
+    {
+      "name": "PAYMONGO_MODE",
+      "type": "plain_text",
+      "sha256": "a3d0641a3e1024a834018bdc9dea4b20094ee59f58148d59437d7d284f813e86"
+    },
+    {
+      "name": "PRO_AI_BUDGET",
+      "type": "durable_object_namespace",
+      "sha256": "64ae0ffa68bc97f02789a23f073f34df5fa957f675a8c6dd70b804aa776c2427"
+    },
+    {
+      "name": "PRO_AI_CACHE_KEY",
+      "type": "secret_text",
+      "sha256": "1a13ec911d21ad6924b65b4c2b89e068de2f919509612149202bf303540c3fb3"
+    },
+    {
+      "name": "PRO_AI_DAILY_MICRO_USD",
+      "type": "plain_text",
+      "sha256": "6cf5c13718318849e96e3bc99f15ef41d65305c465fbeaa988bef079c6158739"
+    },
+    {
+      "name": "PRO_AI_ENABLED",
+      "type": "plain_text",
+      "sha256": "e641a4c31f96e28017728f33451d7c9c09784f223d0b28c0c96fdf36c6be2161"
+    },
+    {
+      "name": "PRO_AI_KEY",
+      "type": "secret_text",
+      "sha256": "de209e75ec827412318397332a6279275b0735b890af1da7e79492a775b68ec1"
+    },
+    {
+      "name": "PRO_AI_MAX_CALL_MICRO_USD",
+      "type": "plain_text",
+      "sha256": "4f54ea8e66c439adfc0b6de170b1093df4a173bcf567355de2e79cc6bdba8b9e"
+    },
+    {
+      "name": "PRO_AI_MODEL",
+      "type": "plain_text",
+      "sha256": "5bacd0521ea1286b53bf761ca7ad68c81a96e12ee240983b631d2185de519e33"
+    },
+    {
+      "name": "PRO_AI_SPENDING_AUTHORIZED",
+      "type": "plain_text",
+      "sha256": "140a6ab9793c172b1f53bc53769328249f5a136e38ea9bbdd026f7525c3b235b"
+    },
+    {
+      "name": "PRO_AI_TOTAL_MICRO_USD",
+      "type": "plain_text",
+      "sha256": "59d4041d54163ca07a60488390e8ca625c997d9c313d8494e5757b5c260966a6"
+    },
+    {
+      "name": "PRO_TOOLS_DEMO",
+      "type": "plain_text",
+      "sha256": "ec3f84a27861e6f348850f47e67244ace2dbc41c1fd39a911c092ec86149057a"
+    },
+    {
+      "name": "PRO_TOOLS_ENABLED",
+      "type": "plain_text",
+      "sha256": "b78c997ef37e48b8d3f95e86e2969cf30e495cb212399f41c25e10e4da3345a5"
+    },
+    {
+      "name": "PRO_TRACKER_ENABLED",
+      "type": "plain_text",
+      "sha256": "5d6d383db99dbc4d5c896d5c2eabdfda50c72e0052beb66471283c74fcb2fa42"
+    },
+    {
+      "name": "QUICK_READ_ADMIN_TOKEN",
+      "type": "secret_text",
+      "sha256": "1179929cabc56a1983811eb528bbb19a2eb474e6ad45380946c3496e47832c0b"
+    },
+    {
+      "name": "QUICK_READ_AUTO_ENABLED",
+      "type": "plain_text",
+      "sha256": "2b5f5e97ef38c43badfff87b555d2ae4c08608b7716bffb60c9a090609b90156"
+    },
+    {
+      "name": "QUICK_READ_BATCH_ENABLED",
+      "type": "plain_text",
+      "sha256": "0308b81b8d3820ea210ae61e92b420560454b1b396a7dfa0906af699a11713cb"
+    },
+    {
+      "name": "QUICK_READ_GENERATION_ENABLED",
+      "type": "plain_text",
+      "sha256": "100897831d1a5efe878f762ce3f2b3fe5bf65bbd25eb107f0097788c953d9ee0"
+    },
+    {
+      "name": "QUICK_READ_MODE",
+      "type": "plain_text",
+      "sha256": "27fe2483e9fba66f3272fa5e040e7e7a199b127339ad68615138b3f640d717dc"
+    },
+    {
+      "name": "QUICK_READ_MODEL",
+      "type": "plain_text",
+      "sha256": "3eee7c7681e9d610bd611d70131765edf79dcc7a7e66a97caab6ab29db8aa820"
+    },
+    {
+      "name": "QUICK_READ_PROVIDER",
+      "type": "plain_text",
+      "sha256": "bcfa5b688eb9337e41af278c522482610141f9cc1ca99d40f4257d5522cb29a7"
+    },
+    {
+      "name": "RESEND_API_KEY",
+      "type": "secret_text",
+      "sha256": "48b731bc53b129e4eb2a8b018e3f5dd2642b7bf87e831a2502ac9444ab373a4d"
+    },
+    {
+      "name": "RESEND_USAGE_KEY",
+      "type": "secret_text",
+      "sha256": "0ac1be546d89f83eba37a33bd72976f96c72838ad7c79802568ed6a5e984eb2b"
+    },
+    {
+      "name": "RESUME_AI_ENABLED",
+      "type": "plain_text",
+      "sha256": "912e557ddb02437df894c3e367ed24654037e8d3404c73f77c6dc8b3342ace98"
+    },
+    {
+      "name": "RESUME_STUDIO_ENABLED",
+      "type": "plain_text",
+      "sha256": "113202911cc8b620570bcdd715c35dea50fe4697b6bdde84fdabb08d52d376a2"
+    },
+    {
+      "name": "SIGNUP_PROTECTION_ENABLED",
+      "type": "plain_text",
+      "sha256": "73c15223c97ebe41f03ed2b869b3128b4177a0ab5bdbba26272b99611b83947e"
+    },
+    {
+      "name": "SITE_URL",
+      "type": "plain_text",
+      "sha256": "9a3c5c3008f2865b7a7cfe5db4cd8f479730e59f268aa02ee486d881ca4491eb"
+    },
+    {
+      "name": "STRONG_MATCH_MODE",
+      "type": "plain_text",
+      "sha256": "890d50547f1a29cf936b4393208b3e967be2a3997fa6c0721cb3741c1bd1fb48"
+    },
+    {
+      "name": "STRONG_MATCH_START_AT",
+      "type": "plain_text",
+      "sha256": "ea58c7f25545ddfcd86531034c6e1bdee985b0aef72da7203ee97b0612142fb3"
+    },
+    {
+      "name": "STRONG_MATCH_TEST_EMAIL",
+      "type": "plain_text",
+      "sha256": "bc9bf5448006b233944d6e7b48dc0597cdd3a5bf949028f8371bfbb4d6b273e2"
+    },
+    {
+      "name": "SUPABASE_PUBLISHABLE_KEY",
+      "type": "plain_text",
+      "sha256": "5cf558a8bc44166b6abed48f29d1dfef38d9fe63e03879839e16e3c006214929"
+    },
+    {
+      "name": "SUPABASE_SERVICE_ROLE_KEY",
+      "type": "secret_text",
+      "sha256": "aa024eead5daa20dc0385ecba6480c67499f70ccb612e9388491086bc9b82516"
+    },
+    {
+      "name": "SUPABASE_URL",
+      "type": "plain_text",
+      "sha256": "e64e4256e1152aba275a7f875eccac3f15e1132bd9e16975d0f208b9f354867d"
+    },
+    {
+      "name": "TURNSTILE_SITE_KEY",
+      "type": "plain_text",
+      "sha256": "8de8f62e450ed14b315cf030e2fde2d8c19bad66331d731b4861ed65975e4920"
+    }
+  ],
+  "configurationSha256": "7bf5a9a5b3ecf51aaa384a1cf58ca27b0c17fd108affd33c52a0381cdba999f0",
+  "configuration": {
+    "placement": {},
+    "compatibility_date": "2026-10-01",
+    "compatibility_flags": [],
+    "usage_model": "standard",
+    "tags": [],
+    "tail_consumers": [],
+    "logpush": false
+  },
+  "crons": [
+    "* * * * *",
+    "0-59 * * * *",
+    "*/15 * * * *",
+    "17 */6 * * *"
+  ],
+  "reviewedBrowserFiles": {
+    "resume-export-v3.js": "5b8cff38b28e66faf8b2b6b16eef47dca2c8eed9260ca440e16edd44426d4279",
+    "resume-layouts-v3.js": "c03e4d2281e8795e0eac45f47da91ca271bc3ef44e2527940b43b479466dfef2",
+    "resume-refined-v3.js": "30d9cf5d4f55d675d6298680172ad1948ea067963b55a92f06ecddac76a9e729",
+    "resume-refined-word-v3.js": "f00f14b21aef0f10be86a6a49667c11b6399023210815a342234135e5e81c035",
+    "resume-studio-v3.css": "a60bad254ca8b6c2ef4e930aacd5854393dbf17afc0ba705a472a0f6f94fa810",
+    "resume-studio-v3.js": "707f3b51af3cdcb8ffa7698df8f2f6f3e61f1662880b4ce8e80045f4285daeee",
+    "resume-word-v3.js": "afe42318b39e620a7e6a239d7b8b0463a3cb1886cf237efdb7102e4e7a346881"
+  },
+  "runtime": {
+    "migration_tag": "pro-ai-v1",
+    "assets": {
+      "serve_directly": true,
+      "raw_run_worker_first": false,
+      "base_path": "/"
+    },
+    "compatibility_date": "2026-10-01",
+    "usage_model": "standard"
+  }
+}

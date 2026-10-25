@@ -1,0 +1,79 @@
+[
+  {
+    "id": "classic",
+    "unchangedPlan": true,
+    "unchangedPdf": true,
+    "unchangedWord": true,
+    "planSha256": "658126037540885294086349ea21ec9aff82536f01d972fc1d0bc56aa3e7e523"
+  },
+  {
+    "id": "editorial",
+    "unchangedPlan": true,
+    "unchangedPdf": true,
+    "unchangedWord": true,
+    "planSha256": "7249e590b4b3011852f8645e63873eeb47ac6c0288228b1c06b570a2bdecbfb1"
+  },
+  {
+    "id": "executive",
+    "unchangedPlan": true,
+    "unchangedPdf": true,
+    "unchangedWord": true,
+    "planSha256": "0ef970baba5bbfaf95fad0aaf15b9df50e866c0f9e76940477d0b5b873ce9adb"
+  },
+  {
+    "id": "modern",
+    "unchangedPlan": true,
+    "unchangedPdf": true,
+    "unchangedWord": true,
+    "planSha256": "5fff1b4cf9056866938807c136ba90c02cef42c3802409d3a4825414503968e2"
+  },
+  {
+    "id": "minimalist",
+    "unchangedPlan": true,
+    "unchangedPdf": true,
+    "unchangedWord": true,
+    "planSha256": "9c5953d4dc969ce110bb89e9aa88b35425b2cdf886542b4b32a21702f5feede2"
+  },
+  {
+    "id": "creative",
+    "unchangedPlan": true,
+    "unchangedPdf": true,
+    "unchangedWord": true,
+    "planSha256": "01eb445d5fd0af20ade0c85ab9630d6fa14ee86d78b36a7728f166d4f8e7f44c"
+  },
+  {
+    "id": "tech",
+    "unchangedPlan": true,
+    "unchangedPdf": true,
+    "unchangedWord": true,
+    "planSha256": "470c2943d90e2535bd3ceec9e15e3a4688885ec606f53fe50f7e88c53e2e0bd4"
+  },
+  {
+    "id": "corporate",
+    "unchangedPlan": true,
+    "unchangedPdf": true,
+    "unchangedWord": true,
+    "planSha256": "5648c3f1642554fc5845a0f3a13dc906237bef0ca0077607d08c1a8afc0792be"
+  },
+  {
+    "id": "fresh",
+    "unchangedPlan": true,
+    "unchangedPdf": true,
+    "unchangedWord": true,
+    "planSha256": "aa6475061375da46b8744deed7ef83c861c64be3d7813798fa6f9a6d7855ee4a"
+  },
+  {
+    "id": "bold",
+    "unchangedPlan": true,
+    "unchangedPdf": true,
+    "unchangedWord": true,
+    "planSha256": "45d23812aecd19d727371fd2170e536782c32b73dca2045056f670a0a1af3c2f"
+  },
+  {
+    "id": "contemporary",
+    "unchangedPlan": true,
+    "unchangedPdf": true,
+    "unchangedWord": true,
+    "planSha256": "0cc89b5e77b69bda22f9dc0b692a7c7aa2c64e6a93c70ee6174ed88a5381382a"
+  }
+]
