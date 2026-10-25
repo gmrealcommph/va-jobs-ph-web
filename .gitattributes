@@ -13,4 +13,5 @@ public/admin.js -whitespace
 src/production-baseline/** -text -whitespace
 src/resume-release/browser/* -text -whitespace
 review/resume-templates-20261025/*.zip -text
+review/resume-templates-20261025/validation-report.md -text
 docs/resume-release/*regression.txt -whitespace
