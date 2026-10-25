@@ -45,7 +45,7 @@ export const styles = {
  },
  "signature": {
   "name": "Signature Collection",
-  "description": "Refined rose and charcoal, expressive serif name typography and fine personal details."
+  "description": "Signature Professional: a formal navy masthead, restrained gold details and clearly aligned chronological experience."
  }
 };
 export function renderResume(root,d,style='classic',accent='forest'){

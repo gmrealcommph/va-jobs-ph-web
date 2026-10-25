@@ -2,7 +2,7 @@ export const refinedIds=new Set(['classic','editorial','executive','modern','min
 export function composeRefined(d,style,accent,photo,f,wrap){
  const W=595.28,H=841.89,B=787;
  const modern=style==='classic',creative=style==='editorial',executive=style==='executive';
- const defaults={classic:'#455c53',editorial:'#237970',executive:'#303833',modern:'#17656a',minimalist:'#514a3e',creative:'#6c4777',tech:'#193c54',corporate:'#163e67',fresh:'#286649',bold:'#252927',contemporary:'#65734c',signature:'#724e56'};
+ const defaults={classic:'#455c53',editorial:'#237970',executive:'#303833',modern:'#17656a',minimalist:'#514a3e',creative:'#6c4777',tech:'#193c54',corporate:'#163e67',fresh:'#286649',bold:'#252927',contemporary:'#65734c',signature:'#233347'};
  const a=accent==='forest'?defaults[style]:({ink:'#29342e',slate:'#365775',plum:'#674c65'}[accent]||defaults[style]),ink='#29342f',muted='#607069';
  const other=!modern&&!creative&&!executive,labelsLayout=style==='contemporary';
  for(const value of Object.values(d))try{f.sans.encodeText(String(value||'').replace(/\r\n?|\n/g,''));}catch{throw Error('This PDF font supports Latin-script text only. Your text is preserved. Use Print / Save as PDF for other scripts.');}
@@ -104,6 +104,17 @@ export function composeRefined(d,style,accent,photo,f,wrap){
     const job=key==='experience'&&first&&line.match(/^(.+?)\s+\|\s+(.+?)\s+\|\s+((?:19|20)\d{2}.*)$/);
     if(job){
      if(cy+85>B){next();heading(key,true);}
+     if(style==='signature'){
+      const b=box(),ds=9.5,dw=f.sans.widthOfTextAtSize(job[3],ds);
+      cy=write(page,job[1],b.x,cy,b.w,12.5,true,ink,'serif',b.region)+4;
+      const companyRows=wrap(job[2],b.w-dw-18,10.5,f.sansBold);
+      for(let k=0;k<companyRows.length;k++){
+       text(page,companyRows[k],b.x,cy,10.5,true,a,'sans',b.region,{lineHeight:14,maxWidth:b.w-dw-18,keepNext:true});
+       if(k===0)text(page,job[3],b.x+b.w-dw,cy+.83,ds,false,muted,'sans',b.region,{alignedDate:true,alignWithY:cy});
+       cy+=14;
+      }
+      cy+=4;first=false;continue;
+     }
      const b=box(),roleSize=modern?12.5:12,ds=9.5,dw=f.sans.widthOfTextAtSize(job[3],ds),roleW=b.w-dw-18;
      if(creative)jobBox={...b,page:pi};
      if(roleW<b.w*.45){paragraph(line,{bold:true,keep:true});first=false;continue;}
@@ -177,9 +188,11 @@ export function composeRefined(d,style,accent,photo,f,wrap){
    hy=write(p,contact,43,hy,509,9.5,false,muted,'sans','header');paintPhoto(480,35,72);return hy+27;
   }
   if(style==='signature'){
-   hy=write(p,name,43,32,509-photoW,39,false,a,'serif','header')+7;
-   hy=write(p,headline,43,hy,509-photoW,10,true,muted,'sans','header')+8;
-   hy=write(p,contact,43,hy,509,9.5,false,muted,'sans','header')+13;rect(p,43,hy,509,.6,'#bba1a0');rect(p,43,hy-2,47,2.5,a);paintPhoto(488,33);return hy+28;
+   rect(p,43,28,461,2.5,a);rect(p,504,28,48,2.5,'#b79a61');
+   hy=write(p,name,43,46,509-photoW,29,true,a,'serif','header')+8;
+   hy=write(p,headline,43,hy,509-photoW,10.5,true,a,'sans','header')+10;
+   hy=write(p,contact,43,hy,509,9.5,false,muted,'sans','header')+13;
+   rect(p,43,hy,509,.5,'#cbd1d8');paintPhoto(488,45);return hy+27;
   }
   if(style==='fresh'){
    rect(p,0,0,W,7,'#a9d3b3');hy=write(p,name,43,33,509-photoW,32,true,a,'sans','header')+8;
@@ -195,7 +208,7 @@ export function composeRefined(d,style,accent,photo,f,wrap){
   hy=write(p,contact,43,hy,509,9.5,false,muted,'sans','header')+12;rect(p,43,hy,509,.7,'#c8cfb6');paintPhoto(488,31);return hy+29;
  }
  function otherHeading(page,key,title,b,cy){
-  const label=style==='signature'?title.toLowerCase().replace(/\b\w/g,c=>c.toUpperCase()):title;
+  const label=title;
   const emit=(x,y,size,bold,family='sans')=>{for(const row of wrap(label,b.w-14,size,f[family+(bold?'Bold':'')])){text(page,row,x,y,size,bold,a,family,b.region);y+=size*1.3;}};
   if(labelsLayout){
    let ly=cy;for(const row of wrap(label,83,9,f.sansBold)){text(page,row,43,ly,9,true,a,'sans','section-label');ly+=12;}rect(page,133,cy,1,20,'#ccd4c0');return;
@@ -206,6 +219,7 @@ export function composeRefined(d,style,accent,photo,f,wrap){
   if(style==='fresh'){rect(page,b.x-5,cy-5,b.w+10,23,'#edf5eb');emit(b.x+2,cy,10,true);return;}
   if(style==='modern'){rect(page,b.x,cy+18+(wrap(label,b.w-14,10,f.sansBold).length-1)*13,29,3,'#dbaa8d');emit(b.x,cy,10,true);return;}
   if(style==='creative'){emit(b.x,cy,12,true,'serif');rect(page,b.x,cy+20,34,1.5,'#b897bc');return;}
+  if(style==='signature'){emit(b.x,cy,10,true);rect(page,b.x,cy+18,36,1.5,'#b79a61');return;}
   emit(b.x,cy,11,false,'serif');rect(page,b.x,cy+20,b.w,.4,style==='signature'?'#d6c6c8':'#d0c9bb');
  }
  function pair(leftKeys,rightKeys,start,index,kind,leftW=302,rightW=183){
@@ -219,7 +233,8 @@ export function composeRefined(d,style,accent,photo,f,wrap){
    if((d.skills||'').length+(d.education||'').length>1400||!d.skills&&!d.education)return flow(['experience','projects','education','skills'],intro.y,intro.index);
    return pair(['experience','projects'],['skills','education'],intro.y,intro.index,'geometric',326,159);
   }
-  if(style==='minimalist'||style==='signature')return flow(['summary','experience','projects','skills','education'],y);
+  if(style==='signature')return flow(['summary','experience','education','skills','projects'],y);
+  if(style==='minimalist')return flow(['summary','experience','projects','skills','education'],y);
   if(style==='creative'){
    const main=flow(['summary','projects','experience'],y);return pair(['skills'],['education'],main.y,main.index,'portfolio-close',244,241);
   }

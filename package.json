@@ -15,7 +15,7 @@
     "test": "node --test",
     "verify:production": "npm run build && node scripts/verify-production-parity.mjs",
     "build:resume-release": "node scripts/build-resume-release.mjs",
-    "test:resume-release": "node --test test/resume-release-parity.test.js test/resume-release-exports.test.js",
+    "test:resume-release": "node --test test/resume-release-parity.test.js test/resume-release-exports.test.js test/resume-signature-professional.test.js",
     "predeploy": "node scripts/resume-release-review-gate.mjs"
   },
   "devDependencies": {

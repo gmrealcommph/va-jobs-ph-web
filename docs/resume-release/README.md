@@ -2,6 +2,8 @@
 
 **Draft PR only. No merge or production deployment is authorized.**
 
+Latest design revision: [Signature Professional validation](SIGNATURE-PROFESSIONAL.md) and [separate staging gallery](https://veeays-signature-preview-20261025.gm-realcommph.workers.dev/template-review/#signature). Signature Collection now follows the replacement corporate reference. The other eleven designs and their PDF/Word samples are unchanged. The links below preserve the original v4 freeze; use the versioned Signature Professional review package for the current candidate.
+
 - [Complete cross-device review ZIP](../../review/resume-templates-20261025/veeays-12-resume-review.zip?raw=1)
 - [Design validation report](../../review/resume-templates-20261025/validation-report.md)
 - [All twelve designs](../../review/resume-templates-20261025/all-12-gallery.jpg)

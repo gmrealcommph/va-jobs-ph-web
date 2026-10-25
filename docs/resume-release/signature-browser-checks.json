@@ -1,0 +1,19 @@
+{
+  "browserPdfPages": 2,
+  "browserPdfMatchesSample": true,
+  "browserNativeWordMatchesSample": true,
+  "mobileEditor": [
+    {
+      "width": 390,
+      "scrollWidth": 375,
+      "pages": 2,
+      "draftPreserved": true
+    },
+    {
+      "width": 320,
+      "scrollWidth": 305,
+      "pages": 2,
+      "draftPreserved": true
+    }
+  ]
+}
