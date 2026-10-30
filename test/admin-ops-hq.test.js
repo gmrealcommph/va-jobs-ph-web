@@ -5,7 +5,7 @@ import {buildOpsHq,opsHqPayload,healthFrom,_resetOpsHqCache} from '../src/admin-
 import {opsHqPage,OPS_HQ_CSP} from '../src/ops-hq-page.js';
 const now=new Date('2026-10-30T04:00:00Z');
 const analytics={members:120,live_jobs:50,pro_access:7,daily:[{day:'2026-10-29',members:4,jobs:10},{day:'2026-10-30',members:6,jobs:3}]};
-const quick={counts:{queued:5,processing:1},all_reads:{ready:90,failed:2},automation:{enabled:true},gate:{enabled:true},oldest_due:'2026-10-30T03:58:00Z',unmatched_running:0,
+const quick={counts:{queued:5,processing:1,stopped_other:4},all_reads:{ready:90,failed:2},automation:{enabled:true},gate:{enabled:true},oldest_due:'2026-10-30T03:58:00Z',unmatched_running:0,
   recent:[{event:'completed',job_id:1,title:'SECRET TITLE',at:'2026-10-30T03:00:00Z'},{event:'queued',job_id:2,at:'2026-10-30T03:01:00Z'},{event:'failed',job_id:3,at:'2026-10-30T03:02:00Z'}]};
 const extended={available:true,members:{expiring_7d:3},email:{accepted_in_period:11}};
 const registrations={available:true,events:[{event_id:'a',registered_at:'2026-10-30T02:00:00Z'},{event_id:'a',registered_at:'2026-10-30T02:00:00Z'}]};
@@ -16,7 +16,7 @@ test('metrics use only verified sources; unavailable ones are null',()=>{
   const r=buildOpsHq(all,now);
   assert.deepEqual(r.metrics.intake,{new_today:6,total:120,growth_pct:50});
   assert.equal(r.metrics.pro.expiring_7d,3);assert.equal(r.metrics.comms.accepted_today,11);
-  assert.equal(r.metrics.reads.ready_total,90);assert.equal(r.metrics.pro.upgrades_today,1);
+  assert.equal(r.metrics.reads.ready_total,90);assert.equal(r.metrics.reads.stopped,4);assert.equal(buildOpsHq({},now).metrics.reads.stopped,null);assert.equal(r.metrics.pro.upgrades_today,1);
   for(const [d,k] of [['refer','verified_signups'],['refer','eligible_conversions'],['refer','on_hold'],['comms','delivered_today'],['comms','suppressed_or_bounced_today'],['chief','open'],['chief','done'],['jobs','processing']])
     assert.equal(r.metrics[d][k],null,d+'.'+k);
   const empty=buildOpsHq({},now).metrics;
@@ -46,36 +46,41 @@ test('health reflects real checks',()=>{
   assert.equal(healthFrom({failed:0,total:5,quick:{...quick,unmatched_running:2},now}).alerts,1);
 });
 const rpcs={veeays_admin_analytics:analytics,veeays_admin_quick_reads:quick,veeays_admin_extended:extended,veeays_admin_registration_snapshot:registrations,veeays_admin_payment_snapshot:payments};
-test('cache: fast sources 15s, extended 120s; stale and null fallback on failure',async()=>{
+test('cache tiers: fast 15s, analytics 60s, extended 120s; shared across admins; failures fall back then go stale',async()=>{
   _resetOpsHqCache();const counts={};let fail=new Set();
-  const call=async(e,t,name)=>{counts[name]=(counts[name]||0)+1;if(fail.has(name)){throw Object.assign(new Error('x'),{status:500});}return rpcs[name];};
-  const t0=new Date(now);
-  await opsHqPayload({},'t','u',call,null,t0);
-  await opsHqPayload({},'t','u',call,null,new Date(t0.getTime()+5000));
+  const call=async(e,t,name)=>{counts[name]=(counts[name]||0)+1;if(fail.has(name))throw Object.assign(new Error('x'),{status:500});return rpcs[name];};
+  const t0=new Date(now),at=(s)=>new Date(t0.getTime()+s*1000);
+  await opsHqPayload({},'t',call,null,t0);
+  await opsHqPayload({},'other-admin-token',call,null,at(5));
   assert.equal(counts.veeays_admin_quick_reads,1);
-  await opsHqPayload({},'t','u',call,null,new Date(t0.getTime()+16000));
-  assert.equal(counts.veeays_admin_quick_reads,2);assert.equal(counts.veeays_admin_extended,1);
-  await opsHqPayload({},'t','u',call,null,new Date(t0.getTime()+121000));
+  await opsHqPayload({},'t',call,null,at(16));
+  assert.equal(counts.veeays_admin_quick_reads,2);assert.equal(counts.veeays_admin_analytics,1);assert.equal(counts.veeays_admin_extended,1);
+  await opsHqPayload({},'t',call,null,at(62));
+  assert.equal(counts.veeays_admin_analytics,2);assert.equal(counts.veeays_admin_extended,1);
+  await opsHqPayload({},'t',call,null,at(122));
   assert.equal(counts.veeays_admin_extended,2);
-  // one source fails: last good reused (fresh enough, not stale), database warning
   fail=new Set(['veeays_admin_registration_snapshot']);
-  let p=await opsHqPayload({},'t','u',call,null,new Date(t0.getTime()+140000));
+  let p=await opsHqPayload({},'t',call,null,at(140));
   assert.equal(p.metrics.health.database,'warning');assert.equal(p.stale,false);
   assert.ok(p.events.some(e=>e.type==='member_registered'));
-  // beyond grace window the failed source drops to nothing and payload is stale
-  p=await opsHqPayload({},'t','u',call,null,new Date(t0.getTime()+700000));
+  p=await opsHqPayload({},'t',call,null,at(700));
   assert.equal(p.stale,true);assert.ok(!p.events.some(e=>e.type==='member_registered'));
-  // everything fails and nothing usable: 503
   _resetOpsHqCache();fail=new Set(Object.keys(rpcs));
-  await assert.rejects(opsHqPayload({},'t','u2',call,null,t0),{status:503});
-  // auth errors propagate
-  await assert.rejects(opsHqPayload({},'t','u3',async()=>{throw Object.assign(new Error('x'),{status:401});},null,t0),{status:401});
+  await assert.rejects(opsHqPayload({},'t',call,null,t0),{status:503});
+  _resetOpsHqCache();
+  await assert.rejects(opsHqPayload({},'t',async()=>{throw Object.assign(new Error('x'),{status:401});},null,t0),{status:401});
+});
+test('concurrent requests share one in-flight refresh per tier',async()=>{
+  _resetOpsHqCache();let n=0;
+  const call=async(e,t,name)=>{n++;await new Promise(r=>setTimeout(r,20));return rpcs[name];};
+  await Promise.all(Array.from({length:10},()=>opsHqPayload({},'t',call,null,now)));
+  assert.equal(n,5);   // 3 fast + 1 analytics + 1 extended, once
 });
 test('stale payload is served from last good data when all sources then fail',async()=>{
   _resetOpsHqCache();let down=false;
   const call=async(e,t,n)=>{if(down)throw Object.assign(new Error('x'),{status:500});return rpcs[n];};
-  await opsHqPayload({},'t','u',call,null,now);down=true;
-  const p=await opsHqPayload({},'t','u',call,null,new Date(now.getTime()+130000));
+  await opsHqPayload({},'t',call,null,now);down=true;
+  const p=await opsHqPayload({},'t',call,null,new Date(now.getTime()+130000));
   assert.equal(p.stale,true);assert.equal(p.metrics.health.database,'critical');assert.equal(p.metrics.intake.total,120);
 });
 const req=(p,init)=>new Request('https://veeays.com'+p,init);

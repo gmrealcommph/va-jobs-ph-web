@@ -77,7 +77,7 @@ export async function adminEndpoint(request, env, {session=sessionForRequest, ca
       if(opsHq){
         const since=url.searchParams.get('since');
         if(since&&!Number.isFinite(Date.parse(since)))return reply(JSON.stringify({error:'Invalid since.'}),400,'application/json');
-        return reply(JSON.stringify(await opsHqPayload(env,state.accessToken,state.user.id,call,since)),200,'application/json');
+        return reply(JSON.stringify(await opsHqPayload(env,state.accessToken,call,since)),200,'application/json');
       }
       if(monitor){
         const data=await call(env,state.accessToken,'veeays_admin_quick_reads',{});

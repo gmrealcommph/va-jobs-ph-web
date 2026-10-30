@@ -3,12 +3,13 @@
 // never a guess. Events carry hashed ids, timestamps and counts only: no personal data.
 const TZ='Asia/Manila';
 const MAX_EVENTS=60;
-const FAST_MS=15000;        // analytics, quick reads, registration and payment snapshots
+const FAST_MS=15000;        // quick reads, registration and payment snapshots (event latency)
+const MID_MS=60000;         // veeays_admin_analytics scans member/job totals; same 60s lifetime as the admin dashboard
 const SLOW_MS=120000;       // veeays_admin_extended is the heaviest RPC; refresh at most every 2 minutes
 const GRACE_MS=300000;      // reuse a last-good snapshot for at most 5 minutes when its RPC fails
 const FRESH_MS=90000;       // beyond this a reused snapshot makes the payload "stale"
 const LATE_WARN_MS=10*60000, LATE_CRIT_MS=30*60000;
-const state=new Map();      // userId -> {fast:{at,data}, slow:{at,data}, last:{name:{at,data}}}
+const cache={fast:{},mid:{},slow:{},last:{}};   // shared across admins; last = last good snapshot per source
 const dayKey=(d)=>new Intl.DateTimeFormat('en-CA',{timeZone:TZ,year:'numeric',month:'2-digit',day:'2-digit'}).format(d);
 const num=(v)=>{const n=Number(v);return v!==null&&v!==undefined&&v!==''&&Number.isFinite(n)?n:null;};
 const iso=(v)=>{const t=Date.parse(v);return Number.isFinite(t)?new Date(t).toISOString():null;};
@@ -50,7 +51,9 @@ export function buildOpsHq({analytics,quick,extended,registrations,payments},now
     intake:{new_today:newM,total:num(analytics?.members),growth_pct:growth},
     jobs:{active:num(analytics?.live_jobs),new_today:t?num(t.jobs):null,processing:null},
     reads:{queued:counts?num(counts.queued):null,running:counts?num(counts.processing):null,
-      ready_total:reads?num(reads.ready):null,failed:reads?num(reads.failed):null},
+      ready_total:reads?num(reads.ready):null,failed:reads?num(reads.failed):null,
+      // queue rows in state 'stopped' whose Quick Read is not 'failed' (e.g. previously attempted). Disjoint from counts.failed.
+      stopped:counts?num(counts.stopped_other):null},
     pro:{active:num(analytics?.pro_access),upgrades_today:upgradesToday,
       expiring_7d:extended?.available?num(extended.members?.expiring_7d):null},
     // No referral tables exist in this repo (veeays_referral: NOT FOUND); stay null until a source exists.
@@ -80,39 +83,43 @@ export function buildOpsHq({analytics,quick,extended,registrations,payments},now
   return {generated_at:meta.generatedAt||now.toISOString(),stale:!!meta.stale,metrics,events};
 }
 
-export async function opsHqPayload(env,token,userId,call,since=null,now=new Date()){
+// Admin-only data is identical for every admin, so one shared cache (per Worker isolate) serves all
+// admins, tabs and devices: Supabase load is bounded by the tier intervals, not by viewer count.
+// Concurrent callers share one in-flight refresh per tier.
+const TIERS={
+  fast:{ms:FAST_MS,jobs:{quick:['veeays_admin_quick_reads',()=>({})],registrations:['veeays_admin_registration_snapshot',()=>({})],payments:['veeays_admin_payment_snapshot',()=>({})]}},
+  mid:{ms:MID_MS,jobs:{analytics:['veeays_admin_analytics',(d,y)=>({p_start:y,p_end:d})]}},
+  slow:{ms:SLOW_MS,jobs:{extended:['veeays_admin_extended',(d)=>({p_start:d,p_end:d})]}}
+};
+export async function opsHqPayload(env,token,call,since=null,now=new Date()){
   const clock=now.getTime();
-  let s=state.get(userId);
-  if(!s){
-    if(state.size>=200)for(const [k,v] of state)if(clock-Math.max(v.fast?.at||0,v.slow?.at||0)>GRACE_MS)state.delete(k);
-    s={fast:null,slow:null,last:{}};if(state.size<200)state.set(userId,s);
-  }
   const d=dayKey(now), y=dayKey(new Date(clock-86400000));
-  const fastJobs={analytics:['veeays_admin_analytics',{p_start:y,p_end:d}],quick:['veeays_admin_quick_reads',{}],
-    registrations:['veeays_admin_registration_snapshot',{}],payments:['veeays_admin_payment_snapshot',{}]};
-  const slowJobs={extended:['veeays_admin_extended',{p_start:d,p_end:d}]};
-  const refresh=async(jobs)=>{
-    const names=Object.keys(jobs);
-    const res=await Promise.allSettled(names.map((n)=>Promise.resolve().then(()=>call(env,token,jobs[n][0],jobs[n][1]))));
-    for(const r of res)if(r.status==='rejected'&&[401,403].includes(r.reason?.status))throw r.reason;
-    const out={};names.forEach((n,i)=>{const v=obj(res[i]);if(v)s.last[n]={at:clock,data:v};out[n]=v;});
-    return out;
+  const refresh=(tier)=>{
+    const t=TIERS[tier],c=cache[tier];
+    if(c.data&&clock-c.at<t.ms)return c.data;
+    if(c.inflight)return c.inflight;
+    const names=Object.keys(t.jobs);
+    c.inflight=Promise.allSettled(names.map((n)=>Promise.resolve().then(()=>call(env,token,t.jobs[n][0],t.jobs[n][1](d,y))))).then((res)=>{
+      for(const r of res)if(r.status==='rejected'&&[401,403].includes(r.reason?.status))throw r.reason;
+      const out={};names.forEach((n,i)=>{const v=obj(res[i]);if(v)cache.last[n]={at:clock,data:v};out[n]=v;});
+      c.at=clock;c.data=out;return out;
+    }).finally(()=>{c.inflight=null;});
+    return c.inflight;
   };
-  if(!s.fast||clock-s.fast.at>=FAST_MS)s.fast={at:clock,data:await refresh(fastJobs)};
-  if(!s.slow||clock-s.slow.at>=SLOW_MS)s.slow={at:clock,data:await refresh(slowJobs)};
-  // Failed sources fall back to their last good snapshot for up to GRACE_MS; otherwise stay null.
+  const [fast,mid,slow]=await Promise.all([refresh('fast'),refresh('mid'),refresh('slow')]);
+  const fresh={...fast,...mid,...slow};
   let stale=false,oldest=clock,failed=0;
   const sources={};
-  for(const n of [...Object.keys(fastJobs),...Object.keys(slowJobs)]){
-    const fresh=(s.fast.data[n]??s.slow.data[n])||null;
-    if(!fresh)failed++;
-    if(fresh){sources[n]=fresh;oldest=Math.min(oldest,(fastJobs[n]?s.fast:s.slow).at);continue;}
-    const l=s.last[n];
+  for(const n of Object.keys(fresh)){
+    const tier=TIERS.fast.jobs[n]?'fast':TIERS.mid.jobs[n]?'mid':'slow';
+    if(fresh[n]){sources[n]=fresh[n];oldest=Math.min(oldest,cache[tier].at);continue;}
+    failed++;
+    const l=cache.last[n];
     if(l&&clock-l.at<=GRACE_MS){sources[n]=l.data;oldest=Math.min(oldest,l.at);if(clock-l.at>FRESH_MS)stale=true;}
-    else{sources[n]=null;if(fastJobs[n])stale=true;}
+    else{sources[n]=null;if(tier!=='slow')stale=true;}
   }
   if(!sources.analytics&&!sources.quick)throw Object.assign(new Error('Ops HQ unavailable'),{status:503});
   // `failed` counts sources whose latest refresh failed even if a last-good copy is being reused.
   return buildOpsHq(sources,now,since,{stale,failed,generatedAt:new Date(oldest).toISOString()});
 }
-export function _resetOpsHqCache(){state.clear();}
+export function _resetOpsHqCache(){cache.fast={};cache.mid={};cache.slow={};cache.last={};}
