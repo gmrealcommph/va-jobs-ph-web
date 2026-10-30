@@ -145,3 +145,17 @@ test('incomplete is set when an event source is missing or at its cap',()=>{
 test('health labels: contract keys unchanged, docs wording lives in the scene',()=>{
   const m=buildOpsHq(all,now).metrics.health;assert.deepEqual(Object.keys(m).sort(),['alerts','database','edge','queue_depth']);
 });
+import fs from 'node:fs';
+import path from 'node:path';
+test('page assets: every referenced file ships, models are gzip, no external hosts, no secrets or personal data in public/ops-hq',()=>{
+  const dir=path.resolve('public/ops-hq'),html=opsHqPage();
+  const refs=[...html.matchAll(/(?:src|href)="(\/ops-hq\/[^"]+)"/g)].map(m=>m[1]);
+  assert.ok(refs.length>=3);
+  for(const r of refs)assert.ok(fs.existsSync(path.join(dir,r.slice(8))),r);
+  const js=fs.readFileSync(path.join(dir,'ops-hq.js'),'utf8');
+  const models=[...js.matchAll(/"\/ops-hq\/(m_[a-z]+\.bin)"/g)].map(m=>m[1]);
+  assert.equal(new Set(models).size,8);
+  for(const m of new Set(models)){const b=fs.readFileSync(path.join(dir,m));assert.deepEqual([b[0],b[1]],[0x1f,0x8b],m);assert.ok(b.length<25*1024*1024);}
+  for(const f of ['ops-hq.js','ops-hq.css'])assert.doesNotMatch(fs.readFileSync(path.join(dir,f),'utf8'),/https?:\/\/(?!www\.w3\.org)|sb_(publishable|secret)|eyJ[A-Za-z0-9_-]{20,}|service_role|@[a-z0-9-]+\.[a-z]{2,}/i,f);
+  assert.match(js,/\/admin\/api\/ops-hq/);
+});
