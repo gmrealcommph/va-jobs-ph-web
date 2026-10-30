@@ -61,8 +61,9 @@ const D=[
  {id:'comms',name:'Communications',color:'#2f8fd8',ic:'mega',px:214,py:782,h:215,mh:.349,hd:.143,card:[58,790,252],rows:()=>[['Sent Today',st.sent],['Delivered',st.deliv],['Suppressed',st.supp,1]]},
  {id:'refer',name:'Refer & Earn',color:'#3aa35a',ic:'plus',px:524,py:788,h:215,mh:.729,hd:.326,card:[392,790,244],rows:()=>[['Verified Signups',st.ref],['Eligible Conversions',st.rw],['On Hold',st.hold]]},
  {id:'chief',name:'Chief of Staff',color:'#7a4a8e',ic:null,px:845,py:800,h:300,mh:.434,hd:.274,card:null,rows:()=>[]},
- {id:'health',name:'System Health',color:'#6b7a89',ic:'gear',px:1232,py:788,h:232,mh:.609,hd:.283,card:[1090,780,264],rows:()=>[['Database',st.db,'h'],['Edges',st.edge,'h'],['Queues',st.q],['Alerts',st.alerts,1]]}];
+ {id:'health',name:'System Health',color:'#6b7a89',ic:'gear',px:1232,py:788,h:232,mh:.609,hd:.283,card:[1090,780,264],rows:()=>[['Admin data',st.db,'h'],['Reads worker',st.edge,'h'],['Reads queue',st.q],['Alerts',st.alerts,1]]}];
 const st={db:'Healthy',edge:'Healthy',tot:2557,newM:142,jobs:2466,newJ:57,jp:23,qd:12,qp:6,qc:1824,qf:8,pro:2,upg:1,exp:0,ref:0,rw:0,hold:0,sent:0,deliv:0,supp:22,q:3,alerts:0,tasks:5,done:11,grow:'+6%'};
+const DEMO0=JSON.stringify(st);
 const byId={};D.forEach(d=>byId[d.id]=d);
 const ICON={people:'<circle cx="9" cy="8" r="3.2"/><circle cx="17" cy="9" r="2.6"/><path d="M3 19c0-3.6 3-5.6 6-5.6s6 2 6 5.6z"/><path d="M15.4 14.4c3 0 5.6 1.5 5.6 4.6h-4.2z"/>',brief:'<path d="M3 9h18v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1z"/><path d="M8 9V6.5h8V9" fill="none" stroke="#fff" stroke-width="2"/>',doc:'<path d="M6 3h8l5 5v13H6z"/><path d="M9 12h7M9 15h7M9 18h5" stroke="#f2b034" stroke-width="1.6"/>',crown:'<path d="M3 19L2 7l5 4 5-7 5 7 5-4-1 12z"/>',mega:'<path d="M3 10v4l11 5V5z"/><rect x="15" y="9" width="5" height="6" rx="2.5"/>',plus:'<circle cx="9" cy="8" r="3.4"/><path d="M2.5 20c0-4 3-6 6.5-6s6.500 2 6.500 6z"/><path d="M19 8v6M16 11h6" stroke="#fff" stroke-width="2.2" fill="none"/>',gear:'<circle cx="12" cy="12" r="4.6" fill="none" stroke="#fff" stroke-width="3"/><circle cx="12" cy="12" r="8.2" fill="none" stroke="#fff" stroke-width="3.2" stroke-dasharray="3 3.1"/>'};
 function cardHTML(d){return'<div class="hd"><span class="ic" style="background:'+d.color+'"><svg viewBox="0 0 24 24">'+ICON[d.ic]+'</svg></span><b>'+d.name+'</b><span class="bars"><i style="height:45%"></i><i style="height:70%"></i><i style="height:100%"></i></span></div>'+d.rows().map(r=>{const v=r[1],bad=r[2]===1&&Number(String(v).replace(/,/g,''))>0;const hc=r[2]==='h'?({Healthy:'ok',Warning:'warn',Critical:'bad'}[v]||''):'';return'<div class="rw"><span>'+r[0]+'</span><b class="'+(bad?'bad':r[2]===2?'ok':hc)+'">'+((r[2]===2||r[2]==='h')?'● ':'')+fmt(v)+'</b></div>'}).join('')}
@@ -228,15 +229,17 @@ function confetti(d){if(RM)return;const cs=['#e8a22c','#2f8f5b','#d4533b','#3b7d
 function tween(dur,fn,done){tws.push({t:0,dur,fn,done})}const tws=[];
 let sel=null;
 function react(id,kind,o){const d=byId[id];if(!d)return;let label;o=o||{};
- if(kind==='alert'){if(id==='health'&&!o.live)st.alerts++;label=o.label||'Check this';if(!RM)tween(.9,p=>{d.shake=Math.sin(p*Math.PI*14)*.004*(1-p)},()=>d.shake=0);if(d.fc)setExpr(d.fc,'surprised',1.8)}
- else{label=o.label||GOOD[id]();confetti(d);if(!RM)tween(1.4,p=>{d.hop=Math.abs(Math.sin(p*Math.PI*3))*.012*(1-p*.4);d.tilt=Math.sin(p*Math.PI*6)*.05*(1-p)},()=>{d.hop=0;d.tilt=0});tween(1.2,p=>{d.pulse=Math.sin(p*Math.PI)},()=>d.pulse=0);if(d.fc)setExpr(d.fc,'happy',2.8)}
+ const sim=!o.live&&!LIVE.on;
+ if(window.opsHq&&window.opsHq.onReact)window.opsHq.onReact(id,kind,o,sim);   // only the offline demo may change counters; live reactions and live-mode previews are visual only
+ if(kind==='alert'){if(sim&&id==='health')st.alerts++;label=o.label||(sim?'Check this':'Preview');if(!RM)tween(.9,p=>{d.shake=Math.sin(p*Math.PI*14)*.004*(1-p)},()=>d.shake=0);if(d.fc)setExpr(d.fc,'surprised',1.8)}
+ else{label=o.label||(sim?GOOD[id]():'Preview');confetti(d);if(!RM)tween(1.4,p=>{d.hop=Math.abs(Math.sin(p*Math.PI*3))*.012*(1-p*.4);d.tilt=Math.sin(p*Math.PI*6)*.05*(1-p)},()=>{d.hop=0;d.tilt=0});tween(1.2,p=>{d.pulse=Math.sin(p*Math.PI)},()=>d.pulse=0);if(d.fc)setExpr(d.fc,'happy',2.8)}
  pop(d,label,kind==='alert'?'#d4533b':d.color);refreshCards();setNum($('nTot'),st.tot,true);setNum($('nJobs'),st.jobs,true);
  if(d.el){d.el.classList.add('hot');setTimeout(()=>d.el.classList.remove('hot'),900)}if(sel===d)showInfo(d)}
 window.react=react;
 
 
 /* ---------- live data: ONE endpoint, contract = GET /admin/api/ops-hq ---------- */
-const LIVE={url:window.OPS_HQ_URL||'/admin/api/ops-hq',on:false,since:null,seen:new Set(),order:[],first:true,ok:false,at:0,fails:0,timer:null,gen:null,stale:true};
+const LIVE={url:window.OPS_HQ_URL||'/admin/api/ops-hq',on:false,since:null,seen:new Set(),order:[],first:true,quiet:true,more:0,ok:false,at:0,fails:0,timer:null,gen:null,stale:true};
 const EVT={member_registered:'+1 member',job_added:'New jobs',quick_read_completed:'Article published',quick_read_failed:'Summary failed',pro_upgrade:'New Pro member',pro_renewal:'Pro renewed',referral_verified:'+1 referral',referral_eligible:'Reward eligible',email_delivered:'Email delivered',email_bounced:'Email bounced',health_warning:'Check system',health_recovered:'Back to normal',task_done:'Task done',task_created:'New task'};
 const HLAB={healthy:'Healthy',warning:'Warning',critical:'Critical',unknown:'Unknown'};
 function liveChip(){const c=document.querySelector('.demo');if(!c)return;
@@ -254,27 +257,34 @@ function applyMetrics(m){if(!m||typeof m!=='object')return false;const g=(a,b)=>
  st.db=HLAB[g('health','database')]||'Unknown';st.edge=HLAB[g('health','edge')]||'Unknown';st.q=g('health','queue_depth');st.alerts=g('health','alerts');
  st.tasks=g('chief','open');st.done=g('chief','done');
  refreshCards();setNum($('nTot'),st.tot,true);setNum($('nJobs'),st.jobs,true);return true}
+const GAP_MS=300000,OVERLAP_MS=120000,MAX_CATCHUP=40;
 function applyPayload(j){if(!j||typeof j!=='object'||!applyMetrics(j.metrics))throw new Error('bad payload');
- LIVE.stale=!!j.stale;LIVE.gen=j.generated_at;LIVE.at=Date.now();LIVE.ok=true;LIVE.fails=0;
+ const gap=LIVE.at>0&&Date.now()-LIVE.at>GAP_MS;           // long disconnection / sleeping tablet: do not replay the backlog as animations
+ LIVE.stale=!!j.stale;LIVE.gen=j.generated_at;LIVE.at=Date.now();LIVE.ok=true;LIVE.fails=0;LIVE.incomplete=!!j.incomplete;
+ const more=j.has_more===true;
  const ev=(Array.isArray(j.events)?j.events:[]).filter(e=>e&&e.event_id&&byId[e.desk]&&(e.kind==='good'||e.kind==='alert')).sort((a,b)=>(a.occurred_at<b.occurred_at?-1:a.occurred_at>b.occurred_at?1:(a.event_id<b.event_id?-1:1)));
- const fresh=ev.filter(e=>!LIVE.seen.has(e.event_id));
+ const fresh=ev.filter(e=>!LIVE.seen.has(e.event_id));      // ids, not timestamps, decide what is new, so equal timestamps are safe
  fresh.forEach(e=>{LIVE.seen.add(e.event_id);LIVE.order.push(e.event_id);if(e.occurred_at&&(!LIVE.since||e.occurred_at>LIVE.since))LIVE.since=e.occurred_at});
  while(LIVE.order.length>800)LIVE.seen.delete(LIVE.order.shift());
- if(LIVE.first){LIVE.first=false;return}                       // first load: show numbers only, never replay history
+ LIVE.more=more?LIVE.more+1:0;                               // server says more events are waiting: poll again soon
+ const quiet=LIVE.first||gap||LIVE.quiet;                   // first load, reconnect and the whole silent catch-up (including its last page): numbers only
+ LIVE.quiet=more&&(LIVE.first||gap||LIVE.quiet);LIVE.first=false;
+ if(quiet)return;
  const grp={};fresh.forEach(e=>{const k=e.desk+'|'+e.kind+'|'+e.type;(grp[k]=grp[k]||{e,n:0}).n+=Math.max(1,e.count|0)});
  Object.values(grp).slice(0,4).forEach((g,i)=>setTimeout(()=>{const lab=(EVT[g.e.type]||(g.e.kind==='alert'?'Check this':'New activity'))+(g.n>1?' ×'+g.n:'');react(g.e.desk,g.e.kind,{live:true,label:lab})},i*900))}
+function sinceParam(){if(!LIVE.since)return'';const t=Date.parse(LIVE.since);return Number.isFinite(t)?'?since='+encodeURIComponent(new Date(t-(LIVE.more>0?0:OVERLAP_MS)).toISOString()):''}   // overlap catches late-committed rows (dedupe is by id); no overlap while paging, so paging always advances
 async function livePoll(){if(!LIVE.on||document.hidden)return;
- try{const r=await fetch(LIVE.url+(LIVE.since?'?since='+encodeURIComponent(LIVE.since):''),{credentials:'include',cache:'no-store',headers:{Accept:'application/json'}});
+ try{const r=await fetch(LIVE.url+sinceParam(),{credentials:'include',cache:'no-store',headers:{Accept:'application/json'}});
   if(!r.ok)throw new Error('http '+r.status);applyPayload(await r.json())}
  catch(e){LIVE.ok=false;LIVE.fails++;if(!LIVE.at)applyMetrics({})}
- liveChip();clearTimeout(LIVE.timer);if(LIVE.on)LIVE.timer=setTimeout(livePoll,Math.min(60000,15000*Math.pow(2,Math.min(LIVE.fails,2))))}
+ liveChip();clearTimeout(LIVE.timer);if(LIVE.on)LIVE.timer=setTimeout(livePoll,LIVE.ok&&LIVE.more>0&&LIVE.more<MAX_CATCHUP?1500:Math.min(60000,15000*Math.pow(2,Math.min(LIVE.fails,2))))}
 function setLive(on){LIVE.on=on;$('bLive').textContent='Live data: '+(on?'on':'off');$('bLive').setAttribute('aria-pressed',on);
- if(on){demo=false;$('bDemo').textContent='Demo mode: off';$('bDemo').setAttribute('aria-pressed',false);LIVE.first=true;LIVE.since=null;LIVE.seen.clear();LIVE.order=[];LIVE.at=0;applyMetrics({});liveChip();livePoll()}
- else{clearTimeout(LIVE.timer);liveChip()}}
+ if(on){demo=false;$('bDemo').textContent='Demo mode: off';$('bDemo').setAttribute('aria-pressed',false);LIVE.first=true;LIVE.quiet=true;LIVE.more=0;LIVE.since=null;LIVE.seen.clear();LIVE.order=[];LIVE.at=0;applyMetrics({});liveChip();livePoll()}
+ else{clearTimeout(LIVE.timer);Object.assign(st,JSON.parse(DEMO0));demo=true;$('bDemo').textContent='Demo mode: on';$('bDemo').setAttribute('aria-pressed',true);refreshCards();setNum($('nTot'),st.tot,true);setNum($('nJobs'),st.jobs,true);liveChip()}}
 $('bLive').onclick=()=>setLive(!LIVE.on);
 document.addEventListener('visibilitychange',()=>{if(!document.hidden&&LIVE.on)livePoll()});
 setInterval(liveChip,5000);
-window.opsHq={apply:applyPayload,state:LIVE};
+window.opsHq={apply:applyPayload,state:LIVE,react,st,setLive,sinceParam};
 
 
 /* ---------- display: fill the whole screen (tablet) ---------- */
@@ -298,9 +308,8 @@ function select(d){sel=d;selDesk.value=d.id;showInfo(d)}
 selDesk.onchange=()=>select(byId[selDesk.value]);
 $('bGood').onclick=()=>react(selDesk.value,'good');$('bBad').onclick=()=>react(selDesk.value,'alert');
 let night=false,nk=0;$('bNight').onclick=e=>{night=!night;e.currentTarget.setAttribute('aria-pressed',night);stage.classList.toggle('night',night)};
-let demo=true,demoT=2;$('bDemo').onclick=e=>{demo=!demo;e.currentTarget.textContent='Demo mode: '+(demo?'on':'off');e.currentTarget.setAttribute('aria-pressed',demo)};
+let demo=true,demoT=2;$('bDemo').onclick=e=>{if(LIVE.on)return;demo=!demo;e.currentTarget.textContent='Demo mode: '+(demo?'on':'off');e.currentTarget.setAttribute('aria-pressed',demo)};
 if(window.OPS_HQ_URL||/[?&]live=1/.test(location.search)||location.pathname.indexOf('/admin/ops-hq')===0)setLive(true);
-let fill=false;$('bFill').onclick=e=>{fill=!fill;e.currentTarget.setAttribute('aria-pressed',fill);D.slice(1).filter(d=>!d.real).forEach(d=>{d.slot.visible=fill;d.tag.style.display=fill?'none':''})};
 $('load').style.display='none';
 
 /* ---------- loop ---------- */
@@ -310,7 +319,7 @@ function frame(now){
  if(document.hidden){last=now;return}
  const dt=Math.min(.05,(now-last)/1000);last=now;simT+=dt;const t=simT,amp=RM?0:1;
  for(let i=tws.length-1;i>=0;i--){const w=tws[i];w.t+=dt;const p=Math.min(1,w.t/w.dur);w.fn(p);if(p>=1){tws.splice(i,1);w.done&&w.done()}}
- if(demo){demoT-=dt;if(demoT<=0){demoT=3.5+Math.random()*3.5;const d=D[Math.floor(Math.random()*D.length)];react(d.id,Math.random()<.12?'alert':'good')}}
+ if(demo&&!LIVE.on){demoT-=dt;if(demoT<=0){demoT=3.5+Math.random()*3.5;const d=D[Math.floor(Math.random()*D.length)];react(d.id,Math.random()<.12?'alert':'good')}}
  nk+=((night?1:0)-nk)*Math.min(1,dt*3);hemi.intensity=lerp(1.0,.5,nk);sun.intensity=lerp(.5,.15,nk);
  D.forEach((d,i)=>{if(!d.slot.visible||!d.body)return;const br=Math.sin(t*1.7+i)*amp;
   d.body.position.set(d.shake*S,0,0);d.body.rotation.set(0,d.yaw+d.tilt*.4,0);d.body.scale.set(S,S*(1+br*.005+d.hop*1.6),S)});

@@ -94,7 +94,7 @@ test('API: anonymous 401, non-admin 403, bad since 400, POST 405, headers privat
   assert.equal((await adminEndpoint(req('/admin/api/ops-hq',{method:'POST'}),{},{session:sess,call:mk()})).status,405);
   const ok=await adminEndpoint(req('/admin/api/ops-hq'),{},{session:sess,call:mk()});
   assert.equal(ok.status,200);assert.match(ok.headers.get('cache-control'),/no-store/);
-  const j=await ok.json();assert.deepEqual(Object.keys(j).sort(),['events','generated_at','metrics','stale']);
+  const j=await ok.json();assert.deepEqual(Object.keys(j).sort(),['events','generated_at','has_more','incomplete','metrics','stale']);   // has_more/incomplete are backward-compatible additions
 });
 test('API: rate limiter blocks over-use',async()=>{
   _resetOpsHqCache();let blocked=0;
@@ -112,4 +112,36 @@ test('page: gated, strict CSP, no inline scripts, no third-party hosts',async()=
   const html=await ok.text();assert.equal(html,opsHqPage());
   assert.doesNotMatch(html,/<script>|<script[^>]*>[^<]+<\/script>|https?:\/\//);
   assert.match(OPS_HQ_CSP,/script-src 'self';/);assert.doesNotMatch(OPS_HQ_CSP.split('style-src')[0],/unsafe|https?:/);
+});
+
+const burst=(n,ts=(i)=>new Date(Date.UTC(2026,9,30,2,0,0)+i*1000).toISOString())=>({available:true,events:Array.from({length:n},(_,i)=>({event_id:'r'+String(i).padStart(3,'0'),registered_at:ts(i)}))});
+test('event paging: oldest first, nothing skipped, has_more until drained',()=>{
+  const regs=burst(150);const src={analytics,quick:{...quick,recent:[]},extended,registrations:regs,payments:{available:true,events:[]}};
+  let since=null;const seen=new Set();let pages=0,more=true;
+  while(more&&pages<10){
+    const r=buildOpsHq(src,now,since);pages++;
+    assert.ok(r.events.length<=60);for(const e of r.events)seen.add(e.event_id);
+    more=r.has_more;since=r.events[r.events.length-1].occurred_at;
+  }
+  assert.equal(seen.size,150);assert.equal(more,false);assert.ok(pages>=3);
+  const first=buildOpsHq(src,now);assert.equal(first.events[0].event_id,'reg:r000');assert.equal(first.has_more,true);
+  assert.equal(buildOpsHq({...src,registrations:burst(10)},now).has_more,false);
+});
+test('event paging never splits events that share a timestamp',()=>{
+  const same=burst(100,()=>'2026-10-30T02:00:00Z');
+  const r=buildOpsHq({analytics,quick:{...quick,recent:[]},registrations:same,payments:{available:true,events:[]}},now);
+  assert.equal(r.events.length,100);assert.equal(r.has_more,false);
+  const mixed=burst(100,(i)=>i<59?'2026-10-30T02:00:00Z':i<80?'2026-10-30T02:00:01Z':'2026-10-30T02:00:02Z');
+  const m=buildOpsHq({analytics,quick:{...quick,recent:[]},registrations:mixed,payments:{available:true,events:[]}},now);
+  assert.equal(m.events.length,80);assert.equal(m.has_more,true);   // 60th event is inside the 02:00:01 group, so the whole group is included
+});
+test('incomplete is set when an event source is missing or at its cap',()=>{
+  const full={analytics,quick:{...quick,recent:[]},registrations,payments};
+  assert.equal(buildOpsHq(full,now).incomplete,false);
+  assert.equal(buildOpsHq({...full,payments:null},now).incomplete,true);
+  assert.equal(buildOpsHq({...full,quick:{...quick,recent:Array.from({length:12},(_,i)=>({event:'queued',job_id:i,at:'2026-10-30T03:00:00Z'}))}},now).incomplete,true);
+  assert.equal(buildOpsHq({...full,registrations:burst(200)},now).incomplete,true);
+});
+test('health labels: contract keys unchanged, docs wording lives in the scene',()=>{
+  const m=buildOpsHq(all,now).metrics.health;assert.deepEqual(Object.keys(m).sort(),['alerts','database','edge','queue_depth']);
 });

@@ -2,7 +2,8 @@
 // Composes EXISTING admin RPC snapshots only. Any metric with no verified source is null,
 // never a guess. Events carry hashed ids, timestamps and counts only: no personal data.
 const TZ='Asia/Manila';
-const MAX_EVENTS=60;
+const MAX_EVENTS=60;        // normal page size
+const HARD_MAX=200;         // a page may grow past MAX_EVENTS only to finish a group of equal timestamps
 const FAST_MS=15000;        // quick reads, registration and payment snapshots (event latency)
 const MID_MS=60000;         // veeays_admin_analytics scans member/job totals; same 60s lifetime as the admin dashboard
 const SLOW_MS=120000;       // veeays_admin_extended is the heaviest RPC; refresh at most every 2 minutes
@@ -78,9 +79,20 @@ export function buildOpsHq({analytics,quick,extended,registrations,payments},now
     add({event_id:'qr:'+e.event+':'+Number(e.job_id)+':'+at,desk:'reads',kind:e.event==='completed'?'good':'alert',
       type:e.event==='completed'?'quick_read_completed':'quick_read_failed',occurred_at:at,count:1});}
   const floor=iso(since);
-  const events=[...map.values()].filter((e)=>!floor||e.occurred_at>=floor)    // inclusive: the client dedupes by id
-    .sort((a,b)=>a.occurred_at<b.occurred_at?-1:a.occurred_at>b.occurred_at?1:a.event_id<b.event_id?-1:1).slice(-MAX_EVENTS);
-  return {generated_at:meta.generatedAt||now.toISOString(),stale:!!meta.stale,metrics,events};
+  const sorted=[...map.values()].filter((e)=>!floor||e.occurred_at>=floor)    // inclusive: the client dedupes by id
+    .sort((a,b)=>a.occurred_at<b.occurred_at?-1:a.occurred_at>b.occurred_at?1:a.event_id<b.event_id?-1:1);
+  // Oldest first: a page never skips ahead, so the client can page forward with `since` and lose nothing.
+  // A page ends on a timestamp boundary (up to HARD_MAX) so events sharing a timestamp are never split.
+  let events=sorted,has_more=false;
+  if(sorted.length>MAX_EVENTS){
+    const cut=sorted[MAX_EVENTS-1].occurred_at;let end=MAX_EVENTS;
+    while(end<sorted.length&&end<HARD_MAX&&sorted[end].occurred_at===cut)end++;
+    events=sorted.slice(0,end);has_more=end<sorted.length;
+  }
+  // `incomplete`: some event source was unavailable or hit its own row cap, so events may be missing (metrics are unaffected).
+  const incomplete=!registrations?.available||!payments?.available||!quick||
+    (registrations.events?.length||0)>=200||(payments.events?.length||0)>=200||(quick.recent?.length||0)>=12;
+  return {generated_at:meta.generatedAt||now.toISOString(),stale:!!meta.stale,metrics,events,has_more,incomplete};
 }
 
 // Admin-only data is identical for every admin, so one shared cache (per Worker isolate) serves all

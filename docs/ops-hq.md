@@ -23,9 +23,17 @@ Unavailable metrics are `null`; the scene shows "—" / "Unknown". Nothing is es
 | comms.delivered_today / suppressed_or_bounced_today | none | Resend delivered events are only logged; bounces are stored without a date |
 | refer.* | none | see "Unverified schemas" |
 | chief.* | none | no source |
-| health.database | real check: all 5 RPC sources answered (healthy), some failed (warning), none (critical) | |
-| health.edge | real check: minute-cron Quick Read worker draining its queue (oldest due item < 10 min healthy, < 30 warning, else critical); `unknown` when automation is disabled | |
+| health.database | **Admin RPC availability only**: all 5 admin RPC sources answered (healthy), some failed (warning), none (critical). Shown in the scene as "Admin data". It says nothing about Supabase as a whole (auth, storage, realtime, other schemas) | |
+| health.edge | **Quick Reads processing only**: the minute-cron Quick Read worker is draining its queue (oldest due item < 10 min healthy, < 30 warning, else critical); `unknown` when automation is disabled. Shown as "Reads worker". It says nothing about Cloudflare or the other Workers/crons | |
 | health.queue_depth / alerts | `counts.queued`; failed sources + late worker + unmatched running reads | |
+
+## Events, paging and reconnection
+Contract fields are unchanged. Two backward-compatible fields were added: `has_more` (boolean) and `incomplete` (boolean).
+- `?since=` is inclusive. Events are returned **oldest first**, 60 per page; a page may grow (up to 200) to finish a group of equal timestamps, so no event is split or skipped. `has_more: true` means call again with `since` = last event's `occurred_at`.
+- `incomplete: true` means an event source was unavailable or hit its own row cap (200 registrations/payments, 12 recent Quick Reads); events may be missing. Metrics are unaffected.
+- Event ids are stable (`reg:`/`pay:` + hash, `qr:` + event + job id + time) and unique per payload.
+- Client: new-ness is decided by event id, never by timestamp. It requests `since` with a 2-minute overlap (catches late-committed rows) except while paging (`has_more`), polls again after 1.5 s while `has_more`, and treats first load, a gap of more than 5 minutes (sleep/offline) and the whole catch-up as **silent**: numbers update, history is not replayed as animations. Reactions are grouped per desk/type (`×N`), max 4 per poll.
+- Live reactions and previews never change a counter. Counters change only in offline demo mode. Turning live data off restores the simulated baseline, so real numbers are never decorated with simulated ones.
 
 ## Unverified schemas (documented gap)
 `veeays_referral`, `veeays_campaign` and `veeays_lifecycle` exist in the production Supabase database but are
