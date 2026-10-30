@@ -10,15 +10,20 @@ const quick={counts:{queued:5,processing:1,stopped_other:4},all_reads:{ready:90,
 const extended={available:true,members:{expiring_7d:3},email:{accepted_in_period:11}};
 const registrations={available:true,events:[{event_id:'a',registered_at:'2026-10-30T02:00:00Z'},{event_id:'a',registered_at:'2026-10-30T02:00:00Z'}]};
 const payments={available:true,events:[{event_id:'b',confirmed_at:'2026-10-30T01:00:00Z',amount_minor:19900,currency:'PHP'}]};
-const all={analytics,quick,extended,registrations,payments};
+const referral={referred_signups:7,eligible_pro_conversions:2,pending_commissions:1,conversion_rate:28.6,commissions_total:1};
+const holds={active:[{commission_id:'SECRET-ID',reason:'SECRET REASON',held_at:'2026-10-30T00:00:00Z'},{commission_id:'x',reason:'y'}],audit:[{actor_id:'SECRET-ACTOR'}]};
+const all={analytics,quick,extended,registrations,payments,referral,holds};
 
 test('metrics use only verified sources; unavailable ones are null',()=>{
   const r=buildOpsHq(all,now);
   assert.deepEqual(r.metrics.intake,{new_today:6,total:120,growth_pct:50});
   assert.equal(r.metrics.pro.expiring_7d,3);assert.equal(r.metrics.comms.accepted_today,11);
   assert.equal(r.metrics.reads.ready_total,90);assert.equal(r.metrics.reads.stopped,4);assert.equal(buildOpsHq({},now).metrics.reads.stopped,null);assert.equal(r.metrics.pro.upgrades_today,1);
-  for(const [d,k] of [['refer','verified_signups'],['refer','eligible_conversions'],['refer','on_hold'],['comms','delivered_today'],['comms','suppressed_or_bounced_today'],['chief','open'],['chief','done'],['jobs','processing']])
+  for(const [d,k] of [['comms','delivered_today'],['comms','suppressed_or_bounced_today'],['chief','open'],['chief','done'],['jobs','processing']])
     assert.equal(r.metrics[d][k],null,d+'.'+k);
+  assert.deepEqual(r.metrics.refer,{verified_signups:7,eligible_conversions:2,on_hold:2});
+  assert.deepEqual(buildOpsHq({},now).metrics.refer,{verified_signups:null,eligible_conversions:null,on_hold:null});
+  assert.doesNotMatch(JSON.stringify(r),/SECRET/);
   const empty=buildOpsHq({},now).metrics;
   assert.equal(empty.intake.total,null);assert.equal(empty.pro.expiring_7d,null);assert.equal(empty.comms.accepted_today,null);
 });
@@ -45,7 +50,7 @@ test('health reflects real checks',()=>{
   assert.equal(healthFrom({failed:0,total:5,quick:{...quick,automation:{enabled:false}},now}).edge,'unknown');
   assert.equal(healthFrom({failed:0,total:5,quick:{...quick,unmatched_running:2},now}).alerts,1);
 });
-const rpcs={veeays_admin_analytics:analytics,veeays_admin_quick_reads:quick,veeays_admin_extended:extended,veeays_admin_registration_snapshot:registrations,veeays_admin_payment_snapshot:payments};
+const rpcs={veeays_referral_admin_analytics:referral,veeays_referral_admin_dispute_hold_dashboard:holds,veeays_admin_analytics:analytics,veeays_admin_quick_reads:quick,veeays_admin_extended:extended,veeays_admin_registration_snapshot:registrations,veeays_admin_payment_snapshot:payments};
 test('cache tiers: fast 15s, analytics 60s, extended 120s; shared across admins; failures fall back then go stale',async()=>{
   _resetOpsHqCache();const counts={};let fail=new Set();
   const call=async(e,t,name)=>{counts[name]=(counts[name]||0)+1;if(fail.has(name))throw Object.assign(new Error('x'),{status:500});return rpcs[name];};
@@ -74,7 +79,7 @@ test('concurrent requests share one in-flight refresh per tier',async()=>{
   _resetOpsHqCache();let n=0;
   const call=async(e,t,name)=>{n++;await new Promise(r=>setTimeout(r,20));return rpcs[name];};
   await Promise.all(Array.from({length:10},()=>opsHqPayload({},'t',call,null,now)));
-  assert.equal(n,5);   // 3 fast + 1 analytics + 1 extended, once
+  assert.equal(n,7);   // 3 fast + 3 mid (analytics, referral, holds) + 1 extended, once
 });
 test('stale payload is served from last good data when all sources then fail',async()=>{
   _resetOpsHqCache();let down=false;

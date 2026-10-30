@@ -21,7 +21,8 @@ Unavailable metrics are `null`; the scene shows "—" / "Unknown". Nothing is es
 | pro.expiring_7d | `veeays_admin_extended` `members.expiring_7d` (from `profiles.pro_expires_at`) | |
 | comms.accepted_today | `veeays_admin_extended` `email.accepted_in_period` (period = today) | digests + strong-match batches only; provider acceptance, **not** delivery |
 | comms.delivered_today / suppressed_or_bounced_today | none | Resend delivered events are only logged; bounces are stored without a date |
-| refer.* | none | see "Unverified schemas" |
+| refer.verified_signups / eligible_conversions | `veeays_referral_admin_analytics()` `referred_signups` / `eligible_pro_conversions` | existing admin RPC; counts `attributions.verified_signup_at is not null` and `pro_conversions.status='eligible' and is_test=false`. Read-only, admin-gated |
+| refer.on_hold | length of `veeays_referral_admin_dispute_hold_dashboard().active` (commissions with `dispute_hold`) | only the count is used; hold reasons and ids are never forwarded |
 | chief.* | none | no source |
 | health.database | **Admin RPC availability only**: all 5 admin RPC sources answered (healthy), some failed (warning), none (critical). Shown in the scene as "Admin data". It says nothing about Supabase as a whole (auth, storage, realtime, other schemas) | |
 | health.edge | **Quick Reads processing only**: the minute-cron Quick Read worker is draining its queue (oldest due item < 10 min healthy, < 30 warning, else critical); `unknown` when automation is disabled. Shown as "Reads worker". It says nothing about Cloudflare or the other Workers/crons | |
@@ -35,7 +36,12 @@ Contract fields are unchanged. Two backward-compatible fields were added: `has_m
 - Client: new-ness is decided by event id, never by timestamp. It requests `since` with a 2-minute overlap (catches late-committed rows) except while paging (`has_more`), polls again after 1.5 s while `has_more`, and treats first load, a gap of more than 5 minutes (sleep/offline) and the whole catch-up as **silent**: numbers update, history is not replayed as animations. Reactions are grouped per desk/type (`×N`), max 4 per poll.
 - Live reactions and previews never change a counter. Counters change only in offline demo mode. Turning live data off restores the simulated baseline, so real numbers are never decorated with simulated ones.
 
-## Unverified schemas (documented gap)
+## Referral and Communications sources (verified on staging `megedmsfdwtjxjejrxaq`, read-only)
+The `veeays_referral`, `veeays_lifecycle` and `veeays_campaign_analytics` schemas exist on staging. Verified status values: commissions `pending|approved|rejected|paid|reversed` (+ `dispute_hold` boolean, `is_test`), pro_conversions `eligible|ineligible|reversed`, payout_requests `pending|approved|rejected|paid|cancelled`, lifecycle deliveries `pending|leased|sending|accepted|held|skipped`.
+No referral payout, program or policy RPC is ever called; only the two read-only count sources above. Production has not been inspected: confirm the same RPCs and columns exist there before production.
+Communications: no existing admin RPC counts lifecycle email deliveries (`veeays_lifecycle.deliveries`) or Resend delivered/bounced events, so those stay `null`. A new admin RPC would need a migration and your approval.
+
+## (Superseded) Unverified schemas
 `veeays_referral`, `veeays_campaign` and `veeays_lifecycle` exist in the production Supabase database but are
 **not in this repository** and this build had **no database access**, so their tables, columns and status values are
 NOT VERIFIED. Referral and Communications metrics beyond `accepted_today` therefore stay `null`.

@@ -35,7 +35,7 @@ export function healthFrom({failed,total,quick,now}){
   return {database,edge,alerts};
 }
 
-export function buildOpsHq({analytics,quick,extended,registrations,payments},now=new Date(),since=null,meta={}){
+export function buildOpsHq({analytics,quick,extended,registrations,payments,referral,holds},now=new Date(),since=null,meta={}){
   const today=dayKey(now), yesterday=dayKey(new Date(now.getTime()-86400000));
   const daily=Array.isArray(analytics?.daily)?analytics.daily:[];
   const dayRow=(k)=>daily.find((x)=>String(x.day).slice(0,10)===k)||null;
@@ -45,7 +45,7 @@ export function buildOpsHq({analytics,quick,extended,registrations,payments},now
   const counts=quick?.counts||null, reads=quick?.all_reads||null;
   const upgradesToday=payments?.available&&Array.isArray(payments.events)
     ? payments.events.filter((e)=>Number.isFinite(Date.parse(e.confirmed_at))&&dayKey(new Date(e.confirmed_at))===today).length : null;
-  const all={analytics,quick,extended,registrations,payments};
+  const all={analytics,quick,extended,registrations,payments,referral,holds};
   const failed=meta.failed??Object.values(all).filter((v)=>!v).length;
   const health=healthFrom({failed,total:Object.keys(all).length,quick,now});
   const metrics={
@@ -57,8 +57,12 @@ export function buildOpsHq({analytics,quick,extended,registrations,payments},now
       stopped:counts?num(counts.stopped_other):null},
     pro:{active:num(analytics?.pro_access),upgrades_today:upgradesToday,
       expiring_7d:extended?.available?num(extended.members?.expiring_7d):null},
-    // No referral tables exist in this repo (veeays_referral: NOT FOUND); stay null until a source exists.
-    refer:{verified_signups:null,eligible_conversions:null,on_hold:null},
+    // Existing admin RPCs only (no new SQL): veeays_referral_admin_analytics counts verified signups and LIVE
+    // (is_test=false) eligible conversions; on_hold = number of commissions under dispute hold, taken from the
+    // length of veeays_referral_admin_dispute_hold_dashboard().active. Hold reasons/ids are never forwarded.
+    refer:{verified_signups:referral?num(referral.referred_signups):null,
+      eligible_conversions:referral?num(referral.eligible_pro_conversions):null,
+      on_hold:holds&&Array.isArray(holds.active)?holds.active.length:null},
     // accepted_today = digests + strong-match batches accepted by the provider today (NOT delivery).
     // Delivered/bounced are only logged, never stored, so they stay null.
     comms:{accepted_today:extended?.available&&extended.email?num(extended.email.accepted_in_period):null,
@@ -100,7 +104,8 @@ export function buildOpsHq({analytics,quick,extended,registrations,payments},now
 // Concurrent callers share one in-flight refresh per tier.
 const TIERS={
   fast:{ms:FAST_MS,jobs:{quick:['veeays_admin_quick_reads',()=>({})],registrations:['veeays_admin_registration_snapshot',()=>({})],payments:['veeays_admin_payment_snapshot',()=>({})]}},
-  mid:{ms:MID_MS,jobs:{analytics:['veeays_admin_analytics',(d,y)=>({p_start:y,p_end:d})]}},
+  mid:{ms:MID_MS,jobs:{analytics:['veeays_admin_analytics',(d,y)=>({p_start:y,p_end:d})],
+    referral:['veeays_referral_admin_analytics',()=>({})],holds:['veeays_referral_admin_dispute_hold_dashboard',()=>({})]}},
   slow:{ms:SLOW_MS,jobs:{extended:['veeays_admin_extended',(d)=>({p_start:d,p_end:d})]}}
 };
 export async function opsHqPayload(env,token,call,since=null,now=new Date()){
