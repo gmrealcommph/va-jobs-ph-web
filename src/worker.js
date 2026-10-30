@@ -39,7 +39,7 @@ function safeReturnPath(value) {
   const v = String(value || '');
   if (/^\/apply\/[A-Za-z0-9%._~-]{1,240}$/.test(v)) return v;
   if (/^\/jobs\/[A-Za-z0-9%._~-]{1,240}(?:\?save=1)?$/.test(v)) return v;
-  if (v === '/admin' || v === '/saved-searches' || v === '/my-jobs' || v === '/matches' || v === '/jobs' || v === '/email-preferences' || v === '/job-alerts') return v;
+  if (v === '/admin' || v === '/admin/ops-hq' || v === '/saved-searches' || v === '/my-jobs' || v === '/matches' || v === '/jobs' || v === '/email-preferences' || v === '/job-alerts') return v;
   if (v === '/pro' || v === '/onboarding' || v === '/') return v;
   return '';
 }

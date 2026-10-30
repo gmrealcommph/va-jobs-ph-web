@@ -4,6 +4,7 @@ import { visitorAnalytics } from './admin-visitors.js';
 import { cachedEmailUsage, actionCenter } from './admin-health.js';
 import {providerBalances} from './admin-balances.js';
 import {opsHqPayload} from './admin-ops-hq.js';
+import {opsHqPage,OPS_HQ_CSP} from './ops-hq-page.js';
 import {QUICK_READ_CRON} from './quick-read-scheduled.js';
 
 export function quickReadSchedule(checkedAt){
@@ -54,7 +55,7 @@ export async function adminEndpoint(request, env, {session=sessionForRequest, ca
     headers.set('content-type',type);
     return new Response(body,{status,headers});
   };
-  if(!['/admin','/admin/','/admin/api/analytics','/admin/api/quick-reads','/admin/api/ops-hq'].includes(url.pathname)) return reply('Not found',404);
+  if(!['/admin','/admin/','/admin/api/analytics','/admin/api/quick-reads','/admin/api/ops-hq','/admin/ops-hq'].includes(url.pathname)) return reply('Not found',404);
   if(request.method!=='GET') {headers.set('allow','GET'); return reply('Method not allowed',405);}
   try {
     const state=await session(request,env);
@@ -62,7 +63,7 @@ export async function adminEndpoint(request, env, {session=sessionForRequest, ca
     else if(state.refreshed===false) clearSessionCookies(headers);
     if(!state.user || !state.accessToken) {
       if(api) return reply(JSON.stringify({error:'Please sign in again.'}),401,'application/json');
-      headers.set('location','/login?return=%2Fadmin');
+      headers.set('location','/login?return='+encodeURIComponent(url.pathname==='/admin/ops-hq'?'/admin/ops-hq':'/admin'));
       return reply('',303);
     }
     if(await call(env,state.accessToken,'veeays_admin_access',{})!==true)
@@ -119,6 +120,7 @@ export async function adminEndpoint(request, env, {session=sessionForRequest, ca
       data.runtime={quick_read_enabled:env.QUICK_READ_AUTO_ENABLED==='true',payment_mode:env.PAYMONGO_MODE || 'not configured'};
       return reply(JSON.stringify(data),200,'application/json');
     }
+    if(url.pathname==='/admin/ops-hq'){headers.set('content-security-policy',OPS_HQ_CSP);return reply(opsHqPage(),200);}
     return reply(adminPage(),200);
   } catch(error) {
     const status=[401,403].includes(error.status)?error.status:503;
