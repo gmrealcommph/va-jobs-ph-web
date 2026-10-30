@@ -3,6 +3,8 @@ import { config } from './data.js';
 import { visitorAnalytics } from './admin-visitors.js';
 import { cachedEmailUsage, actionCenter } from './admin-health.js';
 import {providerBalances} from './admin-balances.js';
+import {opsHqPayload} from './admin-ops-hq.js';
+import {opsHqPage,OPS_HQ_CSP} from './ops-hq-page.js';
 import {QUICK_READ_CRON} from './quick-read-scheduled.js';
 
 export function quickReadSchedule(checkedAt){
@@ -47,13 +49,13 @@ async function rpc(env, token, name, body) {
   return response.json();
 }
 export async function adminEndpoint(request, env, {session=sessionForRequest, call=rpc, visitors=visitorAnalytics, usage=cachedEmailUsage, balances=providerBalances}={}) {
-  const url=new URL(request.url), monitor=url.pathname==='/admin/api/quick-reads', api=monitor||url.pathname==='/admin/api/analytics';
+  const url=new URL(request.url), monitor=url.pathname==='/admin/api/quick-reads', opsHq=url.pathname==='/admin/api/ops-hq', api=monitor||opsHq||url.pathname==='/admin/api/analytics';
   const headers=new Headers(privateHeaders);
   const reply=(body,status,type='text/html; charset=utf-8')=>{
     headers.set('content-type',type);
     return new Response(body,{status,headers});
   };
-  if(!['/admin','/admin/','/admin/api/analytics','/admin/api/quick-reads'].includes(url.pathname)) return reply('Not found',404);
+  if(!['/admin','/admin/','/admin/api/analytics','/admin/api/quick-reads','/admin/api/ops-hq','/admin/ops-hq'].includes(url.pathname)) return reply('Not found',404);
   if(request.method!=='GET') {headers.set('allow','GET'); return reply('Method not allowed',405);}
   try {
     const state=await session(request,env);
@@ -61,7 +63,7 @@ export async function adminEndpoint(request, env, {session=sessionForRequest, ca
     else if(state.refreshed===false) clearSessionCookies(headers);
     if(!state.user || !state.accessToken) {
       if(api) return reply(JSON.stringify({error:'Please sign in again.'}),401,'application/json');
-      headers.set('location','/login?return=%2Fadmin');
+      headers.set('location','/login?return='+encodeURIComponent(url.pathname==='/admin/ops-hq'?'/admin/ops-hq':'/admin'));
       return reply('',303);
     }
     if(await call(env,state.accessToken,'veeays_admin_access',{})!==true)
@@ -71,6 +73,11 @@ export async function adminEndpoint(request, env, {session=sessionForRequest, ca
       if(env.ADMIN_API_LIMITER){
         const limit=await env.ADMIN_API_LIMITER.limit({key:state.user.id});
         if(!limit.success){headers.set('retry-after','60');return reply(JSON.stringify({error:'Please wait before refreshing again.'}),429,'application/json');}
+      }
+      if(opsHq){
+        const since=url.searchParams.get('since');
+        if(since&&!Number.isFinite(Date.parse(since)))return reply(JSON.stringify({error:'Invalid since.'}),400,'application/json');
+        return reply(JSON.stringify(await opsHqPayload(env,state.accessToken,call,since)),200,'application/json');
       }
       if(monitor){
         const data=await call(env,state.accessToken,'veeays_admin_quick_reads',{});
@@ -113,6 +120,7 @@ export async function adminEndpoint(request, env, {session=sessionForRequest, ca
       data.runtime={quick_read_enabled:env.QUICK_READ_AUTO_ENABLED==='true',payment_mode:env.PAYMONGO_MODE || 'not configured'};
       return reply(JSON.stringify(data),200,'application/json');
     }
+    if(url.pathname==='/admin/ops-hq'){headers.set('content-security-policy',OPS_HQ_CSP);return reply(opsHqPage(),200);}
     return reply(adminPage(),200);
   } catch(error) {
     const status=[401,403].includes(error.status)?error.status:503;
