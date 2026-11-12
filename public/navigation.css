@@ -38,9 +38,9 @@ body > .veeays-navigation :is(.member-panel,.mobile-panel) a {color:#0f3d2e}
 body > .veeays-navigation :is(.member-panel,.mobile-panel) a:hover {color:#0f3d2e;background:#e4f9ec}
 body > .veeays-navigation :is(.member-panel,.mobile-panel) :is(a,summary):focus-visible {outline-color:#0f3d2e}
 body > .veeays-navigation .mobile-menu {display:none}
-@media(min-width:1151px) and (max-width:1200px) {
-  body > .veeays-navigation .header {gap:12px}
-  body > .veeays-navigation .discovery-nav a {padding-inline:10px;font-size:12px}
+@media(min-width:1151px) and (max-width:1300px) {
+  body > .veeays-navigation .header {gap:12px;grid-template-columns:auto minmax(0,1fr) auto}
+  body > .veeays-navigation .discovery-nav a {padding-inline:8px;font-size:11px}
   body > .veeays-navigation .veeays-brand {max-width:125px!important}
   body > .veeays-navigation .workspace-nav {gap:8px}
   body > .veeays-navigation .member-name {max-width:60px}
