@@ -1,15 +1,24 @@
 # VeeAys lifecycle v3
 
-The source of the ten lesson bodies and subject lines is the delivered Resend DESIGN TEST v3 batch. The compact white header and responsive logo CSS come from the approved Day 3 MOBILE FORMAT TEST. Subjects omit the preview prefix. Bodies omit preview notices and include an unsubscribe slot. The Free variants preserve the approved Pro promotion. The Pro variants remove the upgrade block and upgrade-only links and also serve as the education-only option for Free members with tips consent alone. See `schedule.mjs` for the exact milestone, stable delivery key, subject, Resend draft alias and ID.
+The ten lessons have Free and Pro HTML and plain-text variants. Free members with timely consent for both tips and Pro promotions receive the Free version. Pro members and Free members who consented only to tips receive the education-only Pro version. Resend holds matching drafts. The staging sender uses the checked-in HTML and text so it can freeze the exact provider payload without publishing a draft.
 
-Each day covers one elapsed 24-hour window measured from original registration. A skipped window expires. The candidate requires confirmed email and current, timely tips consent for every milestone. Free-member promotion additionally requires timely Pro consent. The send path must substitute the existing member-specific HTTPS unsubscribe URL and preserve one-click headers. Where applicable use the verified business mailing address before activation.
+The schedule uses elapsed time from original registration. Days 0, 2, 3, 5, 7, 10, 14, 19, 24 and 30 each have one 24-hour window. Expired windows are never replayed. Day 0 can use consent granted during its open window so that a member can confirm and opt in after registration. Later lessons require consent by the start of the corresponding window. All lessons require current consent and a confirmed email.
 
-## Integration status
+The v3 sender drops the legacy 48-hour confirmation delay and sequence-to-sequence gap. It retains active-send and existing alert/digest coordination. The database locks the control row when reserving capacity and checks exact equality with the Worker's daily and monthly caps. It also rechecks eligibility and tier before storing the payload and marking the attempt. The ledger and provider idempotency key use stable member/step delivery IDs. An ambiguous provider outcome is held for manual reconciliation.
 
-The deployed site Worker still has lifecycle settings and routes but its current scheduled handler does not invoke the legacy lifecycle sender. The historical implementation is in commit `4b11e28` under `src/lifecycle-*.js`. The separate `veeays-welcome` Worker has its own schedule and receipt workflow. This branch contains template assets and a tested candidate selection policy. It contains no production Worker, cron, or database changes.
+The separate welcome RPC and v3 Day 0 share the preferences-row lock. The first workflow to prepare a provider attempt claims welcome for that member. Existing welcome attempts and accepted receipts also block Day 0. The staging coordination is scoped to the Resend simulator address.
 
-Before connecting the sender, reconcile the deployed Worker with the recovered source and update the staging database claim/check/start contract to use the same ten exact-day windows. Retain stable historical keys, the existing unique member/step ledger, atomic claim and last-minute eligibility checks, immutable payloads, provider idempotency and ambiguity holds. Test suppression from both existing preference stores and ensure Day 0 shares an atomic receipt/reservation with the separate welcome flow. A prior legacy welcome receipt blocks lifecycle Day 0.
+## Local verification
 
-The existing RPC applies a 48-hour lifecycle gap and 48-hour post-confirmation wait. That blocks Day 0 and can block Day 3 following Day 2. Reconcile the gap with the requested cadence, validate in staging with fake recipients, and keep the current broadcast and alert coordination before connecting real sending. The live Worker caps (5/day, 50/month) also differ from database caps (500/day, 10,000/month), which fails the recovered sender's readiness equality check. Confirm the intended limits before activation. No catch-up enrollment or replay.
+```sh
+node scripts/build-lifecycle-v3.mjs --check
+node --test emails/lifecycle/v3/schedule.test.mjs test/lifecycle-v3.test.js
+```
 
-Run `node --test emails/lifecycle/v3/schedule.test.mjs` from the repository root. Resend assets are saved as drafts.
+After editing templates, regenerate the Worker bundle module with `node scripts/build-lifecycle-v3.mjs`. The integration suite executes the SQL against local Postgres via PGlite with a simulated provider. It uses a fixture schema and does not establish behavior on the hosted service.
+
+## Hosted staging status
+
+The automatic approval review rejected applying `sql/lifecycle-v3-staging.sql` to Supabase because it changes the welcome RPC in a shared schema. The staging database control is disabled, and the existing staging Worker remains in preview mode with no schedules. Hosted staging delivery and welcome-worker concurrency tests are pending migration approval and deployment. Before starting those tests, verify the separate welcome Worker's staging database target and use the simulator address only.
+
+The Worker requires the exact staging Worker origin and staging Supabase URL, mode `staging-v3`, recipient `delivered@resend.dev`, and caps that match staging control. Production authorization, production-cap selection and any required sender mailing address remain separate rollout decisions.

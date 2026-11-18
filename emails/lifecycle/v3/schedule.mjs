@@ -189,7 +189,7 @@ export function dueLifecycleEmail(member, now, enrollmentStart) {
   // deduplication boundary before the lifecycle version can be used.
   if (step.day === 0 && member.legacyWelcomeState !== 'clear') return null;
 
-  const milestone = registered + step.day * DAY;
+  const milestone = step.day === 0 ? now : registered + step.day * DAY;
   if (!activeConsent(member.consent?.tips, registered, milestone)) return null;
   const canPromote = member.plan === 'free' &&
     activeConsent(member.consent?.pro, registered, milestone);
