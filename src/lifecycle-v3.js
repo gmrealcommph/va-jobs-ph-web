@@ -16,7 +16,7 @@ async function rpc(env, name, args) {
   const key = env.SUPABASE_SERVICE_ROLE_KEY;
   const response = await fetch(`${STAGING_DB}/rest/v1/rpc/${name}`, {
     method: 'POST',
-    redirect: 'error',
+    redirect: 'manual',
     signal: AbortSignal.timeout(12_000),
     headers: {
       apikey: key,
@@ -76,7 +76,7 @@ export async function runLifecycleV3(env, { call = rpc, request = fetch } = {}) 
     started = true;
     const result = await request('https://api.resend.com/emails', {
       method: 'POST',
-      redirect: 'error',
+      redirect: 'manual',
       signal: AbortSignal.timeout(15_000),
       headers: {
         Authorization: `Bearer ${env.RESEND_API_KEY}`,
