@@ -6,7 +6,7 @@ The schedule uses elapsed time from original registration. Days 0, 2, 3, 5, 7, 1
 
 The v3 sender drops the legacy 48-hour confirmation delay and sequence-to-sequence gap. It retains active-send and existing alert/digest coordination. The database locks the control row when reserving capacity and checks exact equality with the Worker's daily and monthly caps. It also rechecks eligibility and tier before storing the payload and marking the attempt. The ledger and provider idempotency key use stable member/step delivery IDs. An ambiguous provider outcome is held for manual reconciliation.
 
-The separate welcome RPC and v3 Day 0 share the preferences-row lock. The first workflow to prepare a provider attempt claims welcome for that member. Existing welcome attempts and accepted receipts also block Day 0. The staging coordination is scoped to the Resend simulator address.
+The existing welcome RPC and v3 Day 0 serialize on the welcome delivery record. If the existing welcome RPC prepares first, its attempt blocks v3. If v3 starts first, it atomically marks the simulator account's welcome record skipped so the existing Worker cannot prepare another send. The migration leaves the welcome RPC definition unchanged.
 
 ## Local verification
 
@@ -19,6 +19,6 @@ After editing templates, regenerate the Worker bundle module with `node scripts/
 
 ## Hosted staging status
 
-The automatic approval review rejected applying `sql/lifecycle-v3-staging.sql` to Supabase because it changes the welcome RPC in a shared schema. The staging database control is disabled, and the existing staging Worker remains in preview mode with no schedules. Hosted staging delivery and welcome-worker concurrency tests are pending migration approval and deployment. Before starting those tests, verify the separate welcome Worker's staging database target and use the simulator address only.
+`sql/lifecycle-v3-staging.sql` was applied to VeeAys Staging. Rollback-only checks on hosted Supabase verified all ten window boundaries, Day 0 deduplication in both send orders, and Day 2 followed by Day 3 without the legacy 48-hour gap. The staging Worker uses the checked-in v3 sender and template module.
 
 The Worker requires the exact staging Worker origin and staging Supabase URL, mode `staging-v3`, recipient `delivered@resend.dev`, and caps that match staging control. Production authorization, production-cap selection and any required sender mailing address remain separate rollout decisions.
