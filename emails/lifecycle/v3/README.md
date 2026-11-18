@@ -19,6 +19,6 @@ After editing templates, regenerate the Worker bundle module with `node scripts/
 
 ## Hosted staging status
 
-`sql/lifecycle-v3-staging.sql` was applied to VeeAys Staging. Rollback-only checks on hosted Supabase verified all ten window boundaries, Day 0 deduplication in both send orders, and Day 2 followed by Day 3 without the legacy 48-hour gap. The staging Worker uses the checked-in v3 sender and template module.
+`sql/lifecycle-v3-staging.sql` was applied to VeeAys Staging. Rollback-only checks on hosted Supabase verified all ten window boundaries, Day 0 deduplication in both send orders, and Day 2 followed by Day 3 without the legacy 48-hour gap. The staging Worker uses the checked-in v3 sender and template module. One scheduled Day 0 run settled as accepted for `delivered@resend.dev` (Resend receipt `01a1ece2-a4a2-7213-903f-60927d3ebefa`), with the legacy welcome record marked skipped. The staging database is disabled and the Worker is in preview mode with no scheduled triggers.
 
 The Worker requires the exact staging Worker origin and staging Supabase URL, mode `staging-v3`, recipient `delivered@resend.dev`, and caps that match staging control. Production authorization, production-cap selection and any required sender mailing address remain separate rollout decisions.
