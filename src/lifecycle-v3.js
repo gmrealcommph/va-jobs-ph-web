@@ -174,7 +174,17 @@ export async function lifecycleV3Webhook(request, env, { call = rpc } = {}) {
       return new Response('Invalid event', { status: 400 });
     }
     const kind = event.type.slice('email.'.length);
-    if (await call(env, 'record_member_email_v3_event', { p_provider: event.data.email_id, p_kind: kind }) !== true) {
+    const { from, to } = event.data;
+    // The Resend account is shared. Only the VeeAys auth sender needs address
+    // matching because authentication messages lack lifecycle delivery IDs.
+    const authSender = typeof from === 'string'
+      && /^(?:no-reply@veeays\.com|[^<>]+<no-reply@veeays\.com>)$/i.test(from.trim());
+    const recipient = authSender
+      && Array.isArray(to) && to.length === 1 && typeof to[0] === 'string'
+      ? to[0].trim() : null;
+    if (await call(env, 'record_member_email_v3_event', {
+      p_provider: event.data.email_id, p_kind: kind, p_recipient: recipient
+    }) !== true) {
       throw new Error('event_not_recorded');
     }
     console.info(JSON.stringify({ event: 'member_email_provider_event', kind }));

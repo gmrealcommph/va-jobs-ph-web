@@ -81,6 +81,9 @@ language sql stable set search_path = pg_catalog as $$
    and coalesce(u.banned_until<=now(),true)
    and u.email_confirmed_at between u.created_at and now()
    and now()>=window_start.opens and now()<window_start.opens+interval '24 hours'
+   -- Day 0 is for registrations after the original v3 cutover. The historical
+   -- provider window is incomplete, so existing accounts never get a welcome.
+   and (p_step<>'welcome' or u.created_at>=c.v3_start_at)
    and p.plan in ('free','pro') and s.tips and not s.suppressed and s.token is not null
    and s.tips_at between u.created_at and timing.consent_cutoff
    and not exists(select 1 from veeays_alerts.settings a where a.user_id=u.id and a.suppressed)

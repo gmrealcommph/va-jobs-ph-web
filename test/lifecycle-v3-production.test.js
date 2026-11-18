@@ -26,6 +26,11 @@ test('production gates, exclusive Day 0 ownership, receipt retention and rollbac
       create function public.start_member_email(uuid,uuid,timestamptz) returns boolean language sql as $$select false$$;
       grant execute on function public.claim_member_email(uuid),
         public.start_member_email(uuid,uuid,timestamptz) to service_role;
+      create function public.suppress_member_email(p_provider text) returns void language sql as $$
+        insert into veeays_lifecycle.provider_events(provider_id) values(p_provider) on conflict do nothing;
+        update veeays_lifecycle.preferences set suppressed=true where user_id in
+          (select user_id from veeays_lifecycle.deliveries where provider_id=p_provider)
+      $$;
       alter table veeays_lifecycle.control drop constraint control_daily_cap_check, drop constraint control_monthly_cap_check;
       update veeays_lifecycle.control set enabled=true, daily_cap=500, monthly_cap=10000;
       with users as (
@@ -37,6 +42,12 @@ test('production gates, exclusive Day 0 ownership, receipt retention and rollbac
     const receipts = () => db.query("select id,provider_id,accepted_at from veeays_lifecycle.deliveries where state='accepted' order by id");
     const originalReceipts = (await receipts()).rows;
     assert.equal(originalReceipts.length, 9);
+    await db.exec(await sql('../sql/lifecycle-v3-continuity.sql'));
+    const preReleaseBounce = (await db.query(`select
+      public.record_member_email_v3_event('pre-release-bounce','bounced',null) as recorded,
+      has_function_privilege('anon','public.record_member_email_v3_event(text,text,text)','execute') as public_access`)).rows[0];
+    assert.deepEqual(preReleaseBounce, { recorded: true, public_access: false });
+    assert.equal((await db.query("select count(*)::int as n from veeays_lifecycle.provider_events where provider_id='pre-release-bounce'")).rows[0].n, 1);
     await db.exec(await sql('../sql/lifecycle-v3-production.sql'));
     assert.deepEqual((await receipts()).rows, originalReceipts);
     assert.deepEqual((await db.query(`
@@ -68,6 +79,8 @@ test('production gates, exclusive Day 0 ownership, receipt retention and rollbac
     assert.equal((await run()).status, 'idle');
     await db.exec(`update veeays_lifecycle.control set v3_start_at=now(),v3_cycle_start=now()-interval '1 day',
       v3_cycle_end=now()+interval '29 days'`);
+    assert.equal((await run()).status, 'idle');
+    await db.exec("update veeays_lifecycle.control set v3_start_at=now()-interval '2 hours'");
     await db.query("insert into welcome_private.deliveries(user_id,state,provider_id) values($1,'accepted','legacy-receipt')", [user]);
     assert.equal((await run()).status, 'idle');
     assert.equal((await db.query('select provider_id from welcome_private.deliveries')).rows[0].provider_id, 'legacy-receipt');
@@ -110,16 +123,12 @@ test('production gates, exclusive Day 0 ownership, receipt retention and rollbac
     await db.exec('update veeays_lifecycle.control set v3_enabled=true');
     assert.equal((await run()).status, 'idle');
 
-    await db.exec(`create function public.suppress_member_email(p_provider text) returns void language sql as $$
-      update veeays_lifecycle.preferences set suppressed=true where user_id in
-        (select user_id from veeays_lifecycle.deliveries where provider_id=p_provider)
-    $$`);
     await db.query("update welcome_private.deliveries set provider_id='welcome-a' where user_id=$1", [user]);
     const secret = new Uint8Array(32).fill(7);
     const webhookEnv = { ...env, LIFECYCLE_V3_ENABLED: 'false',
       LIFECYCLE_WEBHOOK_SECRET: 'whsec_' + Buffer.from(secret).toString('base64') };
-    const webhook = async (kind, signed = true) => {
-      const body = JSON.stringify({ type: 'email.' + kind, data: { email_id: 'welcome-a' } });
+    const webhook = async (kind, signed = true, data = { email_id: 'welcome-a' }) => {
+      const body = JSON.stringify({ type: 'email.' + kind, data });
       const timestamp = String(Math.floor(Date.now() / 1000));
       const id = 'receipt-' + kind;
       const key = await crypto.subtle.importKey('raw', secret, { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']);
@@ -138,6 +147,10 @@ test('production gates, exclusive Day 0 ownership, receipt retention and rollbac
     await db.exec('update veeays_lifecycle.control set v3_enabled=true');
     assert.equal((await webhook('complained')).status, 204);
     assert.equal((await db.query("select v3_enabled from veeays_lifecycle.control")).rows[0].v3_enabled, true);
+    assert.equal((await webhook('bounced', true, { email_id: 'other-sender', from: 'VeeAys <jobs@veeays.com>', to: [email] })).status, 204);
+    assert.equal((await db.query('select suppressed from veeays_lifecycle.preferences')).rows[0].suppressed, false);
+    assert.equal((await webhook('bounced', true, { email_id: 'auth-confirmation', from: 'VeeAys <no-reply@veeays.com>', to: [email] })).status, 204);
+    assert.equal((await db.query('select suppressed from veeays_lifecycle.preferences')).rows[0].suppressed, true);
 
     const token = (await db.query('select token from veeays_lifecycle.preferences')).rows[0].token;
     const url = `https://veeays.com/member-emails/unsubscribe?token=${token}`;
@@ -151,6 +164,12 @@ test('production gates, exclusive Day 0 ownership, receipt retention and rollbac
     }), { ...env, LIFECYCLE_V3_ENABLED: 'false' }, { call });
     assert.equal(response.status, 200);
     assert.equal((await db.query('select tips from veeays_lifecycle.preferences')).rows[0].tips, false);
+    const oneClick = link => lifecycleV3Unsubscribe(new Request(link, {
+      method: 'POST', body: new URLSearchParams({ 'List-Unsubscribe': 'One-Click' })
+    }), disabled, { call });
+    assert.equal((await oneClick(url.replace(token, 'malformed'))).status, 400);
+    assert.equal((await oneClick(url.replace(token, crypto.randomUUID()))).status, 200);
+    assert.equal((await db.query('select suppressed from veeays_lifecycle.preferences')).rows[0].suppressed, true);
   } finally {
     await db.close();
   }
