@@ -36,4 +36,6 @@ https://veeays.com/onboarding
 
 The VeeAys Team
 
+VEEAYS WEB PORTAL SERVICE, 100 San Juan ACCFA, Cabanatuan City, Nueva Ecija, Philippines
+
 Unsubscribe from optional VeeAys emails: {{{UNSUBSCRIBE_URL}}}

@@ -2,14 +2,14 @@ import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { readFile } from 'node:fs/promises';
 import { PGlite } from '@electric-sql/pglite';
-import { lifecycleV3Unsubscribe, runLifecycleV3 } from '../src/lifecycle-v3.js';
+import { lifecycleV3Unsubscribe, lifecycleV3Webhook, runLifecycleV3 } from '../src/lifecycle-v3.js';
 
 const sql = file => readFile(new URL(file, import.meta.url), 'utf8');
 const user = '10000000-0000-4000-8000-000000000001';
 const email = 'member@example.invalid';
 const env = {
   LIFECYCLE_MODE: 'production', LIFECYCLE_V3_ENABLED: 'true',
-  LIFECYCLE_DAILY_CAP: '5', LIFECYCLE_MONTHLY_CAP: '50',
+  LIFECYCLE_DAILY_CAP: '50', LIFECYCLE_MONTHLY_CAP: '1500',
   SUPABASE_URL: 'https://nwqmhqiymtqkdihjadrp.supabase.co',
   SITE_URL: 'https://veeays.com', SUPABASE_SERVICE_ROLE_KEY: 'fixture', RESEND_API_KEY: 'fixture'
 };
@@ -40,14 +40,14 @@ test('production gates, exclusive Day 0 ownership, receipt retention and rollbac
     await db.exec(await sql('../sql/lifecycle-v3-production.sql'));
     assert.deepEqual((await receipts()).rows, originalReceipts);
     assert.deepEqual((await db.query(`
-      select enabled,v3_enabled,v3_start_at='infinity' as no_cutover,daily_cap,monthly_cap,
+      select enabled,v3_enabled,v3_start_at='infinity' as no_cutover,v3_daily_cap,v3_cycle_cap,
         has_function_privilege('service_role','public.claim_member_email(uuid)','execute') as legacy_claim,
         has_function_privilege('service_role','public.start_member_email(uuid,uuid,timestamptz)','execute') as legacy_start,
         has_function_privilege('anon','public.claim_member_email_v3(uuid)','execute') as public_claim,
         to_regprocedure('public.welcome_work(text,text,uuid,uuid,uuid,jsonb,text,text,text)') is not null as legacy_welcome
       from veeays_lifecycle.control
     `)).rows[0], {
-      enabled: true, v3_enabled: false, no_cutover: true, daily_cap: 5, monthly_cap: 50,
+      enabled: true, v3_enabled: false, no_cutover: true, v3_daily_cap: 50, v3_cycle_cap: 1500,
       legacy_claim: false, legacy_start: false, public_claim: false, legacy_welcome: false
     });
     await db.query("insert into auth.users(id,email,created_at,email_confirmed_at) values($1,$2,now()-interval '1 hour',now())", [user,email]);
@@ -61,12 +61,13 @@ test('production gates, exclusive Day 0 ownership, receipt retention and rollbac
     const run = (config = env, request = neverSend, rpc = call) => runLifecycleV3(config, { call: rpc, request });
     assert.equal((await run({ ...env, LIFECYCLE_V3_ENABLED: 'false' }, neverSend, neverSend)).status, 'disabled');
     assert.equal((await run({ ...env, SITE_URL: 'https://other.example' }, neverSend, neverSend)).status, 'configuration_blocked');
-    assert.equal((await run({ ...env, LIFECYCLE_DAILY_CAP: '6' }, neverSend, neverSend)).status, 'configuration_blocked');
+    assert.equal((await run({ ...env, LIFECYCLE_DAILY_CAP: '2001' }, neverSend, neverSend)).status, 'configuration_blocked');
     assert.equal((await run()).status, 'idle');
 
     await db.exec("update veeays_lifecycle.control set v3_enabled=true, v3_start_at=now()");
     assert.equal((await run()).status, 'idle');
-    await db.exec("update veeays_lifecycle.control set v3_start_at=now()-interval '2 hours'");
+    await db.exec(`update veeays_lifecycle.control set v3_start_at=now(),v3_cycle_start=now()-interval '1 day',
+      v3_cycle_end=now()+interval '29 days'`);
     await db.query("insert into welcome_private.deliveries(user_id,state,provider_id) values($1,'accepted','legacy-receipt')", [user]);
     assert.equal((await run()).status, 'idle');
     assert.equal((await db.query('select provider_id from welcome_private.deliveries')).rows[0].provider_id, 'legacy-receipt');
@@ -74,8 +75,10 @@ test('production gates, exclusive Day 0 ownership, receipt retention and rollbac
     assert.equal((await run()).status, 'idle');
     await db.exec('truncate welcome_private.deliveries');
     // Recent historical accepted receipts count even when they lack a first-attempt timestamp.
+    await db.exec("update veeays_lifecycle.control set v3_daily_cap=5");
     await db.exec("update veeays_lifecycle.deliveries set accepted_at=now() where state='accepted'");
-    assert.equal((await run()).status, 'deferred');
+    assert.equal((await run({ ...env, LIFECYCLE_DAILY_CAP: '5' })).status, 'deferred');
+    await db.exec("update veeays_lifecycle.control set v3_daily_cap=50");
     await db.exec("update veeays_lifecycle.deliveries set accepted_at=now()-interval '90 days' where state='accepted'");
     await db.query("update auth.users set email='delivered@resend.dev' where id=$1", [user]);
     assert.equal((await run()).status, 'idle');
@@ -107,8 +110,42 @@ test('production gates, exclusive Day 0 ownership, receipt retention and rollbac
     await db.exec('update veeays_lifecycle.control set v3_enabled=true');
     assert.equal((await run()).status, 'idle');
 
+    await db.exec(`create function public.suppress_member_email(p_provider text) returns void language sql as $$
+      update veeays_lifecycle.preferences set suppressed=true where user_id in
+        (select user_id from veeays_lifecycle.deliveries where provider_id=p_provider)
+    $$`);
+    await db.query("update welcome_private.deliveries set provider_id='welcome-a' where user_id=$1", [user]);
+    const secret = new Uint8Array(32).fill(7);
+    const webhookEnv = { ...env, LIFECYCLE_V3_ENABLED: 'false',
+      LIFECYCLE_WEBHOOK_SECRET: 'whsec_' + Buffer.from(secret).toString('base64') };
+    const webhook = async (kind, signed = true) => {
+      const body = JSON.stringify({ type: 'email.' + kind, data: { email_id: 'welcome-a' } });
+      const timestamp = String(Math.floor(Date.now() / 1000));
+      const id = 'receipt-' + kind;
+      const key = await crypto.subtle.importKey('raw', secret, { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']);
+      const signature = await crypto.subtle.sign('HMAC', key, new TextEncoder().encode(id + '.' + timestamp + '.' + body));
+      return lifecycleV3Webhook(new Request('https://veeays.com/webhooks/member-emails', {
+        method: 'POST', body, headers: { 'svix-id': id, 'svix-timestamp': timestamp,
+          'svix-signature': signed ? 'v1,' + Buffer.from(signature).toString('base64') : 'v1,AAAA' }
+      }), webhookEnv, { call });
+    };
+    assert.equal((await webhook('bounced', false)).status, 401);
+    assert.equal((await webhook('bounced')).status, 204);
+    assert.equal((await webhook('suppressed')).status, 204);
+    assert.equal((await webhook('complained')).status, 204);
+    assert.deepEqual((await db.query("select v3_enabled,(select outcome from welcome_private.deliveries) as outcome from veeays_lifecycle.control")).rows[0],
+      { v3_enabled: false, outcome: 'complained' });
+    await db.exec('update veeays_lifecycle.control set v3_enabled=true');
+    assert.equal((await webhook('complained')).status, 204);
+    assert.equal((await db.query("select v3_enabled from veeays_lifecycle.control")).rows[0].v3_enabled, true);
+
     const token = (await db.query('select token from veeays_lifecycle.preferences')).rows[0].token;
     const url = `https://veeays.com/member-emails/unsubscribe?token=${token}`;
+    const disabled = { ...env, LIFECYCLE_V3_ENABLED: 'false' };
+    const confirmation = await lifecycleV3Unsubscribe(new Request(url), disabled, { call: neverSend });
+    assert.equal(confirmation.status, 200);
+    assert.match(await confirmation.text(), /<form method="post">/);
+    assert.equal((await db.query('select tips from veeays_lifecycle.preferences')).rows[0].tips, true);
     const response = await lifecycleV3Unsubscribe(new Request(url, {
       method: 'POST', body: new URLSearchParams({ 'List-Unsubscribe': 'One-Click' })
     }), { ...env, LIFECYCLE_V3_ENABLED: 'false' }, { call });

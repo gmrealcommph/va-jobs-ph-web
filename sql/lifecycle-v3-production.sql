@@ -2,11 +2,18 @@
 begin;
 
 -- Keep the old control enabled for cross-sender coordination. V3 has its own gate
--- and registration cutoff so enabling it cannot enroll pre-cutover accounts.
+-- and UTC activation timestamp. Registration age stays anchored to auth.users.
 alter table veeays_lifecycle.control
  add column v3_enabled boolean not null default false,
- add column v3_start_at timestamptz not null default 'infinity';
-update veeays_lifecycle.control set daily_cap=5, monthly_cap=50 where id;
+ add column v3_start_at timestamptz not null default 'infinity',
+ add column v3_daily_cap integer not null default 50 check (v3_daily_cap between 1 and 2000),
+ add column v3_cycle_cap integer not null default 1500 check (v3_cycle_cap between 1 and 50000),
+ add column v3_cycle_start timestamptz not null default 'infinity',
+ add column v3_cycle_end timestamptz not null default 'infinity',
+ add column v3_next_send_at timestamptz not null default '-infinity';
+alter table veeays_lifecycle.provider_events add column v3_complained_at timestamptz;
+create index deliveries_attempt_budget_idx on veeays_lifecycle.deliveries
+ (coalesce(first_attempt_at,accepted_at)) where coalesce(first_attempt_at,accepted_at) is not null;
 do $$
 begin
  if not exists (select 1 from veeays_lifecycle.control where id) then
@@ -68,7 +75,7 @@ language sql stable set search_path = pg_catalog as $$
  join veeays_lifecycle.v3_steps() v on v.step=p_step
  cross join lateral (select u.created_at+v.age_hours*interval '1 hour' as opens) window_start
  cross join lateral (select case when v.age_hours=0 then now() else window_start.opens end as consent_cutoff) timing
- where u.id=p_user and c.enabled and c.v3_enabled and u.created_at>=c.v3_start_at
+ where u.id=p_user and c.enabled and c.v3_enabled and now()>=c.v3_start_at and now()>=c.v3_cycle_start and now()<c.v3_cycle_end
    and u.email ~ '^[^[:space:]@]+@[^[:space:]@]+\.[^[:space:]@]+$'
    and u.email !~* '@resend\.dev$' and u.deleted_at is null and not coalesce(u.is_anonymous,false)
    and coalesce(u.banned_until<=now(),true)
@@ -79,7 +86,7 @@ language sql stable set search_path = pg_catalog as $$
    and not exists(select 1 from veeays_alerts.settings a where a.user_id=u.id and a.suppressed)
    and not exists(select 1 from veeays_alerts.deliveries a join veeays_alerts.provider_suppressions e using(provider_id) where a.user_id=u.id)
    and not exists(select 1 from veeays_lifecycle.deliveries d join veeays_lifecycle.provider_events e using(provider_id) where d.user_id=u.id)
-   and not exists(select 1 from welcome_private.deliveries w where w.user_id=u.id and w.outcome in ('bounced','complained','suppressed'))
+   and not exists(select 1 from welcome_private.deliveries w where w.user_id=u.id and (w.outcome in ('bounced','complained','suppressed') or exists(select 1 from veeays_lifecycle.provider_events e where e.provider_id=w.provider_id)))
    and not exists(select 1 from veeays_lifecycle.deliveries d where d.user_id=u.id and d.id is distinct from p_ignore
      and ((d.step=p_step and (d.first_attempt_at is not null or d.state in ('accepted','held','skipped')))
        or (d.state in ('leased','sending') and d.lease_until>now())))
@@ -96,15 +103,18 @@ create function public.claim_member_email_v3(p_token uuid)
 returns jsonb language plpgsql security definer set search_path = pg_catalog as $$
 declare d veeays_lifecycle.deliveries; recipient record;
 begin
- if p_token is null or not exists(select 1 from veeays_lifecycle.control where id and enabled and v3_enabled) then return null; end if;
+ if p_token is null or not exists(select 1 from veeays_lifecycle.control
+   where id and enabled and v3_enabled and now()>=v3_start_at
+   and now()>=v3_cycle_start and now()<v3_cycle_end and v3_next_send_at<=clock_timestamp()) then return null; end if;
  update veeays_lifecycle.deliveries
  set state=case when first_attempt_at is null then 'pending' else 'held' end, code='lease_expired'
  where state in ('leased','sending') and lease_until<=now();
  select u.id, v.step into recipient
  from auth.users u cross join veeays_lifecycle.v3_steps() v
  cross join lateral veeays_lifecycle.v3_candidate(u.id,v.step) eligibility
- where u.created_at >= now()-interval '744 hours'
- order by u.created_at limit 1;
+ where u.created_at <= now()-v.age_hours*interval '1 hour'
+   and u.created_at > now()-(v.age_hours+24)*interval '1 hour'
+ order by u.created_at+v.age_hours*interval '1 hour',u.id limit 1;
  if not found then return null; end if;
  insert into veeays_lifecycle.deliveries(user_id,step) values(recipient.id,recipient.step)
  on conflict(user_id,step) do nothing;
@@ -134,10 +144,11 @@ begin
  for update;
  if not found or p_payload is null or d.first_attempt_at is not null then return false; end if;
  select * into c from veeays_lifecycle.control where id for update;
- if not found or not c.enabled or not c.v3_enabled or p_daily_cap is distinct from c.daily_cap or p_monthly_cap is distinct from c.monthly_cap
-   or c.daily_cap<>5 or c.monthly_cap<>50 then return false; end if;
- if (select count(*) from veeays_lifecycle.deliveries where coalesce(first_attempt_at,accepted_at)>=date_trunc('day',now(),'UTC'))>=c.daily_cap
-   or (select count(*) from veeays_lifecycle.deliveries where coalesce(first_attempt_at,accepted_at)>=date_trunc('month',now(),'UTC'))>=c.monthly_cap
+ if not found or not c.enabled or not c.v3_enabled or c.v3_next_send_at>clock_timestamp()
+   or p_daily_cap is distinct from c.v3_daily_cap or p_monthly_cap is distinct from c.v3_cycle_cap
+   or now()<c.v3_cycle_start or now()>=c.v3_cycle_end then return false; end if;
+ if (select count(*) from veeays_lifecycle.deliveries where coalesce(first_attempt_at,accepted_at)>=date_trunc('day',now(),'UTC'))>=c.v3_daily_cap
+   or (select count(*) from veeays_lifecycle.deliveries where coalesce(first_attempt_at,accepted_at)>=c.v3_cycle_start)>=c.v3_cycle_cap
  then return false; end if;
  -- Serialize with preference writes and legacy send-slot reservations.
  perform 1 from veeays_lifecycle.preferences where user_id=d.user_id for update;
@@ -157,9 +168,47 @@ begin
  end if;
  insert into veeays_lifecycle.send_slots(key,user_id,kind) values('sequence:'||d.id::text,d.user_id,'sequence');
  update veeays_lifecycle.deliveries set state='sending',first_attempt_at=now(),payload=p_payload where id=d.id;
+ update veeays_lifecycle.control set v3_next_send_at=clock_timestamp()+interval '1 second' where id;
  return true;
 end;
 $$;
+
+-- Reuse the existing suppression ledger, including events received before settlement.
+create function public.record_member_email_v3_event(p_provider text,p_kind text)
+returns boolean language plpgsql security definer set search_path = pg_catalog as $$
+begin
+ if p_provider is null or length(p_provider) not between 1 and 128
+   or p_kind is null or p_kind not in ('bounced','complained','suppressed') then return false; end if;
+ -- Serialize with send admission before touching preferences.
+ perform 1 from veeays_lifecycle.control where id for update;
+ insert into veeays_lifecycle.provider_events(provider_id) values(p_provider) on conflict do nothing;
+ perform public.suppress_member_email(p_provider);
+ update welcome_private.deliveries set outcome=p_kind,updated_at=now()
+ where provider_id=p_provider and (outcome is distinct from 'complained' or p_kind='complained');
+ if p_kind='complained' then
+   update veeays_lifecycle.provider_events set v3_complained_at=now()
+   where provider_id=p_provider and v3_complained_at is null;
+   if found then update veeays_lifecycle.control set v3_enabled=false where id; end if;
+ end if;
+ return true;
+end;
+$$;
+
+create function public.pause_member_email_v3(p_seconds integer)
+returns boolean language plpgsql security definer set search_path = pg_catalog as $$
+begin
+ update veeays_lifecycle.control
+ set v3_next_send_at=greatest(v3_next_send_at,clock_timestamp()+make_interval(secs=>least(greatest(p_seconds,60),86400))),
+     v3_enabled=case when p_seconds is null then false else v3_enabled end
+ where id;
+ return found;
+end;
+$$;
+
+revoke all on function public.record_member_email_v3_event(text,text),public.pause_member_email_v3(integer)
+ from public,anon,authenticated;
+grant execute on function public.record_member_email_v3_event(text,text),public.pause_member_email_v3(integer)
+ to service_role;
 
 revoke all on function veeays_lifecycle.v3_steps(),veeays_lifecycle.v3_candidate(uuid,text,uuid)
  from public,anon,authenticated;

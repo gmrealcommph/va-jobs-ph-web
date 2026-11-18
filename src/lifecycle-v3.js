@@ -1,3 +1,4 @@
+import { verifyResendEvent } from './job-alerts-webhook.js';
 import { templates } from './lifecycle-v3-templates.js';
 
 const STAGING_DB = 'https://megedmsfdwtjxjejrxaq.supabase.co';
@@ -47,7 +48,7 @@ export async function runLifecycleV3(env, { call = rpc, request = fetch } = {}) 
   const monthlyCap = Number(env.LIFECYCLE_MONTHLY_CAP);
   if (!databaseTarget(env, db, origin) || !env.RESEND_API_KEY
       || (staging && env.LIFECYCLE_TEST_EMAIL !== FAKE_RECIPIENT)
-      || (production && (env.LIFECYCLE_TEST_EMAIL || dailyCap !== 5 || monthlyCap !== 50))
+      || (production && (env.LIFECYCLE_TEST_EMAIL || dailyCap > 2000 || monthlyCap > 50000))
       || !Number.isSafeInteger(dailyCap) || dailyCap < 1
       || !Number.isSafeInteger(monthlyCap) || monthlyCap < dailyCap) {
     return { status: 'configuration_blocked' };
@@ -99,23 +100,88 @@ export async function runLifecycleV3(env, { call = rpc, request = fetch } = {}) 
       },
       body: JSON.stringify(payload)
     });
+    if (!result.ok && production) {
+      const error = await result.json().catch(() => null);
+      const throttled = result.status === 429 && error?.name === 'rate_limit_exceeded';
+      const retryAfter = Number(result.headers.get('Retry-After'));
+      const pause = throttled ? Math.max(60, Math.min(86400, Math.ceil(retryAfter) || 60)) : null;
+      await call(env, 'hold_member_email', { ...args, p_code: throttled ? 'provider_rate_limit' : 'provider_rejected' });
+      await call(env, 'pause_member_email_v3', { p_seconds: pause });
+      return { status: throttled ? 'throttled' : 'provider_paused' };
+    }
     if (!result.ok) throw new Error('provider_unknown');
     const receipt = await result.json();
     if (typeof receipt?.id !== 'string' || !receipt.id
         || await call(env, 'finish_member_email', { ...args, p_provider: receipt.id }) !== true) {
       throw new Error('settlement_unknown');
     }
+    const used = result.headers.get('x-resend-monthly-quota');
+    if (production && used !== null && Number(used) >= 49_000) {
+      await call(env, 'pause_member_email_v3', { p_seconds: null });
+      return { status: 'quota_paused' };
+    }
     return { status: 'accepted' };
   } catch {
     await call(env, 'hold_member_email', { ...args, p_code: started ? 'ambiguous_after_start' : 'eligibility_or_preflight' });
+    if (production && started) await call(env, 'pause_member_email_v3', { p_seconds: 60 });
     return { status: 'held' };
   }
 }
 
 export async function scheduledLifecycleV3(env) {
-  let result;
-  try { result = await runLifecycleV3(env); } catch { result = { status: 'unavailable' }; }
-  console.info(JSON.stringify({ event: 'member_email_sequence_v3', ...result }));
+  const statuses = {};
+  try {
+    const batchSize = env.LIFECYCLE_MODE === 'production' ? 3 : 1;
+    for (let i = 0; i < batchSize; i++) {
+      const { status } = await runLifecycleV3(env);
+      statuses[status] = (statuses[status] || 0) + 1;
+      if (status !== 'accepted' || i === batchSize - 1) break;
+      await new Promise(resolve => setTimeout(resolve, 1100));
+    }
+  } catch {
+    statuses.unavailable = 1;
+  }
+  console.info(JSON.stringify({ event: 'member_email_sequence_v3', ...statuses }));
+}
+
+export async function lifecycleV3Webhook(request, env, { call = rpc } = {}) {
+  if (new URL(request.url).origin !== PRODUCTION_ORIGIN || !databaseTarget(env, PRODUCTION_DB, PRODUCTION_ORIGIN)) {
+    return new Response('Not found', { status: 404 });
+  }
+  if (request.method !== 'POST') {
+    return new Response('Method not allowed', { status: 405, headers: { Allow: 'POST' } });
+  }
+  if (!env.LIFECYCLE_WEBHOOK_SECRET) return new Response('Temporarily unavailable', { status: 503 });
+  let size = 0;
+  const reader = request.body?.pipeThrough(new TransformStream({
+    transform(chunk, controller) {
+      size += chunk.byteLength;
+      if (size > 64_000) throw new RangeError('Webhook body exceeds limit');
+      controller.enqueue(chunk);
+    }
+  }));
+  let body;
+  try { body = reader ? await new Response(reader).text() : ''; }
+  catch { return new Response('Invalid body', { status: 400 }); }
+  if (!await verifyResendEvent(request.headers, body, env.LIFECYCLE_WEBHOOK_SECRET)) {
+    return new Response('Unauthorized', { status: 401 });
+  }
+  try {
+    const event = JSON.parse(body);
+    const types = ['email.bounced', 'email.complained', 'email.suppressed'];
+    if (!types.includes(event.type)) return new Response(null, { status: 204 });
+    if (typeof event.data?.email_id !== 'string' || !event.data.email_id || event.data.email_id.length > 128) {
+      return new Response('Invalid event', { status: 400 });
+    }
+    const kind = event.type.slice('email.'.length);
+    if (await call(env, 'record_member_email_v3_event', { p_provider: event.data.email_id, p_kind: kind }) !== true) {
+      throw new Error('event_not_recorded');
+    }
+    console.info(JSON.stringify({ event: 'member_email_provider_event', kind }));
+    return new Response(null, { status: 204 });
+  } catch {
+    return new Response('Temporarily unavailable', { status: 503 });
+  }
 }
 
 export async function lifecycleV3Unsubscribe(request, env, { call = rpc } = {}) {
