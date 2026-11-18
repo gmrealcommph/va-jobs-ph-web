@@ -57,6 +57,8 @@ test('all HTML and text variants have the approved responsive header and unsubsc
       assert.match(html, /bgcolor="#ffffff" class="pad" style="background-color:#ffffff;padding:16px 28px/);
       assert.match(html, /src="https:\/\/veeays\.com\/veeays-logo\.png" width="160"/);
       assert.match(html, /max-width:480px[^]*?\.logo\{width:155px!important}/);
+      assert.match(html, /max-width:480px[^]*?\.heading\{font-size:28px!important;line-height:34px!important}/);
+      assert.match(html, /<h1 class="heading" style="font:800 39px/);
       for (const body of [html, text]) {
         assert.equal(body.includes('https://veeays.com/pro'), variant === 'free');
         assert.equal(body.split('{{{UNSUBSCRIBE_URL}}}').length, 2);
