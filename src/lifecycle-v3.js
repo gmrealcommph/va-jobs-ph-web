@@ -2,19 +2,26 @@ import { templates } from './lifecycle-v3-templates.js';
 
 const STAGING_DB = 'https://megedmsfdwtjxjejrxaq.supabase.co';
 const STAGING_ORIGIN = 'https://veeays-member-emails-staging.gm-realcommph.workers.dev';
+const PRODUCTION_DB = 'https://nwqmhqiymtqkdihjadrp.supabase.co';
+const PRODUCTION_ORIGIN = 'https://veeays.com';
 const FAKE_RECIPIENT = 'delivered@resend.dev';
 const SLOT = '{{{UNSUBSCRIBE_URL}}}';
 const TOKEN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
-function stagingTarget(env) {
-  return [STAGING_DB, STAGING_DB + '/'].includes(env.SUPABASE_URL)
-    && [STAGING_ORIGIN, STAGING_ORIGIN + '/'].includes(env.SITE_URL)
+function databaseTarget(env, db, origin) {
+  return [db, db + '/'].includes(env.SUPABASE_URL)
+    && [origin, origin + '/'].includes(env.SITE_URL)
     && !!env.SUPABASE_SERVICE_ROLE_KEY;
+}
+
+function isProductionRecipient(email) {
+  return typeof email === 'string' && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
+    && !/@resend\.dev$/i.test(email);
 }
 
 async function rpc(env, name, args) {
   const key = env.SUPABASE_SERVICE_ROLE_KEY;
-  const response = await fetch(`${STAGING_DB}/rest/v1/rpc/${name}`, {
+  const response = await fetch(`${env.SUPABASE_URL.replace(/\/$/, '')}/rest/v1/rpc/${name}`, {
     method: 'POST',
     redirect: 'manual',
     signal: AbortSignal.timeout(12_000),
@@ -25,16 +32,22 @@ async function rpc(env, name, args) {
     },
     body: JSON.stringify(args)
   });
-  if (!response.ok) throw new Error('staging_database_unavailable');
+  if (!response.ok) throw new Error('lifecycle_database_unavailable');
   return response.json();
 }
 
 export async function runLifecycleV3(env, { call = rpc, request = fetch } = {}) {
-  if (env.LIFECYCLE_MODE !== 'staging-v3') return { status: 'disabled' };
+  const staging = env.LIFECYCLE_MODE === 'staging-v3';
+  const production = env.LIFECYCLE_MODE === 'production' && env.LIFECYCLE_V3_ENABLED === 'true';
+  if (!staging && !production) return { status: 'disabled' };
+  const origin = staging ? STAGING_ORIGIN : PRODUCTION_ORIGIN;
+  const db = staging ? STAGING_DB : PRODUCTION_DB;
 
   const dailyCap = Number(env.LIFECYCLE_DAILY_CAP);
   const monthlyCap = Number(env.LIFECYCLE_MONTHLY_CAP);
-  if (!stagingTarget(env) || env.LIFECYCLE_TEST_EMAIL !== FAKE_RECIPIENT || !env.RESEND_API_KEY
+  if (!databaseTarget(env, db, origin) || !env.RESEND_API_KEY
+      || (staging && env.LIFECYCLE_TEST_EMAIL !== FAKE_RECIPIENT)
+      || (production && (env.LIFECYCLE_TEST_EMAIL || dailyCap !== 5 || monthlyCap !== 50))
       || !Number.isSafeInteger(dailyCap) || dailyCap < 1
       || !Number.isSafeInteger(monthlyCap) || monthlyCap < dailyCap) {
     return { status: 'configuration_blocked' };
@@ -49,16 +62,17 @@ export async function runLifecycleV3(env, { call = rpc, request = fetch } = {}) 
     const candidate = await call(env, 'check_member_email_v3', args);
     const template = candidate && Object.hasOwn(templates, claim.step)
       && ['free', 'pro'].includes(candidate.variant) && templates[claim.step][candidate.variant];
-    if (!template || candidate.email !== FAKE_RECIPIENT || !TOKEN.test(candidate.token)) {
+    const validRecipient = staging ? candidate?.email === FAKE_RECIPIENT : isProductionRecipient(candidate?.email);
+    if (!template || !validRecipient || !TOKEN.test(candidate.token)) {
       await call(env, 'defer_member_email', args);
       return { status: 'ineligible' };
     }
 
-    const unsubscribe = `${STAGING_ORIGIN}/member-emails/unsubscribe?token=${candidate.token}`;
+    const unsubscribe = `${origin}/member-emails/unsubscribe?token=${candidate.token}`;
     const payload = {
       from: 'VeeAys <jobs@veeays.com>',
       reply_to: 'support@veeays.com',
-      to: [FAKE_RECIPIENT],
+      to: [candidate.email],
       subject: template.subject,
       html: template.html.replace(SLOT, unsubscribe),
       text: template.text.replace(SLOT, unsubscribe),
@@ -111,7 +125,9 @@ export async function lifecycleV3Unsubscribe(request, env, { call = rpc } = {}) 
     'Referrer-Policy': 'no-referrer',
     'Content-Type': 'text/plain; charset=utf-8'
   };
-  if (!stagingTarget(env) || url.origin !== STAGING_ORIGIN) {
+  const staging = env.LIFECYCLE_MODE === 'staging-v3';
+  const origin = staging ? STAGING_ORIGIN : PRODUCTION_ORIGIN;
+  if (url.origin !== origin || !databaseTarget(env, staging ? STAGING_DB : PRODUCTION_DB, origin)) {
     return new Response('Not found', { status: 404, headers });
   }
   const token = url.searchParams.get('token') || '';

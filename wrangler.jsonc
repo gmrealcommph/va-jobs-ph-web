@@ -17,6 +17,9 @@
     ]
   },
   "vars": {
+    "LIFECYCLE_V3_ENABLED": "false",
+    "LIFECYCLE_DAILY_CAP": "5",
+    "LIFECYCLE_MONTHLY_CAP": "50",
     "JOB_ALERTS_MODE": "disabled",
     "JOB_REPORTS_ENABLED": "true",
     "JOB_HEALTH_VERIFY_ENABLED": "false",
