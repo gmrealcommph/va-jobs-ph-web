@@ -19,6 +19,7 @@ import { quickReadEndpoint } from './quick-read-service.js';
 import { manualNotification } from './notifications.js';
 import { scheduledStrongMatches } from './strong-matches.js';
 import { scheduledDailyDigest, DIGEST_CRON } from './daily-digest.js';
+import { lifecycleV3Unsubscribe, lifecycleV3Webhook, scheduledLifecycleV3 } from './lifecycle-v3.js';
 import { emailPreferences } from './email-preferences.js';
 import { categoryPage } from './category-page.js';
 import { legalPage } from './legal-pages.js';
@@ -62,6 +63,7 @@ export async function handle(request, env) {
   const url = new URL(request.url);
   if(['/resume-studio','/api/resume/review'].includes(url.pathname))return resumeEndpoint(request,env);
   if(url.pathname==='/saved-searches')return savedSearchesEndpoint(request,env);
+  if(url.pathname==='/webhooks/member-emails')return lifecycleV3Webhook(request,env);
   if(url.pathname==='/webhooks/job-alerts')return jobAlertsWebhook(request,env);
   if(/^\/jobs\/[1-9]\d{0,18}\/report$/.test(url.pathname)||['/admin/job-health','/admin/api/job-health'].includes(url.pathname)||(url.pathname==='/admin'&&url.searchParams.get('view')==='job-health'))return jobHealthEndpoint(request,env);
   if(url.pathname === '/privacy') refreshDeletionDisclosure(env);
@@ -78,6 +80,9 @@ export async function handle(request, env) {
     return manualNotification(request, env, manualMatch[1]);
   }
   if (url.pathname === '/job-alerts' || url.pathname === '/job-alerts/unsubscribe') return jobAlertsEndpoint(request,env);
+  if (url.pathname === '/member-emails/unsubscribe') {
+    return lifecycleV3Unsubscribe(request, env);
+  }
   if (url.pathname === '/email-preferences') { if(env.JOB_ALERTS_MODE==='enabled')return Response.redirect(url.origin+'/job-alerts',303); return emailPreferences(request, env); }
 
   const siteOrigin = origin(env, url);
@@ -1150,6 +1155,10 @@ if (
   }
 }
 export default { fetch: handle, scheduled(controller,env,ctx) {
+  if (env.LIFECYCLE_MODE === 'staging-v3') return scheduledLifecycleV3(env);
+  if (controller.cron === '* * * * *' && env.LIFECYCLE_MODE === 'production' && env.LIFECYCLE_V3_ENABLED === 'true') {
+    ctx.waitUntil(scheduledLifecycleV3(env));
+  }
   if(controller.cron===JOB_HEALTH_CRON)return scheduledJobHealth(controller,env);
   // Independent observer cannot delay or replace operational schedules.
   if(env.ADMIN_HEALTH_MONITOR_ENABLED==='true'&&controller.cron==='*/15 * * * *')ctx.waitUntil(scheduledAdminHealth(controller,env));

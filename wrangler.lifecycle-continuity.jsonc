@@ -1,0 +1,15 @@
+{
+  "name": "veeays-member-email-continuity",
+  "main": "src/lifecycle-v3-continuity.js",
+  "compatibility_date": "2026-10-01",
+  "workers_dev": false,
+  "preview_urls": false,
+  "routes": [
+    { "pattern": "veeays.com/member-emails/unsubscribe*", "zone_name": "veeays.com" },
+    { "pattern": "veeays.com/webhooks/member-emails*", "zone_name": "veeays.com" }
+  ],
+  "vars": {
+    "SITE_URL": "https://veeays.com",
+    "SUPABASE_URL": "https://nwqmhqiymtqkdihjadrp.supabase.co"
+  }
+}
