@@ -169,25 +169,35 @@ export async function lifecycleV3Webhook(request, env, { call = rpc } = {}) {
   try {
     const event = JSON.parse(body);
     const types = ['email.bounced', 'email.complained', 'email.suppressed'];
-    if (!types.includes(event.type)) return new Response(null, { status: 204 });
-    if (typeof event.data?.email_id !== 'string' || !event.data.email_id || event.data.email_id.length > 128) {
-      return new Response('Invalid event', { status: 400 });
+    if (types.includes(event.type)) {
+      if (typeof event.data?.email_id !== 'string' || !event.data.email_id || event.data.email_id.length > 128) {
+        return new Response('Invalid event', { status: 400 });
+      }
+      const kind = event.type.slice('email.'.length);
+      const { from, to } = event.data;
+      // The Resend account is shared. Only the VeeAys auth sender needs address
+      // matching because authentication messages lack lifecycle delivery IDs.
+      const authSender = typeof from === 'string'
+        && /^(?:no-reply@veeays\.com|[^<>]+<no-reply@veeays\.com>)$/i.test(from.trim());
+      const recipient = authSender
+        && Array.isArray(to) && to.length === 1 && typeof to[0] === 'string'
+        ? to[0].trim() : null;
+      if (await call(env, 'record_member_email_v3_event', {
+        p_provider: event.data.email_id, p_kind: kind, p_recipient: recipient
+      }) !== true) {
+        throw new Error('event_not_recorded');
+      }
+      console.info(JSON.stringify({ event: 'member_email_provider_event', kind }));
     }
-    const kind = event.type.slice('email.'.length);
-    const { from, to } = event.data;
-    // The Resend account is shared. Only the VeeAys auth sender needs address
-    // matching because authentication messages lack lifecycle delivery IDs.
-    const authSender = typeof from === 'string'
-      && /^(?:no-reply@veeays\.com|[^<>]+<no-reply@veeays\.com>)$/i.test(from.trim());
-    const recipient = authSender
-      && Array.isArray(to) && to.length === 1 && typeof to[0] === 'string'
-      ? to[0].trim() : null;
-    if (await call(env, 'record_member_email_v3_event', {
-      p_provider: event.data.email_id, p_kind: kind, p_recipient: recipient
-    }) !== true) {
-      throw new Error('event_not_recorded');
+    // Match the application's campaign bookkeeping for every authenticated
+    // provider event with an ID, including delivery and failure events.
+    // A false result simply means the event is not a matching campaign delivery.
+    // A transport/RPC failure must return 503 so the provider retries.
+    if (typeof event.data?.email_id === 'string') {
+      await call(env, 'veeays_v4_provider_event', {
+        p_provider: event.data.email_id, p_event: event.type
+      });
     }
-    console.info(JSON.stringify({ event: 'member_email_provider_event', kind }));
     return new Response(null, { status: 204 });
   } catch {
     return new Response('Temporarily unavailable', { status: 503 });

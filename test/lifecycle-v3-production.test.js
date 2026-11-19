@@ -31,6 +31,20 @@ test('production gates, exclusive Day 0 ownership, receipt retention and rollbac
         update veeays_lifecycle.preferences set suppressed=true where user_id in
           (select user_id from veeays_lifecycle.deliveries where provider_id=p_provider)
       $$;
+      create schema veeays_campaign;
+      create table veeays_campaign.deliveries(
+        campaign text, provider_id text, user_id uuid, provider_event text, updated_at timestamptz
+      );
+      create function public.veeays_v4_provider_event(p_provider text,p_event text) returns boolean language plpgsql security definer set search_path='' as $$
+      declare uid uuid;
+      begin
+        if p_event not in ('email.bounced','email.complained','email.suppressed','email.delivered','email.failed') then return false;end if;
+        update veeays_campaign.deliveries set provider_event=p_event,updated_at=now() where campaign='refer-earn-v4-20261029' and provider_id=p_provider returning user_id into uid;
+        if uid is not null and p_event in ('email.bounced','email.complained','email.suppressed') then
+          update veeays_lifecycle.preferences set suppressed=true where user_id=uid;
+        end if;
+        return uid is not null;
+      end $$;
       alter table veeays_lifecycle.control drop constraint control_daily_cap_check, drop constraint control_monthly_cap_check;
       update veeays_lifecycle.control set enabled=true, daily_cap=500, monthly_cap=10000;
       with users as (
@@ -139,6 +153,13 @@ test('production gates, exclusive Day 0 ownership, receipt retention and rollbac
       }), webhookEnv, { call });
     };
     assert.equal((await webhook('bounced', false)).status, 401);
+    await db.query("insert into veeays_campaign.deliveries(campaign,provider_id,user_id) values('refer-earn-v4-20261029','campaign-fixture',$1)", [user]);
+    assert.equal((await webhook('delivered', false, {email_id:'campaign-fixture'})).status,401);
+    assert.equal((await db.query("select provider_event from veeays_campaign.deliveries")).rows[0].provider_event,null);
+    for (const kind of ['delivered','failed','delivered']) {
+      assert.equal((await webhook(kind, true, {email_id:'campaign-fixture'})).status,204);
+      assert.equal((await db.query("select provider_event from veeays_campaign.deliveries")).rows[0].provider_event,'email.'+kind);
+    }
     assert.equal((await webhook('bounced')).status, 204);
     assert.equal((await webhook('suppressed')).status, 204);
     assert.equal((await webhook('complained')).status, 204);
